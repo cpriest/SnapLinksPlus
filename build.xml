@@ -143,8 +143,7 @@
 	</target>
 	
 	
-	<target name="publish" depends="update.rdf,release.ini">
-		<copy file="${build.dir}/update.rdf" todir="${www.dir}" overwrite="true"/>
+	<target name="publish" depends="release.ini">
 	</target>
 	
 
@@ -216,19 +215,6 @@
 	</target>
 	
 	
-	<target name="update.rdf" depends="set-pub-xpi-name,checksum">
-		<copy file="${src.dir}/update.rdf" todir="${build.dir}" overwrite="true"/>
-
-		<replace file="${build.dir}/update.rdf" propertyFile="${basedir}/release.properties">
-			<replacefilter token="@version@" value="${extension.publishedVersion}" />
-			<replacefilter token="@updateLink@" value="${extension.downloadsDirURL}${extension.published.xpi}" />
-			<replacefilter token="@minVersion@" property="extension.firefox.minVersion" />
-			<replacefilter token="@maxVersion@" property="extension.firefox.maxVersion" />
-			<replacefilter token="@checksum@" value="${extension.checksum.algorithm}:${extension.checksum.value}" />
-		</replace>
-	</target>
-	
-
 	<target name="xpi" depends="jar,set-xpi-name">
 		<delete file="${dist.dir}/${extension.xpi}"/>
 
