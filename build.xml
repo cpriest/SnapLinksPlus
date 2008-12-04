@@ -1,0 +1,283 @@
+<?xml version="1.0"?>
+<project name="snaplinks" default="build-dev">
+
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="dist.dir" value="${basedir}/dist" />
+	<property name="downloads.dir" value="${basedir}/downloads" />
+	<property name="www.dir" value="${basedir}/www" />
+	<property name="cert.dir" value="${basedir}/cert" />
+
+	<property file="${basedir}/release.properties"/>
+
+	<fileset id="src.root.files" dir="${src.dir}"> 
+		<include name="chrome.manifest"/>
+		<include name="defaults/**"/> 
+		<include name="license.*"/> 
+		<include name="gpl.txt"/> 
+		<exclude name="**/.cvsignore"/>
+	</fileset>	
+	
+
+	<target name="build-babelzilla" depends="clean,init,set-version-dev,copy-src-to-build,xpi-babelzilla">
+		<tstamp prefix="stop">
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
+		</tstamp>
+		<echo message="${extension.versionNumber.forThisBuild} ready ${stop.build.tstamp}" />
+	</target>
+	
+	
+	<target name="build-dev" depends="clean,init,set-version-dev,copy-src-to-build,xpi-dev">
+		<tstamp prefix="stop">
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
+		</tstamp>
+		<echo message="${extension.versionNumber.forThisBuild} ready ${stop.build.tstamp}" />
+	</target>
+	
+	
+	<target name="checksum">
+		<checksum file="${downloads.dir}/${extension.published.xpi}" 
+			algorithm="${extension.checksum.algorithm}" 
+			property="extension.checksum.value"/>
+	</target>	
+	
+
+	<target name="clean">
+		<delete includeemptydirs="true">
+			<fileset dir="${build.dir}" includes="**/*" excludes=".cvsignore" />
+		</delete>
+	</target>
+
+	
+	<target name="clean-dist">
+		<delete includeemptydirs="true">
+			<fileset dir="${dist.dir}" includes="**/*" excludes=".cvsignore" />
+		</delete>
+	</target>
+	
+	
+	<target name="copy-src-to-build" depends="init">
+		<copy todir="${build.dir}/src/chrome">
+			<fileset dir="${src.dir}" 
+				includes="content/**,locale/**,skin/**" 
+				excludes="**/.cvsignore,locale/**/*.properties"/>
+		</copy>
+		
+		<native2ascii src="${src.dir}" dest="${build.dir}/src/chrome" encoding="UTF-8">
+			<include name="locale/**/*.properties"/>
+		</native2ascii>
+
+		<copy todir="${build.dir}/src" overwrite="true">
+			<fileset refid="src.root.files"/>
+		</copy>
+
+		<replace file="${build.dir}/src/chrome.manifest">
+			<replacefilter token="jar:" value="" />
+			<replacefilter token="${extension.project}.jar!/" value="" />
+		</replace>
+
+		<copy todir="${build.dir}/src" file="${src.dir}/install.rdf" overwrite="true"/>
+
+		<replace file="${build.dir}/src/install.rdf" propertyFile="${basedir}/release.properties">
+			<replacefilter token="@id@" value="${extension.id}" />
+			<replacefilter token="@version@" value="${extension.versionNumber.forThisBuild}" />
+			<replacefilter token="@updateURL@" value="${extension.updateURL}" />
+			<replacefilter token="@homepageURL@" property="extension.homepageURL" />
+			<replacefilter token="@minVersion@" property="extension.firefox.minVersion" />
+			<replacefilter token="@maxVersion@" property="extension.firefox.maxVersion" />
+		</replace>
+	</target>
+	
+	
+	<target name="copy-src-to-xpi-build" depends="init,copy-src-to-build">
+		<mkdir dir="${build.dir}/xpi" />
+		<mkdir dir="${build.dir}/xpi/chrome" />
+
+		<copy todir="${build.dir}/xpi" overwrite="true">
+			<fileset refid="src.root.files"/>
+		</copy>
+	
+		<copy todir="${build.dir}/xpi" file="${build.dir}/src/install.rdf" overwrite="true"/>
+	</target>
+	
+
+	<target name="dist" depends="clean,set-version-dist,xpi-babelzilla,unpack-babelzilla-bundle,xpi,xpi-amo">
+		<copy file="${dist.dir}/${extension.xpi}" todir="${downloads.dir}" overwrite="true"/>
+		
+		<checksum 
+			file="${downloads.dir}/${extension.xpi}" 
+			algorithm="${extension.checksum.algorithm}" 
+			property="extension.downloads.xpi.checksum"/>
+		
+		<tstamp prefix="stop">
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
+		</tstamp>
+		
+		<echo message="${extension.versionNumber.forThisBuild} is ready ${stop.build.tstamp}" />
+		<echo message="${extension.checksum.algorithm} checsum is ${extension.downloads.xpi.checksum}" />
+	</target>
+	
+	
+	<target name="init">
+		<tstamp>
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
+			<format property="rss.pubDate" pattern="EEE, d MMM yyyy HH:mm:ss Z"/>
+		</tstamp>
+		
+		<property name="buildNumberFile" value=".buildNumbers/build.number.${extension.version}"/>
+		<buildnumber file="${buildNumberFile}"/>
+
+		<echo level="info" message="Version ${extension.version}-${extension.subVersion} Build ${build.number} started ${build.tstamp}"/>
+
+		<mkdir dir="${build.dir}/src" />
+		<mkdir dir="${build.dir}/src/chrome" />
+	</target>
+
+
+	<target name="jar" depends="copy-src-to-xpi-build">
+		<delete file="${build.dir}/xpi/chrome/${extension.project}.jar"/>
+		
+		<zip destfile="${build.dir}/xpi/chrome/${extension.project}.jar">
+			<zipfileset dir="${build.dir}/src/chrome" includes="**/*" excludes="**/amo.properties"/>
+		</zip>
+	</target>
+	
+	
+	<target name="publish" depends="update.rdf,release.ini">
+		<copy file="${build.dir}/update.rdf" todir="${www.dir}" overwrite="true"/>
+	</target>
+	
+
+	<target name="release.ini" depends="set-pub-xpi-name,checksum">
+		<concat destfile="${www.dir}/release.ini">
+			<string value="[release]&#0010;" />
+			<string value="version = &quot;${extension.publishedVersion}&quot;&#0010;" />
+			<string value="xpi = &quot;${extension.published.xpi}&quot;&#0010;" />
+			<string value="checksum = &quot;${extension.checksum.algorithm}:${extension.checksum.value}&quot;&#0010;" />
+		</concat>
+	</target>
+	
+	
+	<target name="repack-published-for-amo" depends="set-pub-xpi-name">
+		<property name="repack.dir" value="${build.dir}/amo.${DSTAMP}.${TSTAMP}"/>
+
+		<mkdir dir="${repack.dir}"/>
+
+		<unzip src="${downloads.dir}/${extension.published.xpi}" dest="${repack.dir}"/>
+
+		<replace file="${repack.dir}/install.rdf">
+			<replacefilter token="&lt;em:updateURL&gt;" value="&lt;!-- &lt;em:updateURL&gt;"/>
+			<replacefilter token="&lt;/em:updateURL&gt;" value="&lt;/em:updateURL&gt; --&gt;"/>
+		</replace>
+
+		<mkdir dir="${dist.dir}/amo" />
+
+		<delete file="${dist.dir}/amo/${extension.published.xpi}"/>
+		
+		<zip destfile="${dist.dir}/amo/${extension.published.xpi}">
+			<zipfileset dir="${repack.dir}" includes="*/**"/>
+		</zip>
+		
+		<delete dir="${repack.dir}"/>
+	</target>
+	
+	
+	<target name="set-pub-xpi-name">
+		<property name="extension.published.xpi" value="${extension.project}-${extension.publishedVersion}-fx.xpi"/>
+	</target>
+
+
+	<target name="set-version">
+		<property name="extension.versionNumber" value="${extension.version}${extension.subVersion}"/>
+	</target>		
+
+			
+	<target name="set-version-dev" depends="set-version">
+		<property name="extension.versionNumber.plusBuild" value="${extension.versionNumber}.0pre${build.number}"/>
+		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber.plusBuild}"/>
+	</target>
+	
+
+	<target name="set-version-dist" depends="set-version">
+		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber}"/>
+	</target>		
+	
+	
+	<target name="set-xpi-name">
+		<property name="extension.xpi" value="${extension.project}-${extension.versionNumber.forThisBuild}-fx.xpi"/>
+	</target>
+	
+
+	<target name="unpack-babelzilla-bundle">
+		<property name="babelzilla-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_replaced.tar.gz"/>
+		
+		<untar src="${basedir}/babelzilla/${babelzilla-bundle-tar-gz}" dest="${build.dir}/src/chrome/locale"
+			compression="gzip" overwrite="true"/>
+	</target>
+	
+	
+	<target name="update.rdf" depends="set-pub-xpi-name,checksum">
+		<copy file="${src.dir}/update.rdf" todir="${build.dir}" overwrite="true"/>
+
+		<replace file="${build.dir}/update.rdf" propertyFile="${basedir}/release.properties">
+			<replacefilter token="@version@" value="${extension.publishedVersion}" />
+			<replacefilter token="@updateLink@" value="${extension.downloadsDirURL}${extension.published.xpi}" />
+			<replacefilter token="@minVersion@" property="extension.firefox.minVersion" />
+			<replacefilter token="@maxVersion@" property="extension.firefox.maxVersion" />
+			<replacefilter token="@checksum@" value="${extension.checksum.algorithm}:${extension.checksum.value}" />
+		</replace>
+	</target>
+	
+
+	<target name="xpi" depends="jar,set-xpi-name">
+		<delete file="${dist.dir}/${extension.xpi}"/>
+
+		<zip destfile="${dist.dir}/${extension.xpi}">
+			<zipfileset dir="${build.dir}/xpi" includes="*/**" />
+		</zip>
+	</target>
+
+	
+	<target name="xpi-amo" depends="jar,set-xpi-name">
+		<mkdir dir="${build.dir}/amo" />
+
+		<copy file="${build.dir}/xpi/install.rdf" todir="${build.dir}/amo" overwrite="true"/>
+		
+		<replace file="${build.dir}/amo/install.rdf">
+			<replacefilter token="&lt;em:updateURL&gt;" value="&lt;!-- &lt;em:updateURL&gt;"/>
+			<replacefilter token="&lt;/em:updateURL&gt;" value="&lt;/em:updateURL&gt; --&gt;"/>
+		</replace>
+		
+		<mkdir dir="${dist.dir}/amo" />
+		
+		<delete file="${dist.dir}/amo/${extension.xpi}" />
+
+		<zip destfile="${dist.dir}/amo/${extension.xpi}">
+			<zipfileset dir="${build.dir}/xpi" includes="*/**" excludes="install.rdf"/>
+			<zipfileset dir="${build.dir}/amo" includes="install.rdf" />
+		</zip>
+	</target>
+
+	
+	<target name="xpi-babelzilla" depends="copy-src-to-build,set-xpi-name">
+		<mkdir dir="${dist.dir}/babelzilla" />
+		
+		<delete file="${dist.dir}/babelzilla/${extension.xpi}" />
+
+		<zip destfile="${dist.dir}/babelzilla/${extension.xpi}" filesonly="true">
+			<zipfileset dir="${build.dir}/src" includes="META-INF/zigbert.rsa"/>
+			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="META-INF/zigbert.rsa"/>
+		</zip>
+	</target>
+
+
+	<target name="xpi-dev" depends="copy-src-to-build,set-xpi-name">
+		<delete file="${dist.dir}/${extension.xpi}"/>
+		
+		<zip destfile="${dist.dir}/${extension.xpi}" filesonly="true">
+			<zipfileset dir="${build.dir}/src" includes="META-INF/zigbert.rsa"/>
+			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="META-INF/zigbert.rsa"/>
+		</zip>
+	</target>
+	
+</project>

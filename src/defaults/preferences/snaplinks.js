@@ -11,4 +11,4 @@ pref("extensions.snaplinks.linksthick",1);
 pref("extensions.snaplinks.drawpicker","#30AF00");
 pref("extensions.snaplinks.drawthick",3);
 
-pref("extensions.snaplinks@snaplinks.net.description", "chrome://snaplinks/locale/snaplinks.properties");  
+pref("extensions.snaplinks@snaplinks.mozdev.org.description", "chrome://snaplinks/locale/snaplinks.properties");  
