@@ -175,11 +175,18 @@ function eventMouseUp(e){
 			// This code didnt work well with the spell checking in FF 2.0
 			//evt.initMouseEvent("contextmenu", true, true, e.originalTarget.defaultView, 0,
 			//	e.screenX, e.screenY, e.clientX, e.clientY, false, false, false, false, 2, null);
-			//e.originalTarget.dispatchEvent(evt);
+			//	e.originalTarget.dispatchEvent(evt);
 
-		  	document.popupNode = e.originalTarget;
-			var obj = document.getElementById("contentAreaContextMenu");
-			obj.showPopup(this, e.clientX, e.clientY, "context", null, null);
+			evt.initMouseEvent("contextmenu", true, true, window, 0,
+				e.screenX, e.screenY, e.clientX, e.clientY, false, false, false, false, 2, null);
+				//e.originalTarget.dispatchEvent(evt);
+
+			var item = gContextMenu.target;
+			item.dispatchEvent(evt);
+
+		  	//document.popupNode = e.originalTarget;
+			//var obj = document.getElementById("contentAreaContextMenu");
+			//obj.showPopup(this, e.clientX, e.clientY, "context", null, null);
 			  
 			snaplStopPopup=true;
 		}
