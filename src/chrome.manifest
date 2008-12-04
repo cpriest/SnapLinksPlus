@@ -1,0 +1,8 @@
+content     snaplinks    jar:chrome/snaplinks.jar!/content/
+locale     snaplinks  en-US  jar:chrome/snaplinks.jar!/locale/en-US/
+locale     snaplinks  pt-PT  jar:chrome/snaplinks.jar!/locale/pt-PT/
+locale     snaplinks  fr-FR  jar:chrome/snaplinks.jar!/locale/fr-FR/
+locale     snaplinks  it-IT  jar:chrome/snaplinks.jar!/locale/it-IT/
+locale     snaplinks  nl-NL  jar:chrome/snaplinks.jar!/locale/nl-NL/
+locale     snaplinks  pl-PL  jar:chrome/snaplinks.jar!/locale/pl-PL/
+overlay chrome://browser/content/browser.xul chrome://snaplinks/content/snaplinks.xul

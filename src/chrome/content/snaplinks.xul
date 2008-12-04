@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE window SYSTEM "chrome://snaplinks/locale/snaplinks.dtd">
+
+<overlay id="snaplinks" 
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<script type="application/x-javascript" src="snaplinks.js"/>		 
+	<script type="application/x-javascript" src="process.js"/>		 
+	<script type="application/x-javascript" src="options.js"/>
+	<statusbar id="status-bar">
+		<statusbarpanel id="snaplinks-panel" label="&snaplinks.panel.loading;" hidden="true" tooltiptext="&snaplinks.panel.tooltip;"/>
+	</statusbar>
+	<popupset id="mainPopupSet">
+		<popup id="snaplMenu">
+			<menuitem label="&snaplinks.popup.newtabs;" oncommand="snaplActionNewTabs()"/>
+			<menuitem label="&snaplinks.popup.newwindows;" oncommand="snaplActionNewWindows()"/>
+			<separator class="groove-thin"/>
+			<menuitem label="&snaplinks.popup.bookmark;" oncommand="snaplActionBookmark()"/>
+			<menuitem label="&snaplinks.popup.download;" oncommand="snaplActionDownload()"/>
+			<menuitem label="&snaplinks.popup.clipboard;" oncommand="snaplActionClipboard()"/>
+			<separator class="groove-thin"/>
+			<menuitem label="&snaplinks.popup.tabsinnewwin;" oncommand="snaplActionTabsInNewWindow()"/>
+			<separator class="groove-thin"/>
+			<menuitem label="&snaplinks.popup.cancel;"/>
+		</popup>
+	</popupset>
+</overlay>
+

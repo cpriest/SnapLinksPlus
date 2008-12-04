@@ -1,0 +1,30 @@
+<!ENTITY snaplinks.dialog.snaplink "Snap Links - opcje">
+<!ENTITY snaplinks.mouse.caption "Przycisk myszy">
+<!ENTITY snaplinks.mouse.description "Przycisk myszy służący do zaznaczenia obszaru (zmiana wymaga ponownego uruchomienia)">
+<!ENTITY snaplinks.mouse.left "Lewy">
+<!ENTITY snaplinks.mouse.middle "Środkowy">
+<!ENTITY snaplinks.mouse.right "Prawy">
+<!ENTITY snaplinks.da.caption "Domyślne działanie">
+<!ENTITY snaplinks.da.description "Po zwolnieniu przycisku myszy:">
+<!ENTITY snaplinks.da.r0.newtabs "Otwórz odnośniki w nowych kartach (domyślne)">
+<!ENTITY snaplinks.da.r1.newwindows "Otwórz odnośniki w nowych oknach">
+<!ENTITY snaplinks.da.r2.tabsinnewwin "Otwórz odnośniki w nowym oknie">
+<!ENTITY snaplinks.da.r3.clipboard "Kopiuj odnośniki do schowka">
+<!ENTITY snaplinks.da.r4.bookmark "Dodaj zakładki do odnośników">
+<!ENTITY snaplinks.da.r5.download "Pobierz odnośniki">
+<!ENTITY snaplinks.drawing.caption "Wygląd obszaru zaznaczenia">
+<!ENTITY snaplinks.drawing.color "Kolor:">
+<!ENTITY snaplinks.drawing.thick "Grubość linii:">
+<!ENTITY snaplinks.links.caption "Wygląd wyróżnienia odnośników">
+<!ENTITY snaplinks.links.color "Kolor:">
+<!ENTITY snaplinks.links.thick "Grubość linii:">
+<!ENTITY snaplinks.adv.caption "Opcje zaawansowane">
+<!ENTITY snaplinks.adv.openleave "Otwórz odnośniki po opuszczeniu okna przez wskaźnik myszy">
+<!ENTITY snaplinks.adv.shownumber "Wyświetl na pasku stanu ilość odnośników w zaznaczonym obszarze">
+<!ENTITY snaplinks.adv.multiline "Przetwarzaj poprawnie złożone odnośniki (spowalnia)">
+<!ENTITY snaplinks.adv.preferbold "Preferuj odnośniki wyświetlone pogrubioną czcionką, gdy są tej samej wielkości (spowalnia)">
+<!ENTITY snaplinks.usage.caption "Informacje">
+<!ENTITY snaplinks.usage.description "Zaznaczanie obszaru z wciśniętym klawiszem:">
+<!ENTITY snaplinks.usage.line0 "- [Shift] powoduje wybranie wszystkich odnośników w zaznaczonym obszarze">
+<!ENTITY snaplinks.usage.line1 "- [Alt] powoduje przeniesienie zaznaczonego obszaru">
+<!ENTITY snaplinks.usage.line2 "- [Ctrl] powoduje po zwolnieniu przycisku myszy wyświetlenie menu kontekstowego">

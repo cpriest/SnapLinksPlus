@@ -1,0 +1,9 @@
+<!ENTITY snaplinks.panel.loading "Caricamento in corso...">
+<!ENTITY snaplinks.panel.tooltip "Snap Links">
+<!ENTITY snaplinks.popup.newtabs "Apri in nuove schede">
+<!ENTITY snaplinks.popup.newwindows "Apri in nuove finestre">
+<!ENTITY snaplinks.popup.bookmark "Aggiungi tutti nei segnalibri">
+<!ENTITY snaplinks.popup.download "Scarica tutti">
+<!ENTITY snaplinks.popup.clipboard "Copia negli appunti">
+<!ENTITY snaplinks.popup.tabsinnewwin "Apri schede in nuova finestra">
+<!ENTITY snaplinks.popup.cancel "Annulla">

@@ -1,0 +1,9 @@
+<!ENTITY snaplinks.panel.loading "Chargement…">
+<!ENTITY snaplinks.panel.tooltip "Snap Links">
+<!ENTITY snaplinks.popup.newtabs "Ouvrir dans de nouveaux onglets">
+<!ENTITY snaplinks.popup.newwindows "Ouvrir dans de nouvelles fenêtres">
+<!ENTITY snaplinks.popup.bookmark "Marquer les liens">
+<!ENTITY snaplinks.popup.download "Enregistrer les cibles des liens sous…">
+<!ENTITY snaplinks.popup.clipboard "Copier les liens dans le presse-papiers">
+<!ENTITY snaplinks.popup.tabsinnewwin "Ouvrir les onglets dans une nouvelle fenêtre">
+<!ENTITY snaplinks.popup.cancel "Annuler">

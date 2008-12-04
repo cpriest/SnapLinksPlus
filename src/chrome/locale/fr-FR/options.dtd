@@ -1,0 +1,30 @@
+<!ENTITY snaplinks.dialog.snaplink "Options de Snap Links">
+<!ENTITY snaplinks.mouse.caption "Bouton de la souris">
+<!ENTITY snaplinks.mouse.description "Bouton de souris utilisé pour le dessin (une modification nécessite l&apos;actualisation du navigateur) :">
+<!ENTITY snaplinks.mouse.left "Bouton gauche">
+<!ENTITY snaplinks.mouse.middle "Bouton central">
+<!ENTITY snaplinks.mouse.right "Bouton droit">
+<!ENTITY snaplinks.da.caption "Action par défaut">
+<!ENTITY snaplinks.da.description "Action exécutée quand le bouton choisi est relâché :">
+<!ENTITY snaplinks.da.r0.newtabs "Ouvrir les liens dans de nouveaux onglets (par défaut)">
+<!ENTITY snaplinks.da.r1.newwindows "Ouvrir les liens dans de nouvelles fenêtres">
+<!ENTITY snaplinks.da.r2.tabsinnewwin "Ouvrir les liens dans une nouvelle fenêtre">
+<!ENTITY snaplinks.da.r3.clipboard "Copier les liens dans le presse-papiers">
+<!ENTITY snaplinks.da.r4.bookmark "Marquer les liens">
+<!ENTITY snaplinks.da.r5.download "Enregistrer la cible des liens sous…">
+<!ENTITY snaplinks.drawing.caption "Cadre de la zone sélectionnée">
+<!ENTITY snaplinks.drawing.color "Couleur :">
+<!ENTITY snaplinks.drawing.thick "Épaisseur :">
+<!ENTITY snaplinks.links.caption "Cadre des liens sélectionnés">
+<!ENTITY snaplinks.links.color "Couleur :">
+<!ENTITY snaplinks.links.thick "Épaisseur :">
+<!ENTITY snaplinks.adv.caption "Options avancées">
+<!ENTITY snaplinks.adv.openleave "Ouvrir les liens quand la souris sort de la fenêtre">
+<!ENTITY snaplinks.adv.shownumber "Afficher le nombre de liens sélectionnés dans la barre d&apos;état">
+<!ENTITY snaplinks.adv.multiline "Lancer correctement les liens multi-lignes (plus lent)">
+<!ENTITY snaplinks.adv.preferbold "Préférer les liens en gras parmi ceux de même taille (plus lent)">
+<!ENTITY snaplinks.usage.caption "Mode d&apos;emploi">
+<!ENTITY snaplinks.usage.description "Faites glisser le bouton de souris choisi afin de sélectionner des liens, et :">
+<!ENTITY snaplinks.usage.line0 "- conservez enfoncée la touche Maj pour récupérer tous les liens de la zone choisie">
+<!ENTITY snaplinks.usage.line1 "- conservez enfoncée la touche Alt pour déplacer la sélection">
+<!ENTITY snaplinks.usage.line2 "- conservez enfoncée la touche Ctrl avant de relâcher le bouton de la souris afin de voir dans un menu les actions possibles">
