@@ -48,7 +48,7 @@
 	</target>
 	
 	
-	<target name="build-dev" depends="clean,init,set-version-dev,copy-src-to-build,xpi-dev">
+	<target name="build-dev" depends="clean,init,set-version-dev,copy-src-to-build,xpi-dev,xpi-babelzilla">
 		<tstamp prefix="stop">
 			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
 		</tstamp>
@@ -95,6 +95,7 @@
 
 		<copy todir="${build.dir}/src" file="${src.dir}/install.rdf" overwrite="true"/>
 
+		<!-- Patch install.rdf -->
 		<replace file="${build.dir}/src/install.rdf" propertyFile="${basedir}/release.properties">
 			<replacefilter token="@id@" value="${extension.id}" />
 			<replacefilter token="@version@" value="${extension.versionNumber.forThisBuild}" />
@@ -138,7 +139,6 @@
 	<target name="init">
 		<tstamp>
 			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
-			<format property="rss.pubDate" pattern="EEE, d MMM yyyy HH:mm:ss Z"/>
 		</tstamp>
 		
 		<property name="buildNumberFile" value=".buildNumbers/build.number.${extension.version}"/>
@@ -174,7 +174,8 @@
 	<target name="publish" depends="release.ini">
 	</target>
 	
-
+	
+	<!-- Create release.ini file which is read by www/local.conf -->
 	<target name="release.ini" depends="set-pub-xpi-name,checksum">
 		<concat destfile="${www.dir}/release.ini">
 			<string value="[release]&#0010;" />
@@ -185,6 +186,7 @@
 	</target>
 	
 	
+	<!-- Repack an existing xpi file as AMO release. --> 
 	<target name="repack-published-for-amo" depends="set-pub-xpi-name">
 		<property name="repack.dir" value="${build.dir}/amo.${DSTAMP}.${TSTAMP}"/>
 
@@ -192,6 +194,7 @@
 
 		<unzip src="${downloads.dir}/${extension.published.xpi}" dest="${repack.dir}"/>
 
+		<!-- Comment out updateURL as AMO does not allow it. -->
 		<replace file="${repack.dir}/install.rdf">
 			<replacefilter token="&lt;em:updateURL&gt;" value="&lt;!-- &lt;em:updateURL&gt;"/>
 			<replacefilter token="&lt;/em:updateURL&gt;" value="&lt;/em:updateURL&gt; --&gt;"/>
@@ -239,35 +242,37 @@
 		<mkdir dir="${build.dir}/all_locales_replaced" />
 
 		<property name="babelzilla-replaced-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_replaced.tar.gz"/>
-		
+
+		<!-- Unpack the string bundle. -->
 		<untar src="${basedir}/babelzilla/${babelzilla-replaced-bundle-tar-gz}" dest="${build.dir}/all_locales_replaced/locale"
 			compression="gzip" overwrite="true"/>
 
+		<!-- Move all files except .properties to .xpi build directory. -->
+		<!-- Also, exclude the default locale (en-US) -->
 		<move todir="${build.dir}/src/chrome" overwrite="true">
 			<fileset dir="${build.dir}/all_locales_replaced" 
 				includes="*/**" 
 				excludes="**/*.properties,**/en-US/**,**/contents.rdf"/>
 		</move>
 
+		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
 		<copy todir="${build.dir}/src/chrome" overwrite="true">
 			<fileset dir="${src.dir}" 
 				includes="locale/**" 
 				excludes="**/.cvsignore,locale/**/*.properties"/>
 		</copy>
 
+		<!-- Encode .properties files of the default locale
+		<!   and store the results to the .xpi build directory. -->
 		<native2ascii src="${src.dir}" dest="${build.dir}/src/chrome" encoding="UTF-8">
 			<include name="locale/**/*.properties"/>
 		</native2ascii>
 
+		<!-- Encode .properties from the bundle -->
 		<native2ascii src="${build.dir}/all_locales_replaced" dest="${build.dir}/src/chrome" encoding="UTF-8">
 			<include name="locale/**/*.properties"/>
 			<exclude name="locale/en-US/**"/>
 		</native2ascii>
-
-		<replace dir="${build.dir}/src/chrome/locale">
-			<include name="**/snaplinks.properties"/>
-			<replacefilter token="snaplinks@snaplinks.net" value="snaplinks@snaplinks.mozdev.org"/>
-		</replace>
 	</target>
 	
 	
@@ -276,34 +281,36 @@
 
 		<property name="babelzilla-blank-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_blank.tar.gz"/>
 		
+		<!-- Unpack the string bundle. -->
 		<untar src="${basedir}/babelzilla/${babelzilla-blank-bundle-tar-gz}" dest="${build.dir}/all_locales_blank/locale"
 			compression="gzip" overwrite="true"/>
 
+		<!-- Move all files except .properties to .xpi build directory. -->
+		<!-- Also, exclude the default locale (en-US) -->
 		<move todir="${build.dir}/babelzilla/chrome" overwrite="true">
 			<fileset dir="${build.dir}/all_locales_blank" 
 				includes="*/**" 
 				excludes="**/*.properties,**/en-US/**,**/contents.rdf"/>
 		</move>
 
+		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
 		<copy todir="${build.dir}/babelzilla/chrome" overwrite="true">
 			<fileset dir="${src.dir}" 
 				includes="locale/**" 
 				excludes="**/.cvsignore,locale/**/*.properties"/>
 		</copy>
 
+		<!-- Encode .properties files of the default locale
+		<!   and store the results to the .xpi build directory. -->
 		<native2ascii src="${src.dir}" dest="${build.dir}/babelzilla/chrome" encoding="UTF-8">
 			<include name="locale/**/*.properties"/>
 		</native2ascii>
 
+		<!-- Encode .properties from the bundle -->
 		<native2ascii src="${build.dir}/all_locales_blank" dest="${build.dir}/babelzilla/chrome" encoding="UTF-8">
 			<include name="locale/**/*.properties"/>
 			<exclude name="locale/en-US/**"/>
 		</native2ascii>
-
-		<replace dir="${build.dir}/babelzilla/chrome/locale">
-			<include name="**/snaplinks.properties"/>
-			<replacefilter token="snaplinks@snaplinks.net" value="snaplinks@snaplinks.mozdev.org"/>
-		</replace>
 	</target>
 	
 	
@@ -316,11 +323,12 @@
 	</target>
 
 	
-	<target name="xpi-amo" depends="jar,set-xpi-name">
+	<target name="xpi-amo" depends="jar,set-xpi-name,unpack-babelzilla-replaced-bundle">
 		<mkdir dir="${build.dir}/amo" />
 
 		<copy file="${build.dir}/xpi/install.rdf" todir="${build.dir}/amo" overwrite="true"/>
 		
+		<!-- Comment out updateURL as AMO does not allow it. -->
 		<replace file="${build.dir}/amo/install.rdf">
 			<replacefilter token="&lt;em:updateURL&gt;" value="&lt;!-- &lt;em:updateURL&gt;"/>
 			<replacefilter token="&lt;/em:updateURL&gt;" value="&lt;/em:updateURL&gt; --&gt;"/>
@@ -336,8 +344,11 @@
 		</zip>
 	</target>
 
-	
-	<target name="xpi-babelzilla" depends="copy-src-to-build,set-xpi-name,unpack-babelzilla-blank-bundle">
+
+	<!-- Make a special .xpi for Babelzilla:
+	<!   - Untranslated strings are blank.
+	<!   - Do not pack the content and the locale files into a jar file. -->
+	<target name="xpi-babelzilla" depends="copy-src-to-build,set-xpi-name,unpack-babelzilla-blank-bundle,jar">
 		<mkdir dir="${dist.dir}/babelzilla" />
 		
 		<delete file="${dist.dir}/babelzilla/${extension.xpi}" />
@@ -350,7 +361,7 @@
 	</target>
 
 
-	<target name="xpi-dev" depends="copy-src-to-build,set-xpi-name">
+	<target name="xpi-dev" depends="copy-src-to-build,set-xpi-name,unpack-babelzilla-replaced-bundle">
 		<delete file="${dist.dir}/${extension.xpi}"/>
 		
 		<zip destfile="${dist.dir}/${extension.xpi}" filesonly="true">
