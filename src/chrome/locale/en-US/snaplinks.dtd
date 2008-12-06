@@ -1,9 +1,0 @@
-<!ENTITY snaplinks.panel.loading      "Loading...">
-<!ENTITY snaplinks.panel.tooltip      "Snap Links">
-<!ENTITY snaplinks.popup.newtabs      "Open in New Tabs">
-<!ENTITY snaplinks.popup.newwindows   "Open in New Windows">
-<!ENTITY snaplinks.popup.bookmark     "Bookmark All">
-<!ENTITY snaplinks.popup.download     "Download All">
-<!ENTITY snaplinks.popup.clipboard    "Copy to Clipboard">
-<!ENTITY snaplinks.popup.tabsinnewwin "Open Tabs in New Window">
-<!ENTITY snaplinks.popup.cancel       "Cancel">

@@ -8,9 +8,10 @@
 	    <em:name>Snap Links</em:name>
 	    <em:version>@version@</em:version>
 	    <em:type>2</em:type>
-	    <!--em:description>Opens multiple links contained in a selected area in new tabs</em:description-->
+	    <em:description>Opens multiple links contained in a selected area in new tabs</em:description>
 
 	    <em:creator>savred</em:creator>
+
 	    <em:contributor>Atreus (FF3 update)</em:contributor>
 	    <em:contributor>Mumbly Juergens (project member, FF3 update)</em:contributor>
 	    <em:contributor>Jeff Sugar (project owner)</em:contributor>

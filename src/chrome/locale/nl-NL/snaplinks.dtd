@@ -1,9 +1,0 @@
-<!ENTITY snaplinks.panel.loading "Laden...">
-<!ENTITY snaplinks.panel.tooltip "Snap Links">
-<!ENTITY snaplinks.popup.newtabs "In nieuwe tabbladen openen">
-<!ENTITY snaplinks.popup.newwindows "In nieuwe vensters openen">
-<!ENTITY snaplinks.popup.bookmark "Van alles bladwijzers maken">
-<!ENTITY snaplinks.popup.download "Alles downloaden">
-<!ENTITY snaplinks.popup.clipboard "Naar Klembord kopiëren">
-<!ENTITY snaplinks.popup.tabsinnewwin "Tabbladen in nieuw venster openen">
-<!ENTITY snaplinks.popup.cancel "Annuleren">

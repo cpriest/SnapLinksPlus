@@ -1,9 +1,0 @@
-<!ENTITY snaplinks.panel.loading      "A carregar...">
-<!ENTITY snaplinks.panel.tooltip      "Snap Links">
-<!ENTITY snaplinks.popup.newtabs      "Abrir em Novos Separadores">
-<!ENTITY snaplinks.popup.newwindows   "Abrir em Novas Janelas">
-<!ENTITY snaplinks.popup.bookmark     "Criar Marcadores">
-<!ENTITY snaplinks.popup.download     "Transferir">
-<!ENTITY snaplinks.popup.clipboard    "Copiar">
-<!ENTITY snaplinks.popup.tabsinnewwin "Abrir Separadores numa Nova Janela">
-<!ENTITY snaplinks.popup.cancel       "Cancelar">

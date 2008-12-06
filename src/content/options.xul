@@ -2,6 +2,26 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <!DOCTYPE window SYSTEM "chrome://snaplinks/locale/options.dtd">
 
+<!--
+	options.xul
+    Copyright (C) 2008	Pedro Fonseca (savred at gmail)
+    
+    This file is part of Snap Links.
+
+    Snap Links is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Snap Links is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
 <dialog buttons="accept, cancel"
         id="snaplinks-options-dialog"
         ondialogaccept="snaplSaveOptions()"
@@ -11,6 +31,10 @@
 
 	<script type="application/x-javascript" src="chrome://snaplinks/content/options.js"/>
 	
+	<style type="text/css">
+		colorpicker {width=100}
+	</style>
+
 	<groupbox>
 		<caption label="&snaplinks.mouse.caption;"/>
 		<description value="&snaplinks.mouse.description;"/>
@@ -49,7 +73,7 @@
 			<vbox>
 				<hbox align="center">
 					<label value="&snaplinks.drawing.color;"/>
-					<colorpicker width="100" type="button" id="snaplinks.drawpicker" prefstring="extensions.snaplinks.drawpicker" onchange="snaplUpdateLineSamples()"/>
+					<colorpicker type="button" id="snaplinks.drawpicker" prefstring="extensions.snaplinks.drawpicker" onchange="snaplUpdateLineSamples()"/>
 					<spacer flex="2"/>
 				</hbox>
 				<hbox align="center">
@@ -84,7 +108,7 @@
 			<vbox>
 				<hbox align="center">
 					<label value="&snaplinks.links.color;"/>
-					<colorpicker width="100" type="button" id="snaplinks.linkspicker" prefstring="extensions.snaplinks.linkspicker" onchange="snaplUpdateLineSamples()"/>
+					<colorpicker type="button" id="snaplinks.linkspicker" prefstring="extensions.snaplinks.linkspicker" onchange="snaplUpdateLineSamples()"/>
 					<spacer flex="2"/>
 				</hbox>
 				<hbox align="center">
