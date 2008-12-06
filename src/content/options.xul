@@ -4,7 +4,8 @@
 
 <!--
 	options.xul
-    Copyright (C) 2008	Pedro Fonseca (savred at gmail)
+    Copyright (C) 2007	Pedro Fonseca (savred at gmail)
+    Copyright (C) 2008	Tommi Rautava
     
     This file is part of Snap Links.
 
@@ -31,10 +32,6 @@
 
 	<script type="application/x-javascript" src="chrome://snaplinks/content/options.js"/>
 	
-	<style type="text/css">
-		colorpicker {width=100}
-	</style>
-
 	<groupbox>
 		<caption label="&snaplinks.mouse.caption;"/>
 		<description value="&snaplinks.mouse.description;"/>
@@ -73,7 +70,7 @@
 			<vbox>
 				<hbox align="center">
 					<label value="&snaplinks.drawing.color;"/>
-					<colorpicker type="button" id="snaplinks.drawpicker" prefstring="extensions.snaplinks.drawpicker" onchange="snaplUpdateLineSamples()"/>
+					<colorpicker width="100" type="button" id="snaplinks.drawpicker" prefstring="extensions.snaplinks.drawpicker" onchange="snaplUpdateLineSamples()"/>
 					<spacer flex="2"/>
 				</hbox>
 				<hbox align="center">
@@ -108,7 +105,7 @@
 			<vbox>
 				<hbox align="center">
 					<label value="&snaplinks.links.color;"/>
-					<colorpicker type="button" id="snaplinks.linkspicker" prefstring="extensions.snaplinks.linkspicker" onchange="snaplUpdateLineSamples()"/>
+					<colorpicker width="100" type="button" id="snaplinks.linkspicker" prefstring="extensions.snaplinks.linkspicker" onchange="snaplUpdateLineSamples()"/>
 					<spacer flex="2"/>
 				</hbox>
 				<hbox align="center">
