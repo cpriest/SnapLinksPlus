@@ -162,7 +162,7 @@
 	</target>
 	
 
-	<target name="jar" depends="copy-src-to-xpi-build">
+	<target name="jar" depends="copy-src-to-xpi-build,unpack-babelzilla-replaced-bundle">
 		<delete file="${build.dir}/xpi/chrome/${ant.project.name}.jar"/>
 		
 		<zip destfile="${build.dir}/xpi/chrome/${ant.project.name}.jar">
@@ -187,7 +187,7 @@
 	
 	
 	<!-- Repack an existing xpi file as AMO release. --> 
-	<target name="repack-published-for-amo" depends="set-pub-xpi-name">
+	<target name="repack-published-for-amo" depends="init-amo,set-pub-xpi-name">
 		<property name="repack.dir" value="${build.dir}/amo.${DSTAMP}.${TSTAMP}"/>
 
 		<mkdir dir="${repack.dir}"/>
@@ -314,7 +314,7 @@
 	</target>
 	
 	
-	<target name="xpi" depends="jar,set-xpi-name,unpack-babelzilla-replaced-bundle">
+	<target name="xpi" depends="set-xpi-name,unpack-babelzilla-replaced-bundle,jar">
 		<delete file="${dist.dir}/${extension.xpi}"/>
 
 		<zip destfile="${dist.dir}/${extension.xpi}">
@@ -323,7 +323,7 @@
 	</target>
 
 	
-	<target name="xpi-amo" depends="jar,set-xpi-name,unpack-babelzilla-replaced-bundle">
+	<target name="xpi-amo" depends="init-amo,set-xpi-name,unpack-babelzilla-replaced-bundle,jar">
 		<mkdir dir="${build.dir}/amo" />
 
 		<copy file="${build.dir}/xpi/install.rdf" todir="${build.dir}/amo" overwrite="true"/>
@@ -348,7 +348,7 @@
 	<!-- Make a special .xpi for Babelzilla:
 	<!   - Untranslated strings are blank.
 	<!   - Do not pack the content and the locale files into a jar file. -->
-	<target name="xpi-babelzilla" depends="copy-src-to-build,set-xpi-name,unpack-babelzilla-blank-bundle,jar">
+	<target name="xpi-babelzilla" depends="set-xpi-name,copy-src-to-build,unpack-babelzilla-blank-bundle,jar">
 		<mkdir dir="${dist.dir}/babelzilla" />
 		
 		<delete file="${dist.dir}/babelzilla/${extension.xpi}" />
@@ -361,7 +361,7 @@
 	</target>
 
 
-	<target name="xpi-dev" depends="copy-src-to-build,set-xpi-name,unpack-babelzilla-replaced-bundle">
+	<target name="xpi-dev" depends="set-xpi-name,copy-src-to-build,unpack-babelzilla-replaced-bundle">
 		<delete file="${dist.dir}/${extension.xpi}"/>
 		
 		<zip destfile="${dist.dir}/${extension.xpi}" filesonly="true">
