@@ -22,14 +22,20 @@
 
 <project name="snaplinks" default="build-dev">
 
+	<property file="${basedir}/release.properties" />
+	<property file="${basedir}/credentials.properties" />
+
+	<property name="babelzilla.dir" value="${basedir}/babelzilla" />
 	<property name="build.dir" value="${basedir}/build" />
-	<property name="src.dir" value="${basedir}/src" />
+	<property name="cert.dir" value="${basedir}/cert" />
 	<property name="dist.dir" value="${basedir}/dist" />
 	<property name="downloads.dir" value="${basedir}/downloads" />
+	<property name="src.dir" value="${basedir}/src" />
 	<property name="www.dir" value="${basedir}/www" />
-	<property name="cert.dir" value="${basedir}/cert" />
-
-	<property file="${basedir}/release.properties"/>
+	
+	<property name="releaseIni.file" value="${www.dir}/release.ini"/>
+	<property name="buildNumber.file" value="${basedir}/.buildNumbers/build.number.${extension.version}"/>
+	<property name="credentials.file" value="${basedir}/credentials.properties" />
 
 	<fileset id="src.root.files" dir="${src.dir}"> 
 		<include name="chrome.manifest"/>
@@ -38,8 +44,19 @@
 		<include name="gpl.txt"/> 
 		<exclude name="**/.cvsignore"/>
 	</fileset>	
-	
 
+	<condition property="existsCredentialsFile">
+		<available file="${credentials.file}"/>
+	</condition>
+
+	<condition property="isUnsetBabelzillaCredentials">
+		<or>
+			<equals arg1="${babelzilla.username}" arg2="" />
+			<equals arg1="${babelzilla.password}" arg2="" />
+		</or>
+	</condition>
+	
+	
 	<target name="build-babelzilla" depends="clean,init,set-version-dev,copy-src-to-build,xpi-babelzilla">
 		<tstamp prefix="stop">
 			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
@@ -119,6 +136,16 @@
 	</target>
 	
 
+	<target name="create-credentials-file" unless="existsCredentialsFile">
+		<concat destfile="${credentials.file}">
+			<string value="babelzilla.username = &#0010;" />
+			<string value="babelzilla.password = &#0010;" />
+		</concat>
+		
+		<fail message="Enter your credentials to the newly created file: ${credentials.file}"/>
+	</target>
+	
+
 	<target name="dist" depends="clean,set-version-dist,xpi-babelzilla,xpi,xpi-amo">
 		<copy file="${dist.dir}/${extension.xpi}" todir="${downloads.dir}" overwrite="true"/>
 		
@@ -135,15 +162,47 @@
 		<echo message="${extension.checksum.algorithm} checsum is ${extension.downloads.xpi.checksum}" />
 	</target>
 	
-	
-	<target name="init">
-		<tstamp>
-			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
-		</tstamp>
-		
-		<property name="buildNumberFile" value=".buildNumbers/build.number.${extension.version}"/>
-		<buildnumber file="${buildNumberFile}"/>
+<!--
+	<target name="download-from-babelzilla" depends="download-from-babelzilla-prerequirements"
+		description="Download locale bundles from Babelzilla">
+		<exec executable="attrib" osfamily="windows">
+			<arg value="-r"/>
+			<arg file="${babelzilla.dir}\${extension.babelzillaFilenamePrefix}_all_locales_replaced.tar.gz"/>
+		</exec>
 
+		<exec executable="attrib" osfamily="windows">
+			<arg value="-r"/>
+			<arg file="${babelzilla.dir}\${extension.babelzillaFilenamePrefix}_all_locales_blank.tar.gz"/>
+		</exec>
+
+		<exec executable="attrib" osfamily="windows">
+			<arg value="-r"/>
+			<arg file="${babelzilla.dir}\${extension.babelzillaFilenamePrefix}_all_locales_skipped.tar.gz"/>
+		</exec>
+
+		<get src="http://www.babelzilla.org/index.php?option=com_wts&amp;Itemid=88&amp;type=downloadtar&amp;extension=4497"
+			dest="${babelzilla.dir}/${extension.babelzillaFilenamePrefix}_all_locales_replaced.tar.gz"
+			verbose="true" ignoreerrors="false"
+			username="${babelzilla.username}" password="${babelzilla.password}"/>
+
+		<get src="http://www.babelzilla.org/index.php?option=com_wts&amp;Itemid=88&amp;type=downloadempty&amp;extension=4497"
+			dest="${babelzilla.dir}/${extension.babelzillaFilenamePrefix}_all_locales_blank.tar.gz"
+			verbose="true" ignoreerrors="false"
+			username="${babelzilla.username}" password="${babelzilla.password}"/>
+
+		<get src="http://www.babelzilla.org/index.php?option=com_wts&amp;Itemid=88&amp;type=downloadskip&amp;extension=4497"
+			dest="${babelzilla.dir}/${extension.babelzillaFilenamePrefix}_all_locales_skipped.tar.gz"
+			verbose="true" ignoreerrors="false"
+			username="${babelzilla.username}" password="${babelzilla.password}"/>
+	</target>
+-->
+	
+	<target name="download-from-babelzilla-prerequirements" depends="create-credentials-file" if="isUnsetBabelzillaCredentials">
+		<fail message="Credentials are not defined in ${credentials.file}" />
+	</target>
+		
+		
+	<target name="init" depends="init-build">
 		<echo level="info" message="Version ${extension.version}-${extension.subVersion} Build ${build.number} started ${build.tstamp}"/>
 
 		<mkdir dir="${build.dir}/src" />
@@ -162,6 +221,21 @@
 	</target>
 	
 
+	<target name="init-build">
+		<tstamp>
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
+		</tstamp>
+		
+		<!-- Make the build number file writable. -->
+		<exec executable="attrib" dir="${basedir}" osfamily="windows">
+			<arg value="-r"/>
+			<arg file="${buildNumber.file}"/>
+		</exec>
+
+		<buildnumber file="${buildNumber.file}"/>		
+	</target>
+	
+
 	<target name="jar" depends="copy-src-to-xpi-build,unpack-babelzilla-replaced-bundle">
 		<delete file="${build.dir}/xpi/chrome/${ant.project.name}.jar"/>
 		
@@ -177,7 +251,12 @@
 	
 	<!-- Create release.ini file which is read by www/local.conf -->
 	<target name="release.ini" depends="set-pub-xpi-name,checksum">
-		<concat destfile="${www.dir}/release.ini">
+		<exec executable="attrib" dir="${basedir}" osfamily="windows">
+			<arg value="-r"/>
+			<arg file="${releaseIni.file}"/>
+		</exec>
+
+		<concat destfile="${releaseIni.file}">
 			<string value="[release]&#0010;" />
 			<string value="version = &quot;${extension.publishedVersion}&quot;&#0010;" />
 			<string value="xpi = &quot;${extension.published.xpi}&quot;&#0010;" />
@@ -369,5 +448,5 @@
 			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="META-INF/zigbert.rsa"/>
 		</zip>
 	</target>
-	
+
 </project>

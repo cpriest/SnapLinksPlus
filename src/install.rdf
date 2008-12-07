@@ -18,9 +18,6 @@
 	    <em:contributor>Tommi Rautava (project owner)</em:contributor>
 
 	    <em:translator>animarval (ca-AD)</em:translator>
-	    <em:translator>WangKing (zh-CN)</em:translator>
-	    <em:translator>toomore (zh-TW)</em:translator>
-	    <em:translator>markh (nl-NL)</em:translator>
 	    <em:translator>savred (en-US)</em:translator>
 	    <em:translator>kenmooda (fi-FI)</em:translator>
 	    <em:translator>myahoo (fr-FR)</em:translator>
@@ -28,10 +25,14 @@
 	    <em:translator>Cashman (hu-HU)</em:translator>
 	    <em:translator>l0stintranslation (it-IT)</em:translator>
 	    <em:translator>Norah (ja-JP)</em:translator>
+	    <em:translator>markh (nl-NL)</em:translator>
 	    <em:translator>teo (pl-PL)</em:translator>
 	    <em:translator>gulego (pt-BR)</em:translator>
 	    <em:translator>savred (pt-PT)</em:translator>
+		<em:translator>PiVV (ru-RU)</em:translator>
 	    <em:translator>PeePay (sk-SK)</em:translator>
+	    <em:translator>WangKing (zh-CN)</em:translator>
+	    <em:translator>toomore (zh-TW)</em:translator>
 
 		<em:iconURL>chrome://snaplinks/content/icon.png</em:iconURL>
 		<em:homepageURL>@homepageURL@</em:homepageURL>
