@@ -3,6 +3,7 @@ overlay	chrome://browser/content/browser.xul	chrome://snaplinks/content/snaplink
 
 locale	snaplinks	en-US	jar:chrome/snaplinks.jar!/locale/en-US/
 locale	snaplinks	ca-AD	jar:chrome/snaplinks.jar!/locale/ca-AD/
+locale	snaplinks	cs-CZ	jar:chrome/snaplinks.jar!/locale/cs-CZ/
 locale	snaplinks	de-DE	jar:chrome/snaplinks.jar!/locale/de-DE/
 locale	snaplinks	fi-FI	jar:chrome/snaplinks.jar!/locale/fi-FI/
 locale	snaplinks	fr-FR	jar:chrome/snaplinks.jar!/locale/fr-FR/

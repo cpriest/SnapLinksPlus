@@ -5,7 +5,7 @@
 
 	<RDF:Description about="urn:mozilla:install-manifest">
     	<em:id>@id@</em:id>
-	    <em:name>Snap Links</em:name>
+	    <em:name>Snap Links Plus</em:name>
 	    <em:version>@version@</em:version>
 	    <em:type>2</em:type>
 	    <em:description>Opens multiple links contained in a selected area in new tabs</em:description>
@@ -18,10 +18,11 @@
 	    <em:contributor>Tommi Rautava (project owner)</em:contributor>
 
 	    <em:translator>animarval (ca-AD)</em:translator>
+		<em:translator>Sam (cs-CZ)</em:translator>
+	    <em:translator>MartinMeise, Team erweiterungen.de, Archaeopteryx (de-DE)</em:translator>
 	    <em:translator>savred (en-US)</em:translator>
 	    <em:translator>kenmooda (fi-FI)</em:translator>
 	    <em:translator>myahoo (fr-FR)</em:translator>
-	    <em:translator>MartinMeise (de-DE)</em:translator>
 	    <em:translator>Cashman (hu-HU)</em:translator>
 	    <em:translator>l0stintranslation (it-IT)</em:translator>
 	    <em:translator>Norah (ja-JP)</em:translator>
