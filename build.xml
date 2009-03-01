@@ -426,7 +426,7 @@
 
 	<!-- Make a special .xpi for Babelzilla:
 	<!   - Untranslated strings are blank.
-	<!   - Do not pack the content and the locale files into a jar file. -->
+	<!   - Leave the contents unpacked (in other words, do not pack the content and the locale files into a jar file). -->
 	<target name="xpi-babelzilla" depends="set-xpi-name,copy-src-to-build,unpack-babelzilla-blank-bundle,jar">
 		<mkdir dir="${dist.dir}/babelzilla" />
 		
