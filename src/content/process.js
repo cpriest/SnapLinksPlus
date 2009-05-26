@@ -242,7 +242,7 @@ function addRectZone(start){
 					// Links appear to be bigger if they are bold
 					if(snaplValueBold){
 						if(lisz>(isz-0.2)){
-							var stl = content.document.defaultView.getComputedStyle(explored[m], "fonte-weight");
+							var stl = content.document.defaultView.getComputedStyle(explored[m], "font-weight");
 							var lbold = 400;
 							lbold = parseFloat(stl.fontWeight);
 							if(lbold > 400)
@@ -592,7 +592,7 @@ function openTabs(){
 		var sContent = document.getElementById("content");
 		for(i=0;i<snaplLinks.length;i++){
 			var l = snaplLinks[i].href;
-			sContent.addTab(l,makeReferrer());
+			getBrowser().addTab(l,makeReferrer());
 		}
 	}
 }

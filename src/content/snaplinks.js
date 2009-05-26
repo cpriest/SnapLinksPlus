@@ -197,7 +197,7 @@ function eventMouseUp(e){
 				//e.originalTarget.dispatchEvent(evt);
 
 			var item = gContextMenu.target;
-			item.dispatchEvent(evt);
+			item.dispatchEvent(e);
 
 		  	//document.popupNode = e.originalTarget;
 			//var obj = document.getElementById("contentAreaContextMenu");
