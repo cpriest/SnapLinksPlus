@@ -2,6 +2,7 @@
  *  snaplinks.js 
  *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
  *  Copyright (C) 2008  Atreus, MumblyJuergens
+ *  Copyright (C) 2009  Tommi Rautava
  *  
  *  This file is part of Snap Links.
  *
@@ -176,7 +177,7 @@ function eventMouseUp(e){
 			showSnapPopup(e.clientX,e.clientY);
 		
 		if(!stillLoading()){
-			activateLinks()
+			activateLinks();
 		}else{
 			snaplPostLoadingActivate = true;
 		}
@@ -289,7 +290,7 @@ function eventMouseMove(e){
 
 function processTimeout(){
 	snaplIdTimeout=0;
-	drawRect()
+	drawRect();
 }
 
 function updateStatusLabel(){
@@ -335,7 +336,7 @@ function eventSnaplPopupHidden(){
 		clearRect();
 		return;
 	}
-	activateLinks()
+	activateLinks();
 	snaplAction = SNAPLACTION_DEFAULT;
 }
 

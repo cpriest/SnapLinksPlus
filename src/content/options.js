@@ -2,6 +2,7 @@
  *  options.js 
  *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
  *  Copyright (C) 2008  Atreus, MumblyJuergens
+ *  Copyright (C) 2009  Tommi Rautava
  *  
  *  This file is part of Snap Links.
  *
@@ -101,8 +102,8 @@ function snaplUpdateLineSamples() {
 	document.getElementById("snaplinks.linksId").setAttribute("style",
 		"border-top-width:" + size + "px;border-top-color:" + color + ";border-top-style:solid");
 
-	var color = document.getElementById("snaplinks.drawpicker").color;
-	var size = document.getElementById("snaplinks.drawthick").selectedIndex;
+	color = document.getElementById("snaplinks.drawpicker").color;
+	size = document.getElementById("snaplinks.drawthick").selectedIndex;
 	document.getElementById("snaplinks.drawId").setAttribute("style",
 		"border-top-width:" + size + "px;border-top-color:" + color+";border-top-style:dashed");
 }

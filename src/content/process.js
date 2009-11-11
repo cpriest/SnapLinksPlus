@@ -1,6 +1,7 @@
 /*
  *  process.js 
  *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
+ *  Copyright (C) 2009  Tommi Rautava
  *  
  *  This file is part of Snap Links.
  *
@@ -18,11 +19,11 @@
  *  along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var currentState=-1
-var startBegining=0
+var currentState=-1;
+var startBegining=0;
 
-var minY=0
-var maxy=0
+var minY=0;
+var maxy=0;
 
 function initializeLoc(e){
 	snaplTargetDoc = e.target.ownerDocument;
@@ -43,7 +44,7 @@ function processTimeoutStartRect(){
 
 	initiateLoading();
 	initiateYBoundaries();
-	startRect()
+	startRect();
 	
 	if((currentState!=-1 || startBegining ==1) && snaplDrawing){
 		snaplIdTimeoutStart=window.setTimeout("processTimeoutRectContinue();",30);
@@ -150,7 +151,7 @@ function addRectZone(start){
 			
 			if(!start){	
 			   	var contains=0;
-				for(k=0;k<snaplVisibleLinks.length;k++){
+				for(var k=0;k<snaplVisibleLinks.length;k++){
 					if(snaplVisibleLinks[k]==l){
 						contains=1;
 						break;
@@ -166,7 +167,7 @@ function addRectZone(start){
 			if(sz.fontSize.indexOf("px")>=0)
 				isz=parseFloat(sz.fontSize);
 
-			var b = snaplTargetDoc.getBoxObjectFor(l);
+			var b = snaplGetBoundingClientRect(l);
 
 			if(!b || (b.y + b.height) < minY || b.y > maxY)
 				continue;
@@ -190,7 +191,7 @@ function addRectZone(start){
 					nexps.push(l.childNodes[k]);
 				}
 			
-				for(m = 0; m < nexps.length; m++) {
+				for(var m = 0; m < nexps.length; m++) {
 					for(k=0;k<nexps[m].childNodes.length;k++){
 						nexps.push(nexps[m].childNodes[k]);
 					}	
@@ -246,7 +247,7 @@ function addRectZone(start){
 							var lbold = 400;
 							lbold = parseFloat(stl.fontWeight);
 							if(lbold > 400)
-								lisz += 0.2
+								lisz += 0.2;
 						}
 					}
 					if(lisz > isz){
@@ -254,15 +255,16 @@ function addRectZone(start){
 					}
 				}
 			
+				var box;
 				for(m = 0; m < explored.length; m++) {
-					var box = snaplTargetDoc.getBoxObjectFor(explored[m]);
+					box = snaplGetBoundingClientRect(explored[m]);
 					mb.push(box);
 				}
 			
 				// Hack for the cases where a link has sub-nodes in different places	
 				for(m = 0; m < nexps.length; m++) {
 					try{
-						var box = snaplTargetDoc.getBoxObjectFor(nexps[m]);
+						box = snaplGetBoundingClientRect(nexps[m]);
 						mb.push(box);
 					}catch(e){
 					}
@@ -394,13 +396,13 @@ function controlLinks(){
 	snaplLinks = new Array();
 	var sz = 0;
 	
-	for(i=0;i<snaplVisibleLinks.length;i++){
+	for(var i=0;i<snaplVisibleLinks.length;i++){
 		var l = snaplVisibleLinks[i];
 		var link_ok;
 		
 		if(snaplMultiBoxesMode){
 			link_ok=false;
-			for(j=0;j<snaplMultiBoxes[i].length;j++){
+			for(var j=0;j<snaplMultiBoxes[i].length;j++){
 				var l_X1 = snaplMultiBoxes[i][j].x;
 				var l_Y1 = snaplMultiBoxes[i][j].y;
 				var l_X2 = l_X1 + snaplMultiBoxes[i][j].width;
@@ -474,7 +476,7 @@ function clearRect() {
 	snaplRect = null;
 	
 	if(snaplLinks && snaplLinks.length){
-		for(i=0;i<snaplLinks.length;i++){
+		for(var i=0;i<snaplLinks.length;i++){
 			snaplLinks[i].style.MozOutline = "none";
 		}
 		snaplLinks = null;
@@ -521,7 +523,7 @@ function saveCliboard(){
 		htmlRepresentation = "";
 		plainTextRepresentation = "";
 
-		for(i=0;i<snaplLinks.length;i++){
+		for(var i=0;i<snaplLinks.length;i++){
 			text = snaplLinks[i].textContent;
 			text = text.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
 			
@@ -590,7 +592,7 @@ function openWindows(){
 function openTabs(){
 	if(snaplLinks && snaplLinks.length && snaplVisible){
 		var sContent = document.getElementById("content");
-		for(i=0;i<snaplLinks.length;i++){
+		for(var i=0;i<snaplLinks.length;i++){
 			var l = snaplLinks[i].href;
 			getBrowser().addTab(l,makeReferrer());
 		}
@@ -599,7 +601,7 @@ function openTabs(){
 
 function openTabsWindow() {
 	if(snaplLinks.length==0)
-		return;
+		return null;
 
 	var hand = Components.classes["@mozilla.org/browser/clh;1"].getService(Components.interfaces.nsIBrowserHandler);
 	var urls = snaplLinks.join("|") || hand.defaultArgs;
@@ -677,7 +679,7 @@ function makeReferrer() {
 		var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
 		if (ref){ 
 			ref = ioService.newURI(ref, null, null);
-			return ref
+			return ref;
 		}
 					
 	} catch (e) {
@@ -685,3 +687,27 @@ function makeReferrer() {
 	return null;
 }
 
+function snaplGetBoundingClientRect(elem) {
+	var consoleService = Components.classes['@mozilla.org/consoleservice;1'].
+		getService(Components.interfaces.nsIConsoleService);
+
+	var box;
+	
+	if (elem.ownerDocument.getBoxObjectFor != null) {
+		consoleService.logStringMessage("Snaplinks: using getBoxObjectFor()");
+		box = elem.ownerDocument.getBoxObjectFor(elem);
+	} else {
+		consoleService.logStringMessage("Snaplinks: using getBoundingClientRect()");
+		var rect = elem.getBoundingClientRect();
+		var docElem = elem.ownerDocument.documentElement;
+		box = {
+			x: rect.left + docElem.scrollLeft, 
+			y: rect.top + docElem.scrollTop,
+			width: rect.width,
+			height: rect.height
+		};
+		consoleService.logStringMessage("x="+ box.x +" y="+ box.y +" scrollLeft="+ docElem.scrollLeft +" scrollTop="+ docElem.scrollTop);
+	}
+	
+	return box;
+}
