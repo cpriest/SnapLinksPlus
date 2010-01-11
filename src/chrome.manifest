@@ -6,7 +6,7 @@ locale	snaplinks	ca-AD	jar:chrome/snaplinks.jar!/locale/ca-AD/
 locale	snaplinks	cs-CZ	jar:chrome/snaplinks.jar!/locale/cs-CZ/
 locale	snaplinks	de-DE	jar:chrome/snaplinks.jar!/locale/de-DE/
 locale	snaplinks	fi-FI	jar:chrome/snaplinks.jar!/locale/fi-FI/
-locale	snaplinks	fr-FR	jar:chrome/snaplinks.jar!/locale/fr-FR/
+locale	snaplinks	fr		jar:chrome/snaplinks.jar!/locale/fr/
 locale	snaplinks	hu-HU	jar:chrome/snaplinks.jar!/locale/hu-HU/
 locale	snaplinks	it-IT	jar:chrome/snaplinks.jar!/locale/it-IT/
 locale	snaplinks	ja-JP	jar:chrome/snaplinks.jar!/locale/ja-JP/
