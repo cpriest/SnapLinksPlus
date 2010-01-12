@@ -121,8 +121,10 @@
 			<replacefilter token="@version@" value="${extension.versionNumber.forThisBuild}" />
 			<replacefilter token="@updateURL@" value="${extension.updateURL}" />
 			<replacefilter token="@homepageURL@" property="extension.homepageURL" />
-			<replacefilter token="@minVersion@" property="extension.firefox.minVersion" />
-			<replacefilter token="@maxVersion@" property="extension.firefox.maxVersion" />
+			<replacefilter token="@firefoxMinVersion@" property="extension.firefox.minVersion" />
+			<replacefilter token="@firefoxMaxVersion@" property="extension.firefox.maxVersion" />
+			<replacefilter token="@seamonkeyMinVersion@" property="extension.seamonkey.minVersion" />
+			<replacefilter token="@seamonkeyMaxVersion@" property="extension.seamonkey.maxVersion" />
 		</replace>
 	</target>
 	

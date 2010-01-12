@@ -1,5 +1,6 @@
 content	snaplinks	jar:chrome/snaplinks.jar!/content/
-overlay	chrome://browser/content/browser.xul	chrome://snaplinks/content/snaplinks.xul
+overlay	chrome://browser/content/browser.xul		chrome://snaplinks/content/snaplinks.xul	application={ec8030f7-c20a-464f-9b0e-13a3a9e97384}
+overlay	chrome://navigator/content/navigator.xul	chrome://snaplinks/content/snaplinks.xul	application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
 
 locale	snaplinks	en-US	jar:chrome/snaplinks.jar!/locale/en-US/
 locale	snaplinks	ca-AD	jar:chrome/snaplinks.jar!/locale/ca-AD/
@@ -7,15 +8,17 @@ locale	snaplinks	cs-CZ	jar:chrome/snaplinks.jar!/locale/cs-CZ/
 locale	snaplinks	de-DE	jar:chrome/snaplinks.jar!/locale/de-DE/
 locale	snaplinks	fi-FI	jar:chrome/snaplinks.jar!/locale/fi-FI/
 locale	snaplinks	fr		jar:chrome/snaplinks.jar!/locale/fr/
+locale	snaplinks	hr-HR	jar:chrome/snaplinks.jar!/locale/hr-HR/
 locale	snaplinks	hu-HU	jar:chrome/snaplinks.jar!/locale/hu-HU/
 locale	snaplinks	it-IT	jar:chrome/snaplinks.jar!/locale/it-IT/
 locale	snaplinks	ja-JP	jar:chrome/snaplinks.jar!/locale/ja-JP/
-locale	snaplinks	nl-NL	jar:chrome/snaplinks.jar!/locale/nl-NL/
+locale	snaplinks	nl		jar:chrome/snaplinks.jar!/locale/nl/
 locale	snaplinks	pl-PL	jar:chrome/snaplinks.jar!/locale/pl-PL/
 locale	snaplinks	pt-BR	jar:chrome/snaplinks.jar!/locale/pt-BR/
 locale	snaplinks	pt-PT	jar:chrome/snaplinks.jar!/locale/pt-PT/
 locale	snaplinks	ru-RU	jar:chrome/snaplinks.jar!/locale/ru-RU/
 locale	snaplinks	sk-SK	jar:chrome/snaplinks.jar!/locale/sk-SK/
+locale	snaplinks	tr-TR	jar:chrome/snaplinks.jar!/locale/tr-TR/
 locale	snaplinks	vi-VN	jar:chrome/snaplinks.jar!/locale/vi-VN/
 locale	snaplinks	zh-CN	jar:chrome/snaplinks.jar!/locale/zh-CN/
 locale	snaplinks	zh-TW	jar:chrome/snaplinks.jar!/locale/zh-TW/
