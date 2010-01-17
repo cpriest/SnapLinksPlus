@@ -267,6 +267,9 @@
 			<string value="xpi = &quot;${extension.published.xpi}&quot;&#0010;" />
 			<string value="checksum = &quot;${extension.checksum.algorithm}:${extension.checksum.value}&quot;&#0010;" />
 		</concat>
+		
+		<echo>xpi: ${extension.published.xpi}</echo>
+		<echo>checksum: ${extension.checksum.algorithm}:${extension.checksum.value}</echo>
 	</target>
 	
 	
