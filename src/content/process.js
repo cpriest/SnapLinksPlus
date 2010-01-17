@@ -603,9 +603,23 @@ function openTabsWindow() {
 	if(snaplLinks.length==0)
 		return null;
 
-	var hand = Components.classes["@mozilla.org/browser/clh;1"].getService(Components.interfaces.nsIBrowserHandler);
-	var urls = snaplLinks.join("|") || hand.defaultArgs;
-   	return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
+	var urls = snaplLinks[0]; // Add the first url.
+	var count = snaplLinks.length;
+
+	for (var i=1; i<count; ++i) {
+		urls = urls +"|"+ snaplLinks[i]; // Append another url
+	}
+
+	if (!urls) {
+		// It seems that we did not have any links after all.
+		// Let's use the default arguments. 
+		var browserHandler = Components.classes["@mozilla.org/browser/clh;1"].
+			getService(Components.interfaces.nsIBrowserHandler);
+
+		urls = browserHandler.defaultArgs;
+	}		
+	
+	return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
 }
 
 function bookmarkLinks(){
@@ -688,16 +702,16 @@ function makeReferrer() {
 }
 
 function snaplGetBoundingClientRect(elem) {
-	var consoleService = Components.classes['@mozilla.org/consoleservice;1'].
-		getService(Components.interfaces.nsIConsoleService);
+	//var consoleService = Components.classes['@mozilla.org/consoleservice;1'].
+	//	getService(Components.interfaces.nsIConsoleService);
 
 	var box;
 	
 	if (elem.ownerDocument.getBoxObjectFor != null) {
-		consoleService.logStringMessage("Snaplinks: using getBoxObjectFor()");
+		//consoleService.logStringMessage("Snaplinks: using getBoxObjectFor()");
 		box = elem.ownerDocument.getBoxObjectFor(elem);
 	} else {
-		consoleService.logStringMessage("Snaplinks: using getBoundingClientRect()");
+		//consoleService.logStringMessage("Snaplinks: using getBoundingClientRect()");
 		var rect = elem.getBoundingClientRect();
 		var docElem = elem.ownerDocument.documentElement;
 		box = {
@@ -706,7 +720,7 @@ function snaplGetBoundingClientRect(elem) {
 			width: rect.width,
 			height: rect.height
 		};
-		consoleService.logStringMessage("x="+ box.x +" y="+ box.y +" scrollLeft="+ docElem.scrollLeft +" scrollTop="+ docElem.scrollTop);
+		//consoleService.logStringMessage("x="+ box.x +" y="+ box.y +" scrollLeft="+ docElem.scrollLeft +" scrollTop="+ docElem.scrollTop);
 	}
 	
 	return box;
