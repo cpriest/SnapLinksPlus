@@ -300,7 +300,7 @@
 	
 	
 	<target name="set-pub-xpi-name">
-		<property name="extension.published.xpi" value="${ant.project.name}-${extension.publishedVersion}-fx.xpi"/>
+		<property name="extension.published.xpi" value="${ant.project.name}-${extension.publishedVersion}${extension.appsPostfix}.xpi"/>
 	</target>
 
 	
@@ -321,7 +321,7 @@
 	
 	
 	<target name="set-xpi-name">
-		<property name="extension.xpi" value="${ant.project.name}-${extension.versionNumber.forThisBuild}-fx.xpi"/>
+		<property name="extension.xpi" value="${ant.project.name}-${extension.versionNumber.forThisBuild}${extension.appsPostfix}.xpi"/>
 	</target>
 	
 	

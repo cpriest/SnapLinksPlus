@@ -184,7 +184,7 @@ function eventMouseUp(e){
 	}
 	else{
 		clearRect();
-		if(snaplButton == snaplRMB){
+		if(snaplButton == snaplRMB && gContextMenu){
 			var evt = document.createEvent("MouseEvents");
 			snaplStopPopup=false;
 

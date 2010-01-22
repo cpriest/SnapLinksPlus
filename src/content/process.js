@@ -713,14 +713,18 @@ function snaplGetBoundingClientRect(elem) {
 	} else {
 		//consoleService.logStringMessage("Snaplinks: using getBoundingClientRect()");
 		var rect = elem.getBoundingClientRect();
-		var docElem = elem.ownerDocument.documentElement;
+		var doc = elem.ownerDocument;
+		var docElem = doc.documentElement;
+		var scrollLeft = docElem.scrollLeft ? docElem.scrollLeft : doc.body.scrollLeft;
+		var scrollTop = docElem.scrollTop ? docElem.scrollTop : doc.body.scrollTop;
+
 		box = {
-			x: rect.left + docElem.scrollLeft, 
-			y: rect.top + docElem.scrollTop,
+			x: rect.left + scrollLeft, 
+			y: rect.top + scrollTop,
 			width: rect.width,
 			height: rect.height
 		};
-		//consoleService.logStringMessage("x="+ box.x +" y="+ box.y +" scrollLeft="+ docElem.scrollLeft +" scrollTop="+ docElem.scrollTop);
+		//consoleService.logStringMessage("x="+ box.x +" y="+ box.y +" scrollLeft="+ scrollLeft +" scrollTop="+ scrollTop);
 	}
 	
 	return box;
