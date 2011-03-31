@@ -21,9 +21,10 @@
 
 var currentState=-1;
 var startBegining=0;
+var startingLinkAnalysis=0;
 
 var minY=0;
-var maxy=0;
+var maxY=0;
 
 function initializeLoc(e){
 	snaplTargetDoc = e.target.ownerDocument;
@@ -141,7 +142,7 @@ function addRectZone(start){
 			startBegining=0;
 			currentState=0;
 		}
-		max = currentState + 60;
+		var max = currentState + 60;
 
 		for(i=currentState;i<snaplTargetDoc.links.length;i++){
 			var l=snaplTargetDoc.links[i];
@@ -183,7 +184,7 @@ function addRectZone(start){
 			// Also a link node might contain various nodes like images and divs with very different positions 
 			//   due to styles
 			if(snaplMultiBoxesMode){
-				mb = new Array(); 				// MultiBoxes
+				var mb = new Array(); 			// MultiBoxes
 				var explored = new Array();		// Explored nodes
 				var nexps =  new Array();   	// Not yet explored nodes
 

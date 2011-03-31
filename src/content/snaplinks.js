@@ -27,7 +27,10 @@ var snaplLinks;
 var snaplVisibleLinks;
 var snaplBoxes;
 var snaplTSize;
-				
+
+var snaplMultiBoxesMode = 0;
+var snaplMultiBoxes;
+
 var snaplTrailCont;
 
 const snaplLMB  = 0;

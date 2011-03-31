@@ -339,15 +339,32 @@
 		<move todir="${build.dir}/src/chrome" overwrite="true">
 			<fileset dir="${build.dir}/all_locales_replaced" 
 				includes="*/**" 
-				excludes="**/*.properties,**/en-US/**,**/contents.rdf"/>
+				excludes="**/*.dtd,**/*.properties,locale/en-US/**,**/contents.rdf"/>
 		</move>
 		
 		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
 		<copy todir="${build.dir}/src/chrome" overwrite="true">
 			<fileset dir="${src.dir}" 
 				includes="locale/**" 
-				excludes="**/.cvsignore,locale/**/*.properties"/>
+				excludes="**/.cvsignore,locale/**/*.properties,locale/**/*.dtd"/>
 		</copy>
+		
+		<!-- Convert DTD files to UTF-8. -->
+		<apply executable="${basedir}/utility/convertTextEncoding.exe"
+			dest="${build.dir}/src/chrome"
+			parallel="false">
+			<arg value="utf-8"/>
+			<srcfile/>
+			<targetfile/>
+			<fileset
+				dir="${src.dir}"
+				includes="locale/en-US/*.dtd"/>
+			<fileset 
+				dir="${build.dir}/all_locales_replaced"
+				includes="**/*.dtd"
+				excludes="locale/en-US/**"/>
+			<mapper type="identity"/>
+		</apply>
 		
 		<!-- Encode .properties files of the default locale
 		<!   and store the results to the .xpi build directory. -->
@@ -377,15 +394,32 @@
 		<move todir="${build.dir}/babelzilla/chrome" overwrite="true">
 			<fileset dir="${build.dir}/all_locales_blank" 
 				includes="*/**" 
-				excludes="**/*.properties,**/en-US/**,**/contents.rdf"/>
+				excludes="**/*.dtd,**/*.properties,**/en-US/**,**/contents.rdf"/>
 		</move>
 		
 		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
 		<copy todir="${build.dir}/babelzilla/chrome" overwrite="true">
 			<fileset dir="${src.dir}" 
 				includes="locale/**" 
-				excludes="**/.cvsignore,locale/**/*.properties"/>
+				excludes="**/.cvsignore,locale/**/*.properties,locale/**/*.dtd"/>
 		</copy>
+		
+		<!-- Convert DTD files to UTF-8. -->
+		<apply executable="${basedir}/utility/convertTextEncoding.exe"
+			dest="${build.dir}/babelzilla/chrome"
+			parallel="false">
+			<arg value="utf-8"/>
+			<srcfile/>
+			<targetfile/>
+			<fileset
+				dir="${src.dir}"
+				includes="locale/en-US/*.dtd"/>
+			<fileset 
+				dir="${build.dir}/all_locales_blank"
+				includes="**/*.dtd"
+				excludes="**/en-US/**"/>
+			<mapper type="identity"/>
+		</apply>
 		
 		<!-- Encode .properties files of the default locale
 		<!   and store the results to the .xpi build directory. -->
