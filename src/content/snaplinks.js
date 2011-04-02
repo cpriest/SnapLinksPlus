@@ -82,6 +82,7 @@ var msgStatusUsage = localeStrings.GetStringFromName("snaplinks.status.usage");
 var msgStatusLoading = localeStrings.GetStringFromName("snaplinks.status.loading");
 var msgPanelLinks =  localeStrings.GetStringFromName("snaplinks.panel.links");
 
+
 function updateStatus(str){
 	var el = null;
 	el = document.getElementById("snaplinks-panel");
@@ -176,8 +177,9 @@ function eventMouseUp(e){
 
 	if(snaplVisible == true){
 		snaplStopPopup=true;
-		if(e.ctrlKey)
-			showSnapPopup(e.clientX,e.clientY);
+		if(e.ctrlKey) {
+			showSnapPopup(e);
+		}
 		
 		if(!stillLoading()){
 			activateLinks();
@@ -197,7 +199,8 @@ function eventMouseUp(e){
 			//	e.originalTarget.dispatchEvent(evt);
 
 			evt.initMouseEvent("contextmenu", true, true, window, 0,
-				e.screenX, e.screenY, e.clientX, e.clientY, false, false, false, false, 2, null);
+				e.screenX, e.screenY, e.clientX, e.clientY,
+				false, false, false, false, 2, null);
 				//e.originalTarget.dispatchEvent(evt);
 
 			if (gContextMenu)
@@ -215,10 +218,16 @@ function eventMouseUp(e){
 	}
 }
 
-function showSnapPopup(x,y){
+function showSnapPopup(e) {
 	pop = document.getElementById("snaplMenu");
-	pop.showPopup(pop,x,y,"popup",0,0);
 	snaplAction=SNAPLACTION_UNDEF;
+	
+	// openPopupAtScreen is available since FF3.
+	if (pop.openPopupAtScreen != null) {
+		pop.openPopupAtScreen(e.screenX, e.screenY, true);
+	} else {
+		pop.showPopup(pop, e.clientX, e.clientY, "popup", 0, 0);
+	}
 }
 
 function activateLinks(){

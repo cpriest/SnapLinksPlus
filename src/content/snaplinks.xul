@@ -34,7 +34,7 @@
 	</statusbar>
 
 	<popupset id="mainPopupSet">
-		<popup id="snaplMenu">
+		<menupopup id="snaplMenu">
 			<menuitem label="&snaplinks.popup.newtabs;" oncommand="snaplActionNewTabs()"/>
 			<menuitem label="&snaplinks.popup.newwindows;" oncommand="snaplActionNewWindows()"/>
 			<separator class="groove-thin"/>
@@ -45,7 +45,7 @@
 			<menuitem label="&snaplinks.popup.tabsinnewwin;" oncommand="snaplActionTabsInNewWindow()"/>
 			<separator class="groove-thin"/>
 			<menuitem label="&snaplinks.popup.cancel;"/>
-		</popup>
+		</menupopup>
 	</popupset>
 
 	<script type="application/x-javascript" src="snaplinks.js"/>		 
