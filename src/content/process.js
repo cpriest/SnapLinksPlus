@@ -26,20 +26,6 @@ var startingLinkAnalysis=0;
 var minY=0;
 var maxY=0;
 
-function initializeLoc(e){
-	snaplTargetDoc = e.target.ownerDocument;
-
-	if (snaplTargetDoc.defaultView.top instanceof Window){
-		snaplTargetDoc = snaplTargetDoc;
-	}
-
-	clearRect();
-	snaplX1 = Math.min(e.pageX,snaplTargetDoc.documentElement.offsetWidth + snaplTargetDoc.defaultView.pageXOffset);
-	snaplY1 = e.pageY;
-	snaplVisible=false;
-}
-
-
 function processTimeoutStartRect(){
 	snaplIdTimeoutStart=0;
 
@@ -151,7 +137,7 @@ function addRectZone(start){
 				break;
 			
 			if(!start){	
-			   	var contains=0;
+				var contains=0;
 				for(var k=0;k<snaplVisibleLinks.length;k++){
 					if(snaplVisibleLinks[k]==l){
 						contains=1;
@@ -213,7 +199,7 @@ function addRectZone(start){
 								}
 							}
 						}	
-					   	
+						
 						if(nexps[m].parentNode.childNodes.length==1){	
 							explored.push(nexps[m].parentNode);
 						}else{
@@ -299,88 +285,14 @@ function startRect(){
 	snaplBoxes = new Array();
 	snaplTSize = new Array();
 	snaplMultiBoxes = new Array();
- 	
+	
 	addRectZone(true);
 
 	return;
 }
 
-
-function createRect(x, y,insertionNode) {
-	if (insertionNode  && snaplRect ) {
-		snaplRect.style.left = x + "px"; 
-		snaplRect.style.top = y + "px";
-		insertionNode.appendChild(snaplRect);
-	}
-}
-
-function rectVisible(){
-	if(!snaplVisible){
-		if(Math.abs(snaplX1-snaplX2)>4 || Math.abs(snaplY1-snaplY2)> 4){
-			if(!snaplIdTimeoutStart){
-			var insertionNode = (snaplTargetDoc.documentElement) ? snaplTargetDoc.documentElement : snaplTargetDoc;
-				snaplRect = snaplTargetDoc.createElementNS(snaplXhtmlNS, "snaplRect");
-				snaplRect.style.color = snaplBorderColor;
-				snaplRect.style.border = snaplBorderWidth + "px dotted";
-
-				snaplRect.style.position = "absolute";
-				snaplRect.style.zIndex = "10000";
-				createRect(snaplX1,snaplY1,insertionNode);
-				snaplIdTimeoutStart=window.setTimeout("processTimeoutStartRect();",50);
-			}
-			snaplVisible=true;
-			if(snaplShowNumber){
-				updateStatus(msgPanelLinks + " " + "0");
-			}
-		}
-	}
-	return snaplVisible;
-}
-
-
-function selectZone(e){
-
-	if(e.altKey){
-		var mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-			.getInterface(Components.interfaces.nsIWebNavigation)
-			.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
-			.rootTreeItem
-			.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-			.getInterface(Components.interfaces.nsIDOMWindow);
-		var tabbrowser = mainWindow.document.getElementById("content");
-		var minHeight = tabbrowser.selectedBrowser.boxObject.height;
-		var minWidth = tabbrowser.selectedBrowser.boxObject.width;
-																										   
-		var tg = snaplTargetDoc.defaultView;
-		var de = snaplTargetDoc.documentElement;
-		var dX = e.pageX - snaplX2;
-		var dY = e.pageY - snaplY2;
-		snaplX1 += dX;
-		snaplY1 += dY;
-		snaplX1 = Math.max(Math.min(Math.max(snaplTargetDoc.width,minWidth),snaplX1),0);
-		snaplY1 = Math.max(Math.min(Math.max(snaplTargetDoc.height,minHeight),snaplY1),0);
-	}
-
-	if(e.shiftKey){
-		snaplEqualSize=false;
-	}else{
-		snaplEqualSize=true;
-	}
-
-	snaplX2 = Math.min(e.pageX,content.document.documentElement.offsetWidth + snaplTargetDoc.defaultView.pageXOffset);
-	snaplY2 = e.pageY;
-
-	if(!rectVisible())
-		return;
-	snaplRect.style.width = Math.abs(snaplX1-snaplX2) - snaplBorderWidth + "px";
-	snaplRect.style.height = Math.abs(snaplY1-snaplY2) - snaplBorderWidth + "px";
-	snaplRect.style.top = Math.min(snaplY1,snaplY2) - snaplBorderWidth + "px";
-	snaplRect.style.left = Math.min(snaplX1,snaplX2) - snaplBorderWidth + "px";
-	return;
-}
-
 function drawRect() {
-	if(!rectVisible())
+	if(!SnapLinks.Selection.Create())
 		return;
 	controlLinks();
 }
@@ -388,10 +300,7 @@ function drawRect() {
 function controlLinks(){
 	if(!snaplDrawing) return;
 
-	var c_X1 = Math.min(snaplX1,snaplX2);
-	var c_X2 = Math.max(snaplX1,snaplX2);
-	var c_Y1 = Math.min(snaplY1,snaplY2);
-	var c_Y2 = Math.max(snaplY1,snaplY2);
+	var c = SnapLinks.Selection.NormalizedRect;
 
 	var outlineFormat = snaplLinksBorderWidth + "px solid " + snaplLinksBorderColor; //"1px solid #ff0000";
 	snaplLinks = new Array();
@@ -409,7 +318,7 @@ function controlLinks(){
 				var l_X2 = l_X1 + snaplMultiBoxes[i][j].width;
 				var l_Y2 = l_Y1 + snaplMultiBoxes[i][j].height;
 				
-				if(l_Y1 < c_Y2 && l_Y2 > c_Y1 && l_X2 > c_X1 && l_X1 < c_X2){
+				if(l_Y1 < c.Y2 && l_Y2 > c.Y1 && l_X2 > c.X1 && l_X1 < c.X2){
 					link_ok=true;
 					break;
 				}
@@ -422,7 +331,7 @@ function controlLinks(){
 			var l_X2 = l_X1 + snaplBoxes[i].width;
 			var l_Y2 = l_Y1 + snaplBoxes[i].height;
 	
-			if(l_Y1 > c_Y2 || l_Y2 < c_Y1 || l_X2 < c_X1 ||l_X1 > c_X2){
+			if(l_Y1 > c.Y2 || l_Y2 < c.Y1 || l_X2 < c.X1 ||l_X1 > c.X2){
 				link_ok=false;
 			}else{
 				link_ok=true;
@@ -470,25 +379,6 @@ function changeOutline(obj,format){
 	return;
 }
 
-function clearRect() {
-	snaplDrawing=false;
-	if (snaplRect)
-		snaplRect.parentNode.removeChild(snaplRect);
-	snaplRect = null;
-	
-	if(snaplLinks && snaplLinks.length){
-		for(var i=0;i<snaplLinks.length;i++){
-			snaplLinks[i].style.MozOutline = "none";
-		}
-		snaplLinks = null;
-	}
-	snaplRect = null;
-	snaplX1=0; snaplX2=0; snaplY1=0; snaplY2=0;
-	snaplVisible=false;
-	displayInfo("");
-	updateStatus("");
-}
-
 
 function executeAction(){
 
@@ -510,9 +400,9 @@ function executeAction(){
 				bookmarkLinks();
 				break;
 			case SNAPLACTION_DOWNLOAD:
-			    snaplAction = SNAPLACTION_UNDEF
+				snaplAction = SNAPLACTION_UNDEF
 				downloadLinks();
-		        snaplAction = SNAPLACTION_DEFAULT;
+				snaplAction = SNAPLACTION_DEFAULT;
 				break;
 		}
 	}	

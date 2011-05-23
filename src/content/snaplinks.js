@@ -44,13 +44,6 @@ var snaplLinksBorderColor = '#FF0000';
 
 const snaplXhtmlNS = "http://www.w3.org/1999/xhtml";
 
-var snaplRect;
-
-var snaplX1=0;
-var snaplX2=0;
-var snaplY1=0;
-var snaplY2=0;
-
 var snaplVisible;
 var snaplBorderWidth=3;
 var snaplLinksBorderWidth=1;
@@ -59,7 +52,6 @@ var snaplTargetDoc;
 var snaplStopPopup;
 var snaplEqualSize;
 var snaplIdTimeout=0;
-var snaplLastMoveEvent;
 
 var snaplLastEventMouseOver=0;
 var snaplIdTimeoutStart=0;
@@ -81,6 +73,323 @@ var localeStrings = gsnaplinksBundle.createBundle("chrome://snaplinks/locale/sna
 var msgStatusUsage = localeStrings.GetStringFromName("snaplinks.status.usage");
 var msgStatusLoading = localeStrings.GetStringFromName("snaplinks.status.loading");
 var msgPanelLinks =  localeStrings.GetStringFromName("snaplinks.panel.links");
+
+
+/**
+*  Heavy Refactoring of code base by Clint Priest on 5/22/2011
+*/
+var SnapLinks;
+
+/* Utility */
+function Log() { Firebug.Console.logFormatted(arguments); }
+
+/** Stripped down (non inheriting version of prototype classes, allows for getters/setters including c# style getters/setters */
+var Class = (function() {
+	function create() {
+		function klass() {
+			this.initialize.apply(this, arguments);
+		}
+		
+		klass.addMethods = Class.Methods.addMethods;
+		
+		for (var i = 0; i < arguments.length; i++)
+			klass.addMethods(arguments[i]);
+
+		if (!klass.prototype.initialize)
+			klass.prototype.initialize = function() { };
+
+		return klass;
+	}
+
+	function addMethods(source) {
+		var properties = Object.keys(source);
+
+		for (var i = 0, length = properties.length; i < length; i++) {
+			var property = properties[i];
+			
+			var Setter = source.__lookupSetter__(property),
+				Getter = source.__lookupGetter__(property);
+
+			if(Setter)
+				this.prototype.__defineSetter__(property, Setter);
+			if(Getter)
+				this.prototype.__defineGetter__(property, Getter);
+
+			if(Setter == undefined && Getter == undefined) {
+
+				/* Support Name: { get: function(), set: function() } syntax, ala C# getter/setter syntax */
+				var Descriptor = source[property];
+				if(Descriptor && typeof Descriptor == 'object' && (Descriptor.get || Descriptor.set)) {
+					if(Descriptor.set)
+						this.prototype.__defineSetter__(property, Descriptor.set);
+					if(Descriptor.get)
+						this.prototype.__defineGetter__(property, Descriptor.get);
+				} else {
+					this.prototype[property] = source[property];
+				}
+			}
+		}
+		return this;
+	}
+
+	return {
+		create: create,
+		Methods: {
+			addMethods: addMethods
+		}
+	};
+})();
+
+window.addEventListener('load', function() {
+	
+	
+	/** Selection class handles the selection rectangle and accompanying visible element */
+	var Selection = Class.create({ 
+		X1: 0, Y1: 0, X2: 0, Y2: 0,
+		
+		NormalizedRect: {
+			get: function() { 
+				return {	X1: Math.min(this.X1,this.X2),	Y1: Math.min(this.Y1,this.Y2),
+							X2: Math.max(this.X1,this.X2),	Y2: Math.max(this.Y1,this.Y2),	}
+			},
+		},
+		
+		DragStarted: false,
+		
+		initialize: function() {
+			
+		},
+		
+		Create: function() {
+			if(this.DragStarted == true)
+				return true;
+				
+			if(!snaplIdTimeoutStart && Math.abs(this.X1-this.X2) > 4 || Math.abs(this.Y1-this.Y2) > 4) {
+				var InsertionNode = (snaplTargetDoc.documentElement) ? snaplTargetDoc.documentElement : snaplTargetDoc;
+				
+				this.Element = snaplTargetDoc.createElementNS(snaplXhtmlNS, 'snaplRect');
+				if(InsertionNode && this.Element) {
+					this.Element.style.color = snaplBorderColor;
+					this.Element.style.border = snaplBorderWidth + 'px dotted';
+					this.Element.style.position = 'absolute';
+					this.Element.style.zIndex = '10000';
+					this.Element.style.left = this.X1 + 'px'; 
+					this.Element.style.top = this.Y1 + 'px';
+					InsertionNode.appendChild(this.Element);
+
+					this.DragStarted = this.Element.parentNode != undefined;
+
+					if(this.DragStarted) {
+						snaplIdTimeoutStart=window.setTimeout("processTimeoutStartRect();",50);
+
+						snaplVisible=true;
+						if(snaplShowNumber)
+							updateStatus(msgPanelLinks + " " + "0");
+						return true;
+					}
+				}
+			}
+			return false;
+		},
+
+		/** Clears the selection by removing the element, also clears some other non-refactored but moved code */
+		Clear: function() {
+			if (this.Element)
+				this.Element.parentNode.removeChild(this.Element);
+			this.Element = null;
+			
+			this.X1=0; this.X2=0; this.Y1=0; this.Y2=0;
+			this.DragStarted = false;
+		},
+		
+		/** Offsets the selection by the given coordinates */
+		OffsetSelection: function(X, Y) {
+			this.X1 += X;	this.Y1 += Y;
+			this.X2 += X;	this.Y2 += Y;
+			this.UpdateElement();
+		},
+		
+		ExpandSelectionTo: function(X, Y) {
+			this.X2 = X;	this.Y2 = Y;
+			this.UpdateElement();
+		},
+		
+		UpdateElement: function() {
+			if(this.Create()) {
+				this.Element.style.width 	= Math.abs(this.X1-this.X2) - snaplBorderWidth + 'px';
+				this.Element.style.height 	= Math.abs(this.Y1-this.Y2) - snaplBorderWidth + 'px';
+				this.Element.style.top 		= Math.min(this.Y1,this.Y2) - snaplBorderWidth + 'px';
+				this.Element.style.left 	= Math.min(this.X1,this.X2) - snaplBorderWidth + 'px';
+			}
+		},
+		
+		/** Initializes the position as the result of a mouse down */
+		InitializePosition: function(X1, Y1) {
+			this.X1 = X1;
+			this.Y1 = Y1;
+		}
+	} );
+	
+	SnapLinks = new (Class.create( {
+		initialize: function() {
+			this.Selection = new Selection();
+			
+			this.PanelContainer = document.getElementById("content").mPanelContainer;
+			this.PanelContainer.addEventListener("mousedown", this.OnMouseDown.bind(this), true);
+			this.PanelContainer.addEventListener("mouseup", this.OnMouseUp.bind(this), true);
+			
+			this._OnMouseMove 	= this.OnMouseMove.bind(this);
+			this._OnMouseOut	= this.OnMouseOut.bind(this);
+		},
+		OnMouseDown: function(e) {
+			snaplUpdateOptions();
+
+			if(e.button != snaplButton)
+				return;
+			if(snaplPostLoadingActivate)
+				return;
+
+			snaplStopPopup = true;
+
+			initiateLoading();
+			
+			snaplTargetDoc = e.target.ownerDocument;
+
+			/** Does this even do anything?? --Clint */
+//			if (snaplTargetDoc.defaultView.top instanceof Window){
+//				snaplTargetDoc = snaplTargetDoc;
+//			}
+
+			this.Clear();
+			
+			SnapLinks.Selection.InitializePosition(
+				Math.min(e.pageX,snaplTargetDoc.documentElement.offsetWidth + snaplTargetDoc.defaultView.pageXOffset), 
+				e.pageY
+			);
+			
+			snaplVisible=false;			
+			snaplEqualSize=true;
+			snaplDrawing=true;
+
+			this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
+			this.PanelContainer.addEventListener('mouseout', this._OnMouseOut, true);
+		},
+		
+		OnMouseMove: function(e) {
+			if(snaplDrawing == false || snaplPostLoadingActivate == true || !snaplAction)
+				return;
+
+			updateStatusLabel();
+			
+			snaplEqualSize = e.shiftKey;
+
+			if(e.altKey){
+				SnapLinks.Selection.OffsetSelection(e.pageX - SnapLinks.Selection.X2, e.pageY - SnapLinks.Selection.Y2);
+
+				/** The below commented section of code causes the rectangle to shrink if it goes off screen, is this even a desired functionality? -- Clint - 5/22/2011 */
+		//		var mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+		//			.getInterface(Components.interfaces.nsIWebNavigation)
+		//			.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+		//			.rootTreeItem
+		//			.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+		//			.getInterface(Components.interfaces.nsIDOMWindow);
+		//		var tabbrowser = mainWindow.document.getElementById("content");
+		//		var minHeight = tabbrowser.selectedBrowser.boxObject.height;
+		//		var minWidth = tabbrowser.selectedBrowser.boxObject.width;
+																														
+		//		SnapLinks.Selection.X1 = Math.max(Math.min(Math.max(snaplTargetDoc.width,minWidth),SnapLinks.Selection.X1),0);
+		//		SnapLinks.Selection.Y1 = Math.max(Math.min(Math.max(snaplTargetDoc.height,minHeight),SnapLinks.Selection.Y1),0);
+			} else {
+				SnapLinks.Selection.ExpandSelectionTo(Math.min(e.pageX,content.document.documentElement.offsetWidth + snaplTargetDoc.defaultView.pageXOffset), e.pageY);
+			}
+			
+			if(!snaplIdTimeout)
+				snaplIdTimeout=window.setTimeout("processTimeout();",300);
+		},
+		
+		OnMouseUp: function(e) {
+			if(e.button != snaplButton)
+				return;
+			if(snaplPostLoadingActivate)
+				return;
+
+			this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
+			this.PanelContainer.removeEventListener('mouseout', this._OnMouseOut, true);
+
+			if(snaplVisible == true){
+				snaplStopPopup=true;
+				if(e.ctrlKey) {
+					showSnapPopup(e);
+				}
+				
+				if(!stillLoading()){
+					activateLinks();
+				}else{
+					snaplPostLoadingActivate = true;
+				}
+			} else {
+				SnapLinks.Clear();
+				if(snaplButton == snaplRMB){
+					var evt = document.createEvent("MouseEvents");
+					snaplStopPopup=false;
+
+					// This code didnt work well with the spell checking in FF 2.0
+					//evt.initMouseEvent("contextmenu", true, true, e.originalTarget.defaultView, 0,
+					//	e.screenX, e.screenY, e.clientX, e.clientY, false, false, false, false, 2, null);
+					//	e.originalTarget.dispatchEvent(evt);
+
+					evt.initMouseEvent("contextmenu", true, true, window, 0,
+						e.screenX, e.screenY, e.clientX, e.clientY,
+						false, false, false, false, 2, null);
+						//e.originalTarget.dispatchEvent(evt);
+
+					if (gContextMenu)
+					{
+						var item = gContextMenu.target;
+						item.dispatchEvent(e);
+			
+						//document.popupNode = e.originalTarget;
+						//var obj = document.getElementById("contentAreaContextMenu");
+						//obj.showPopup(this, e.clientX, e.clientY, "context", null, null);
+						  
+						snaplStopPopup=true;
+					}
+				}
+			}
+		},
+		
+		OnMouseOut: function(e) {
+			if(snaplEndWhenOut){
+				if(snaplVisible == true){
+					if(!e.relatedTarget){
+						snaplStopPopup=true;
+						drawRect();
+						executeAction();
+						SnapLinks.Clear();
+					}
+				}
+			}
+		},
+		
+		Clear: function() {
+			snaplDrawing=false;
+
+			this.Selection.Clear();
+			
+			if(snaplLinks && snaplLinks.length){
+				for(var i=0;i<snaplLinks.length;i++){
+					snaplLinks[i].style.MozOutline = "none";
+				}
+				snaplLinks = null;
+			}
+			snaplVisible=false;
+			
+			displayInfo("");
+			updateStatus("");
+		}
+	}));
+	
+}, false);
 
 
 function updateStatus(str){
@@ -106,10 +415,6 @@ function start(e){
 	snaplStarted = true;
 	snaplContextPopup = document.getElementById("contentAreaContextMenu");
 	snaplContextPopup.addEventListener("popupshowing", eventPopupshowing, false);
-	snaplRendering.addEventListener("mouseup", eventMouseUp, true);
-	snaplRendering.addEventListener("mousedown", eventMouseDown, true);
-	snaplRendering.addEventListener("mouseout", eventMouseOut, true);
-	snaplRendering.addEventListener("mousemove", eventMouseMove, true);
 	snaplRendering.addEventListener("keypress", eventKeypress, true);
 	
 	snaplRendering.addEventListener("keydown", eventKeyDownUp, true);
@@ -134,7 +439,7 @@ function displayInfo(info){
 
 function eventKeypress(e){
 	if(e.keyCode == KeyboardEvent.DOM_VK_ESCAPE){
-		clearRect();
+		SnapLinks.Clear();
 	}
 }
 
@@ -158,7 +463,7 @@ function eventOnMouseOver(e){
 function eventOnScroll(e){
 	if(snaplLastEventMouseOver){
 		scrollUpdate();
-		eventMouseMove(snaplLastEventMouseOver);
+		SnapLinks.OnMouseMove(snaplLastEventMouseOver);
 		snaplLastEventMouseOver=0;
 	}
 }
@@ -168,53 +473,6 @@ function eventPopupshowing(e){
 		e.preventDefault();
 		snaplStopPopup=false;
 		return false;
-	}
-}
-
-function eventMouseUp(e){
-	if(e.button != snaplButton) return;
-	if(snaplPostLoadingActivate) return;
-
-	if(snaplVisible == true){
-		snaplStopPopup=true;
-		if(e.ctrlKey) {
-			showSnapPopup(e);
-		}
-		
-		if(!stillLoading()){
-			activateLinks();
-		}else{
-			snaplPostLoadingActivate = true;
-		}
-	}
-	else{
-		clearRect();
-		if(snaplButton == snaplRMB){
-			var evt = document.createEvent("MouseEvents");
-			snaplStopPopup=false;
-
-			// This code didnt work well with the spell checking in FF 2.0
-			//evt.initMouseEvent("contextmenu", true, true, e.originalTarget.defaultView, 0,
-			//	e.screenX, e.screenY, e.clientX, e.clientY, false, false, false, false, 2, null);
-			//	e.originalTarget.dispatchEvent(evt);
-
-			evt.initMouseEvent("contextmenu", true, true, window, 0,
-				e.screenX, e.screenY, e.clientX, e.clientY,
-				false, false, false, false, 2, null);
-				//e.originalTarget.dispatchEvent(evt);
-
-			if (gContextMenu)
-			{
-				var item = gContextMenu.target;
-				item.dispatchEvent(e);
-	
-			  	//document.popupNode = e.originalTarget;
-				//var obj = document.getElementById("contentAreaContextMenu");
-				//obj.showPopup(this, e.clientX, e.clientY, "context", null, null);
-				  
-				snaplStopPopup=true;
-			}
-		}
 	}
 }
 
@@ -234,7 +492,7 @@ function activateLinks(){
 	if(snaplAction != SNAPLACTION_UNDEF){
 		drawRect();
 		executeAction();
-		clearRect();
+		SnapLinks.Clear();
 	}
 }
 
@@ -245,62 +503,12 @@ function signalEndLoading(){
 	}
 }
 
-function eventMouseOut(e){
-
-	if(snaplEndWhenOut){
-		if(snaplVisible == true){
-			if(!e.relatedTarget){
-				snaplStopPopup=true;
-				drawRect();
-				executeAction();
-				clearRect();
-			}
-		}
-	}
-}
-
-function eventMouseDown(e){
-	snaplUpdateOptions();
-
-	if(e.button != snaplButton) return;
-	if(snaplPostLoadingActivate) return;
-
-	snaplStopPopup = true;
-
-	initiateLoading();
-	initializeLoc(e);
-	snaplEqualSize=true;
-	snaplDrawing=true;
-}
-
-
 function saveMouseOverEvent(e){
 	if(!snaplLastEventMouseOver)
 		snaplLastEventMouseOver = new Object();
 
 	snaplLastEventMouseOver.pageX = e.pageX;
 	snaplLastEventMouseOver.pageY = e.pageY;
-}
-
-function saveMouseEvent(e){
-	if(!snaplLastMoveEvent)
-		snaplLastMoveEvent = new Object();
-
-	snaplLastMoveEvent.pageX = e.pageX;
-	snaplLastMoveEvent.pageY = e.pageY;
-}
-
-function eventMouseMove(e){
-	if(snaplDrawing==false) return;
-	if(snaplPostLoadingActivate || !snaplAction) return;
-
-	updateStatusLabel();
-
-	selectZone(e);
-
-	if(!snaplIdTimeout){
-		snaplIdTimeout=window.setTimeout("processTimeout();",300);
-	}
 }
 
 function processTimeout(){
@@ -348,7 +556,7 @@ function eventSnaplPopupHidden(){
 	if(snaplAction == SNAPLACTION_UNDEF){
 		snaplAction = SNAPLACTION_DEFAULT;
 		// Escape
-		clearRect();
+		SnapLinks.Clear();
 		return;
 	}
 	activateLinks();
