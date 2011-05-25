@@ -73,11 +73,11 @@ function processTimeoutRectContinue(){
 		processTimeout();
 	}else{
 		processTimeout();
-		updateStatusLabel();
+//		SnapLinks.UpdateStatusLabel();		/* Necessary?? */
 		stopLoading();
 		signalEndLoading();
 	}
-	updateStatusLabel();
+	SnapLinks.UpdateStatusLabel();
 }
 
 function scrollUpdate(){

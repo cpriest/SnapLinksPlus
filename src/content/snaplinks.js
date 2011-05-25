@@ -156,18 +156,69 @@ window.addEventListener('load', function() {
 		
 		DragStarted: false,
 		
-		initialize: function() {
-			
+		initialize: function(PanelContainer) {
+			this.PanelContainer = PanelContainer;
+			this.PanelContainer.addEventListener("mousedown", this.OnMouseDown.bind(this), true);
+			this.PanelContainer.addEventListener("mouseup", this.OnMouseUp.bind(this), true);
+
+			this._OnMouseMove 	= this.OnMouseMove.bind(this);
+//			this._OnMouseOut	= this.OnMouseOut.bind(this);
 		},
+		
+		OnMouseDown: function(e) {
+			if(e.button != snaplButton)
+				return;
+
+			if(snaplPostLoadingActivate)
+				return;
+
+			this.Document = e.target.ownerDocument;
+				
+			/** Initializes the starting mouse position */
+			this.X1 = Math.min(e.pageX,this.Document.documentElement.offsetWidth + this.Document.defaultView.pageXOffset);
+			this.Y1 = e.pageY;
+
+			this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
+		},
+		
+		OnMouseMove: function(e) {
+			if(snaplDrawing == false || snaplPostLoadingActivate == true || !snaplAction)
+				return;
+			
+			if(e.altKey) {
+				this.OffsetSelection(e.pageX - this.X2, e.pageY - this.Y2);
+
+				/** The below commented section of code causes the rectangle to shrink if it goes off screen, is this even a desired functionality? -- Clint - 5/22/2011 */
+		//		var mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+		//			.getInterface(Components.interfaces.nsIWebNavigation)
+		//			.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
+		//			.rootTreeItem
+		//			.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+		//			.getInterface(Components.interfaces.nsIDOMWindow);
+		//		var tabbrowser = mainWindow.document.getElementById("content");
+		//		var minHeight = tabbrowser.selectedBrowser.boxObject.height;
+		//		var minWidth = tabbrowser.selectedBrowser.boxObject.width;
+																														
+		//		SnapLinks.Selection.X1 = Math.max(Math.min(Math.max(snaplTargetDoc.width,minWidth),SnapLinks.Selection.X1),0);
+		//		SnapLinks.Selection.Y1 = Math.max(Math.min(Math.max(snaplTargetDoc.height,minHeight),SnapLinks.Selection.Y1),0);
+			} else {
+				this.ExpandSelectionTo(Math.min(e.pageX,this.Document.documentElement.offsetWidth + this.Document.defaultView.pageXOffset), e.pageY);
+			}
+		},
+
+		OnMouseUp: function(e) {
+			this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
+		},
+		
 		
 		Create: function() {
 			if(this.DragStarted == true)
 				return true;
 				
 			if(!snaplIdTimeoutStart && Math.abs(this.X1-this.X2) > 4 || Math.abs(this.Y1-this.Y2) > 4) {
-				var InsertionNode = (snaplTargetDoc.documentElement) ? snaplTargetDoc.documentElement : snaplTargetDoc;
+				var InsertionNode = (this.Document.documentElement) ? this.Document.documentElement : this.Document;
 				
-				this.Element = snaplTargetDoc.createElementNS(snaplXhtmlNS, 'snaplRect');
+				this.Element = this.Document.createElementNS(snaplXhtmlNS, 'snaplRect');
 				if(InsertionNode && this.Element) {
 					this.Element.style.color = snaplBorderColor;
 					this.Element.style.border = snaplBorderWidth + 'px dotted';
@@ -222,25 +273,33 @@ window.addEventListener('load', function() {
 				this.Element.style.left 	= Math.min(this.X1,this.X2) - snaplBorderWidth + 'px';
 			}
 		},
-		
-		/** Initializes the position as the result of a mouse down */
-		InitializePosition: function(X1, Y1) {
-			this.X1 = X1;
-			this.Y1 = Y1;
-		}
 	} );
 	
 	SnapLinks = new (Class.create( {
+		
+		StatusBarLabel: {	set: function(x) { document.getElementById('statusbar-display').label = x; }	},
+		
 		initialize: function() {
-			this.Selection = new Selection();
-			
 			this.PanelContainer = document.getElementById("content").mPanelContainer;
 			this.PanelContainer.addEventListener("mousedown", this.OnMouseDown.bind(this), true);
 			this.PanelContainer.addEventListener("mouseup", this.OnMouseUp.bind(this), true);
 			
 			this._OnMouseMove 	= this.OnMouseMove.bind(this);
 			this._OnMouseOut	= this.OnMouseOut.bind(this);
+
+			this.Selection = new Selection(this.PanelContainer);
 		},
+		
+		UpdateStatusLabel: function() {
+			if(!snaplDrawing)
+				return;
+
+			if(stillLoading())
+				this.StatusBarLabel = msgStatusLoading;
+			else
+				this.StatusBarLabel = msgStatusUsage;
+		},
+		
 		OnMouseDown: function(e) {
 			snaplUpdateOptions();
 
@@ -261,12 +320,7 @@ window.addEventListener('load', function() {
 //			}
 
 			this.Clear();
-			
-			SnapLinks.Selection.InitializePosition(
-				Math.min(e.pageX,snaplTargetDoc.documentElement.offsetWidth + snaplTargetDoc.defaultView.pageXOffset), 
-				e.pageY
-			);
-			
+						
 			snaplVisible=false;			
 			snaplEqualSize=true;
 			snaplDrawing=true;
@@ -279,29 +333,9 @@ window.addEventListener('load', function() {
 			if(snaplDrawing == false || snaplPostLoadingActivate == true || !snaplAction)
 				return;
 
-			updateStatusLabel();
+			this.UpdateStatusLabel();
 			
 			snaplEqualSize = e.shiftKey;
-
-			if(e.altKey){
-				SnapLinks.Selection.OffsetSelection(e.pageX - SnapLinks.Selection.X2, e.pageY - SnapLinks.Selection.Y2);
-
-				/** The below commented section of code causes the rectangle to shrink if it goes off screen, is this even a desired functionality? -- Clint - 5/22/2011 */
-		//		var mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-		//			.getInterface(Components.interfaces.nsIWebNavigation)
-		//			.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
-		//			.rootTreeItem
-		//			.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-		//			.getInterface(Components.interfaces.nsIDOMWindow);
-		//		var tabbrowser = mainWindow.document.getElementById("content");
-		//		var minHeight = tabbrowser.selectedBrowser.boxObject.height;
-		//		var minWidth = tabbrowser.selectedBrowser.boxObject.width;
-																														
-		//		SnapLinks.Selection.X1 = Math.max(Math.min(Math.max(snaplTargetDoc.width,minWidth),SnapLinks.Selection.X1),0);
-		//		SnapLinks.Selection.Y1 = Math.max(Math.min(Math.max(snaplTargetDoc.height,minHeight),SnapLinks.Selection.Y1),0);
-			} else {
-				SnapLinks.Selection.ExpandSelectionTo(Math.min(e.pageX,content.document.documentElement.offsetWidth + snaplTargetDoc.defaultView.pageXOffset), e.pageY);
-			}
 			
 			if(!snaplIdTimeout)
 				snaplIdTimeout=window.setTimeout("processTimeout();",300);
@@ -384,7 +418,7 @@ window.addEventListener('load', function() {
 			}
 			snaplVisible=false;
 			
-			displayInfo("");
+			this.StatusBarLabel = '';
 			updateStatus("");
 		}
 	}));
@@ -430,11 +464,6 @@ function start(e){
 	snaplLastEventMouseOver=0;
 	snaplPostLoadingActivate=false;
 	snaplAction=SNAPLACTION_DEFAULT;
-}
-
-function displayInfo(info){
-	var statusbar = document.getElementById("statusbar-display");
-	statusbar.label=info;
 }
 
 function eventKeypress(e){
@@ -515,17 +544,6 @@ function processTimeout(){
 	snaplIdTimeout=0;
 	drawRect();
 }
-
-function updateStatusLabel(){
-	if(!snaplDrawing)
-		return;
-
-	if(stillLoading())
-		displayInfo(msgStatusLoading);	
-	else
-		displayInfo(msgStatusUsage);	
-}
-
 
 function snaplActionNewTabs(){
 	snaplAction=SNAPLACTION_TABS;
