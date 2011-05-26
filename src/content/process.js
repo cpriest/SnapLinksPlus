@@ -358,10 +358,8 @@ function controlLinks(){
 			snaplLinks.push(l);
 		}
 	}
-	if(snaplShowNumber){
-		updateStatus(msgPanelLinks + " " + snaplLinks.length);
-	}
-
+	if(snaplShowNumber)
+		SnapLinks.SnapLinksStatus = msgPanelLinks + ' ' + snaplLinks.length;
 }
 
 // Its more precise but very slow and may be ugly

@@ -19,8 +19,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+ /*
+ *	To Fix:
+ * 		Scrolling while selection active does not update selection rect properly (look into using clientX + scrollX rather than pageX)
+ *
+ *
+ *
+ */
 
-var snaplStarted = false;
 var snaplDrawing = false;
 
 var snaplLinks;
@@ -53,7 +60,6 @@ var snaplStopPopup;
 var snaplEqualSize;
 var snaplIdTimeout=0;
 
-var snaplLastEventMouseOver=0;
 var snaplIdTimeoutStart=0;
 
 var snaplPostLoadingActivate=false;
@@ -162,6 +168,7 @@ window.addEventListener('load', function() {
 			this.PanelContainer.addEventListener("mouseup", this.OnMouseUp.bind(this), true);
 
 			this._OnMouseMove 	= this.OnMouseMove.bind(this);
+//			this._OnScroll		= this.OnScroll.bind(this);
 //			this._OnMouseOut	= this.OnMouseOut.bind(this);
 		},
 		
@@ -179,6 +186,7 @@ window.addEventListener('load', function() {
 			this.Y1 = e.pageY;
 
 			this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
+//			this.Document.addEventListener("scroll", this._OnScroll, false);
 		},
 		
 		OnMouseMove: function(e) {
@@ -202,14 +210,18 @@ window.addEventListener('load', function() {
 		//		SnapLinks.Selection.X1 = Math.max(Math.min(Math.max(snaplTargetDoc.width,minWidth),SnapLinks.Selection.X1),0);
 		//		SnapLinks.Selection.Y1 = Math.max(Math.min(Math.max(snaplTargetDoc.height,minHeight),SnapLinks.Selection.Y1),0);
 			} else {
-				this.ExpandSelectionTo(Math.min(e.pageX,this.Document.documentElement.offsetWidth + this.Document.defaultView.pageXOffset), e.pageY);
+				this.ExpandSelectionTo(Math.min(e.pageX), e.pageY);
 			}
 		},
+		
+//		OnScroll: function(e) {
+//			this.ExpandSelectionTo(Math.min(e.pageX,this.Document.documentElement.offsetWidth + this.Document.defaultView.pageXOffset), e.pageY);
+//		},
 
 		OnMouseUp: function(e) {
 			this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
+//			this.Document.removeEventListener('scroll', this._OnScroll, false);
 		},
-		
 		
 		Create: function() {
 			if(this.DragStarted == true)
@@ -235,7 +247,7 @@ window.addEventListener('load', function() {
 
 						snaplVisible=true;
 						if(snaplShowNumber)
-							updateStatus(msgPanelLinks + " " + "0");
+							SnapLinks.SnapLinksStatus = msgPanelLinks + ' 0';
 						return true;
 					}
 				}
@@ -277,17 +289,42 @@ window.addEventListener('load', function() {
 	
 	SnapLinks = new (Class.create( {
 		
+		SnapLinksStatus: {
+			set: function(x) {
+				var el = document.getElementById("snaplinks-panel") ;
+				el && (el.label = x);
+				el && (el.hidden = (x == ''));
+			} 
+		},
 		StatusBarLabel: {	set: function(x) { document.getElementById('statusbar-display').label = x; }	},
 		
 		initialize: function() {
+			snaplUpdateOptions();
+			
+			snaplButton = snaplRMB;
+			snaplPostLoadingActivate=false;
+			snaplAction=SNAPLACTION_DEFAULT;
+
 			this.PanelContainer = document.getElementById("content").mPanelContainer;
 			this.PanelContainer.addEventListener("mousedown", this.OnMouseDown.bind(this), true);
 			this.PanelContainer.addEventListener("mouseup", this.OnMouseUp.bind(this), true);
-			
+			this.PanelContainer.addEventListener("keypress", this.OnKeyPress.bind(this), true);
+
 			this._OnMouseMove 	= this.OnMouseMove.bind(this);
 			this._OnMouseOut	= this.OnMouseOut.bind(this);
+			this._OnKeyDown		= this.OnKeyDown.bind(this);
+			this._OnKeyUp		= this.OnKeyUp.bind(this);
+			this._OnScroll		= this.OnScroll.bind(this);
+
+			document.getElementById('contentAreaContextMenu')
+				.addEventListener('popupshowing', this.OnContextMenuShowing.bind(this), false);
+				
+			document.getElementById('snaplMenu')
+				.addEventListener('popuphidden',this.OnSnapLinksPopupHidden.bind(this),false)
 
 			this.Selection = new Selection(this.PanelContainer);
+
+			this.SnapLinksStatus = '';
 		},
 		
 		UpdateStatusLabel: function() {
@@ -327,6 +364,9 @@ window.addEventListener('load', function() {
 
 			this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
 			this.PanelContainer.addEventListener('mouseout', this._OnMouseOut, true);
+			this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
+			this.PanelContainer.addEventListener('keyup', this._OnKeyUp, true);
+			document.addEventListener('scroll', this._OnScroll, false);
 		},
 		
 		OnMouseMove: function(e) {
@@ -334,9 +374,7 @@ window.addEventListener('load', function() {
 				return;
 
 			this.UpdateStatusLabel();
-			
-			snaplEqualSize = e.shiftKey;
-			
+						
 			if(!snaplIdTimeout)
 				snaplIdTimeout=window.setTimeout("processTimeout();",300);
 		},
@@ -349,6 +387,9 @@ window.addEventListener('load', function() {
 
 			this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
 			this.PanelContainer.removeEventListener('mouseout', this._OnMouseOut, true);
+			this.PanelContainer.removeEventListener('keydown', this._OnKeyDown, true);
+			this.PanelContainer.removeEventListener('keyup', this._OnKeyUp, true);
+			document.removeEventListener('scroll', this._OnScroll, false);
 
 			if(snaplVisible == true){
 				snaplStopPopup=true;
@@ -377,8 +418,7 @@ window.addEventListener('load', function() {
 						false, false, false, false, 2, null);
 						//e.originalTarget.dispatchEvent(evt);
 
-					if (gContextMenu)
-					{
+					if (gContextMenu) {
 						var item = gContextMenu.target;
 						item.dispatchEvent(e);
 			
@@ -405,6 +445,49 @@ window.addEventListener('load', function() {
 			}
 		},
 		
+		OnKeyPress: function(e) {
+			if(e.keyCode == KeyboardEvent.DOM_VK_ESCAPE)
+				SnapLinks.Clear();
+		},
+		
+		OnKeyDown: function(e) {
+			if(e.keyCode == KeyboardEvent.DOM_VK_SHIFT ){
+				snaplEqualSize = false;
+				drawRect();
+			}
+		},
+		
+		OnKeyUp: function(e) {
+			if(e.keyCode == KeyboardEvent.DOM_VK_SHIFT ){
+				snaplEqualSize = true;
+				drawRect();
+			}
+		},
+		
+		OnScroll: function(e) {
+			scrollUpdate();
+		},
+
+		OnContextMenuShowing: function(e){
+			if((snaplStopPopup==true) && (snaplButton==snaplRMB)){
+				e.preventDefault();
+				snaplStopPopup=false;
+				return false;
+			}
+		},
+
+		OnSnapLinksPopupHidden: function(e){
+
+			if(snaplAction == SNAPLACTION_UNDEF){
+				snaplAction = SNAPLACTION_DEFAULT;
+				// Escape
+				SnapLinks.Clear();
+				return;
+			}
+			activateLinks();
+			snaplAction = SNAPLACTION_DEFAULT;
+		},
+		
 		Clear: function() {
 			snaplDrawing=false;
 
@@ -419,91 +502,11 @@ window.addEventListener('load', function() {
 			snaplVisible=false;
 			
 			this.StatusBarLabel = '';
-			updateStatus("");
+			this.SnapLinksStatus = '';
 		}
 	}));
 	
 }, false);
-
-
-function updateStatus(str){
-	var el = null;
-	el = document.getElementById("snaplinks-panel");
-	if (!el)
-		return;	
-	else
-		el.label=str;
-
-	if(str=="")
-		el.hidden=true;
-	else
-		el.hidden=false;
-}
-
-function start(e){
-	updateStatus("");
-	snaplUpdateOptions();
-	snaplContent = document.getElementById("content");
-
-	var snaplRendering = snaplContent.mPanelContainer;
-	snaplStarted = true;
-	snaplContextPopup = document.getElementById("contentAreaContextMenu");
-	snaplContextPopup.addEventListener("popupshowing", eventPopupshowing, false);
-	snaplRendering.addEventListener("keypress", eventKeypress, true);
-	
-	snaplRendering.addEventListener("keydown", eventKeyDownUp, true);
-	snaplRendering.addEventListener("keyup", eventKeyDownUp, true);
-	
-	document.addEventListener("scroll", eventOnScroll, false);
-	document.addEventListener("mouseover", eventOnMouseOver, false);
-
-	pop = document.getElementById("snaplMenu");
-	pop.addEventListener("popuphidden",eventSnaplPopupHidden,false);
-	
-	snaplButton = snaplRMB;
-	snaplLastEventMouseOver=0;
-	snaplPostLoadingActivate=false;
-	snaplAction=SNAPLACTION_DEFAULT;
-}
-
-function eventKeypress(e){
-	if(e.keyCode == KeyboardEvent.DOM_VK_ESCAPE){
-		SnapLinks.Clear();
-	}
-}
-
-function eventKeyDownUp(e){
-	if(e.keyCode == KeyboardEvent.DOM_VK_SHIFT ){
-		if(e.type.toLowerCase()=="keydown"){
-			snaplEqualSize = false;
-			drawRect();
-		}
-		if(e.type.toLowerCase()=="keyup"){
-			snaplEqualSize = true;
-			drawRect();
-		}
-	}
-}
-
-function eventOnMouseOver(e){
-	saveMouseOverEvent(e);
-}
-
-function eventOnScroll(e){
-	if(snaplLastEventMouseOver){
-		scrollUpdate();
-		SnapLinks.OnMouseMove(snaplLastEventMouseOver);
-		snaplLastEventMouseOver=0;
-	}
-}
-
-function eventPopupshowing(e){
-	if((snaplStopPopup==true) && (snaplButton==snaplRMB)){
-		e.preventDefault();
-		snaplStopPopup=false;
-		return false;
-	}
-}
 
 function showSnapPopup(e) {
 	pop = document.getElementById("snaplMenu");
@@ -530,14 +533,6 @@ function signalEndLoading(){
 		snaplPostLoadingActivate=false;
 		activateLinks();
 	}
-}
-
-function saveMouseOverEvent(e){
-	if(!snaplLastEventMouseOver)
-		snaplLastEventMouseOver = new Object();
-
-	snaplLastEventMouseOver.pageX = e.pageX;
-	snaplLastEventMouseOver.pageY = e.pageY;
 }
 
 function processTimeout(){
@@ -568,18 +563,3 @@ function snaplActionBookmark(){
 function snaplActionDownload(){
 	snaplAction=SNAPLACTION_DOWNLOAD;
 }
-
-function eventSnaplPopupHidden(){
-
-	if(snaplAction == SNAPLACTION_UNDEF){
-		snaplAction = SNAPLACTION_DEFAULT;
-		// Escape
-		SnapLinks.Clear();
-		return;
-	}
-	activateLinks();
-	snaplAction = SNAPLACTION_DEFAULT;
-}
-
-
-window.addEventListener("load", start, false);
