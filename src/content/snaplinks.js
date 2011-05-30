@@ -27,7 +27,7 @@
  *
  *
  */
-
+ 
 var snaplDrawing = false;
 
 var snaplLinks;
@@ -148,7 +148,28 @@ var Class = (function() {
 
 window.addEventListener('load', function() {
 	
-	
+	/* Converts an iterable element to an array */
+	function $A(iterable) {
+		if (!iterable) return [];
+		if ('toArray' in Object(iterable)) return iterable.toArray();
+		var length = iterable.length || 0, results = new Array(length);
+		while (length--) results[length] = iterable[length];
+		return results;
+	}
+
+	/** Returns an array of { top, left, width, height } objects which combined make up the bounding rects of the given element, 
+	* 	this uses the built-in .getClientRects() and additionally compensates for 'block' elements which it would appear is not
+	* 	handled appropriately for our needs by Mozilla or the standard 
+	*/
+	function GetClientElementRects(node) {
+		var Rects = $A(node.getClientRects());
+		
+		$A(node.querySelectorAll('IMG')).forEach( function(elem) {
+			Rects = Rects.concat( $A(elem.getClientRects()) );
+		} );
+		return Rects;
+	}
+			
 	/** Selection class handles the selection rectangle and accompanying visible element */
 	var Selection = Class.create({ 
 		X1: 0, Y1: 0, X2: 0, Y2: 0,
@@ -287,8 +308,114 @@ window.addEventListener('load', function() {
 		},
 	} );
 	
-	SnapLinks = new (Class.create( {
+	var SnapLinksDebug = new (Class.create({
+		Flags: {
+			Links: {
+				LinkStyle: 			{ border: '1px solid red' },
+				ClientRectStyle:	{ backgroundColor: 'black', opacity: .3 },
+				
+				OnLoad: {
+					ApplyLinkStyle:			true,
+					ShowClientRects:		false,
+				},
+				OnMouseOver: {
+					ApplyLinkStyle: 		false,
+					ShowClientRects:		true,
+				},
+			}
+		},
 		
+		DebugLinksAtLoad: 		{ get: function() { return this.Flags.Links.OnLoad.ApplyLinkStyle || this.Flags.Links.OnLoad.ShowClientRects; }	},
+		DebugLinksOnMouseOver: 	{ get: function() { return this.Flags.Links.OnMouseOver.ApplyLinkStyle || this.Flags.Links.OnMouseOver.ShowClientRects; }	},
+		
+		initialize: function() {
+			if(this.DebugLinksAtLoad || this.DebugLinksOnMouseOver)
+				gBrowser.addEventListener('load', this.OnDocumentLoaded.bind(this), true);
+		},
+
+		OnDocumentLoaded: function(e) {
+			$A(e.target.links).forEach( function( link ) {
+				if(this.DebugLinksAtLoad) {
+					if(this.Flags.Links.OnLoad.ApplyLinkStyle)
+						this.ApplyStyle(link, this.Flags.Links.LinkStyle);
+					if(this.Flags.Links.OnLoad.ShowClientRects) {
+						this.ShowClientElementRects(link);
+						/* If we're showing during startup, lose the references so they are not cleared during mouse-over timeout */
+						delete link.SnapDebugNodes;
+					}
+				}
+					
+				if(this.DebugLinksOnMouseOver)
+					link.addEventListener('mousemove', this.OnMouseMove.bind(this, link), false);
+			}, this );
+		},
+
+		ClearClientRects: function(link) {
+			(link.SnapDebugNodes || []).forEach( function(elem) {
+				elem.parentNode.removeChild(elem);
+			} );
+			link.SnapDebugNodes = [ ];
+		},
+		ClearVisualDebugAids: function(link) {
+			this.ClearClientRects(link);
+			
+			link.OriginalStyle
+				&& this.ApplyStyle(link, link.OriginalStyle)
+				&& delete link.OriginalStyle;
+		},
+
+		OnMouseMove: function(link, e) {
+			clearTimeout(link.SnapDebugClearTimer || 0);
+			
+			if(this.Flags.Links.OnMouseOver.ApplyLinkStyle) {
+				var ReplacedStyle = this.ApplyStyle(link, this.Flags.Links.LinkStyle);
+				link.OriginalStyle = link.OriginalStyle || ReplacedStyle;
+			}
+			
+			if(this.Flags.Links.OnMouseOver.ShowClientRects)
+				this.ShowClientElementRects(link);
+			
+			link.SnapDebugClearTimer = setTimeout(this.ClearVisualDebugAids.bind(this, link), 3000);
+		},
+		ShowClientElementRects: function(link) {
+			this.ClearClientRects(link);
+
+			var scrollX = link.ownerDocument.defaultView.scrollX;
+			var scrollY = link.ownerDocument.defaultView.scrollY;
+			
+			GetClientElementRects(link).forEach( function(rect) {
+				var elem = link.ownerDocument.createElement('div');
+				this.ApplyStyle(elem, {
+					position	: 'absolute',
+					zIndex		: 1,
+					top			: (rect.top + scrollY) + 'px',
+					left		: (rect.left + scrollX) + 'px',
+					width		: rect.width + 'px',
+					height		: rect.height + 'px',
+					cursor		: 'pointer',
+				} );
+				this.ApplyStyle(elem, this.Flags.Links.ClientRectStyle);
+				elem.addEventListener('click', function(e) {
+					var evt = document.createEvent('MouseEvents');
+					evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+					link.dispatchEvent(evt); 
+				}, true);
+				link.ownerDocument.body.appendChild(elem);
+				link.SnapDebugNodes.push(elem);
+			}, this );
+		},
+		ApplyStyle: function(elem, style) {
+			var OriginalStyle = { };
+			Object.keys(style).forEach( function(name) {
+				OriginalStyle[name] = elem.style[name];
+				elem.style[name] = style[name];
+			} );
+			return OriginalStyle;
+		}
+	}))();
+	
+	SnapLinks = new (Class.create( {
+				
 		SnapLinksStatus: {
 			set: function(x) {
 				var el = document.getElementById("snaplinks-panel") ;
@@ -326,7 +453,7 @@ window.addEventListener('load', function() {
 
 			this.SnapLinksStatus = '';
 		},
-		
+				
 		UpdateStatusLabel: function() {
 			if(!snaplDrawing)
 				return;
@@ -503,7 +630,8 @@ window.addEventListener('load', function() {
 			
 			this.StatusBarLabel = '';
 			this.SnapLinksStatus = '';
-		}
+		},
+
 	}));
 	
 }, false);
