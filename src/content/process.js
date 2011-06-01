@@ -31,6 +31,7 @@ function processTimeoutStartRect(){
 
 	initiateLoading();
 	initiateYBoundaries();
+	Log('processTimeoutStartRect');
 	startRect();
 	
 	if((currentState!=-1 || startBegining ==1) && snaplDrawing){
@@ -62,6 +63,7 @@ function stillLoading(){
 function processTimeoutRectContinue(){
 	snaplIdTimeoutStart=0;
 	
+	Log('processTimeoutRectContinue');
 	if (startingLinkAnalysis){
 		addRectZone(true);
 	}else{
@@ -110,7 +112,8 @@ function snaplMaxF(x,y){
 function addRectZone(start){
 	if(!snaplTargetDoc)
 		return;
-
+	
+	Log('addRectZone');
 	var insertionNode = (snaplTargetDoc.documentElement) ? snaplTargetDoc.documentElement : snaplTargetDoc;
 	var tg = snaplTargetDoc.defaultView;
 
@@ -286,6 +289,7 @@ function startRect(){
 	snaplTSize = new Array();
 	snaplMultiBoxes = new Array();
 	
+	Log('startRect');
 	addRectZone(true);
 
 	return;
@@ -380,7 +384,7 @@ function changeOutline(obj,format){
 
 function executeAction(){
 
-	if(snaplLinks && snaplLinks.length && snaplVisible){
+	if(SnapLinks.Selection.SelectedElements.length){
 		switch(snaplAction){
 			case SNAPLACTION_TABS:
 				openTabs();
@@ -408,171 +412,123 @@ function executeAction(){
 
 function saveCliboard(){
 
-	if(snaplLinks && snaplLinks.length && snaplVisible){
-		htmlRepresentation = "";
-		plainTextRepresentation = "";
+	var Representations = SnapLinks.Selection.SelectedElements.reduce( function(acc, elem) {
+		var text = elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
 
-		for(var i=0;i<snaplLinks.length;i++){
-			text = snaplLinks[i].textContent;
-			text = text.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
-			
-			htmlRepresentation += "<a href=\"" + snaplLinks[i].href +"\">" + text + "</a>";
-			plainTextRepresentation += 	snaplLinks[i].href;
-			if ((i + 1)!= snaplLinks.length ){
-				htmlRepresentation += "\n";
-				plainTextRepresentation += " ";
-			}
+		acc.html.push( '<a href="' + elem.href + '">' + text + '</a>' );
+		acc.text.push( elem.href );
+		return acc;
+	}, { html: [ ], text: [ ] } );
+
+	// Create the transferable
+	var objData = Components.classes["@mozilla.org/widget/transferable;1"]
+					.createInstance(Components.interfaces.nsITransferable);
+	
+	if(objData) {
+		var TextContent = Components.classes["@mozilla.org/supports-string;1"]
+							.createInstance(Components.interfaces.nsISupportsString);
+		if(TextContent) {
+			TextContent.data = Representations.text.join(' ');
+
+			objData.addDataFlavor('text/unicode');
+			objData.setTransferData('text/unicode', TextContent, TextContent.data.length * 2);	/* Double byte data (len*2) */
 		}
 
-		// Create the transferable
-		var trans =
-			Components.classes["@mozilla.org/widget/transferable;1"]
-					.createInstance(Components.interfaces.nsITransferable);
-		if ( trans ) {
+		var HtmlContent = Components.classes["@mozilla.org/supports-string;1"]
+							.createInstance(Components.interfaces.nsISupportsString);
+		if(HtmlContent) {
+			HtmlContent.data = Representations.html.join("\n");
+			
+			objData.addDataFlavor('text/html');
+			objData.setTransferData('text/html', HtmlContent, HtmlContent.data.length * 2);	/* Double byte data (len*2) */
+		}
 
-			// Register the data flavors
-			trans.addDataFlavor("text/html");
-			trans.addDataFlavor("text/unicode");
-
-			// Create the data objects
-			var textWrapper =
-				Components.classes["@mozilla.org/supports-string;1"]
-						.createInstance(Components.interfaces.nsISupportsString);
-			var htmlWrapper =
-				Components.classes["@mozilla.org/supports-string;1"]
-						.createInstance(Components.interfaces.nsISupportsString);
-
-			if ( textWrapper && htmlWrapper ) {
-				// Get the data
-				textWrapper.data = plainTextRepresentation;
-				htmlWrapper.data = htmlRepresentation;
-
-				// Add data objects to transferable
-				trans.setTransferData ( "text/html", htmlWrapper, 
-					  htmlRepresentation.length * 2 );  	// double byte data (len*2)
-				trans.setTransferData ( "text/unicode", textWrapper, 
-					  plainTextRepresentation.length * 2);  // double byte data (len*2)
-				
-				var clipid = Components.interfaces.nsIClipboard;
-				var clip   = Components.classes["@mozilla.org/widget/clipboard;1"].getService(clipid);
-				if (!clip) return false;
-
-				clip.setData(trans, null, clipid.kGlobalClipboard);
-			}
-		}	
-	}	
+		var objClipboard = Components.classes["@mozilla.org/widget/clipboard;1"]
+							.getService(Components.interfaces.nsIClipboard);
+		if (objClipboard)
+			objClipboard.setData(objData, null, Components.interfaces.nsIClipboard.kGlobalClipboard);
+	}
 }
 
 function openWindows(){
-	var total = snaplLinks.length;
-	var links = new Array();
-	var i;
-	if(snaplLinks && total && snaplVisible){
-		for(i=0;i<total;i++){
-			links.push(snaplLinks[i].href);
-		}
-		for(i=0;i<total;i++){
-			var l = links[i];
-			window.open(l,"snapl");
-		}
-	}
+	SnapLinks.Selection.SelectedElements.forEach( function(elem) {
+		if(elem.href)
+			window.open(elem.href);
+	} );
 }
 
 function openTabs(){
-	if(snaplLinks && snaplLinks.length && snaplVisible){
-		var sContent = document.getElementById("content");
-		for(var i=0;i<snaplLinks.length;i++){
-			var l = snaplLinks[i].href;
-			getBrowser().addTab(l,makeReferrer());
-		}
-	}
+	SnapLinks.Selection.SelectedElements.forEach( function(elem) {
+		if(elem.href)
+			getBrowser().addTab(elem.href,makeReferrer());
+	} );
 }
 
 function openTabsWindow() {
-	if(snaplLinks.length==0)
-		return null;
+	if(SnapLinks.Selection.SelectedElements.length) {
+		var urls = SnapLinks.Selection.SelectedElements.map( function(elem) {
+			return elem.href;
+		} ).join('|');
 
-	var urls = snaplLinks[0]; // Add the first url.
-	var count = snaplLinks.length;
-
-	for (var i=1; i<count; ++i) {
-		urls = urls +"|"+ snaplLinks[i]; // Append another url
-	}
-
-	if (!urls) {
+/*	if (!urls) {
 		// It seems that we did not have any links after all.
 		// Let's use the default arguments. 
 		var browserHandler = Components.classes["@mozilla.org/browser/clh;1"].
 			getService(Components.interfaces.nsIBrowserHandler);
 
 		urls = browserHandler.defaultArgs;
-	}		
-	
-	return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
+	}
+*/	
+		return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
+	}
 }
 
 function bookmarkLinks(){
-	var linksInfo = [];
-	try{
-		for(i=0;i<snaplLinks.length;i++){
-			var name = snaplLinks[i].textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
-			var url = snaplLinks[i].href;
-			linksInfo[i] = { name: name, url: url };
-		}
-		var dialogArgs;
-		dialogArgs = { name: gNavigatorBundle.getString("bookmarkAllTabsDefault") };
+	if(SnapLinks.Selection.SelectedElements.length) {
+		/* Does not work, find way to add bookmarks to FF4 - @BROKEN */
+		var linksInfo = SnapLinks.Selection.SelectedElements.map( function(elem) {
+			return { 
+				name	: elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' '),
+				url		: elem.href,
+			};
+		} );
+		const BROWSER_ADD_BM_FEATURES = 'centerscreen,chrome,dialog=no,resizable=yes';
+		
+		var dialogArgs = { name: gNavigatorBundle.getString("bookmarkAllTabsDefault") }
 		dialogArgs.bBookmarkAllTabs = true;
 		dialogArgs.objGroup = linksInfo;
 		openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "", BROWSER_ADD_BM_FEATURES, dialogArgs);
-	}catch(e){
 	}
 }
 
 function downloadLinks() {
-	var i,j,k;
-	var links = [];
-	var total = snaplLinks.length;
-	var names = [];
-	var num=1;
-	var MAX_ATMPS = 10;
-
-	for(i=0;i<total;i++){
-		links[i] = { href : snaplLinks[i].href, 
-			textContent : snaplLinks[i].textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ').replace(/ /g,'_')};
-
-		var t = links[i].textContent;
-
-		for(k=num;k<num+MAX_ATMPS;k++){
-			var ok=true;
-			for(j=0;j<names.length;j++){
-				if(t == names[j]){
-					ok=false;
+	if(SnapLinks.Selection.SelectedElements.length) {
+		var TitlesUsed = { };
+		
+		var links = SnapLinks.Selection.SelectedElements.map( function(elem) {
+			var Title = elem.textContent.replace(/\s{2,}/g, ' ').replace(/ /g,'_').replace(/[^a-zA-Z0-9_]+/g, '').substring(0, 75);
+			
+			/* Ensure Uniqueness of Filename */
+			for(var j=0;j<99;j++) {
+				var TitleCheck = Title;
+				if(j > 0)
+					TitleCheck += '' + j;
+				if(TitlesUsed[TitleCheck] == undefined) {
+					Title = TitleCheck
 					break;
 				}
 			}
-			if(ok){
-				links[i].textContent = t;
-				names.push(t);
-				break;
-			}else{
-				t = links[i].textContent + "" + num;
-				num++;
-			}					
-		}
-
-	}
-	var ln;
-	for(ln=0;ln<total;ln++){
-		try{
-			var url = links[ln].href;
-			var referrer = makeReferrer(); 
-			var bypassCache = true;
-			var fileName = links[ln].textContent;
-			var titleW = null;
-			var skipPrompt = false;
-			saveURL(url, fileName, false, bypassCache, skipPrompt, referrer);
-		}catch(e){
-		}
+			TitlesUsed[Title] = true;
+			
+			return { FileName: Title, Url: elem.href };
+		} );
+		links.forEach( function( link ) {
+			const BYPASS_CACHE = true;
+			const DONT_SKIP_PROMPT = false;
+			
+			try { saveURL(link.Url, link.FileName, false, BYPASS_CACHE, DONT_SKIP_PROMPT, makeReferrer()); } 
+				catch(e) { }
+		} );
 	}
 }
 
