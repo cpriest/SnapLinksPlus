@@ -585,9 +585,8 @@ window.addEventListener('load', function() {
 				snaplStopPopup=true;
 				if(e.ctrlKey) {
 					showSnapPopup(e);
-				} else {
-					activateLinks();
-				}
+				} else
+					this.ActivateSelection();
 				
 //				if(!stillLoading()){
 //				}else{
@@ -623,9 +622,8 @@ window.addEventListener('load', function() {
 				if(snaplVisible == true){
 					if(!e.relatedTarget){
 						snaplStopPopup=true;
-						drawRect();
-						executeAction();
-						SnapLinks.Clear();
+//						drawRect();
+						this.ActivateSelection();
 					}
 				}
 			}
@@ -663,15 +661,7 @@ window.addEventListener('load', function() {
 		},
 
 		OnSnapLinksPopupHidden: function(e){
-
-			if(snaplAction == SNAPLACTION_UNDEF){
-				snaplAction = SNAPLACTION_DEFAULT;
-				// Escape
-				SnapLinks.Clear();
-				return;
-			}
-			activateLinks();
-			snaplAction = SNAPLACTION_DEFAULT;
+			SnapLinks.Clear();
 		},
 		
 		Clear: function() {
@@ -691,13 +681,145 @@ window.addEventListener('load', function() {
 			this.SnapLinksStatus = '';
 		},
 
+		ACTION: {
+			DEFAULT				: 'OpenTabs',
+			NEW_TABS			: 'OpenTabs',
+			NEW_WINDOWS			: 'OpenWindows',
+			TABS_IN_NEW_WINDOW	: 'OpenTabsInNewWindow',
+			COPY_TO_CLIPBOARD	: 'CopyToClipboard',
+			BOOKMARK_LINKS		: 'BookmarkLinks',
+			DOWNLOAD_LINKS		: 'DownloadLinks',
+		},
+		
+		ActivateSelection: function(Action) {
+			Action = Action || this.ACTION.DEFAULT;
+			if(this[Action])
+				this[Action]();
+			this.Clear();
+		},
+		
+		OpenTabs: function() {
+			this.Selection.SelectedElements.forEach( function(elem) {
+				if(elem.href)
+					getBrowser().addTab(elem.href,makeReferrer());
+			} );
+		},
+		OpenWindows: function() {
+			SnapLinks.Selection.SelectedElements.forEach( function(elem) {
+				if(elem.href)
+					window.open(elem.href);
+			} );
+		},
+		OpenTabsInNewWindow: function() {
+			if(SnapLinks.Selection.SelectedElements.length) {
+				var urls = SnapLinks.Selection.SelectedElements.map( function(elem) {
+					return elem.href;
+				} ).join('|');
+
+		/*	if (!urls) {
+				// It seems that we did not have any links after all.
+				// Let's use the default arguments. 
+				var browserHandler = Components.classes["@mozilla.org/browser/clh;1"].
+					getService(Components.interfaces.nsIBrowserHandler);
+
+				urls = browserHandler.defaultArgs;
+			}
+		*/	
+				return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
+			}
+		},
+		CopyToClipboard: function() {
+			var Representations = SnapLinks.Selection.SelectedElements.reduce( function(acc, elem) {
+				var text = elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
+
+				acc.html.push( '<a href="' + elem.href + '">' + text + '</a>' );
+				acc.text.push( elem.href );
+				return acc;
+			}, { html: [ ], text: [ ] } );
+
+			// Create the transferable
+			var objData = Components.classes["@mozilla.org/widget/transferable;1"]
+							.createInstance(Components.interfaces.nsITransferable);
+			
+			if(objData) {
+				var TextContent = Components.classes["@mozilla.org/supports-string;1"]
+									.createInstance(Components.interfaces.nsISupportsString);
+				if(TextContent) {
+					TextContent.data = Representations.text.join(' ');
+
+					objData.addDataFlavor('text/unicode');
+					objData.setTransferData('text/unicode', TextContent, TextContent.data.length * 2);	/* Double byte data (len*2) */
+				}
+
+				var HtmlContent = Components.classes["@mozilla.org/supports-string;1"]
+									.createInstance(Components.interfaces.nsISupportsString);
+				if(HtmlContent) {
+					HtmlContent.data = Representations.html.join("\n");
+					
+					objData.addDataFlavor('text/html');
+					objData.setTransferData('text/html', HtmlContent, HtmlContent.data.length * 2);	/* Double byte data (len*2) */
+				}
+
+				var objClipboard = Components.classes["@mozilla.org/widget/clipboard;1"]
+									.getService(Components.interfaces.nsIClipboard);
+				if (objClipboard)
+					objClipboard.setData(objData, null, Components.interfaces.nsIClipboard.kGlobalClipboard);
+			}
+		},
+		BookmarkLinks: function() {
+			if(SnapLinks.Selection.SelectedElements.length) {
+				/* Does not work, find way to add bookmarks to FF4 - @BROKEN */
+				var linksInfo = SnapLinks.Selection.SelectedElements.map( function(elem) {
+					return { 
+						name	: elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' '),
+						url		: elem.href,
+					};
+				} );
+				const BROWSER_ADD_BM_FEATURES = 'centerscreen,chrome,dialog=no,resizable=yes';
+				
+				var dialogArgs = { name: gNavigatorBundle.getString("bookmarkAllTabsDefault") }
+				dialogArgs.bBookmarkAllTabs = true;
+				dialogArgs.objGroup = linksInfo;
+				openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "", BROWSER_ADD_BM_FEATURES, dialogArgs);
+			}
+		},
+		DownloadLinks: function() {
+			if(SnapLinks.Selection.SelectedElements.length) {
+				var TitlesUsed = { };
+				
+				var links = SnapLinks.Selection.SelectedElements.map( function(elem) {
+					var Title = elem.textContent.replace(/\s{2,}/g, ' ').replace(/ /g,'_').replace(/[^a-zA-Z0-9_]+/g, '').substring(0, 75);
+					
+					/* Ensure Uniqueness of Filename */
+					for(var j=0;j<99;j++) {
+						var TitleCheck = Title;
+						if(j > 0)
+							TitleCheck += '' + j;
+						if(TitlesUsed[TitleCheck] == undefined) {
+							Title = TitleCheck
+							break;
+						}
+					}
+					TitlesUsed[Title] = true;
+					
+					return { FileName: Title, Url: elem.href };
+				} );
+				links.forEach( function( link ) {
+					const BYPASS_CACHE = true;
+					const DONT_SKIP_PROMPT = false;
+					
+					try { saveURL(link.Url, link.FileName, false, BYPASS_CACHE, DONT_SKIP_PROMPT, makeReferrer()); } 
+						catch(e) { }
+				} );
+			}
+		},
 	}));
 	
 }, false);
 
 function showSnapPopup(e) {
 	pop = document.getElementById('snaplMenu');
-	snaplAction=SNAPLACTION_UNDEF;
+//	snaplAction=SNAPLACTION_UNDEF;		/* Probably needed to circumvent bad design, possibly no longer needed */
 	
 	// openPopupAtScreen is available since FF3.
 	if (pop.openPopupAtScreen != null) {
@@ -707,47 +829,14 @@ function showSnapPopup(e) {
 	}
 }
 
-function activateLinks(){
-	if(snaplAction != SNAPLACTION_UNDEF){
-//		drawRect();
-		executeAction();
-		SnapLinks.Clear();
-	}
-}
-
 function signalEndLoading(){
 	if(snaplPostLoadingActivate){
 		snaplPostLoadingActivate=false;
-		activateLinks();
+		SnapLinks.ActivateSelection();
 	}
 }
 
 function processTimeout(){
 	snaplIdTimeout=0;
 	drawRect();
-}
-
-function snaplActionNewTabs(){
-	snaplAction=SNAPLACTION_TABS;
-}
-
-function snaplActionNewWindows(){
-	snaplAction=SNAPLACTION_WINDOWS;
-	activateLinks();
-}
-
-function snaplActionClipboard(){
-	snaplAction=SNAPLACTION_CLIPBOARD;
-}
-
-function snaplActionTabsInNewWindow(){
-	snaplAction=SNAPLACTION_WINDOW;
-}
-
-function snaplActionBookmark(){
-	snaplAction=SNAPLACTION_BOOKMARK;
-}
-
-function snaplActionDownload(){
-	snaplAction=SNAPLACTION_DOWNLOAD;
 }
