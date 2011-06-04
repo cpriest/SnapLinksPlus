@@ -49,8 +49,6 @@ var snaplLinksBorderWidth=1;
 var snaplTargetDoc;
 var snaplStopPopup;
 
-var snaplPostLoadingActivate=false;
-
 const SNAPLACTION_UNDEF=0;
 const SNAPLACTION_TABS=1;
 const SNAPLACTION_WINDOWS=2;
@@ -196,7 +194,6 @@ window.addEventListener('load', function() {
 			this._OnMouseMove 	= this.OnMouseMove.bind(this);
 			this._OnKeyDown		= this.OnKeyDown.bind(this);
 			this._OnKeyUp		= this.OnKeyUp.bind(this);
-//			this._OnMouseOut	= this.OnMouseOut.bind(this);
 		},
 		
 		OnWindowResize: function(e) {
@@ -206,9 +203,6 @@ window.addEventListener('load', function() {
 		
 		OnMouseDown: function(e) {
 			if(e.button != snaplButton)
-				return;
-
-			if(snaplPostLoadingActivate)
 				return;
 
 			this.Document = e.target.ownerDocument;
@@ -522,7 +516,6 @@ window.addEventListener('load', function() {
 			snaplUpdateOptions();
 			
 			snaplButton = snaplRMB;
-			snaplPostLoadingActivate=false;
 
 			this.PanelContainer = document.getElementById('content').mPanelContainer;
 			this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
@@ -552,8 +545,6 @@ window.addEventListener('load', function() {
 
 			if(e.button != snaplButton)
 				return;
-			if(snaplPostLoadingActivate)
-				return;
 
 			this.Document = e.target.ownerDocument;
 
@@ -571,20 +562,14 @@ window.addEventListener('load', function() {
 		OnMouseUp: function(e) {
 			if(e.button != snaplButton)
 				return;
-			if(snaplPostLoadingActivate)
-				return;
 
 			if(this.Selection.DragStarted == true){
 				snaplStopPopup=true;
 				if(e.ctrlKey) {
-					showSnapPopup(e);
+					pop = document.getElementById('snaplMenu');
+					pop.openPopupAtScreen(e.screenX, e.screenY, true);
 				} else
 					this.ActivateSelection();
-				
-//				if(!stillLoading()){
-//				}else{
-//					snaplPostLoadingActivate = true;
-//				}
 			} else {
 				SnapLinks.Clear();
 				if(snaplButton == snaplRMB){
@@ -689,15 +674,6 @@ window.addEventListener('load', function() {
 					return elem.href;
 				} ).join('|');
 
-		/*	if (!urls) {
-				// It seems that we did not have any links after all.
-				// Let's use the default arguments. 
-				var browserHandler = Components.classes["@mozilla.org/browser/clh;1"].
-					getService(Components.interfaces.nsIBrowserHandler);
-
-				urls = browserHandler.defaultArgs;
-			}
-		*/	
 				return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
 			}
 		},
@@ -789,16 +765,4 @@ window.addEventListener('load', function() {
 	}));
 	
 }, false);
-
-function showSnapPopup(e) {
-	pop = document.getElementById('snaplMenu');
-//	snaplAction=SNAPLACTION_UNDEF;		/* Probably needed to circumvent bad design, possibly no longer needed */
-	
-	// openPopupAtScreen is available since FF3.
-	if (pop.openPopupAtScreen != null) {
-		pop.openPopupAtScreen(e.screenX, e.screenY, true);
-	} else {
-		pop.showPopup(pop, e.clientX, e.clientY, 'popup', 0, 0);
-	}
-}
 
