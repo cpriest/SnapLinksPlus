@@ -3,6 +3,7 @@
  *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
  *  Copyright (C) 2008  Atreus, MumblyJuergens
  *  Copyright (C) 2009  Tommi Rautava
+ *  Copyright (C) 2011  Clint Priest
  *  
  *  This file is part of Snap Links.
  *
@@ -18,6 +19,9 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Activity:
+ * 	 Clint Priest - 6/3/2011 - Fairly complete refactor and major rewrite
  */
  
  /*
@@ -30,16 +34,6 @@
  
 var snaplDrawing = false;
 
-var snaplLinks;
-var snaplVisibleLinks;
-var snaplBoxes;
-var snaplTSize;
-
-var snaplMultiBoxesMode = 0;
-var snaplMultiBoxes;
-
-var snaplTrailCont;
-
 const snaplLMB  = 0;
 const snaplMMB  = 1;
 const snaplRMB  = 2;
@@ -49,18 +43,11 @@ var snaplButton;
 var snaplBorderColor = '#30AF00';
 var snaplLinksBorderColor = '#FF0000';
 
-const snaplXhtmlNS = "http://www.w3.org/1999/xhtml";
-
-var snaplVisible;
 var snaplBorderWidth=3;
 var snaplLinksBorderWidth=1;
 
 var snaplTargetDoc;
 var snaplStopPopup;
-var snaplEqualSize;
-var snaplIdTimeout=0;
-
-var snaplIdTimeoutStart=0;
 
 var snaplPostLoadingActivate=false;
 
@@ -72,7 +59,6 @@ const SNAPLACTION_CLIPBOARD=4;
 const SNAPLACTION_BOOKMARK=5;
 const SNAPLACTION_DOWNLOAD=6;
 var SNAPLACTION_DEFAULT=SNAPLACTION_TABS;
-var snaplAction=SNAPLACTION_DEFAULT;
 
 var gsnaplinksBundle = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
 var localeStrings = gsnaplinksBundle.createBundle("chrome://snaplinks/locale/snaplinks.properties");
@@ -80,10 +66,6 @@ var msgStatusUsage = localeStrings.GetStringFromName("snaplinks.status.usage");
 var msgStatusLoading = localeStrings.GetStringFromName("snaplinks.status.loading");
 var msgPanelLinks =  localeStrings.GetStringFromName("snaplinks.panel.links");
 
-
-/**
-*  Heavy Refactoring of code base by Clint Priest on 5/22/2011
-*/
 var SnapLinks;
 
 /* Utility */
@@ -190,7 +172,10 @@ window.addEventListener('load', function() {
 	var Selection = Class.create({ 
 		X1: 0, Y1: 0, X2: 0, Y2: 0,
 		
-		SelectedElements: [ ],
+		IntersectedElements: 	[ ],
+		SelectedElements: 		[ ],
+		
+		SelectLargestFontSizeIntersectionLinks:		true,
 		
 		NormalizedRect: {
 			get: function() { 
@@ -209,7 +194,8 @@ window.addEventListener('load', function() {
 			window.addEventListener('resize', this.OnWindowResize.bind(this), true);
 			
 			this._OnMouseMove 	= this.OnMouseMove.bind(this);
-//			this._OnScroll		= this.OnScroll.bind(this);
+			this._OnKeyDown		= this.OnKeyDown.bind(this);
+			this._OnKeyUp		= this.OnKeyUp.bind(this);
 //			this._OnMouseOut	= this.OnMouseOut.bind(this);
 		},
 		
@@ -232,13 +218,11 @@ window.addEventListener('load', function() {
 			this.Y1 = e.pageY;
 
 			this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
-//			this.Document.addEventListener('scroll', this._OnScroll, false);
+			this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
+			this.PanelContainer.addEventListener('keyup', this._OnKeyUp, true);
 		},
 		
 		OnMouseMove: function(e) {
-			if(snaplDrawing == false || snaplPostLoadingActivate == true || !snaplAction)
-				return;
-			
 			if(e.altKey) {
 				this.OffsetSelection(e.pageX - this.X2, e.pageY - this.Y2);
 
@@ -253,31 +237,38 @@ window.addEventListener('load', function() {
 		//		var minHeight = tabbrowser.selectedBrowser.boxObject.height;
 		//		var minWidth = tabbrowser.selectedBrowser.boxObject.width;
 																														
-		//		SnapLinks.Selection.X1 = Math.max(Math.min(Math.max(snaplTargetDoc.width,minWidth),SnapLinks.Selection.X1),0);
-		//		SnapLinks.Selection.Y1 = Math.max(Math.min(Math.max(snaplTargetDoc.height,minHeight),SnapLinks.Selection.Y1),0);
+		//		SnapLinks.Selection.X1 = Math.max(Math.min(Math.max(this.Document.width,minWidth),SnapLinks.Selection.X1),0);
+		//		SnapLinks.Selection.Y1 = Math.max(Math.min(Math.max(this.Document.height,minHeight),SnapLinks.Selection.Y1),0);
 			} else {
 				this.ExpandSelectionTo(Math.min(e.pageX), e.pageY);
 			}
 		},
 		
-//		OnScroll: function(e) {
-//			Log('OnScroll');
-//			this.ExpandSelectionTo(Math.min(e.pageX,this.Document.documentElement.offsetWidth + this.Document.defaultView.pageXOffset), e.pageY);
-//		},
-
 		OnMouseUp: function(e) {
-			this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
-//			this.Document.removeEventListener('scroll', this._OnScroll, false);
+			this.RemoveEventHooks();
+		},
+
+		OnKeyDown: function(e) {
+			if(e.keyCode == KeyboardEvent.DOM_VK_SHIFT ) {
+				this.SelectLargestFontSizeIntersectionLinks = false;
+				this.UpdateElement();
+			}
 		},
 		
+		OnKeyUp: function(e) {
+			if(e.keyCode == KeyboardEvent.DOM_VK_SHIFT ) {
+				this.SelectLargestFontSizeIntersectionLinks = true;
+				this.UpdateElement();
+			}
+		},		
 		Create: function() {
 			if(this.DragStarted == true)
 				return true;
 				
-			if(!snaplIdTimeoutStart && Math.abs(this.X1-this.X2) > 4 || Math.abs(this.Y1-this.Y2) > 4) {
+			if(Math.abs(this.X1-this.X2) > 4 || Math.abs(this.Y1-this.Y2) > 4) {
 				var InsertionNode = (this.Document.documentElement) ? this.Document.documentElement : this.Document;
 				
-				this.Element = this.Document.createElementNS(snaplXhtmlNS, 'snaplRect');
+				this.Element = this.Document.createElementNS('http://www.w3.org/1999/xhtml', 'snaplRect');
 				if(InsertionNode && this.Element) {
 					this.Element.style.color = snaplBorderColor;
 					this.Element.style.border = snaplBorderWidth + 'px dotted';
@@ -290,9 +281,6 @@ window.addEventListener('load', function() {
 					this.DragStarted = this.Element.parentNode != undefined;
 
 					if(this.DragStarted) {
-//						snaplIdTimeoutStart=window.setTimeout('processTimeoutStartRect();',50);
-
-						snaplVisible=true;
 						if(snaplShowNumber)
 							SnapLinks.SnapLinksStatus = msgPanelLinks + ' 0';
 
@@ -314,9 +302,13 @@ window.addEventListener('load', function() {
 
 			var offset = { x: this.Document.defaultView.scrollX, y: this.Document.defaultView.scrollY };
 
+			var Start = (new Date()).getMilliseconds();
 			$A(this.Document.links).forEach( function( link ) {
 				link.SnapRects = GetElementRects(link, offset);
+				delete link.SnapFontSize;
 			});
+			var End = (new Date()).getMilliseconds();
+			Log("Time = %sms", Math.round(End - Start, 2));
 		},
 
 		/** Clears the selection by removing the element, also clears some other non-refactored but moved code */
@@ -329,14 +321,26 @@ window.addEventListener('load', function() {
 			
 			this.X1=0; this.X2=0; this.Y1=0; this.Y2=0;
 			this.DragStarted = false;
+			this.SelectLargestFontSizeIntersectionLinks = true;
+			this.RemoveEventHooks();
+			
 			delete this.CalculateWindowWidth;
 		},
 		ClearSelectedElements: function() {
+			this.IntersectedElements = [ ];
+
 			this.SelectedElements.forEach( function(elem) {
 				elem.style.MozOutline = '';
 			} );
 			this.SelectedElements = [ ];
 		},
+
+		RemoveEventHooks: function() {
+			this.PanelContainer.removeEventListener('keydown', this._OnKeyDown, true);
+			this.PanelContainer.removeEventListener('keyup', this._OnKeyUp, true);
+			this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
+		},
+
 		/** Offsets the selection by the given coordinates */
 		OffsetSelection: function(X, Y) {
 			this.X1 += X;	this.Y1 += Y;
@@ -362,15 +366,32 @@ window.addEventListener('load', function() {
 				this.ClearSelectedElements();
 				
 				var SelectRect = this.NormalizedRect;
+				var HighFontSize = 0;
 				
+				/* Find Links Which Intersect With Selection Rectangle */
 				$A(this.Document.links).forEach( function( link ) {
 					var Intersects = link.SnapRects.some( function(Rect) {
 						return !( SelectRect.X1 > Rect.right || SelectRect.X2 < Rect.left || SelectRect.Y1 > Rect.bottom || SelectRect.Y2 < Rect.top );
 					});
 					
-					if(Intersects)
-						this.SelectedElements.push(link);
+					if(Intersects) {
+						if(this.SelectLargestFontSizeIntersectionLinks) {
+							var sz=content.document.defaultView.getComputedStyle(link, "font-size");
+							if(sz.fontSize.indexOf("px")>=0)
+								link.SnapFontSize=parseFloat(sz.fontSize);
+							
+							if(link.SnapFontSize > HighFontSize)
+								HighFontSize = link.SnapFontSize;
+						}
+						
+						this.IntersectedElements.push(link);
+					}
 				}, this );
+				
+				this.IntersectedElements.forEach( function(elem) {
+					if(!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighFontSize)
+						this.SelectedElements.push(elem);
+				}, this);
 				
 				this.SelectedElements.forEach( function(elem) {
 					elem.style.MozOutline = snaplLinksBorderWidth + 'px solid ' + snaplLinksBorderColor;
@@ -404,7 +425,7 @@ window.addEventListener('load', function() {
 				gBrowser.addEventListener('load', this.OnDocumentLoaded.bind(this), true);
 		},
 
-		OnDocumentLoaded: function(e) {
+		OnDocumentLoaded: function(e) {			
 			$A(e.target.links).forEach( function( link ) {
 				if(this.DebugLinksAtLoad) {
 					if(this.Flags.Links.OnLoad.ApplyLinkStyle)
@@ -479,7 +500,15 @@ window.addEventListener('load', function() {
 	}))();
 	
 	SnapLinks = new (Class.create( {
-				
+			
+		DocumentReferer: { 
+			get: function() {
+				try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
+							.ioService.newURI(this.Document.location.href, null, null); }
+				catch(e) { }
+				return null;
+			}
+		},	
 		SnapLinksStatus: {
 			set: function(x) {
 				var el = document.getElementById('snaplinks-panel') ;
@@ -494,7 +523,6 @@ window.addEventListener('load', function() {
 			
 			snaplButton = snaplRMB;
 			snaplPostLoadingActivate=false;
-			snaplAction=SNAPLACTION_DEFAULT;
 
 			this.PanelContainer = document.getElementById('content').mPanelContainer;
 			this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
@@ -503,9 +531,6 @@ window.addEventListener('load', function() {
 
 			this._OnMouseMove 	= this.OnMouseMove.bind(this);
 			this._OnMouseOut	= this.OnMouseOut.bind(this);
-			this._OnKeyDown		= this.OnKeyDown.bind(this);
-			this._OnKeyUp		= this.OnKeyUp.bind(this);
-			this._OnScroll		= this.OnScroll.bind(this);
 
 			document.getElementById('contentAreaContextMenu')
 				.addEventListener('popupshowing', this.OnContextMenuShowing.bind(this), false);
@@ -519,13 +544,7 @@ window.addEventListener('load', function() {
 		},
 				
 		UpdateStatusLabel: function() {
-			if(!snaplDrawing)
-				return;
-
-			if(stillLoading())
-				this.StatusBarLabel = msgStatusLoading;
-			else
-				this.StatusBarLabel = msgStatusUsage;
+			this.StatusBarLabel = msgStatusUsage;
 		},
 		
 		OnMouseDown: function(e) {
@@ -536,37 +555,17 @@ window.addEventListener('load', function() {
 			if(snaplPostLoadingActivate)
 				return;
 
+			this.Document = e.target.ownerDocument;
+
 			snaplStopPopup = true;
-
-			initiateLoading();
 			
-			snaplTargetDoc = e.target.ownerDocument;
-
-			/** Does this even do anything?? --Clint */
-//			if (snaplTargetDoc.defaultView.top instanceof Window){
-//				snaplTargetDoc = snaplTargetDoc;
-//			}
-
 			this.Clear();
-						
-			snaplVisible=false;			
-			snaplEqualSize=true;
-			snaplDrawing=true;
 
-			this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
-			this.PanelContainer.addEventListener('mouseout', this._OnMouseOut, true);
-			this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
-			this.PanelContainer.addEventListener('keyup', this._OnKeyUp, true);
-			document.addEventListener('scroll', this._OnScroll, false);
+			this.InstallEventHooks();
 		},
 		
 		OnMouseMove: function(e) {
-			if(snaplDrawing == false || snaplPostLoadingActivate == true || !snaplAction)
-				return;
-
 //			this.UpdateStatusLabel();
-//			if(!snaplIdTimeout)
-//				snaplIdTimeout=window.setTimeout('processTimeout();',300);
 		},
 		
 		OnMouseUp: function(e) {
@@ -574,12 +573,6 @@ window.addEventListener('load', function() {
 				return;
 			if(snaplPostLoadingActivate)
 				return;
-
-			this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
-			this.PanelContainer.removeEventListener('mouseout', this._OnMouseOut, true);
-			this.PanelContainer.removeEventListener('keydown', this._OnKeyDown, true);
-			this.PanelContainer.removeEventListener('keyup', this._OnKeyUp, true);
-			document.removeEventListener('scroll', this._OnScroll, false);
 
 			if(this.Selection.DragStarted == true){
 				snaplStopPopup=true;
@@ -617,41 +610,30 @@ window.addEventListener('load', function() {
 			}
 		},
 		
+		InstallEventHooks: function() {
+			this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
+			this.PanelContainer.addEventListener('mouseout', this._OnMouseOut, true);
+		},
+		
+		RemoveEventHooks: function() {
+			this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
+			this.PanelContainer.removeEventListener('mouseout', this._OnMouseOut, true);
+		},
+		
 		OnMouseOut: function(e) {
 			if(snaplEndWhenOut){
-				if(snaplVisible == true){
-					if(!e.relatedTarget){
-						snaplStopPopup=true;
-//						drawRect();
-						this.ActivateSelection();
-					}
+				if(!e.relatedTarget){
+					snaplStopPopup=true;
+					this.ActivateSelection();
 				}
 			}
 		},
 		
 		OnKeyPress: function(e) {
 			if(e.keyCode == KeyboardEvent.DOM_VK_ESCAPE)
-				SnapLinks.Clear();
+				this.Clear();
 		},
 		
-		OnKeyDown: function(e) {
-			if(e.keyCode == KeyboardEvent.DOM_VK_SHIFT ){
-//				snaplEqualSize = false;
-//				drawRect();
-			}
-		},
-		
-		OnKeyUp: function(e) {
-			if(e.keyCode == KeyboardEvent.DOM_VK_SHIFT ){
-//				snaplEqualSize = true;
-//				drawRect();
-			}
-		},
-		
-		OnScroll: function(e) {
-//			scrollUpdate();
-		},
-
 		OnContextMenuShowing: function(e){
 			if((snaplStopPopup==true) && (snaplButton==snaplRMB)){
 				e.preventDefault();
@@ -665,20 +647,11 @@ window.addEventListener('load', function() {
 		},
 		
 		Clear: function() {
-			snaplDrawing=false;
-
 			this.Selection.Clear();
-			
-			if(snaplLinks && snaplLinks.length){
-				for(var i=0;i<snaplLinks.length;i++){
-					snaplLinks[i].style.MozOutline = 'none';
-				}
-				snaplLinks = null;
-			}
-			snaplVisible=false;
-			
+						
 			this.StatusBarLabel = '';
 			this.SnapLinksStatus = '';
+			this.RemoveEventHooks();
 		},
 
 		ACTION: {
@@ -701,7 +674,7 @@ window.addEventListener('load', function() {
 		OpenTabs: function() {
 			this.Selection.SelectedElements.forEach( function(elem) {
 				if(elem.href)
-					getBrowser().addTab(elem.href,makeReferrer());
+					getBrowser().addTab(elem.href, this.DocumentReferer);
 			} );
 		},
 		OpenWindows: function() {
@@ -808,7 +781,7 @@ window.addEventListener('load', function() {
 					const BYPASS_CACHE = true;
 					const DONT_SKIP_PROMPT = false;
 					
-					try { saveURL(link.Url, link.FileName, false, BYPASS_CACHE, DONT_SKIP_PROMPT, makeReferrer()); } 
+					try { saveURL(link.Url, link.FileName, false, BYPASS_CACHE, DONT_SKIP_PROMPT, this.DocumentReferer); } 
 						catch(e) { }
 				} );
 			}
@@ -829,14 +802,3 @@ function showSnapPopup(e) {
 	}
 }
 
-function signalEndLoading(){
-	if(snaplPostLoadingActivate){
-		snaplPostLoadingActivate=false;
-		SnapLinks.ActivateSelection();
-	}
-}
-
-function processTimeout(){
-	snaplIdTimeout=0;
-	drawRect();
-}

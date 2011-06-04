@@ -88,8 +88,8 @@ function snaplUpdateOptions(){
 		snaplLinksBorderWidth = pref.getIntPref("extensions.snaplinks.linksthick");
 		snaplBorderWidth = pref.getIntPref("extensions.snaplinks.drawthick");
 	
+		/* @@Broken */
 		SNAPLACTION_DEFAULT = pref.getIntPref("extensions.snaplinks.defaultaction") + 1;
-		snaplAction= SNAPLACTION_DEFAULT;	
 
 		snaplBorderColor = pref.getCharPref("extensions.snaplinks.drawpicker");
 		snaplLinksBorderColor = pref.getCharPref("extensions.snaplinks.linkspicker");
