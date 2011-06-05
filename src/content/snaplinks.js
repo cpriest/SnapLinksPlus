@@ -1,8 +1,4 @@
 /*
- *  snaplinks.js 
- *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
- *  Copyright (C) 2008  Atreus, MumblyJuergens
- *  Copyright (C) 2009  Tommi Rautava
  *  Copyright (C) 2011  Clint Priest
  *  
  *  This file is part of Snap Links.
@@ -19,750 +15,276 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * Activity:
- * 	 Clint Priest - 6/3/2011 - Fairly complete refactor and major rewrite
  */
- 
- /*
- *	To Fix:
- * 		Scrolling while selection active does not update selection rect properly (look into using clientX + scrollX rather than pageX)
- *
- *
- *
- */
- 
-var snaplDrawing = false;
 
-const snaplLMB  = 0;
-const snaplMMB  = 1;
-const snaplRMB  = 2;
 
-var snaplButton;
-
-var snaplBorderColor = '#30AF00';
-var snaplLinksBorderColor = '#FF0000';
-
-var snaplBorderWidth=3;
-var snaplLinksBorderWidth=1;
-
-var snaplTargetDoc;
-var snaplStopPopup;
-
-const SNAPLACTION_UNDEF=0;
-const SNAPLACTION_TABS=1;
-const SNAPLACTION_WINDOWS=2;
-const SNAPLACTION_WINDOW=3;
-const SNAPLACTION_CLIPBOARD=4;
-const SNAPLACTION_BOOKMARK=5;
-const SNAPLACTION_DOWNLOAD=6;
-var SNAPLACTION_DEFAULT=SNAPLACTION_TABS;
-
-var gsnaplinksBundle = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
-var localeStrings = gsnaplinksBundle.createBundle("chrome://snaplinks/locale/snaplinks.properties");
-var msgStatusUsage = localeStrings.GetStringFromName("snaplinks.status.usage");
-var msgStatusLoading = localeStrings.GetStringFromName("snaplinks.status.loading");
-var msgPanelLinks =  localeStrings.GetStringFromName("snaplinks.panel.links");
-
-var SnapLinks;
-
-/* Utility */
-function Log() { Firebug.Console.logFormatted(arguments); }
-
-/** Stripped down (non inheriting version of prototype classes, allows for getters/setters including c# style getters/setters */
-var Class = (function() {
-	function create() {
-		function klass() {
-			this.initialize.apply(this, arguments);
+SnapLinks = new (Class.create( {
+	DocumentReferer: { 
+		get: function() {
+			try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
+						.ioService.newURI(this.Document.location.href, null, null); }
+			catch(e) { }
+			return null;
 		}
-		
-		klass.addMethods = Class.Methods.addMethods;
-		
-		for (var i = 0; i < arguments.length; i++)
-			klass.addMethods(arguments[i]);
-
-		if (!klass.prototype.initialize)
-			klass.prototype.initialize = function() { };
-
-		return klass;
-	}
-
-	function addMethods(source) {
-		var properties = Object.keys(source);
-
-		for (var i = 0, length = properties.length; i < length; i++) {
-			var property = properties[i];
-			
-			var Setter = source.__lookupSetter__(property),
-				Getter = source.__lookupGetter__(property);
-
-			if(Setter)
-				this.prototype.__defineSetter__(property, Setter);
-			if(Getter)
-				this.prototype.__defineGetter__(property, Getter);
-
-			if(Setter == undefined && Getter == undefined) {
-
-				/* Support Name: { get: function(), set: function() } syntax, ala C# getter/setter syntax */
-				var Descriptor = source[property];
-				if(Descriptor && typeof Descriptor == 'object' && (Descriptor.get || Descriptor.set)) {
-					if(Descriptor.set)
-						this.prototype.__defineSetter__(property, Descriptor.set);
-					if(Descriptor.get)
-						this.prototype.__defineGetter__(property, Descriptor.get);
-				} else {
-					this.prototype[property] = source[property];
-				}
-			}
-		}
-		return this;
-	}
-
-	return {
-		create: create,
-		Methods: {
-			addMethods: addMethods
-		}
-	};
-})();
-
-window.addEventListener('load', function() {
+	},	
+	SnapLinksStatus: {
+		set: function(x) {
+			var el = document.getElementById('snaplinks-panel') ;
+			el && (el.label = x);
+			el && (el.hidden = (x == ''));
+		} 
+	},
+	StatusBarLabel: {	set: function(x) { document.getElementById('statusbar-display').label = x; }	},
 	
-	/* Converts an iterable element to an array */
-	function $A(iterable) {
-		if (!iterable) return [];
-		if ('toArray' in Object(iterable)) return iterable.toArray();
-		var length = iterable.length || 0, results = new Array(length);
-		while (length--) results[length] = iterable[length];
-		return results;
-	}
-
-	/** Returns an array of { top, left, width, height } objects which combined make up the bounding rects of the given element, 
-	* 	this uses the built-in .getClientRects() and additionally compensates for 'block' elements which it would appear is not
-	* 	handled appropriately for our needs by Mozilla or the standard 
-	*/
-	function GetElementRects(node, offset) {
-		offset = offset || { x: 0, y: 0 };
+	initialize: function() {
+		snaplUpdateOptions();
 		
-		var Rects = $A(node.getClientRects());
-		
-		$A(node.querySelectorAll('IMG')).forEach( function(elem) {
-			Rects = Rects.concat( $A(elem.getClientRects()) );
-		} );
-		return Rects.map( function(rect) {
-			return { 	top		: rect.top + offset.y, 
-						left	: rect.left + offset.x, 
-						bottom	: rect.top + rect.height + offset.y, 
-						right	: rect.left + rect.width + offset.x };
-		} );
-	}
+		snaplButton = snaplRMB;
 
-	function ApplyStyle(elem, style) {
-		var OriginalStyle = { };
-		Object.keys(style).forEach( function(name) {
-			OriginalStyle[name] = elem.style[name];
-			elem.style[name] = style[name];
-		} );
-		return OriginalStyle;
-	}
+		this.PanelContainer = document.getElementById('content').mPanelContainer;
+		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
+		this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
+		this.PanelContainer.addEventListener('keypress', this.OnKeyPress.bind(this), true);
+
+		this._OnMouseMove 	= this.OnMouseMove.bind(this);
+		this._OnMouseOut	= this.OnMouseOut.bind(this);
+
+		document.getElementById('contentAreaContextMenu')
+			.addEventListener('popupshowing', this.OnContextMenuShowing.bind(this), false);
 			
-	/** Selection class handles the selection rectangle and accompanying visible element */
-	var Selection = Class.create({ 
-		X1: 0, Y1: 0, X2: 0, Y2: 0,
-		
-		IntersectedElements: 	[ ],
-		SelectedElements: 		[ ],
-		
-		SelectLargestFontSizeIntersectionLinks:		true,
-		
-		NormalizedRect: {
-			get: function() { 
-				return {	X1: Math.min(this.X1,this.X2),	Y1: Math.min(this.Y1,this.Y2),
-							X2: Math.max(this.X1,this.X2),	Y2: Math.max(this.Y1,this.Y2),	}
-			},
-		},
-		
-		DragStarted: false,
-		
-		initialize: function(PanelContainer) {
-			this.PanelContainer = PanelContainer;
-			this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
-			this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
+		document.getElementById('snaplMenu')
+			.addEventListener('popuphidden',this.OnSnapLinksPopupHidden.bind(this),false)
+
+		this.Selection = new Selection(this.PanelContainer);
+
+		this.SnapLinksStatus = '';
+	},
 			
-			window.addEventListener('resize', this.OnWindowResize.bind(this), true);
-			
-			this._OnMouseMove 	= this.OnMouseMove.bind(this);
-			this._OnKeyDown		= this.OnKeyDown.bind(this);
-			this._OnKeyUp		= this.OnKeyUp.bind(this);
-		},
-		
-		OnWindowResize: function(e) {
-			if(this.DragStarted == true)
-				this.CalculateSnapRects();
-		},
-		
-		OnMouseDown: function(e) {
-			if(e.button != snaplButton)
-				return;
-
-			this.Document = e.target.ownerDocument;
-				
-			/** Initializes the starting mouse position */
-			this.X1 = Math.min(e.pageX,this.Document.documentElement.offsetWidth + this.Document.defaultView.pageXOffset);
-			this.Y1 = e.pageY;
-
-			this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
-			this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
-			this.PanelContainer.addEventListener('keyup', this._OnKeyUp, true);
-		},
-		
-		OnMouseMove: function(e) {
-			if(e.altKey) {
-				this.OffsetSelection(e.pageX - this.X2, e.pageY - this.Y2);
-
-				/** The below commented section of code causes the rectangle to shrink if it goes off screen, is this even a desired functionality? -- Clint - 5/22/2011 */
-		//		var mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-		//			.getInterface(Components.interfaces.nsIWebNavigation)
-		//			.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
-		//			.rootTreeItem
-		//			.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-		//			.getInterface(Components.interfaces.nsIDOMWindow);
-		//		var tabbrowser = mainWindow.document.getElementById('content');
-		//		var minHeight = tabbrowser.selectedBrowser.boxObject.height;
-		//		var minWidth = tabbrowser.selectedBrowser.boxObject.width;
-																														
-		//		SnapLinks.Selection.X1 = Math.max(Math.min(Math.max(this.Document.width,minWidth),SnapLinks.Selection.X1),0);
-		//		SnapLinks.Selection.Y1 = Math.max(Math.min(Math.max(this.Document.height,minHeight),SnapLinks.Selection.Y1),0);
-			} else {
-				this.ExpandSelectionTo(Math.min(e.pageX), e.pageY);
-			}
-		},
-		
-		OnMouseUp: function(e) {
-			this.RemoveEventHooks();
-		},
-
-		OnKeyDown: function(e) {
-			if(e.keyCode == KeyboardEvent.DOM_VK_SHIFT ) {
-				this.SelectLargestFontSizeIntersectionLinks = false;
-				this.UpdateElement();
-			}
-		},
-		
-		OnKeyUp: function(e) {
-			if(e.keyCode == KeyboardEvent.DOM_VK_SHIFT ) {
-				this.SelectLargestFontSizeIntersectionLinks = true;
-				this.UpdateElement();
-			}
-		},		
-		Create: function() {
-			if(this.DragStarted == true)
-				return true;
-				
-			if(Math.abs(this.X1-this.X2) > 4 || Math.abs(this.Y1-this.Y2) > 4) {
-				var InsertionNode = (this.Document.documentElement) ? this.Document.documentElement : this.Document;
-				
-				this.Element = this.Document.createElementNS('http://www.w3.org/1999/xhtml', 'snaplRect');
-				if(InsertionNode && this.Element) {
-					this.Element.style.color = snaplBorderColor;
-					this.Element.style.border = snaplBorderWidth + 'px dotted';
-					this.Element.style.position = 'absolute';
-					this.Element.style.zIndex = '10000';
-					this.Element.style.left = this.X1 + 'px'; 
-					this.Element.style.top = this.Y1 + 'px';
-					InsertionNode.appendChild(this.Element);
-
-					this.DragStarted = this.Element.parentNode != undefined;
-
-					if(this.DragStarted) {
-						if(snaplShowNumber)
-							SnapLinks.SnapLinksStatus = msgPanelLinks + ' 0';
-
-						this.CalculateSnapRects();
-						return true;
-					}
-				}
-			}
-			return false;
-		},
-		
-		/** Calculates and caches the rectangles that make up all document lengths */
-		CalculateSnapRects: function() {
-			/* If the last calculation was done at the same innerWidth, skip calculation */
-			if(this.CalculateWindowWidth == window.innerWidth)
-				return;
-				
-			this.CalculateWindowWidth = window.innerWidth;
-
-			var offset = { x: this.Document.defaultView.scrollX, y: this.Document.defaultView.scrollY };
-
-			var Start = (new Date()).getMilliseconds();
-			$A(this.Document.links).forEach( function( link ) {
-				link.SnapRects = GetElementRects(link, offset);
-				delete link.SnapFontSize;
-			});
-			var End = (new Date()).getMilliseconds();
-			Log("Time = %sms", Math.round(End - Start, 2));
-		},
-
-		/** Clears the selection by removing the element, also clears some other non-refactored but moved code */
-		Clear: function() {
-			if (this.Element)
-				this.Element.parentNode.removeChild(this.Element);
-			delete this.Element;
-			
-			this.ClearSelectedElements();
-			
-			this.X1=0; this.X2=0; this.Y1=0; this.Y2=0;
-			this.DragStarted = false;
-			this.SelectLargestFontSizeIntersectionLinks = true;
-			this.RemoveEventHooks();
-			
-			delete this.CalculateWindowWidth;
-		},
-		ClearSelectedElements: function() {
-			this.IntersectedElements = [ ];
-
-			this.SelectedElements.forEach( function(elem) {
-				elem.style.MozOutline = '';
-			} );
-			this.SelectedElements = [ ];
-		},
-
-		RemoveEventHooks: function() {
-			this.PanelContainer.removeEventListener('keydown', this._OnKeyDown, true);
-			this.PanelContainer.removeEventListener('keyup', this._OnKeyUp, true);
-			this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
-		},
-
-		/** Offsets the selection by the given coordinates */
-		OffsetSelection: function(X, Y) {
-			this.X1 += X;	this.Y1 += Y;
-			this.X2 += X;	this.Y2 += Y;
-			this.UpdateElement();
-		},
-		
-		/* Expands the selection to the given X2, Y2 coordinates */
-		ExpandSelectionTo: function(X, Y) {
-			this.X2 = X;	this.Y2 = Y;
-			this.UpdateElement();
-		},
-		
-		UpdateElement: function() {
-			if(this.Create()) {
-				ApplyStyle(this.Element, {
-					width 	: Math.abs(this.X1-this.X2) - snaplBorderWidth + 'px',
-					height 	: Math.abs(this.Y1-this.Y2) - snaplBorderWidth + 'px',
-					top 	: Math.min(this.Y1,this.Y2) - snaplBorderWidth + 'px',
-					left 	: Math.min(this.X1,this.X2) - snaplBorderWidth + 'px',
-				} );
-				
-				this.ClearSelectedElements();
-				
-				var SelectRect = this.NormalizedRect;
-				var HighFontSize = 0;
-				
-				/* Find Links Which Intersect With Selection Rectangle */
-				$A(this.Document.links).forEach( function( link ) {
-					var Intersects = link.SnapRects.some( function(Rect) {
-						return !( SelectRect.X1 > Rect.right || SelectRect.X2 < Rect.left || SelectRect.Y1 > Rect.bottom || SelectRect.Y2 < Rect.top );
-					});
-					
-					if(Intersects) {
-						if(this.SelectLargestFontSizeIntersectionLinks) {
-							var sz=content.document.defaultView.getComputedStyle(link, "font-size");
-							if(sz.fontSize.indexOf("px")>=0)
-								link.SnapFontSize=parseFloat(sz.fontSize);
-							
-							if(link.SnapFontSize > HighFontSize)
-								HighFontSize = link.SnapFontSize;
-						}
-						
-						this.IntersectedElements.push(link);
-					}
-				}, this );
-				
-				this.IntersectedElements.forEach( function(elem) {
-					if(!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighFontSize)
-						this.SelectedElements.push(elem);
-				}, this);
-				
-				this.SelectedElements.forEach( function(elem) {
-					elem.style.MozOutline = snaplLinksBorderWidth + 'px solid ' + snaplLinksBorderColor;
-				} );
-			}
-		},
-	} );
+	UpdateStatusLabel: function() {
+		this.StatusBarLabel = msgStatusUsage;
+	},
 	
-	var SnapLinksDebug = new (Class.create({
-		Flags: {
-			Links: {
-				LinkStyle: 			{ border: '1px solid blue' },
-				ClientRectStyle:	{ backgroundColor: 'black', opacity: .3 },
-				
-				OnLoad: {
-					ApplyLinkStyle:			false,
-					ShowClientRects:		false,
-				},
-				OnMouseOver: {
-					ApplyLinkStyle: 		false,
-					ShowClientRects:		false,
-				},
-			}
-		},
+	OnMouseDown: function(e) {
+		snaplUpdateOptions();
+
+		if(e.button != snaplButton)
+			return;
+
+		this.Document = e.target.ownerDocument;
+
+		snaplStopPopup = true;
 		
-		DebugLinksAtLoad: 		{ get: function() { return this.Flags.Links.OnLoad.ApplyLinkStyle || this.Flags.Links.OnLoad.ShowClientRects; }	},
-		DebugLinksOnMouseOver: 	{ get: function() { return this.Flags.Links.OnMouseOver.ApplyLinkStyle || this.Flags.Links.OnMouseOver.ShowClientRects; }	},
-		
-		initialize: function() {
-			if(this.DebugLinksAtLoad || this.DebugLinksOnMouseOver)
-				gBrowser.addEventListener('load', this.OnDocumentLoaded.bind(this), true);
-		},
+		this.Clear();
 
-		OnDocumentLoaded: function(e) {			
-			$A(e.target.links).forEach( function( link ) {
-				if(this.DebugLinksAtLoad) {
-					if(this.Flags.Links.OnLoad.ApplyLinkStyle)
-						ApplyStyle(link, this.Flags.Links.LinkStyle);
-					if(this.Flags.Links.OnLoad.ShowClientRects) {
-						this.ShowClientElementRects(link);
-						/* If we're showing during startup, lose the references so they are not cleared during mouse-over timeout */
-						delete link.SnapDebugNodes;
-					}
-				}
-					
-				if(this.DebugLinksOnMouseOver)
-					link.addEventListener('mousemove', this.OnMouseMove.bind(this, link), false);
-			}, this );
-		},
-
-		ClearClientRects: function(link) {
-			(link.SnapDebugNodes || []).forEach( function(elem) {
-				elem.parentNode.removeChild(elem);
-			} );
-			link.SnapDebugNodes = [ ];
-		},
-		ClearVisualDebugAids: function(link) {
-			this.ClearClientRects(link);
-			
-			link.OriginalStyle
-				&& ApplyStyle(link, link.OriginalStyle)
-				&& delete link.OriginalStyle;
-		},
-
-		OnMouseMove: function(link, e) {
-			clearTimeout(link.SnapDebugClearTimer || 0);
-			
-			if(this.Flags.Links.OnMouseOver.ApplyLinkStyle) {
-				var ReplacedStyle = ApplyStyle(link, this.Flags.Links.LinkStyle);
-				link.OriginalStyle = link.OriginalStyle || ReplacedStyle;
-			}
-			
-			if(this.Flags.Links.OnMouseOver.ShowClientRects)
-				this.ShowClientElementRects(link);
-			
-			link.SnapDebugClearTimer = setTimeout(this.ClearVisualDebugAids.bind(this, link), 3000);
-		},
-		ShowClientElementRects: function(link) {
-			this.ClearClientRects(link);
-
-			var offset = { x: this.Document.defaultView.scrollX, y: this.Document.defaultView.scrollY };
-			
-			GetElementRects(link, offset).forEach( function(rect) {
-				var elem = link.ownerDocument.createElement('div');
-				ApplyStyle(elem, {
-					position	: 'absolute',
-					zIndex		: 1,
-					top			: rect.top + 'px',
-					left		: rect.left + 'px',
-					width		: (rect.right - rect.left) + 'px',
-					height		: (rect.bottom - rect.top) + 'px',
-					cursor		: 'pointer',
-				} );
-				ApplyStyle(elem, this.Flags.Links.ClientRectStyle);
-				
-				/* Pass through any clicks to this div to the original link */
-				elem.addEventListener('click', function(e) {
-					var evt = document.createEvent('MouseEvents');
-					evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-					link.dispatchEvent(evt); 
-				}, true);
-				link.ownerDocument.body.appendChild(elem);
-				link.SnapDebugNodes.push(elem);
-			}, this );
-		}
-	}))();
+		this.InstallEventHooks();
+	},
 	
-	SnapLinks = new (Class.create( {
-			
-		DocumentReferer: { 
-			get: function() {
-				try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
-							.ioService.newURI(this.Document.location.href, null, null); }
-				catch(e) { }
-				return null;
-			}
-		},	
-		SnapLinksStatus: {
-			set: function(x) {
-				var el = document.getElementById('snaplinks-panel') ;
-				el && (el.label = x);
-				el && (el.hidden = (x == ''));
-			} 
-		},
-		StatusBarLabel: {	set: function(x) { document.getElementById('statusbar-display').label = x; }	},
-		
-		initialize: function() {
-			snaplUpdateOptions();
-			
-			snaplButton = snaplRMB;
+	OnMouseMove: function(e) {
+//		this.UpdateStatusLabel();
+	},
+	
+	OnMouseUp: function(e) {
+		if(e.button != snaplButton)
+			return;
 
-			this.PanelContainer = document.getElementById('content').mPanelContainer;
-			this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
-			this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
-			this.PanelContainer.addEventListener('keypress', this.OnKeyPress.bind(this), true);
-
-			this._OnMouseMove 	= this.OnMouseMove.bind(this);
-			this._OnMouseOut	= this.OnMouseOut.bind(this);
-
-			document.getElementById('contentAreaContextMenu')
-				.addEventListener('popupshowing', this.OnContextMenuShowing.bind(this), false);
-				
-			document.getElementById('snaplMenu')
-				.addEventListener('popuphidden',this.OnSnapLinksPopupHidden.bind(this),false)
-
-			this.Selection = new Selection(this.PanelContainer);
-
-			this.SnapLinksStatus = '';
-		},
-				
-		UpdateStatusLabel: function() {
-			this.StatusBarLabel = msgStatusUsage;
-		},
-		
-		OnMouseDown: function(e) {
-			snaplUpdateOptions();
-
-			if(e.button != snaplButton)
-				return;
-
-			this.Document = e.target.ownerDocument;
-
-			snaplStopPopup = true;
-			
-			this.Clear();
-
-			this.InstallEventHooks();
-		},
-		
-		OnMouseMove: function(e) {
-//			this.UpdateStatusLabel();
-		},
-		
-		OnMouseUp: function(e) {
-			if(e.button != snaplButton)
-				return;
-
-			if(this.Selection.DragStarted == true){
-				snaplStopPopup=true;
-				if(e.ctrlKey) {
-					pop = document.getElementById('snaplMenu');
-					pop.openPopupAtScreen(e.screenX, e.screenY, true);
-				} else
-					this.ActivateSelection();
-			} else {
-				SnapLinks.Clear();
-				if(snaplButton == snaplRMB){
-					var evt = document.createEvent('MouseEvents');
-					snaplStopPopup=false;
-
-					evt.initMouseEvent('contextmenu', true, true, window, 0,
-						e.screenX, e.screenY, e.clientX, e.clientY,
-						false, false, false, false, 2, null);
-					e.originalTarget.dispatchEvent(evt);
-
-					if (gContextMenu) {
-						var item = gContextMenu.target;
-						item.dispatchEvent(e);
-			
-						document.popupNode = e.originalTarget;
-						var obj = document.getElementById('contentAreaContextMenu');
-						obj.showPopup(this, e.clientX, e.clientY, 'context', null, null);
-						  
-						snaplStopPopup=true;
-					}
-				}
-			}
-		},
-		
-		InstallEventHooks: function() {
-			this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
-			this.PanelContainer.addEventListener('mouseout', this._OnMouseOut, true);
-		},
-		
-		RemoveEventHooks: function() {
-			this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
-			this.PanelContainer.removeEventListener('mouseout', this._OnMouseOut, true);
-		},
-		
-		OnMouseOut: function(e) {
-			if(snaplEndWhenOut){
-				if(!e.relatedTarget){
-					snaplStopPopup=true;
-					this.ActivateSelection();
-				}
-			}
-		},
-		
-		OnKeyPress: function(e) {
-			if(e.keyCode == KeyboardEvent.DOM_VK_ESCAPE)
-				this.Clear();
-		},
-		
-		OnContextMenuShowing: function(e){
-			if((snaplStopPopup==true) && (snaplButton==snaplRMB)){
-				e.preventDefault();
-				snaplStopPopup=false;
-				return false;
-			}
-		},
-
-		OnSnapLinksPopupHidden: function(e){
+		if(this.Selection.DragStarted == true){
+			snaplStopPopup=true;
+			if(e.ctrlKey) {
+				pop = document.getElementById('snaplMenu');
+				pop.openPopupAtScreen(e.screenX, e.screenY, true);
+			} else
+				this.ActivateSelection();
+		} else {
 			SnapLinks.Clear();
-		},
+			if(snaplButton == snaplRMB){
+				var evt = document.createEvent('MouseEvents');
+				snaplStopPopup=false;
+
+				evt.initMouseEvent('contextmenu', true, true, window, 0,
+					e.screenX, e.screenY, e.clientX, e.clientY,
+					false, false, false, false, 2, null);
+				e.originalTarget.dispatchEvent(evt);
+
+				if (gContextMenu) {
+					var item = gContextMenu.target;
+					item.dispatchEvent(e);
 		
-		Clear: function() {
-			this.Selection.Clear();
-						
-			this.StatusBarLabel = '';
-			this.SnapLinksStatus = '';
-			this.RemoveEventHooks();
-		},
-
-		ACTION: {
-			DEFAULT				: 'OpenTabs',
-			NEW_TABS			: 'OpenTabs',
-			NEW_WINDOWS			: 'OpenWindows',
-			TABS_IN_NEW_WINDOW	: 'OpenTabsInNewWindow',
-			COPY_TO_CLIPBOARD	: 'CopyToClipboard',
-			BOOKMARK_LINKS		: 'BookmarkLinks',
-			DOWNLOAD_LINKS		: 'DownloadLinks',
-		},
-		
-		ActivateSelection: function(Action) {
-			Action = Action || this.ACTION.DEFAULT;
-			if(this[Action])
-				this[Action]();
-			this.Clear();
-		},
-		
-		OpenTabs: function() {
-			this.Selection.SelectedElements.forEach( function(elem) {
-				if(elem.href)
-					getBrowser().addTab(elem.href, this.DocumentReferer);
-			} );
-		},
-		OpenWindows: function() {
-			SnapLinks.Selection.SelectedElements.forEach( function(elem) {
-				if(elem.href)
-					window.open(elem.href);
-			} );
-		},
-		OpenTabsInNewWindow: function() {
-			if(SnapLinks.Selection.SelectedElements.length) {
-				var urls = SnapLinks.Selection.SelectedElements.map( function(elem) {
-					return elem.href;
-				} ).join('|');
-
-				return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
-			}
-		},
-		CopyToClipboard: function() {
-			var Representations = SnapLinks.Selection.SelectedElements.reduce( function(acc, elem) {
-				var text = elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
-
-				acc.html.push( '<a href="' + elem.href + '">' + text + '</a>' );
-				acc.text.push( elem.href );
-				return acc;
-			}, { html: [ ], text: [ ] } );
-
-			// Create the transferable
-			var objData = Components.classes["@mozilla.org/widget/transferable;1"]
-							.createInstance(Components.interfaces.nsITransferable);
-			
-			if(objData) {
-				var TextContent = Components.classes["@mozilla.org/supports-string;1"]
-									.createInstance(Components.interfaces.nsISupportsString);
-				if(TextContent) {
-					TextContent.data = Representations.text.join(' ');
-
-					objData.addDataFlavor('text/unicode');
-					objData.setTransferData('text/unicode', TextContent, TextContent.data.length * 2);	/* Double byte data (len*2) */
+					document.popupNode = e.originalTarget;
+					var obj = document.getElementById('contentAreaContextMenu');
+					obj.showPopup(this, e.clientX, e.clientY, 'context', null, null);
+					  
+					snaplStopPopup=true;
 				}
-
-				var HtmlContent = Components.classes["@mozilla.org/supports-string;1"]
-									.createInstance(Components.interfaces.nsISupportsString);
-				if(HtmlContent) {
-					HtmlContent.data = Representations.html.join("\n");
-					
-					objData.addDataFlavor('text/html');
-					objData.setTransferData('text/html', HtmlContent, HtmlContent.data.length * 2);	/* Double byte data (len*2) */
-				}
-
-				var objClipboard = Components.classes["@mozilla.org/widget/clipboard;1"]
-									.getService(Components.interfaces.nsIClipboard);
-				if (objClipboard)
-					objClipboard.setData(objData, null, Components.interfaces.nsIClipboard.kGlobalClipboard);
 			}
-		},
-		BookmarkLinks: function() {
-			if(SnapLinks.Selection.SelectedElements.length) {
-				/* Does not work, find way to add bookmarks to FF4 - @BROKEN */
-				var linksInfo = SnapLinks.Selection.SelectedElements.map( function(elem) {
-					return { 
-						name	: elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' '),
-						url		: elem.href,
-					};
-				} );
-				const BROWSER_ADD_BM_FEATURES = 'centerscreen,chrome,dialog=no,resizable=yes';
-				
-				var dialogArgs = { name: gNavigatorBundle.getString("bookmarkAllTabsDefault") }
-				dialogArgs.bBookmarkAllTabs = true;
-				dialogArgs.objGroup = linksInfo;
-				openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "", BROWSER_ADD_BM_FEATURES, dialogArgs);
-			}
-		},
-		DownloadLinks: function() {
-			if(SnapLinks.Selection.SelectedElements.length) {
-				var TitlesUsed = { };
-				
-				var links = SnapLinks.Selection.SelectedElements.map( function(elem) {
-					var Title = elem.textContent.replace(/\s{2,}/g, ' ').replace(/ /g,'_').replace(/[^a-zA-Z0-9_]+/g, '').substring(0, 75);
-					
-					/* Ensure Uniqueness of Filename */
-					for(var j=0;j<99;j++) {
-						var TitleCheck = Title;
-						if(j > 0)
-							TitleCheck += '' + j;
-						if(TitlesUsed[TitleCheck] == undefined) {
-							Title = TitleCheck
-							break;
-						}
-					}
-					TitlesUsed[Title] = true;
-					
-					return { FileName: Title, Url: elem.href };
-				} );
-				links.forEach( function( link ) {
-					const BYPASS_CACHE = true;
-					const DONT_SKIP_PROMPT = false;
-					
-					try { saveURL(link.Url, link.FileName, false, BYPASS_CACHE, DONT_SKIP_PROMPT, this.DocumentReferer); } 
-						catch(e) { }
-				} );
-			}
-		},
-	}));
+		}
+	},
 	
-}, false);
+	InstallEventHooks: function() {
+		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
+		this.PanelContainer.addEventListener('mouseout', this._OnMouseOut, true);
+	},
+	
+	RemoveEventHooks: function() {
+		this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
+		this.PanelContainer.removeEventListener('mouseout', this._OnMouseOut, true);
+	},
+	
+	OnMouseOut: function(e) {
+		if(snaplEndWhenOut){
+			if(!e.relatedTarget){
+				snaplStopPopup=true;
+				this.ActivateSelection();
+			}
+		}
+	},
+	
+	OnKeyPress: function(e) {
+		if(e.keyCode == KeyboardEvent.DOM_VK_ESCAPE)
+			this.Clear();
+	},
+	
+	OnContextMenuShowing: function(e){
+		if((snaplStopPopup==true) && (snaplButton==snaplRMB)){
+			e.preventDefault();
+			snaplStopPopup=false;
+			return false;
+		}
+	},
+
+	OnSnapLinksPopupHidden: function(e){
+		SnapLinks.Clear();
+	},
+	
+	Clear: function() {
+		this.Selection.Clear();
+					
+		this.StatusBarLabel = '';
+		this.SnapLinksStatus = '';
+		this.RemoveEventHooks();
+	},
+
+	ACTION: {
+		DEFAULT				: 'OpenTabs',
+		NEW_TABS			: 'OpenTabs',
+		NEW_WINDOWS			: 'OpenWindows',
+		TABS_IN_NEW_WINDOW	: 'OpenTabsInNewWindow',
+		COPY_TO_CLIPBOARD	: 'CopyToClipboard',
+		BOOKMARK_LINKS		: 'BookmarkLinks',
+		DOWNLOAD_LINKS		: 'DownloadLinks',
+	},
+	
+	ActivateSelection: function(Action) {
+		Action = Action || this.ACTION.DEFAULT;
+		if(this[Action])
+			this[Action]();
+		this.Clear();
+	},
+	
+	OpenTabs: function() {
+		this.Selection.SelectedElements.forEach( function(elem) {
+			if(elem.href)
+				getBrowser().addTab(elem.href, this.DocumentReferer);
+		} );
+	},
+	OpenWindows: function() {
+		SnapLinks.Selection.SelectedElements.forEach( function(elem) {
+			if(elem.href)
+				window.open(elem.href);
+		} );
+	},
+	OpenTabsInNewWindow: function() {
+		if(SnapLinks.Selection.SelectedElements.length) {
+			var urls = SnapLinks.Selection.SelectedElements.map( function(elem) {
+				return elem.href;
+			} ).join('|');
+
+			return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
+		}
+	},
+	CopyToClipboard: function() {
+		var Representations = SnapLinks.Selection.SelectedElements.reduce( function(acc, elem) {
+			var text = elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
+
+			acc.html.push( '<a href="' + elem.href + '">' + text + '</a>' );
+			acc.text.push( elem.href );
+			return acc;
+		}, { html: [ ], text: [ ] } );
+
+		// Create the transferable
+		var objData = Components.classes["@mozilla.org/widget/transferable;1"]
+						.createInstance(Components.interfaces.nsITransferable);
+		
+		if(objData) {
+			var TextContent = Components.classes["@mozilla.org/supports-string;1"]
+								.createInstance(Components.interfaces.nsISupportsString);
+			if(TextContent) {
+				TextContent.data = Representations.text.join(' ');
+
+				objData.addDataFlavor('text/unicode');
+				objData.setTransferData('text/unicode', TextContent, TextContent.data.length * 2);	/* Double byte data (len*2) */
+			}
+
+			var HtmlContent = Components.classes["@mozilla.org/supports-string;1"]
+								.createInstance(Components.interfaces.nsISupportsString);
+			if(HtmlContent) {
+				HtmlContent.data = Representations.html.join("\n");
+				
+				objData.addDataFlavor('text/html');
+				objData.setTransferData('text/html', HtmlContent, HtmlContent.data.length * 2);	/* Double byte data (len*2) */
+			}
+
+			var objClipboard = Components.classes["@mozilla.org/widget/clipboard;1"]
+								.getService(Components.interfaces.nsIClipboard);
+			if (objClipboard)
+				objClipboard.setData(objData, null, Components.interfaces.nsIClipboard.kGlobalClipboard);
+		}
+	},
+	BookmarkLinks: function() {
+		if(SnapLinks.Selection.SelectedElements.length) {
+			/* Does not work, find way to add bookmarks to FF4 - @BROKEN */
+			var linksInfo = SnapLinks.Selection.SelectedElements.map( function(elem) {
+				return { 
+					name	: elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' '),
+					url		: elem.href,
+				};
+			} );
+			const BROWSER_ADD_BM_FEATURES = 'centerscreen,chrome,dialog=no,resizable=yes';
+			
+			var dialogArgs = { name: gNavigatorBundle.getString("bookmarkAllTabsDefault") }
+			dialogArgs.bBookmarkAllTabs = true;
+			dialogArgs.objGroup = linksInfo;
+			openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "", BROWSER_ADD_BM_FEATURES, dialogArgs);
+		}
+	},
+	DownloadLinks: function() {
+		if(SnapLinks.Selection.SelectedElements.length) {
+			var TitlesUsed = { };
+			
+			var links = SnapLinks.Selection.SelectedElements.map( function(elem) {
+				var Title = elem.textContent.replace(/\s{2,}/g, ' ').replace(/ /g,'_').replace(/[^a-zA-Z0-9_]+/g, '').substring(0, 75);
+				
+				/* Ensure Uniqueness of Filename */
+				for(var j=0;j<99;j++) {
+					var TitleCheck = Title;
+					if(j > 0)
+						TitleCheck += '' + j;
+					if(TitlesUsed[TitleCheck] == undefined) {
+						Title = TitleCheck
+						break;
+					}
+				}
+				TitlesUsed[Title] = true;
+				
+				return { FileName: Title, Url: elem.href };
+			} );
+			links.forEach( function( link ) {
+				const BYPASS_CACHE = true;
+				const DONT_SKIP_PROMPT = false;
+				
+				try { saveURL(link.Url, link.FileName, false, BYPASS_CACHE, DONT_SKIP_PROMPT, this.DocumentReferer); } 
+					catch(e) { }
+			} );
+		}
+	},
+}));
 
