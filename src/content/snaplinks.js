@@ -47,7 +47,6 @@ SnapLinks = new (Class.create( {
 		this.PanelContainer.addEventListener('keypress', this.OnKeyPress.bind(this), true);
 
 		this._OnMouseMove 	= this.OnMouseMove.bind(this);
-		this._OnMouseOut	= this.OnMouseOut.bind(this);
 			
 		document.getElementById('snaplMenu')
 			.addEventListener('popuphidden',this.OnSnapLinksPopupHidden.bind(this),false)
@@ -68,7 +67,8 @@ SnapLinks = new (Class.create( {
 			return;
 
 		this.Document = e.target.ownerDocument;
-
+		this.Document.body.setCapture(false);
+		
 //		snaplStopPopup = true;
 		
 		this.Clear();
@@ -84,6 +84,7 @@ SnapLinks = new (Class.create( {
 		if(e.button != snaplButton)
 			return;
 
+		this.Document.releaseCapture();
 		if(this.Selection.DragStarted == true){
 //			snaplStopPopup=true;
 			this.StopNextContextMenuPopup();
@@ -119,23 +120,12 @@ SnapLinks = new (Class.create( {
 	
 	InstallEventHooks: function() {
 		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
-		this.PanelContainer.addEventListener('mouseout', this._OnMouseOut, true);
 	},
 	
 	RemoveEventHooks: function() {
 		this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
-		this.PanelContainer.removeEventListener('mouseout', this._OnMouseOut, true);
 	},
-	
-	OnMouseOut: function(e) {
-		if(snaplEndWhenOut){
-			if(!e.relatedTarget){
-//				snaplStopPopup=true;
-				this.ActivateSelection();
-			}
-		}
-	},
-	
+		
 	OnKeyPress: function(e) {
 		if(e.keyCode == KeyboardEvent.DOM_VK_ESCAPE)
 			this.Clear();

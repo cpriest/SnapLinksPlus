@@ -68,6 +68,13 @@ var Selection = Class.create({
 	},
 	
 	OnMouseMove: function(e) {
+		if(this.Element) {
+			if(e.clientX < 0 || e.clientY < 0 || e.clientX > this.PanelContainer.clientWidth || e.clientY > this.PanelContainer.clientHeight)
+				this.Element.style.display = 'none';
+			else
+				this.Element.style.display = '';
+		}
+
 		if(e.altKey) {
 			this.OffsetSelection(e.pageX - this.X2, e.pageY - this.Y2);
 
@@ -105,7 +112,7 @@ var Selection = Class.create({
 			this.SelectLargestFontSizeIntersectionLinks = true;
 			this.UpdateElement();
 		}
-	},		
+	},
 	Create: function() {
 		if(this.DragStarted == true)
 			return true;
@@ -210,37 +217,39 @@ var Selection = Class.create({
 			
 			this.ClearSelectedElements();
 			
-			var SelectRect = this.NormalizedRect;
-			var HighFontSize = 0;
-			
-			/* Find Links Which Intersect With Selection Rectangle */
-			$A(this.Document.links).forEach( function( link ) {
-				var Intersects = link.SnapRects.some( function(Rect) {
-					return !( SelectRect.X1 > Rect.right || SelectRect.X2 < Rect.left || SelectRect.Y1 > Rect.bottom || SelectRect.Y2 < Rect.top );
-				});
+			if(this.Element.style.display != 'none') {
+				var SelectRect = this.NormalizedRect;
+				var HighFontSize = 0;
 				
-				if(Intersects) {
-					if(this.SelectLargestFontSizeIntersectionLinks) {
-						var sz=content.document.defaultView.getComputedStyle(link, "font-size");
-						if(sz.fontSize.indexOf("px")>=0)
-							link.SnapFontSize=parseFloat(sz.fontSize);
-						
-						if(link.SnapFontSize > HighFontSize)
-							HighFontSize = link.SnapFontSize;
-					}
+				/* Find Links Which Intersect With Selection Rectangle */
+				$A(this.Document.links).forEach( function( link ) {
+					var Intersects = link.SnapRects.some( function(Rect) {
+						return !( SelectRect.X1 > Rect.right || SelectRect.X2 < Rect.left || SelectRect.Y1 > Rect.bottom || SelectRect.Y2 < Rect.top );
+					});
 					
-					this.IntersectedElements.push(link);
-				}
-			}, this );
-			
-			this.IntersectedElements.forEach( function(elem) {
-				if(!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighFontSize)
-					this.SelectedElements.push(elem);
-			}, this);
-			
-			this.SelectedElements.forEach( function(elem) {
-				elem.style.MozOutline = snaplLinksBorderWidth + 'px solid ' + snaplLinksBorderColor;
-			} );
+					if(Intersects) {
+						if(this.SelectLargestFontSizeIntersectionLinks) {
+							var sz=content.document.defaultView.getComputedStyle(link, "font-size");
+							if(sz.fontSize.indexOf("px")>=0)
+								link.SnapFontSize=parseFloat(sz.fontSize);
+							
+							if(link.SnapFontSize > HighFontSize)
+								HighFontSize = link.SnapFontSize;
+						}
+						
+						this.IntersectedElements.push(link);
+					}
+				}, this );
+				
+				this.IntersectedElements.forEach( function(elem) {
+					if(!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighFontSize)
+						this.SelectedElements.push(elem);
+				}, this);
+				
+				this.SelectedElements.forEach( function(elem) {
+					elem.style.MozOutline = snaplLinksBorderWidth + 'px solid ' + snaplLinksBorderColor;
+				} );
+			}
 		}
 	},
 } );
