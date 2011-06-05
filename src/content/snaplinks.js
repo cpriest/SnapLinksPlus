@@ -95,26 +95,6 @@ SnapLinks = new (Class.create( {
 				this.ActivateSelection();
 		} else {
 			SnapLinks.Clear();
-			if(snaplButton == snaplRMB){
-				var evt = document.createEvent('MouseEvents');
-//				snaplStopPopup=false;
-
-				evt.initMouseEvent('contextmenu', true, true, window, 0,
-					e.screenX, e.screenY, e.clientX, e.clientY,
-					false, false, false, false, 2, null);
-				e.originalTarget.dispatchEvent(evt);
-
-				if (gContextMenu) {
-					var item = gContextMenu.target;
-					item.dispatchEvent(e);
-		
-					document.popupNode = e.originalTarget;
-					var obj = document.getElementById('contentAreaContextMenu');
-					obj.showPopup(this, e.clientX, e.clientY, 'context', null, null);
-					  
-//					snaplStopPopup=true;
-				}
-			}
 		}
 	},
 	
