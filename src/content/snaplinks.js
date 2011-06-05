@@ -48,9 +48,6 @@ SnapLinks = new (Class.create( {
 
 		this._OnMouseMove 	= this.OnMouseMove.bind(this);
 		this._OnMouseOut	= this.OnMouseOut.bind(this);
-
-		document.getElementById('contentAreaContextMenu')
-			.addEventListener('popupshowing', this.OnContextMenuShowing.bind(this), false);
 			
 		document.getElementById('snaplMenu')
 			.addEventListener('popuphidden',this.OnSnapLinksPopupHidden.bind(this),false)
@@ -72,7 +69,7 @@ SnapLinks = new (Class.create( {
 
 		this.Document = e.target.ownerDocument;
 
-		snaplStopPopup = true;
+//		snaplStopPopup = true;
 		
 		this.Clear();
 
@@ -88,7 +85,8 @@ SnapLinks = new (Class.create( {
 			return;
 
 		if(this.Selection.DragStarted == true){
-			snaplStopPopup=true;
+//			snaplStopPopup=true;
+			this.StopNextContextMenuPopup();
 			if(e.ctrlKey) {
 				pop = document.getElementById('snaplMenu');
 				pop.openPopupAtScreen(e.screenX, e.screenY, true);
@@ -98,7 +96,7 @@ SnapLinks = new (Class.create( {
 			SnapLinks.Clear();
 			if(snaplButton == snaplRMB){
 				var evt = document.createEvent('MouseEvents');
-				snaplStopPopup=false;
+//				snaplStopPopup=false;
 
 				evt.initMouseEvent('contextmenu', true, true, window, 0,
 					e.screenX, e.screenY, e.clientX, e.clientY,
@@ -113,7 +111,7 @@ SnapLinks = new (Class.create( {
 					var obj = document.getElementById('contentAreaContextMenu');
 					obj.showPopup(this, e.clientX, e.clientY, 'context', null, null);
 					  
-					snaplStopPopup=true;
+//					snaplStopPopup=true;
 				}
 			}
 		}
@@ -132,7 +130,7 @@ SnapLinks = new (Class.create( {
 	OnMouseOut: function(e) {
 		if(snaplEndWhenOut){
 			if(!e.relatedTarget){
-				snaplStopPopup=true;
+//				snaplStopPopup=true;
 				this.ActivateSelection();
 			}
 		}
@@ -143,14 +141,24 @@ SnapLinks = new (Class.create( {
 			this.Clear();
 	},
 	
-	OnContextMenuShowing: function(e){
-		if((snaplStopPopup==true) && (snaplButton==snaplRMB)){
+	/** Called to prevent the next context menu popup from showing */
+	StopNextContextMenuPopup: function() {
+		if(this.StoppingNextContextMenuPopup)
+			return;
+		
+		this.StoppingNextContextMenuPopup = true;
+		
+		var ContentAreaContextMenu = document.getElementById('contentAreaContextMenu');
+		var _PreventEventDefault;
+		function PreventEventDefault(e) { 
 			e.preventDefault();
-			snaplStopPopup=false;
-			return false;
+			this.StoppingNextContextMenuPopup = false;
+			ContentAreaContextMenu.removeEventListener('popupshowing', _PreventEventDefault, false);
 		}
+		_PreventEventDefault = PreventEventDefault.bind(this);
+		ContentAreaContextMenu.addEventListener('popupshowing', _PreventEventDefault, false);
 	},
-
+	
 	OnSnapLinksPopupHidden: function(e){
 		SnapLinks.Clear();
 	},

@@ -147,13 +147,13 @@ var Selection = Class.create({
 
 		var offset = { x: this.Document.defaultView.scrollX, y: this.Document.defaultView.scrollY };
 
-		var Start = (new Date()).getMilliseconds();
+//		var Start = (new Date()).getMilliseconds();
 		$A(this.Document.links).forEach( function( link ) {
 			link.SnapRects = GetElementRects(link, offset);
 			delete link.SnapFontSize;
 		});
-		var End = (new Date()).getMilliseconds();
-		Log("Time = %sms", Math.round(End - Start, 2));
+//		var End = (new Date()).getMilliseconds();
+//		Log("Time = %sms", Math.round(End - Start, 2));
 	},
 
 	/** Clears the selection by removing the element, also clears some other non-refactored but moved code */

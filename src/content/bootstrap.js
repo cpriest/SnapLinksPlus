@@ -47,7 +47,7 @@ var snaplBorderWidth=3;
 var snaplLinksBorderWidth=1;
 
 var snaplTargetDoc;
-var snaplStopPopup;
+//var snaplStopPopup;
 
 const SNAPLACTION_UNDEF=0;
 const SNAPLACTION_TABS=1;
