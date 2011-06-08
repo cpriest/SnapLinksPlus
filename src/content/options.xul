@@ -9,31 +9,31 @@
 
 <!--
 	options.xul
-    Copyright (C) 2007	Pedro Fonseca (savred at gmail)
-    Copyright (C) 2008	Tommi Rautava
-    
-    This file is part of Snap Links.
+	Copyright (C) 2007	Pedro Fonseca (savred at gmail)
+	Copyright (C) 2008	Tommi Rautava
+	
+	This file is part of Snap Links.
 
-    Snap Links is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	Snap Links is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    Snap Links is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	Snap Links is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <dialog buttons="accept, cancel"
-        id="snaplinks-options-dialog"
-        ondialogaccept="snaplSaveOptions()"
-        onload="snaplInitializeOptions()"
-        title="&snaplinks.dialog.snaplink;"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+		id="snaplinks-options-dialog"
+		ondialogaccept="PrefsDialog.SavePrefsFromDialog(this)"
+		onload="PrefsDialog.InitializeDialog(this)"
+		title="&snaplinks.dialog.snaplink;"
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 	<script type="application/x-javascript" src="chrome://snaplinks/content/options.js"/>
 	
@@ -75,13 +75,13 @@
 			<vbox>
 				<hbox align="center">
 					<label value="&snaplinks.drawing.color;"/>
-					<colorpicker width="100" type="button" id="snaplinks.drawpicker" prefstring="extensions.snaplinks.drawpicker" onchange="snaplUpdateLineSamples()"/>
+					<colorpicker width="100" type="button" id="snaplinks.drawpicker" prefstring="extensions.snaplinks.drawpicker" onchange="PrefsDialog.UpdateLinePreviews()"/>
 					<spacer flex="2"/>
 				</hbox>
 				<hbox align="center">
 					<label value="&snaplinks.drawing.thick;"/>
 					<menulist id="snaplinks.drawthick" prefstring="extensions.snaplinks.drawthick">
-						<menupopup onpopuphidden="snaplUpdateLineSamples()">
+						<menupopup onpopuphidden="PrefsDialog.UpdateLinePreviews()">
 							<menuitem label="0" />
 							<menuitem label="1" />
 							<menuitem label="2" />
@@ -110,13 +110,13 @@
 			<vbox>
 				<hbox align="center">
 					<label value="&snaplinks.links.color;"/>
-					<colorpicker width="100" type="button" id="snaplinks.linkspicker" prefstring="extensions.snaplinks.linkspicker" onchange="snaplUpdateLineSamples()"/>
+					<colorpicker width="100" type="button" id="snaplinks.linkspicker" prefstring="extensions.snaplinks.linkspicker" onchange="PrefsDialog.UpdateLinePreviews()"/>
 					<spacer flex="2"/>
 				</hbox>
 				<hbox align="center">
 					<label value="&snaplinks.links.thick;"/>
 					<menulist id="snaplinks.linksthick" prefstring="extensions.snaplinks.linksthick">
-						<menupopup onpopuphidden="snaplUpdateLineSamples()">
+						<menupopup onpopuphidden="PrefsDialog.UpdateLinePreviews()">
 							<menuitem label="0" />
 							<menuitem label="1" />
 							<menuitem label="2" />

@@ -17,8 +17,52 @@
  *  along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//	setTimeout( function() {
+//		var a = Class.create( {
+//			initialize: function() { Log('TestInheritence: 1'); }
+//		});
+//		var b = Class.create(a, {
+//			initialize: function($super) { $super(); Log('TestInheritence: 2'); }
+//		});
+//		
+//		var ib = new b();
+//	}, 1000);
 
-SnapLinks = new (Class.create( {
+ 
+var snaplDrawing = false;
+
+const snaplLMB  = 0;
+const snaplMMB  = 1;
+const snaplRMB  = 2;
+
+var snaplButton;
+
+var snaplBorderColor = '#30AF00';
+var snaplLinksBorderColor = '#FF0000';
+
+var snaplBorderWidth=3;
+var snaplLinksBorderWidth=1;
+
+var snaplTargetDoc;
+var snaplShowNumber;
+//var snaplStopPopup;
+
+const SNAPLACTION_UNDEF=0;
+const SNAPLACTION_TABS=1;
+const SNAPLACTION_WINDOWS=2;
+const SNAPLACTION_WINDOW=3;
+const SNAPLACTION_CLIPBOARD=4;
+const SNAPLACTION_BOOKMARK=5;
+const SNAPLACTION_DOWNLOAD=6;
+var SNAPLACTION_DEFAULT=SNAPLACTION_TABS;
+
+var gsnaplinksBundle = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
+var localeStrings = gsnaplinksBundle.createBundle("chrome://snaplinks/locale/snaplinks.properties");
+var msgStatusUsage = localeStrings.GetStringFromName("snaplinks.status.usage");
+var msgStatusLoading = localeStrings.GetStringFromName("snaplinks.status.loading");
+var msgPanelLinks =  localeStrings.GetStringFromName("snaplinks.panel.links");
+
+SnapLinks = new (Class.create({
 	DocumentReferer: { 
 		get: function() {
 			try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
@@ -37,17 +81,14 @@ SnapLinks = new (Class.create( {
 	StatusBarLabel: {	set: function(x) { document.getElementById('statusbar-display').label = x; }	},
 	
 	initialize: function() {
-		snaplUpdateOptions();
-		
 		snaplButton = snaplRMB;
+		this._OnMouseMove 	= this.OnMouseMove.bind(this);
 
 		this.PanelContainer = document.getElementById('content').mPanelContainer;
 		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
 		this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
 		this.PanelContainer.addEventListener('keypress', this.OnKeyPress.bind(this), true);
 
-		this._OnMouseMove 	= this.OnMouseMove.bind(this);
-			
 		document.getElementById('snaplMenu')
 			.addEventListener('popuphidden',this.OnSnapLinksPopupHidden.bind(this),false)
 
@@ -61,8 +102,6 @@ SnapLinks = new (Class.create( {
 	},
 	
 	OnMouseDown: function(e) {
-		snaplUpdateOptions();
-
 		if(e.button != snaplButton)
 			return;
 
@@ -85,6 +124,7 @@ SnapLinks = new (Class.create( {
 			return;
 
 		this.Document.releaseCapture();
+		
 		if(this.Selection.DragStarted == true){
 //			snaplStopPopup=true;
 			this.StopNextContextMenuPopup();
@@ -264,5 +304,6 @@ SnapLinks = new (Class.create( {
 			} );
 		}
 	},
-}));
+}))();
+
 

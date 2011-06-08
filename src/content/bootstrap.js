@@ -64,9 +64,12 @@ var msgStatusUsage = localeStrings.GetStringFromName("snaplinks.status.usage");
 var msgStatusLoading = localeStrings.GetStringFromName("snaplinks.status.loading");
 var msgPanelLinks =  localeStrings.GetStringFromName("snaplinks.panel.links");
 
+var SnapLinks;
 var SnapLinksContext = { };
 
 window.addEventListener('load', function() {
+//	toJavaScriptConsole();
+
 	function LoadScript(path) {
 		Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
 			.getService(Components.interfaces.mozIJSSubScriptLoader)
@@ -77,5 +80,5 @@ window.addEventListener('load', function() {
 	LoadScript('chrome://snaplinks/content/Selection.js');
 	LoadScript('chrome://snaplinks/content/Debug.js');
 	LoadScript('chrome://snaplinks/content/SnapLinks.js');
+//	setTimeout( function() { Firebug.Console.logFormatted( [ window ]); }, 1000);
 }, false);
-

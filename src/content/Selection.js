@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+  
 /** Selection class handles the selection rectangle and accompanying visible element */
 var Selection = Class.create({ 
 	X1: 0, Y1: 0, X2: 0, Y2: 0,

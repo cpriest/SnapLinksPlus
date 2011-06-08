@@ -48,8 +48,5 @@
 		</menupopup>
 	</popupset>
 
-	<script type="application/x-javascript" src="bootstrap.js"/>		 
-	<script type="application/x-javascript" src="options.js"/>
-	
+	<script type="application/x-javascript" src="bootstrap.js"/>
 </overlay>
-
