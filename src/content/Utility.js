@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2011  Clint Priest
- *  
+ *
  *  This file is part of Snap Links.
  *
  *  Snap Links is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 function Log() {
 	if(typeof Firebug != 'undefined') {
 		Firebug.Console.logFormatted(arguments);
-	} else {	
+	} else {
 		/* If Firebug not in our current context, try seeing if there is a recent browser window context that has it, if so, use it. */
 		var mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
 					.getService(Components.interfaces.nsIWindowMediator)
@@ -30,11 +30,20 @@ function Log() {
 			mrbw.Firebug.Console.logFormatted(arguments);
 	}
 }
+/** Logs a warning to the standard console */
+Log.Warning = function(Message, Source, Line, Column) {
+	var ConsoleService = Components.classes["@mozilla.org/consoleservice;1"]
+							.getService(Components.interfaces.nsIConsoleService);
+	var ScriptMessage = Components.classes["@mozilla.org/scripterror;1"]
+							.createInstance(Components.interfaces.nsIScriptError);
+	ScriptMessage.init(Message, Source, null, Line, Column, 1, null);
+	ConsoleService.logMessage(ScriptMessage);
+}
 
-/* 
+/*
  * Prototype Imports -- Mozilla Organization may not like these...
  */
- 
+
 /* Returns true if objec tis a function */
 Object.isFunction = function isFunction(object) {
 	return typeof object === 'function';
@@ -64,7 +73,7 @@ Function.wrap = function wrap(func, wrapper) {
 		while (length--) array[arrayLength + length] = args[length];
 		return array;
 	}
-	
+
 	var __method = func;
 	return function() {
 		var a = update([__method.bind(this)], arguments);
@@ -88,9 +97,9 @@ var Class = (function() {
 		}
 		klass.superclass = parent;
 		klass.subclasses = [];
-		
+
 		klass.addMethods = Class.Methods.addMethods;
-		
+
 		if (parent) {
 			subclass.prototype = parent.prototype;
 			klass.prototype = new subclass;
@@ -113,7 +122,7 @@ var Class = (function() {
 
 		for (var i = 0, length = properties.length; i < length; i++) {
 			var property = properties[i];
-			
+
 			var Setter = source.__lookupSetter__(property),
 				Getter = source.__lookupGetter__(property);
 
@@ -166,22 +175,22 @@ function $A(iterable) {
 	return results;
 }
 
-/** Returns an array of { top, left, width, height } objects which combined make up the bounding rects of the given element, 
+/** Returns an array of { top, left, width, height } objects which combined make up the bounding rects of the given element,
 * 	this uses the built-in .getClientRects() and additionally compensates for 'block' elements which it would appear is not
-* 	handled appropriately for our needs by Mozilla or the standard 
+* 	handled appropriately for our needs by Mozilla or the standard
 */
 function GetElementRects(node, offset) {
 	offset = offset || { x: 0, y: 0 };
-	
+
 	var Rects = $A(node.getClientRects());
-	
+
 	$A(node.querySelectorAll('IMG')).forEach( function(elem) {
 		Rects = Rects.concat( $A(elem.getClientRects()) );
 	} );
 	return Rects.map( function(rect) {
-		return { 	top		: rect.top + offset.y, 
-					left	: rect.left + offset.x, 
-					bottom	: rect.top + rect.height + offset.y, 
+		return { 	top		: rect.top + offset.y,
+					left	: rect.left + offset.x,
+					bottom	: rect.top + rect.height + offset.y,
 					right	: rect.left + rect.width + offset.x };
 	} );
 }
@@ -208,35 +217,51 @@ var PrefsMapper = Class.create({
 		this.BasePath = BasePath;
 		this.map = map || {};
 		this.pref = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
-		
-		Object.keys(this.map).forEach( function(PropertyTitle) {
-			this.map[PropertyTitle].Type = this.map[PropertyTitle].Type || 'char';
-			this.map[PropertyTitle].Name = this.map[PropertyTitle].Name || (this.BasePath + '.' + PropertyTitle);
-			
-			Object.defineProperty(this, PropertyTitle, {
-				get:	function() { return this.GetPref(PropertyTitle); },
-				set:	function(x) { this.SetPref(PropertyTitle, x); },
+
+		Object.keys(this.map).forEach( function(Property) {
+			this.map[Property].Type = this.map[Property].Type || 'char';
+			this.map[Property].Path = (this.map[Property].Name[0] == '.' && this.BasePath + this.map[Property].Name) || (this.BasePath + '.' + Property);
+
+			Object.defineProperty(this, Property, {
+				get:	function() { return this.GetPref(Property); },
+				set:	function(x) { this.SetPref(Property, x); },
 			});
 
 			/* Ensure the value or default value is stored */
-			this[PropertyTitle] = this[PropertyTitle];
+			try { this[Property] = this[Property]; }
+				catch(e) { Log.Warning('Unable to retrieve or set preference: ' + this.map[Property].Path + '\r\n' + e.toString()); }
 		}, this);
 	},
-	GetPref: function(PropertyTitle) {
-		switch(this.map[PropertyTitle].Type) {
-			case 'bool':	return this.pref.getBoolPref(this.map[PropertyTitle].Name) || this.map[PropertyTitle].Default;
-			case 'int':		return this.pref.getIntPref(this.map[PropertyTitle].Name) || this.map[PropertyTitle].Default;
-			case 'char':	return this.pref.getCharPref(this.map[PropertyTitle].Name) || this.map[PropertyTitle].Default;
+	GetPref: function(Property) {
+		if(this.pref.prefHasUserValue(this.map[Property].Path) == false)
+			return this.map[Property].Default;
+		switch(this.map[Property].Type) {
+			case 'bool':	return this.pref.getBoolPref(this.map[Property].Path);
+			case 'int':		return this.pref.getIntPref(this.map[Property].Path);
+			case 'char':	return this.pref.getCharPref(this.map[Property].Path);
 		}
 	},
-	SetPref: function(PropertyTitle, Value) {
-		Value = Value || this.map[PropertyTitle].Default;
-		
-		switch(this.map[PropertyTitle].Type) {
-			case 'bool':	return this.pref.setBoolPref(this.map[PropertyTitle].Name, Value);
-			case 'int':		return this.pref.setIntPref(this.map[PropertyTitle].Name, Value);
-			case 'char':	return this.pref.setCharPref(this.map[PropertyTitle].Name, Value);
+	SetPref: function(Property, Value) {
+		if(Value == undefined)
+			Value = this.map[Property].Default;
+
+		switch(this.map[Property].Type) {
+			case 'bool':	return this.pref.setBoolPref(this.map[Property].Path, Value);
+			case 'int':		return this.pref.setIntPref(this.map[Property].Path, Value);
+			case 'char':	return this.pref.setCharPref(this.map[Property].Path, Value);
 		}
+	},
+	TranslatePref: function(Property, Map) {
+		var PreviousValue;
+
+		switch(this.pref.getPrefType(this.map[Property].Path)) {
+			case this.pref.PREF_STRING:	PreviousValue = this.pref.getCharPref(this.map[Property].Path);	break;
+			case this.pref.PREF_INT:	PreviousValue = this.pref.getIntPref(this.map[Property].Path);	break;
+			case this.pref.PREF_BOOL:	PreviousValue = this.pref.getBoolPref(this.map[Property].Path);	break;
+		}
+		this.pref.deleteBranch(this.map[Property].Path);
+		this[Property] = Map[PreviousValue];
+		Log.Warning("Translated Preference (" + this.map[Property].Path + ") from " + PreviousValue + " to " + this[Property]);
 	}
 } );
 
@@ -247,48 +272,48 @@ var PrefsMapper = Class.create({
 */
 var PrefsDialogMapper = Class.create( {
 	TypeMap: {
-		radiogroup:		{ Property: 'selectedIndex', 	Type: 'int' },
+		radiogroup:		{ Property: 'value',		 	Type: 'char' },
 		menulist:		{ Property: 'selectedIndex', 	Type: 'int' },
 		colorpicker:	{ Property: 'color', 			Type: 'char' },
 		checkbox:		{ Property: 'checked', 			Type: 'bool' },
 	},
-	
+
 	initialize: function() {
 		this.pref = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
 	},
-	
+
 	InitializeDialog: function(dialog) {
 		$A(dialog.document.querySelectorAll('*[prefstring]')).forEach( function(elem) {
 			if(!this.TypeMap[elem.tagName])
 				return;
-				
+
 			elem[this.TypeMap[elem.tagName].Property] = this.GetPrefValue(elem);
 		}, this );
 	},
-	
+
 	/* Gets the preference for the given element, put here so as to be over-ridable by sub-classes */
 	GetPrefValue: function(elem) {
-		switch(this.TypeMap[elem.tagName].Type) {
-			case 'int':		return this.pref.getIntPref(elem.getAttribute('prefstring'));	break;
-			case 'bool':	return this.pref.getBoolPref(elem.getAttribute('prefstring'));	break;
-			case 'char':	return this.pref.getCharPref(elem.getAttribute('prefstring'));	break;
+		switch(this.pref.getPrefType(elem.getAttribute('prefstring'))) {
+			case this.pref.PREF_INT:	return this.pref.getIntPref(elem.getAttribute('prefstring'));
+			case this.pref.PREF_BOOL:	return this.pref.getBoolPref(elem.getAttribute('prefstring'));
+			case this.pref.PREF_STRING:	return this.pref.getCharPref(elem.getAttribute('prefstring'));
 		}
 	},
-		
+
 	SavePrefsFromDialog: function(dialog) {
 		$A(dialog.document.querySelectorAll('*[prefstring]')).forEach( function(elem) {
 			if(!this.TypeMap[elem.tagName])
 				return;
-				
+
 			this.SetPrefValue(elem, elem[this.TypeMap[elem.tagName].Property]);
 		}, this );
 	},
 	/* Saves the preference for the given element, put here so as to be over-ridable by sub-classes */
 	SetPrefValue: function(elem, value) {
-		switch(this.TypeMap[elem.tagName].Type) {
-			case 'int':		this.pref.setIntPref(elem.getAttribute('prefstring'), value);	break;
-			case 'bool':	this.pref.setBoolPref(elem.getAttribute('prefstring'), value);	break;
-			case 'char':	this.pref.setCharPref(elem.getAttribute('prefstring'), value);	break;
+		switch(this.pref.getPrefType(elem.getAttribute('prefstring')) || this.TypeMap[elem.tagName].Type) {
+			case this.pref.PREF_INT:		this.pref.setIntPref(elem.getAttribute('prefstring'), value);	break;
+			case this.pref.PREF_BOOL:		this.pref.setBoolPref(elem.getAttribute('prefstring'), value);	break;
+			case this.pref.PREF_STRING:		this.pref.setCharPref(elem.getAttribute('prefstring'), value);	break;
 		}
 	}
 });

@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2011  Clint Priest
- *  
+ *
  *  This file is part of Snap Links.
  *
  *  Snap Links is free software: you can redistribute it and/or modify
@@ -24,27 +24,18 @@
 //		var b = Class.create(a, {
 //			initialize: function($super) { $super(); Log('TestInheritence: 2'); }
 //		});
-//		
+//
 //		var ib = new b();
 //	}, 1000);
 
- 
+
 var snaplDrawing = false;
 
 const snaplLMB  = 0;
 const snaplMMB  = 1;
 const snaplRMB  = 2;
 
-var snaplButton;
-
-var snaplBorderColor = '#30AF00';
-var snaplLinksBorderColor = '#FF0000';
-
-var snaplBorderWidth=3;
-var snaplLinksBorderWidth=1;
-
 var snaplTargetDoc;
-var snaplShowNumber;
 //var snaplStopPopup;
 
 const SNAPLACTION_UNDEF=0;
@@ -63,25 +54,24 @@ var msgStatusLoading = localeStrings.GetStringFromName("snaplinks.status.loading
 var msgPanelLinks =  localeStrings.GetStringFromName("snaplinks.panel.links");
 
 SnapLinks = new (Class.create({
-	DocumentReferer: { 
+	DocumentReferer: {
 		get: function() {
 			try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
 						.ioService.newURI(this.Document.location.href, null, null); }
 			catch(e) { }
 			return null;
 		}
-	},	
+	},
 	SnapLinksStatus: {
 		set: function(x) {
 			var el = document.getElementById('snaplinks-panel') ;
 			el && (el.label = x);
 			el && (el.hidden = (x == ''));
-		} 
+		}
 	},
 	StatusBarLabel: {	set: function(x) { document.getElementById('statusbar-display').label = x; }	},
-	
+
 	initialize: function() {
-		snaplButton = snaplRMB;
 		this._OnMouseMove 	= this.OnMouseMove.bind(this);
 
 		this.PanelContainer = document.getElementById('content').mPanelContainer;
@@ -95,36 +85,41 @@ SnapLinks = new (Class.create({
 		this.Selection = new Selection(this.PanelContainer);
 
 		this.SnapLinksStatus = '';
+
+		/* Import anything already defined into SnapLinks.* (like Prefs) */
+		Object.keys(SnapLinks).forEach( function(Name) {
+			this[Name] = SnapLinks[Name];
+		}, this);
 	},
-			
+
 	UpdateStatusLabel: function() {
 		this.StatusBarLabel = msgStatusUsage;
 	},
-	
+
 	OnMouseDown: function(e) {
-		if(e.button != snaplButton)
+		if(e.button != SnapLinks.Prefs.SelectionButton)
 			return;
 
 		this.Document = e.target.ownerDocument;
 		this.Document.body.setCapture(false);
-		
+
 //		snaplStopPopup = true;
-		
+
 		this.Clear();
 
 		this.InstallEventHooks();
 	},
-	
+
 	OnMouseMove: function(e) {
 //		this.UpdateStatusLabel();
 	},
-	
+
 	OnMouseUp: function(e) {
-		if(e.button != snaplButton)
+		if(e.button != SnapLinks.Prefs.SelectionButton)
 			return;
 
 		this.Document.releaseCapture();
-		
+
 		if(this.Selection.DragStarted == true){
 //			snaplStopPopup=true;
 			this.StopNextContextMenuPopup();
@@ -137,30 +132,30 @@ SnapLinks = new (Class.create({
 			SnapLinks.Clear();
 		}
 	},
-	
+
 	InstallEventHooks: function() {
 		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
 	},
-	
+
 	RemoveEventHooks: function() {
 		this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
 	},
-		
+
 	OnKeyPress: function(e) {
 		if(e.keyCode == KeyboardEvent.DOM_VK_ESCAPE)
 			this.Clear();
 	},
-	
+
 	/** Called to prevent the next context menu popup from showing */
 	StopNextContextMenuPopup: function() {
 		if(this.StoppingNextContextMenuPopup)
 			return;
-		
+
 		this.StoppingNextContextMenuPopup = true;
-		
+
 		var ContentAreaContextMenu = document.getElementById('contentAreaContextMenu');
 		var _PreventEventDefault;
-		function PreventEventDefault(e) { 
+		function PreventEventDefault(e) {
 			e.preventDefault();
 			this.StoppingNextContextMenuPopup = false;
 			ContentAreaContextMenu.removeEventListener('popupshowing', _PreventEventDefault, false);
@@ -168,21 +163,20 @@ SnapLinks = new (Class.create({
 		_PreventEventDefault = PreventEventDefault.bind(this);
 		ContentAreaContextMenu.addEventListener('popupshowing', _PreventEventDefault, false);
 	},
-	
+
 	OnSnapLinksPopupHidden: function(e){
 		SnapLinks.Clear();
 	},
-	
+
 	Clear: function() {
 		this.Selection.Clear();
-					
+
 		this.StatusBarLabel = '';
 		this.SnapLinksStatus = '';
 		this.RemoveEventHooks();
 	},
 
 	ACTION: {
-		DEFAULT				: 'OpenTabs',
 		NEW_TABS			: 'OpenTabs',
 		NEW_WINDOWS			: 'OpenWindows',
 		TABS_IN_NEW_WINDOW	: 'OpenTabsInNewWindow',
@@ -190,14 +184,14 @@ SnapLinks = new (Class.create({
 		BOOKMARK_LINKS		: 'BookmarkLinks',
 		DOWNLOAD_LINKS		: 'DownloadLinks',
 	},
-	
+
 	ActivateSelection: function(Action) {
-		Action = Action || this.ACTION.DEFAULT;
+		Action = Action || this.Prefs.DefaultAction;
 		if(this[Action])
 			this[Action]();
 		this.Clear();
 	},
-	
+
 	OpenTabs: function() {
 		this.Selection.SelectedElements.forEach( function(elem) {
 			if(elem.href)
@@ -231,7 +225,7 @@ SnapLinks = new (Class.create({
 		// Create the transferable
 		var objData = Components.classes["@mozilla.org/widget/transferable;1"]
 						.createInstance(Components.interfaces.nsITransferable);
-		
+
 		if(objData) {
 			var TextContent = Components.classes["@mozilla.org/supports-string;1"]
 								.createInstance(Components.interfaces.nsISupportsString);
@@ -246,7 +240,7 @@ SnapLinks = new (Class.create({
 								.createInstance(Components.interfaces.nsISupportsString);
 			if(HtmlContent) {
 				HtmlContent.data = Representations.html.join("\n");
-				
+
 				objData.addDataFlavor('text/html');
 				objData.setTransferData('text/html', HtmlContent, HtmlContent.data.length * 2);	/* Double byte data (len*2) */
 			}
@@ -261,13 +255,13 @@ SnapLinks = new (Class.create({
 		if(SnapLinks.Selection.SelectedElements.length) {
 			/* Does not work, find way to add bookmarks to FF4 - @BROKEN */
 			var linksInfo = SnapLinks.Selection.SelectedElements.map( function(elem) {
-				return { 
+				return {
 					name	: elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' '),
 					url		: elem.href,
 				};
 			} );
 			const BROWSER_ADD_BM_FEATURES = 'centerscreen,chrome,dialog=no,resizable=yes';
-			
+
 			var dialogArgs = { name: gNavigatorBundle.getString("bookmarkAllTabsDefault") }
 			dialogArgs.bBookmarkAllTabs = true;
 			dialogArgs.objGroup = linksInfo;
@@ -277,10 +271,10 @@ SnapLinks = new (Class.create({
 	DownloadLinks: function() {
 		if(SnapLinks.Selection.SelectedElements.length) {
 			var TitlesUsed = { };
-			
+
 			var links = SnapLinks.Selection.SelectedElements.map( function(elem) {
 				var Title = elem.textContent.replace(/\s{2,}/g, ' ').replace(/ /g,'_').replace(/[^a-zA-Z0-9_]+/g, '').substring(0, 75);
-				
+
 				/* Ensure Uniqueness of Filename */
 				for(var j=0;j<99;j++) {
 					var TitleCheck = Title;
@@ -292,14 +286,14 @@ SnapLinks = new (Class.create({
 					}
 				}
 				TitlesUsed[Title] = true;
-				
+
 				return { FileName: Title, Url: elem.href };
 			} );
 			links.forEach( function( link ) {
 				const BYPASS_CACHE = true;
 				const DONT_SKIP_PROMPT = false;
-				
-				try { saveURL(link.Url, link.FileName, false, BYPASS_CACHE, DONT_SKIP_PROMPT, this.DocumentReferer); } 
+
+				try { saveURL(link.Url, link.FileName, false, BYPASS_CACHE, DONT_SKIP_PROMPT, this.DocumentReferer); }
 					catch(e) { }
 			} );
 		}

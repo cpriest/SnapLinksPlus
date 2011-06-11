@@ -53,7 +53,7 @@ var Selection = Class.create({
 	},
 	
 	OnMouseDown: function(e) {
-		if(e.button != snaplButton)
+		if(e.button != SnapLinks.Prefs.SelectionButton)
 			return;
 
 		this.Document = e.target.ownerDocument;
@@ -122,8 +122,8 @@ var Selection = Class.create({
 			
 			this.Element = this.Document.createElementNS('http://www.w3.org/1999/xhtml', 'snaplRect');
 			if(InsertionNode && this.Element) {
-				this.Element.style.color = snaplBorderColor;
-				this.Element.style.border = snaplBorderWidth + 'px dotted';
+				this.Element.style.color = SnapLinks.Prefs.SelectionBorderColor;
+				this.Element.style.border = SnapLinks.Prefs.SelectionBorderWidth + 'px dotted';
 				this.Element.style.position = 'absolute';
 				this.Element.style.zIndex = '10000';
 				this.Element.style.left = this.X1 + 'px'; 
@@ -133,7 +133,7 @@ var Selection = Class.create({
 				this.DragStarted = this.Element.parentNode != undefined;
 
 				if(this.DragStarted) {
-					if(snaplShowNumber)
+					if(SnapLinks.Prefs.ShowSelectedCount)
 						SnapLinks.SnapLinksStatus = msgPanelLinks + ' 0';
 
 					this.CalculateSnapRects();
@@ -209,10 +209,10 @@ var Selection = Class.create({
 	UpdateElement: function() {
 		if(this.Create()) {
 			ApplyStyle(this.Element, {
-				width 	: Math.abs(this.X1-this.X2) - snaplBorderWidth + 'px',
-				height 	: Math.abs(this.Y1-this.Y2) - snaplBorderWidth + 'px',
-				top 	: Math.min(this.Y1,this.Y2) - snaplBorderWidth + 'px',
-				left 	: Math.min(this.X1,this.X2) - snaplBorderWidth + 'px',
+				width 	: Math.abs(this.X1-this.X2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
+				height 	: Math.abs(this.Y1-this.Y2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
+				top 	: Math.min(this.Y1,this.Y2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
+				left 	: Math.min(this.X1,this.X2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
 			} );
 			
 			this.ClearSelectedElements();
@@ -247,7 +247,7 @@ var Selection = Class.create({
 				}, this);
 				
 				this.SelectedElements.forEach( function(elem) {
-					elem.style.MozOutline = snaplLinksBorderWidth + 'px solid ' + snaplLinksBorderColor;
+					elem.style.MozOutline = SnapLinks.Prefs.SelectedElementsBorderWidth + 'px solid ' + SnapLinks.Prefs.SelectedElementsBorderColor;
 				} );
 			}
 		}
