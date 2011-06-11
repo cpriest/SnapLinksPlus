@@ -108,7 +108,7 @@ SnapLinks = new (Class.create({
 		if(this.Selection.DragStarted == true){
 //			snaplStopPopup=true;
 			this.StopNextContextMenuPopup();
-			if(e.ctrlKey) {
+			if(e.ctrlKey && this.Selection.SelectedElementsType == 'Links') {
 				pop = document.getElementById('snaplMenu');
 				pop.openPopupAtScreen(e.screenX, e.screenY, true);
 			} else
@@ -170,15 +170,34 @@ SnapLinks = new (Class.create({
 		COPY_TO_CLIPBOARD	: 'CopyToClipboard',
 		BOOKMARK_LINKS		: 'BookmarkLinks',
 		DOWNLOAD_LINKS		: 'DownloadLinks',
+		CLICK_ELEMENTS		: 'ClickElements',
 	},
-
+	
 	ActivateSelection: function(Action) {
+		/* Hash of valid actions by SelectedElementType  */
+		var ValidActions = {
+			'Links':		[ 'OpenTabs','OpenWindows','OpenTabsInNewWindow','CopyToClipboard','BookmarkLinks','DownloadLinks' ],
+			'Buttons':		[ 'ClickElements' ],
+			'Checkboxes':	[ 'ClickElements' ],
+		};
+
 		Action = Action || this.Prefs.DefaultAction;
+		
+		/* Check to see that the requested action is valid for the given SelectedElementsType */
+		if(ValidActions[this.Selection.SelectedElementsType].indexOf(Action) == -1)
+			Action = ValidActions[this.Selection.SelectedElementsType][0];
+		
 		if(this[Action])
 			this[Action]();
 		this.Clear();
 	},
 
+	ClickElements: function() {
+		this.Selection.SelectedElements.forEach( function(elem) {
+			elem.click();
+		} );
+	},
+	
 	/* Opens the selected element links in tabs in the current window */
 	OpenTabs: function() {
 		this.Selection.SelectedElements.forEach( function(elem) {

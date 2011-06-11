@@ -161,11 +161,25 @@ var Selection = Class.create({
 
 		var offset = { x: this.Document.defaultView.scrollX, y: this.Document.defaultView.scrollY };
 
+		var SelectableElements = [ ];
+		
 //		var Start = (new Date()).getMilliseconds();
 		$A(this.Document.links).forEach( function( link ) {
-			link.SnapRects = GetElementRects(link, offset);
 			delete link.SnapFontSize;
+			SelectableElements.push(link);
 		});
+		$A(this.Document.body.querySelectorAll('INPUT')).forEach( function(input) {
+			var Type = input.getAttribute('type');
+			if(SnapLinks.Prefs.HighlightButtonsForClicking && (Type == 'submit' || Type == 'button')) {
+				SelectableElements.push(input);
+			} else if(SnapLinks.Prefs.HighlightCheckboxesForClicking && Type == 'checkbox') {
+				SelectableElements.push(input);
+			}
+		});
+		SelectableElements.forEach( function(elem) {
+			elem.SnapRects = GetElementRects(elem, offset);
+		} );
+		this.SelectableElements = SelectableElements;
 //		var End = (new Date()).getMilliseconds();
 //		Log("Time = %sms", Math.round(End - Start, 2));
 	},
@@ -235,34 +249,60 @@ var Selection = Class.create({
 			var SelectRect = this.NormalizedRect;
 			var HighFontSize = 0;
 			
+			var TypeCounts = { 'Links': 0,	'Checkbox': 0, 'Buttons': 0};
+			
 			/* Find Links Which Intersect With Selection Rectangle */
-			$A(this.Document.links).forEach( function( link ) {
-				var Intersects = link.SnapRects.some( function(Rect) {
+			$A(this.SelectableElements).forEach( function( elem ) {
+				var Intersects = elem.SnapRects.some( function(Rect) {
 					return !( SelectRect.X1 > Rect.right || SelectRect.X2 < Rect.left || SelectRect.Y1 > Rect.bottom || SelectRect.Y2 < Rect.top );
 				});
 				
 				if(Intersects) {
-					if(this.SelectLargestFontSizeIntersectionLinks) {
-						var sz=content.document.defaultView.getComputedStyle(link, "font-size");
+					if(elem.tagName == 'A' && this.SelectLargestFontSizeIntersectionLinks) {
+						var sz=content.document.defaultView.getComputedStyle(elem, "font-size");
 						if(sz.fontSize.indexOf("px")>=0)
-							link.SnapFontSize=parseFloat(sz.fontSize);
+							elem.SnapFontSize=parseFloat(sz.fontSize);
 						
-						if(link.SnapFontSize > HighFontSize)
-							HighFontSize = link.SnapFontSize;
+						if(elem.SnapFontSize > HighFontSize)
+							HighFontSize = elem.SnapFontSize;
 					}
+					if(elem.tagName == 'INPUT') {
+						switch(elem.getAttribute('type')) {
+							case 'checkbox':	TypeCounts.Checkbox++;	break;
+							case 'button':
+							case 'submit':		TypeCounts.Buttons++;	break;
+						}
+							
+					} else if(elem.tagName == 'A')
+						TypeCounts.Links++;
 					
-					this.IntersectedElements.push(link);
+					this.IntersectedElements.push(elem);
 				}
 			}, this );
 			
-			this.IntersectedElements.forEach( function(elem) {
-				if(!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighFontSize)
-					this.SelectedElements.push(elem);
+			var Greatest;
+			if(TypeCounts.Links > TypeCounts.Checkbox && TypeCounts.Links > TypeCounts.Buttons)
+				Greatest = 'Links';
+			else if(TypeCounts.Checkbox > TypeCounts.Buttons && TypeCounts.Checkbox > TypeCounts.Links)
+				Greatest = 'Checkboxes';
+			else
+				Greatest = 'Buttons';
+			
+			this.SelectedElements = this.IntersectedElements.filter( function(elem) {
+				switch(Greatest) {
+					case 'Links':
+						return elem.tagName == 'A' && !this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighFontSize;
+					case 'Checkboxes':
+						return elem.tagName == 'INPUT' && elem.getAttribute('type') == 'checkbox';
+					case 'Buttons':
+						return elem.tagName == 'INPUT' && (elem.getAttribute('type') == 'button' || elem.getAttribute('type') == 'submit');
+				}
 			}, this);
 			
 			this.SelectedElements.forEach( function(elem) {
 				elem.style.MozOutline = SnapLinks.Prefs.SelectedElementsBorderWidth + 'px solid ' + SnapLinks.Prefs.SelectedElementsBorderColor;
 			} );
+			this.SelectedElementsType = Greatest;
 		}
 	},
 } );

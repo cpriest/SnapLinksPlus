@@ -145,6 +145,8 @@
 
 	<groupbox>
 		<caption label="&snaplinks.adv.caption;"/>
+		<checkbox label="&snaplinks.adv.HighlightCheckboxes;" prefstring="extensions.snaplinks.HighlightCheckboxesForClicking"/>
+		<checkbox label="&snaplinks.adv.HighlightButtons;" prefstring="extensions.snaplinks.HighlightButtonsForClicking"/>
 		<checkbox label="&snaplinks.adv.hideleave;" prefstring="extensions.snaplinks.HideSelectionOnMouseLeave"/>
 		<checkbox label="&snaplinks.adv.shownumber;" prefstring="extensions.snaplinks.shownumber"/>
 	</groupbox>

@@ -29,3 +29,6 @@ pref('extensions.snaplinks.linkspicker','#FF0000');
 pref('extensions.snaplinks.linksthick',1);
 pref('extensions.snaplinks.drawpicker','#30AF00');
 pref('extensions.snaplinks.drawthick',3);
+
+pref('extensions.snaplinks.HighlightButtonsForClicking', true);
+pref('extensions.snaplinks.HighlightCheckboxesForClicking', true);

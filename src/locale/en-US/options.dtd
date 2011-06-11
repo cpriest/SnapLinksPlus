@@ -24,6 +24,8 @@
 <!ENTITY snaplinks.links.thick        "Thickness:">
 
 <!ENTITY snaplinks.adv.caption        "Advanced Options">
+<!ENTITY snaplinks.adv.HighlightCheckboxes      "Highlight checkboxes within selection rectangle for clicking">
+<!ENTITY snaplinks.adv.HighlightButtons      	"Highlight buttons within selection rectangle for clicking">
 <!ENTITY snaplinks.adv.hideleave      "Hide selection rectangle when mouse leaves window">
 <!ENTITY snaplinks.adv.shownumber     "Show number of links selected in status bar">
 <!ENTITY snaplinks.adv.multiline      "Process correctly multi-line links (slower)">
