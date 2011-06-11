@@ -17,7 +17,7 @@
  *  along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Utility */
+/* Log() logs info to the Firebug plugin if available, identical usage to console.log() from within a client page */
 function Log() {
 	if(typeof Firebug != 'undefined') {
 		Firebug.Console.logFormatted(arguments);
@@ -44,7 +44,7 @@ Log.Warning = function(Message, Source, Line, Column) {
  * Prototype Imports -- Mozilla Organization may not like these...
  */
 
-/* Returns true if objec tis a function */
+/* Returns true if object is a function */
 Object.isFunction = function isFunction(object) {
 	return typeof object === 'function';
 }
@@ -67,7 +67,7 @@ Function.argumentNames = function argumentNames(func) {
 
 /** Returns the given func wrapped with wrapper */
 Function.wrap = function wrap(func, wrapper) {
-	/* Localized version of Function.updaate from prototype */
+	/* Localized version of Function.update from prototype */
 	function update(array, args) {
 		var arrayLength = array.length, length = args.length;
 		while (length--) array[arrayLength + length] = args[length];
@@ -82,7 +82,7 @@ Function.wrap = function wrap(func, wrapper) {
 }
 
 
-/** Stripped down (non inheriting version of prototype classes, allows for getters/setters including c# style getters/setters */
+/** Fully functioning prototype class inheritence, also allows for getters/setters including c# style getters/setters */
 var Class = (function() {
 	function subclass() {};
 
@@ -195,6 +195,7 @@ function GetElementRects(node, offset) {
 	} );
 }
 
+/* Applies the given style to the given element returns a hash of what changed styles were originally */
 function ApplyStyle(elem, style) {
 	var OriginalStyle = { };
 	Object.keys(style).forEach( function(name) {
@@ -204,7 +205,7 @@ function ApplyStyle(elem, style) {
 	return OriginalStyle;
 }
 
-/** Maps the given parameters as getters/setters on the object */
+/** Creates getters/setters on this class for each parameter specified in the map */
 var PrefsMapper = Class.create({
 	/**
 	 *	@param BasePath string 	- String representing the prefix for automatic preference names based on property name of map
@@ -299,7 +300,8 @@ var PrefsDialogMapper = Class.create( {
 			case this.pref.PREF_STRING:	return this.pref.getCharPref(elem.getAttribute('prefstring'));
 		}
 	},
-
+	
+	/* Saves the settings in the dialog to the preferences store */
 	SavePrefsFromDialog: function(dialog) {
 		$A(dialog.document.querySelectorAll('*[prefstring]')).forEach( function(elem) {
 			if(!this.TypeMap[elem.tagName])

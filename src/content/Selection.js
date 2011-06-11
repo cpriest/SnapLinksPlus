@@ -24,8 +24,10 @@ var Selection = Class.create({
 	IntersectedElements: 	[ ],
 	SelectedElements: 		[ ],
 	
+	/* Internal flag to control selecting all links or all links matching the greatest size */
 	SelectLargestFontSizeIntersectionLinks:		true,
 	
+	/* Returns a rect whos X1,Y1 are the closest to zero of the four corners */
 	NormalizedRect: {
 		get: function() { 
 			return {	X1: Math.min(this.X1,this.X2),	Y1: Math.min(this.Y1,this.Y2),
@@ -33,6 +35,7 @@ var Selection = Class.create({
 		},
 	},
 	
+	/* Internal Flag indicating that a selection has been started */
 	DragStarted: false,
 	
 	initialize: function(PanelContainer) {
@@ -47,11 +50,13 @@ var Selection = Class.create({
 		this._OnKeyUp		= this.OnKeyUp.bind(this);
 	},
 	
+	/* Element bounding rectangles are calculated at the start, if the window is resized during a drag, then we recalculate */
 	OnWindowResize: function(e) {
 		if(this.DragStarted == true)
 			this.CalculateSnapRects();
 	},
 	
+	/* Starting Hook for beginning a selection */
 	OnMouseDown: function(e) {
 		if(e.button != SnapLinks.Prefs.SelectionButton)
 			return;
@@ -113,6 +118,8 @@ var Selection = Class.create({
 			this.UpdateElement();
 		}
 	},
+	
+	/* Creates the selection rectangle element, returns true if element exists or was created successfully */
 	Create: function() {
 		if(this.DragStarted == true)
 			return true;
@@ -178,6 +185,7 @@ var Selection = Class.create({
 		
 		delete this.CalculateWindowWidth;
 	},
+	/* Clears the selection style from the currently selected elements */
 	ClearSelectedElements: function() {
 		this.IntersectedElements = [ ];
 
@@ -206,6 +214,7 @@ var Selection = Class.create({
 		this.UpdateElement();
 	},
 	
+	/* Updates the visible position of the element */
 	UpdateElement: function() {
 		if(this.Create()) {
 			ApplyStyle(this.Element, {
@@ -215,41 +224,45 @@ var Selection = Class.create({
 				left 	: Math.min(this.X1,this.X2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
 			} );
 			
-			this.ClearSelectedElements();
+			this.CalcSelectedElements();
+		}
+	},
+	
+	/* Calculates which elements intersect with the selection */
+	CalcSelectedElements: function() {
+		this.ClearSelectedElements();
+		if(this.Element.style.display != 'none') {
+			var SelectRect = this.NormalizedRect;
+			var HighFontSize = 0;
 			
-			if(this.Element.style.display != 'none') {
-				var SelectRect = this.NormalizedRect;
-				var HighFontSize = 0;
+			/* Find Links Which Intersect With Selection Rectangle */
+			$A(this.Document.links).forEach( function( link ) {
+				var Intersects = link.SnapRects.some( function(Rect) {
+					return !( SelectRect.X1 > Rect.right || SelectRect.X2 < Rect.left || SelectRect.Y1 > Rect.bottom || SelectRect.Y2 < Rect.top );
+				});
 				
-				/* Find Links Which Intersect With Selection Rectangle */
-				$A(this.Document.links).forEach( function( link ) {
-					var Intersects = link.SnapRects.some( function(Rect) {
-						return !( SelectRect.X1 > Rect.right || SelectRect.X2 < Rect.left || SelectRect.Y1 > Rect.bottom || SelectRect.Y2 < Rect.top );
-					});
-					
-					if(Intersects) {
-						if(this.SelectLargestFontSizeIntersectionLinks) {
-							var sz=content.document.defaultView.getComputedStyle(link, "font-size");
-							if(sz.fontSize.indexOf("px")>=0)
-								link.SnapFontSize=parseFloat(sz.fontSize);
-							
-							if(link.SnapFontSize > HighFontSize)
-								HighFontSize = link.SnapFontSize;
-						}
+				if(Intersects) {
+					if(this.SelectLargestFontSizeIntersectionLinks) {
+						var sz=content.document.defaultView.getComputedStyle(link, "font-size");
+						if(sz.fontSize.indexOf("px")>=0)
+							link.SnapFontSize=parseFloat(sz.fontSize);
 						
-						this.IntersectedElements.push(link);
+						if(link.SnapFontSize > HighFontSize)
+							HighFontSize = link.SnapFontSize;
 					}
-				}, this );
-				
-				this.IntersectedElements.forEach( function(elem) {
-					if(!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighFontSize)
-						this.SelectedElements.push(elem);
-				}, this);
-				
-				this.SelectedElements.forEach( function(elem) {
-					elem.style.MozOutline = SnapLinks.Prefs.SelectedElementsBorderWidth + 'px solid ' + SnapLinks.Prefs.SelectedElementsBorderColor;
-				} );
-			}
+					
+					this.IntersectedElements.push(link);
+				}
+			}, this );
+			
+			this.IntersectedElements.forEach( function(elem) {
+				if(!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighFontSize)
+					this.SelectedElements.push(elem);
+			}, this);
+			
+			this.SelectedElements.forEach( function(elem) {
+				elem.style.MozOutline = SnapLinks.Prefs.SelectedElementsBorderWidth + 'px solid ' + SnapLinks.Prefs.SelectedElementsBorderColor;
+			} );
 		}
 	},
 } );

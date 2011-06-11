@@ -17,7 +17,14 @@
  *  along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
  */
  
+/* This class primarily was written to validate the selection rectangle and bounding rect element functionality
+ *
+ * It would seem this method of calculation should work wherever, but if there are problem pages this class can
+ * be used to diagnose where there may be an issue with the algorithm.
+ */
 var SnapLinksDebug = new (Class.create({
+	
+	/* Flags to indicate what should be highlighted at load and on mouse over, as well as how to highlight them */
 	Flags: {
 		Links: {
 			LinkStyle: 			{ border: '1px solid blue' },

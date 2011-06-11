@@ -26,6 +26,7 @@ function LoadScript(path) {
 
 LoadScript('chrome://snaplinks/content/Utility.js');
 
+/* Includes some non-standard PrefsDialogMapper functionality like maintaining line previews */
 var PrefsDialog = new (Class.create(PrefsDialogMapper, {
 	InitializeDialog: function($super, dialog) {
 		$super(dialog);

@@ -1,3 +1,4 @@
+
 /*
  *  Copyright (C) 2011  Clint Priest
  *
@@ -29,31 +30,12 @@
 //	}, 1000);
 
 
-var snaplDrawing = false;
-
 const snaplLMB  = 0;
 const snaplMMB  = 1;
 const snaplRMB  = 2;
 
-var snaplTargetDoc;
-//var snaplStopPopup;
-
-const SNAPLACTION_UNDEF=0;
-const SNAPLACTION_TABS=1;
-const SNAPLACTION_WINDOWS=2;
-const SNAPLACTION_WINDOW=3;
-const SNAPLACTION_CLIPBOARD=4;
-const SNAPLACTION_BOOKMARK=5;
-const SNAPLACTION_DOWNLOAD=6;
-var SNAPLACTION_DEFAULT=SNAPLACTION_TABS;
-
-var gsnaplinksBundle = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
-var localeStrings = gsnaplinksBundle.createBundle("chrome://snaplinks/locale/snaplinks.properties");
-var msgStatusUsage = localeStrings.GetStringFromName("snaplinks.status.usage");
-var msgStatusLoading = localeStrings.GetStringFromName("snaplinks.status.loading");
-var msgPanelLinks =  localeStrings.GetStringFromName("snaplinks.panel.links");
-
 SnapLinks = new (Class.create({
+	/* Returns an Mozilla URI pointed at the current documents referrer */
 	DocumentReferer: {
 		get: function() {
 			try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
@@ -62,6 +44,7 @@ SnapLinks = new (Class.create({
 			return null;
 		}
 	},
+	/* Setter to change the snap links status text */
 	SnapLinksStatus: {
 		set: function(x) {
 			var el = document.getElementById('snaplinks-panel') ;
@@ -69,6 +52,7 @@ SnapLinks = new (Class.create({
 			el && (el.hidden = (x == ''));
 		}
 	},
+	/* Setter to change the status bar text */
 	StatusBarLabel: {	set: function(x) { document.getElementById('statusbar-display').label = x; }	},
 
 	initialize: function() {
@@ -100,6 +84,7 @@ SnapLinks = new (Class.create({
 		if(e.button != SnapLinks.Prefs.SelectionButton)
 			return;
 
+		/* Capture the current working document */
 		this.Document = e.target.ownerDocument;
 		this.Document.body.setCapture(false);
 
@@ -163,11 +148,13 @@ SnapLinks = new (Class.create({
 		_PreventEventDefault = PreventEventDefault.bind(this);
 		ContentAreaContextMenu.addEventListener('popupshowing', _PreventEventDefault, false);
 	},
-
+	
+	/* This is fired when the snap links context menu is closed */
 	OnSnapLinksPopupHidden: function(e){
 		SnapLinks.Clear();
 	},
 
+	/* Clears the selection and our internal state */
 	Clear: function() {
 		this.Selection.Clear();
 
@@ -192,18 +179,21 @@ SnapLinks = new (Class.create({
 		this.Clear();
 	},
 
+	/* Opens the selected element links in tabs in the current window */
 	OpenTabs: function() {
 		this.Selection.SelectedElements.forEach( function(elem) {
 			if(elem.href)
 				getBrowser().addTab(elem.href, this.DocumentReferer);
 		} );
 	},
+	/* Opens the selected links in new windows */
 	OpenWindows: function() {
 		SnapLinks.Selection.SelectedElements.forEach( function(elem) {
 			if(elem.href)
 				window.open(elem.href);
 		} );
 	},
+	/* Opens the selected links in one new window */
 	OpenTabsInNewWindow: function() {
 		if(SnapLinks.Selection.SelectedElements.length) {
 			var urls = SnapLinks.Selection.SelectedElements.map( function(elem) {
@@ -213,6 +203,7 @@ SnapLinks = new (Class.create({
 			return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
 		}
 	},
+	/* Copies the selected links to the clip board */
 	CopyToClipboard: function() {
 		var Representations = SnapLinks.Selection.SelectedElements.reduce( function(acc, elem) {
 			var text = elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
@@ -251,6 +242,7 @@ SnapLinks = new (Class.create({
 				objClipboard.setData(objData, null, Components.interfaces.nsIClipboard.kGlobalClipboard);
 		}
 	},
+	/* Bookmarks the selected links */
 	BookmarkLinks: function() {
 		if(SnapLinks.Selection.SelectedElements.length) {
 			/* Does not work, find way to add bookmarks to FF4 - @BROKEN */
@@ -268,6 +260,7 @@ SnapLinks = new (Class.create({
 			openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "", BROWSER_ADD_BM_FEATURES, dialogArgs);
 		}
 	},
+	/* Downloads the selected links as files */
 	DownloadLinks: function() {
 		if(SnapLinks.Selection.SelectedElements.length) {
 			var TitlesUsed = { };

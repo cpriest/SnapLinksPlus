@@ -32,28 +32,21 @@
  *
  */
 
-var snaplDrawing = false;
-
-const snaplLMB  = 0;
-const snaplMMB  = 1;
-const snaplRMB  = 2;
-
-var snaplTargetDoc;
-//var snaplStopPopup;
-
 var gsnaplinksBundle = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
 var localeStrings = gsnaplinksBundle.createBundle("chrome://snaplinks/locale/snaplinks.properties");
 var msgStatusUsage = localeStrings.GetStringFromName("snaplinks.status.usage");
-var msgStatusLoading = localeStrings.GetStringFromName("snaplinks.status.loading");
 var msgPanelLinks =  localeStrings.GetStringFromName("snaplinks.panel.links");
 
 var SnapLinks = { };
 var SnapLinksContext = { };
 
+/* Load all resource files into the SnapLinksContext, SnapLinks is the main global used to reference this extension */
+
 window.addEventListener('load', function() {
-	toJavaScriptConsole();
+//	toJavaScriptConsole();
 
 	function LoadScript(path) {
+		/* Loads the script into the SnapLinksContext object */
 		Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
 			.getService(Components.interfaces.mozIJSSubScriptLoader)
 			.loadSubScript(path, SnapLinksContext);
