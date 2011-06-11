@@ -15,16 +15,16 @@
 <!ENTITY snaplinks.da.r4.bookmark     "Bookmark Links">
 <!ENTITY snaplinks.da.r5.download     "Download Links">
 
-<!ENTITY snaplinks.drawing.caption    "Drawing Rectangle">
+<!ENTITY snaplinks.drawing.caption    "Selection Rectangle">
 <!ENTITY snaplinks.drawing.color      "Color:">
 <!ENTITY snaplinks.drawing.thick      "Thickness:">
 
-<!ENTITY snaplinks.links.caption      "Selected Links Rectangle">
+<!ENTITY snaplinks.links.caption      "Selected Elements Highlight">
 <!ENTITY snaplinks.links.color        "Color:">
 <!ENTITY snaplinks.links.thick        "Thickness:">
 
 <!ENTITY snaplinks.adv.caption        "Advanced Options">
-<!ENTITY snaplinks.adv.openleave      "Open links when mouse leaves window">
+<!ENTITY snaplinks.adv.hideleave      "Hide selection rectangle when mouse leaves window">
 <!ENTITY snaplinks.adv.shownumber     "Show number of links selected in status bar">
 <!ENTITY snaplinks.adv.multiline      "Process correctly multi-line links (slower)">
 <!ENTITY snaplinks.adv.preferbold     "Prefer bold links when equal-sized (slower)">
@@ -32,7 +32,7 @@
 <!ENTITY snaplinks.usage.caption      "Usage">
 <!ENTITY snaplinks.usage.description  "Drag with selected mouse button to select links:">
 <!ENTITY snaplinks.usage.line0        "- Hold the Shift key to select all links inside selection area">
-<!ENTITY snaplinks.usage.line1        "- Hold the Alt key to move selection">
-<!ENTITY snaplinks.usage.line2        "- Hold the Ctrl key while releasing the mouse button to show the actions popup menu">
+<!ENTITY snaplinks.usage.line1        "- Hold the Ctrl key while releasing the mouse button to show the actions popup menu">
+<!ENTITY snaplinks.usage.line2        "">
 
 
