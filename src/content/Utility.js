@@ -221,7 +221,7 @@ var PrefsMapper = Class.create({
 
 		Object.keys(this.map).forEach( function(Property) {
 			this.map[Property].Type = this.map[Property].Type || 'char';
-			this.map[Property].Path = (this.map[Property].Name[0] == '.' && this.BasePath + this.map[Property].Name) || (this.BasePath + '.' + Property);
+			this.map[Property].Path = (this.map[Property].Name && this.map[Property].Name[0] == '.' && this.BasePath + this.map[Property].Name) || (this.BasePath + '.' + Property);
 
 			Object.defineProperty(this, Property, {
 				get:	function() { return this.GetPref(Property); },

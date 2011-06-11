@@ -62,7 +62,7 @@ var Selection = Class.create({
 			return;
 
 		this.Document = e.target.ownerDocument;
-			
+
 		/** Initializes the starting mouse position */
 		this.X1 = Math.min(e.pageX,this.Document.documentElement.offsetWidth + this.Document.defaultView.pageXOffset);
 		this.Y1 = e.pageY;
@@ -74,7 +74,7 @@ var Selection = Class.create({
 	
 	OnMouseMove: function(e) {
 		if(this.Element) {
-			if(e.clientX < 0 || e.clientY < 0 || e.clientX > this.PanelContainer.clientWidth || e.clientY > this.PanelContainer.clientHeight)
+			if((e.clientX < 0 || e.clientY < 0 || e.clientX > this.PanelContainer.clientWidth || e.clientY > this.PanelContainer.clientHeight) && SnapLinks.Prefs.HideSelectionOnMouseLeave)
 				this.Element.style.display = 'none';
 			else
 				this.Element.style.display = '';

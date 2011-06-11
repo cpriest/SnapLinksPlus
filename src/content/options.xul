@@ -11,6 +11,7 @@
 	options.xul
 	Copyright (C) 2007	Pedro Fonseca (savred at gmail)
 	Copyright (C) 2008	Tommi Rautava
+	Copyright (C) 2011	Clint Priest
 
 	This file is part of Snap Links.
 
@@ -40,11 +41,11 @@
 	<groupbox>
 		<caption label="&snaplinks.mouse.caption;"/>
 		<description value="&snaplinks.mouse.description;"/>
-		<radiogroup id="snaplinks.mouse" prefstring="extensions.snaplinks.button">
+		<radiogroup prefstring="extensions.snaplinks.button">
 			<hbox>
-				<radio id="snaplinks.mouse0" label="&snaplinks.mouse.left;" value="0"/>
-				<radio id="snaplinks.mouse1" label="&snaplinks.mouse.middle;" value="1"/>
-				<radio id="snaplinks.mouse2" label="&snaplinks.mouse.right;" value="2"/>
+				<radio label="&snaplinks.mouse.left;" value="0"/>
+				<radio label="&snaplinks.mouse.middle;" value="1"/>
+				<radio label="&snaplinks.mouse.right;" value="2"/>
 			</hbox>
 		</radiogroup>
 	</groupbox>
@@ -52,17 +53,17 @@
 	<groupbox>
 		<caption label="&snaplinks.da.caption;"/>
 		<description value="&snaplinks.da.description;"/>
-		<radiogroup id="snaplinks.defaultaction" prefstring="extensions.snaplinks.defaultaction">
+		<radiogroup prefstring="extensions.snaplinks.defaultaction">
 			<hbox>
 				<vbox>
-					<radio id="snaplinks.defaultaction0" label="&snaplinks.da.r0.newtabs;" value="OpenTabs"/>
-					<radio id="snaplinks.defaultaction1" label="&snaplinks.da.r1.newwindows;" value="OpenWindows"/>
-					<radio id="snaplinks.defaultaction2" label="&snaplinks.da.r2.tabsinnewwin;" value="OpenTabsInNewWindow"/>
+					<radio label="&snaplinks.da.r0.newtabs;" value="OpenTabs"/>
+					<radio label="&snaplinks.da.r1.newwindows;" value="OpenWindows"/>
+					<radio label="&snaplinks.da.r2.tabsinnewwin;" value="OpenTabsInNewWindow"/>
 				</vbox>
 				<vbox>
-					<radio id="snaplinks.defaultaction3" label="&snaplinks.da.r3.clipboard;" value="CopyToClipboard"/>
-					<radio id="snaplinks.defaultaction4" label="&snaplinks.da.r4.bookmark;" value="BookmarkLinks"/>
-					<radio id="snaplinks.defaultaction5" label="&snaplinks.da.r5.download;" value="DownloadLinks"/>
+					<radio label="&snaplinks.da.r3.clipboard;" value="CopyToClipboard"/>
+					<radio label="&snaplinks.da.r4.bookmark;" value="BookmarkLinks"/>
+					<radio label="&snaplinks.da.r5.download;" value="DownloadLinks"/>
 				</vbox>
 			</hbox>
 		</radiogroup>
@@ -144,14 +145,8 @@
 
 	<groupbox>
 		<caption label="&snaplinks.adv.caption;"/>
-		<checkbox id="snaplinks.openmouseleave" label="&snaplinks.adv.openleave;"
-			pref="true" preftype="bool" prefstring="extensions.snaplinks.openmouseleave"/>
-		<checkbox id="snaplinks.shownumber" label="&snaplinks.adv.shownumber;"
-			pref="true" preftype="bool" prefstring="extensions.snaplinks.shownumber"/>
-		<checkbox id="snaplinks.multiline" label="&snaplinks.adv.multiline;"
-			pref="true" preftype="bool" prefstring="extensions.snaplinks.multiline"/>
-		<checkbox id="snaplinks.multifonts" label="&snaplinks.adv.preferbold;"
-			pref="true" preftype="bool" prefstring="extensions.snaplinks.multifonts"/>
+		<checkbox label="&snaplinks.adv.hideleave;" prefstring="extensions.snaplinks.HideSelectionOnMouseLeave"/>
+		<checkbox label="&snaplinks.adv.shownumber;" prefstring="extensions.snaplinks.shownumber"/>
 	</groupbox>
 
 	<groupbox>

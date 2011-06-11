@@ -43,8 +43,6 @@ var SnapLinksContext = { };
 /* Load all resource files into the SnapLinksContext, SnapLinks is the main global used to reference this extension */
 
 window.addEventListener('load', function() {
-//	toJavaScriptConsole();
-
 	function LoadScript(path) {
 		/* Loads the script into the SnapLinksContext object */
 		Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
@@ -57,4 +55,7 @@ window.addEventListener('load', function() {
 	LoadScript('chrome://snaplinks/content/Debug.js');
 	LoadScript('chrome://snaplinks/content/Preferences.js');
 	LoadScript('chrome://snaplinks/content/SnapLinks.js');
+	
+	if(SnapLinks.Prefs.DevShowJSConsoleAtStartup)
+		toJavaScriptConsole();
 }, false);
