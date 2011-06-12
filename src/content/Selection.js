@@ -158,30 +158,48 @@ var Selection = Class.create({
 			return;
 			
 		this.CalculateWindowWidth = window.innerWidth;
-
 		var offset = { x: this.Document.defaultView.scrollX, y: this.Document.defaultView.scrollY };
-
 		var SelectableElements = [ ];
 		
-//		var Start = (new Date()).getMilliseconds();
+		var Start = (new Date()).getMilliseconds();
+
 		$A(this.Document.links).forEach( function( link ) {
+			link.SnapRects = GetElementRects(link, offset);
 			delete link.SnapFontSize;
 			SelectableElements.push(link);
 		});
+
+		var Links = (new Date()).getMilliseconds();
+
 		$A(this.Document.body.querySelectorAll('INPUT')).forEach( function(input) {
-			var Type = input.getAttribute('type');
+			var Type = input.getAttribute('type'),
+				ElementRectsNode = input;
 			if(SnapLinks.Prefs.HighlightButtonsForClicking && (Type == 'submit' || Type == 'button')) {
 				SelectableElements.push(input);
 			} else if(SnapLinks.Prefs.HighlightCheckboxesForClicking && Type == 'checkbox') {
+				if(input.parentNode.tagName == 'LABEL') {
+					ElementRectsNode = input.parentNode;
+					input.SnapOutlines = [ input.parentNode ];
+				}
 				SelectableElements.push(input);
 			}
+			input.SnapRects = GetElementRects(ElementRectsNode, offset);
 		});
-		SelectableElements.forEach( function(elem) {
-			elem.SnapRects = GetElementRects(elem, offset);
-		} );
+
+		var Inputs = (new Date()).getMilliseconds();;
+
+		$A(this.Document.body.querySelectorAll('LABEL')).forEach( function(label) {
+			var ForElement = label.getAttribute('for') && this.Document.body.querySelector('INPUT[type=checkbox]#'+label.getAttribute('for'));
+			if(ForElement != undefined) {
+				ForElement.SnapRects = ForElement.SnapRects.concat(GetElementRects(label, offset));
+				ForElement.SnapOutlines = [ ForElement, label ];
+			}
+		}, this );
 		this.SelectableElements = SelectableElements;
-//		var End = (new Date()).getMilliseconds();
-//		Log("Time = %sms", Math.round(End - Start, 2));
+
+		var End = (new Date()).getMilliseconds();
+//		Log("Links: %sms, Inputs: %sms, Labels: %sms, Total: %sms", 
+//			Math.round(Links - Start, 2), Math.round(Inputs - Links, 2), Math.round(End - Inputs, 2), Math.round(End - Start, 2));
 	},
 
 	/** Clears the selection by removing the element, also clears some other non-refactored but moved code */
@@ -204,7 +222,9 @@ var Selection = Class.create({
 		this.IntersectedElements = [ ];
 
 		this.SelectedElements.forEach( function(elem) {
-			elem.style.MozOutline = '';
+			(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
+				elem.style.MozOutline = '';
+			} );
 		} );
 		this.SelectedElements = [ ];
 	},
@@ -299,8 +319,11 @@ var Selection = Class.create({
 				}
 			}, this);
 			
+			var OutlineStyle = SnapLinks.Prefs.SelectedElementsBorderWidth + 'px solid ' + SnapLinks.Prefs.SelectedElementsBorderColor;
 			this.SelectedElements.forEach( function(elem) {
-				elem.style.MozOutline = SnapLinks.Prefs.SelectedElementsBorderWidth + 'px solid ' + SnapLinks.Prefs.SelectedElementsBorderColor;
+				(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
+					elem.style.MozOutline = OutlineStyle;
+				} );
 			} );
 			this.SelectedElementsType = Greatest;
 		}
