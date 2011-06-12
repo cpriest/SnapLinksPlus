@@ -59,7 +59,7 @@ SnapLinks = new (Class.create({
 		this._OnMouseMove 	= this.OnMouseMove.bind(this);
 
 		this.PanelContainer = document.getElementById('content').mPanelContainer;
-		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
+		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), false);
 		this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
 		this.PanelContainer.addEventListener('keypress', this.OnKeyPress.bind(this), true);
 

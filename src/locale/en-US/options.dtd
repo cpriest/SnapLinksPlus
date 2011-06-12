@@ -1,7 +1,6 @@
 <!ENTITY snaplinks.dialog.snaplink    "Snap Links Options">
 
-<!ENTITY snaplinks.mouse.caption      "Mouse Button">
-<!ENTITY snaplinks.mouse.description  "Drawing mouse button:">
+<!ENTITY snaplinks.mouse.caption      "Start Selecting With">
 <!ENTITY snaplinks.mouse.shift        "Shift">
 <!ENTITY snaplinks.mouse.ctrl         "Control">
 <!ENTITY snaplinks.mouse.alt          "Alt">

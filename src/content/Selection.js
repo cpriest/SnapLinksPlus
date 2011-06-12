@@ -40,7 +40,7 @@ var Selection = Class.create({
 	
 	initialize: function(PanelContainer) {
 		this.PanelContainer = PanelContainer;
-		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
+		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), false);
 		this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
 		
 		window.addEventListener('resize', this.OnWindowResize.bind(this), true);
