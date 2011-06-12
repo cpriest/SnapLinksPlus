@@ -122,7 +122,7 @@ SnapLinks = new (Class.create({
 			if(this.Selection.DragStarted == true){
 	//			snaplStopPopup=true;
 				this.StopNextContextMenuPopup();
-				if(e.ctrlKey && this.Selection.SelectedElementsType == 'Links') {
+				if((e.ctrlKey || SnapLinks.Prefs.DefaultAction == this.ACTION.ASK_USER) && this.Selection.SelectedElementsType == 'Links') {
 					pop = document.getElementById('snaplMenu');
 					pop.openPopupAtScreen(e.screenX, e.screenY, true);
 				} else
@@ -186,6 +186,8 @@ SnapLinks = new (Class.create({
 		COPY_TO_CLIPBOARD	: 'CopyToClipboard',
 		BOOKMARK_LINKS		: 'BookmarkLinks',
 		DOWNLOAD_LINKS		: 'DownloadLinks',
+		ASK_USER			: 'AskUser',
+
 		CLICK_ELEMENTS		: 'ClickElements',
 	},
 	

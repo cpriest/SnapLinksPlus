@@ -63,6 +63,7 @@
 					<radio label="&snaplinks.da.r0.newtabs;" value="OpenTabs"/>
 					<radio label="&snaplinks.da.r1.newwindows;" value="OpenWindows"/>
 					<radio label="&snaplinks.da.r2.tabsinnewwin;" value="OpenTabsInNewWindow"/>
+					<radio label="&snaplinks.da.askuser;" value="AskUser"/>
 				</vbox>
 				<vbox>
 					<radio label="&snaplinks.da.r3.clipboard;" value="CopyToClipboard"/>

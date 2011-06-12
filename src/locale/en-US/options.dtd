@@ -16,6 +16,8 @@
 <!ENTITY snaplinks.da.r3.clipboard    "Copy Links to Clipboard">
 <!ENTITY snaplinks.da.r4.bookmark     "Bookmark Links">
 <!ENTITY snaplinks.da.r5.download     "Download Links">
+<!ENTITY snaplinks.da.askuser     	  "Ask Me What To Do">
+
 
 <!ENTITY snaplinks.drawing.caption    "Selection Rectangle">
 <!ENTITY snaplinks.drawing.color      "Color:">
