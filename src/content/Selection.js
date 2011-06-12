@@ -58,14 +58,14 @@ var Selection = Class.create({
 	
 	/* Starting Hook for beginning a selection */
 	OnMouseDown: function(e) {
-		if(e.button != SnapLinks.Prefs.SelectionButton)
+		if(!SnapLinks.ShouldActivate(e))
 			return;
 
 		this.Document = e.target.ownerDocument;
 
 		/** Initializes the starting mouse position */
-		this.X1 = Math.min(e.pageX,this.Document.documentElement.offsetWidth + this.Document.defaultView.pageXOffset);
-		this.Y1 = e.pageY;
+		this.X1 = this.X2 = Math.min(e.pageX,this.Document.documentElement.offsetWidth + this.Document.defaultView.pageXOffset);
+		this.Y1 = this.Y2 = e.pageY;
 
 		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
 		this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
@@ -80,7 +80,8 @@ var Selection = Class.create({
 				this.Element.style.display = '';
 		}
 
-		if(e.altKey) {
+		/* Disabled At The Moment */ 
+		if(false && e.altKey && !SnapLinks.Prefs.ActivateRequiresAlt) {
 			this.OffsetSelection(e.pageX - this.X2, e.pageY - this.Y2);
 
 			/** The below commented section of code causes the rectangle to shrink if it goes off screen, is this even a desired functionality? -- Clint - 5/22/2011 */

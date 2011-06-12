@@ -1,7 +1,10 @@
 <!ENTITY snaplinks.dialog.snaplink    "Snap Links Options">
 
 <!ENTITY snaplinks.mouse.caption      "Mouse Button">
-<!ENTITY snaplinks.mouse.description  "Drawing mouse button (changes require browser reload):">
+<!ENTITY snaplinks.mouse.description  "Drawing mouse button:">
+<!ENTITY snaplinks.mouse.shift        "Shift">
+<!ENTITY snaplinks.mouse.ctrl         "Control">
+<!ENTITY snaplinks.mouse.alt          "Alt">
 <!ENTITY snaplinks.mouse.left         "Left Button">
 <!ENTITY snaplinks.mouse.middle       "Middle Button">
 <!ENTITY snaplinks.mouse.right        "Right Button">

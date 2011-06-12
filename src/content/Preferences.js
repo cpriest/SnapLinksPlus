@@ -20,10 +20,13 @@
 
 SnapLinks.Prefs = new (Class.create(PrefsMapper, {
 	BasePath:	'extensions.snaplinks',
-	map:		{
+	map:	{
 		DevShowJSConsoleAtStartup:			{ Type: 'bool', Default: false, 		},
 		DefaultAction:						{ Type: 'char', Default: 'OpenTabs', 	Name: '.defaultaction' },	/* @Broken */
 		SelectionButton:					{ Type: 'int', 	Default: 2, 			Name: '.button' },
+		ActivateRequiresAlt:				{ Type: 'bool', Default: false,			},
+		ActivateRequiresShift:				{ Type: 'bool', Default: false,			},
+		ActivateRequiresCtrl:				{ Type: 'bool', Default: false,			},
 		HideSelectionOnMouseLeave:			{ Type: 'bool',	Default: false },
 		ShowSelectedCount:					{ Type: 'bool', Default: true, 			Name: '.shownumber' },
 		SelectedElementsBorderWidth:		{ Type: 'int', 	Default: 1, 			Name: '.linksthick' },

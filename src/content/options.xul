@@ -41,6 +41,11 @@
 	<groupbox>
 		<caption label="&snaplinks.mouse.caption;"/>
 		<description value="&snaplinks.mouse.description;"/>
+		<hbox>
+			<checkbox label="&snaplinks.mouse.shift;" prefstring="extensions.snaplinks.ActivateRequiresShift"/>
+			<checkbox label="&snaplinks.mouse.ctrl;" prefstring="extensions.snaplinks.ActivateRequiresCtrl"/>
+			<checkbox label="&snaplinks.mouse.alt;" prefstring="extensions.snaplinks.ActivateRequiresAlt"/>
+		</hbox>
 		<radiogroup prefstring="extensions.snaplinks.button">
 			<hbox>
 				<radio label="&snaplinks.mouse.left;" value="0"/>

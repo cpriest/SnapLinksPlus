@@ -32,3 +32,7 @@ pref('extensions.snaplinks.drawthick',3);
 
 pref('extensions.snaplinks.HighlightButtonsForClicking', true);
 pref('extensions.snaplinks.HighlightCheckboxesForClicking', true);
+
+pref('extensions.snaplinks.ActivateRequiresAlt', false);
+pref('extensions.snaplinks.ActivateRequiresShift', false);
+pref('extensions.snaplinks.ActivateRequiresCtrl', false);

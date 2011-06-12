@@ -75,22 +75,35 @@ SnapLinks = new (Class.create({
 			this[Name] = SnapLinks[Name];
 		}, this);
 	},
+	
+	/* Evaluates a given event looking to see if the button and modifier keys are present */
+	ShouldActivate: function(e) {
+		if(e.button != SnapLinks.Prefs.SelectionButton)
+			return false;
+		if(this.Prefs.ActivateRequiresAlt && !e.altKey)
+			return false;
+		if(this.Prefs.ActivateRequiresShift && !e.shiftKey)
+			return false;
+		if(this.Prefs.ActivateRequiresCtrl && !e.ctrlKey)
+			return false;
+		return true;
+	},
 
 	UpdateStatusLabel: function() {
 		this.StatusBarLabel = msgStatusUsage;
 	},
 
 	OnMouseDown: function(e) {
-		if(e.button != SnapLinks.Prefs.SelectionButton)
+		if(!this.ShouldActivate(e))
 			return;
+
+		this.Clear();
 
 		/* Capture the current working document */
 		this.Document = e.target.ownerDocument;
 		this.Document.body.setCapture(false);
 
 //		snaplStopPopup = true;
-
-		this.Clear();
 
 		this.InstallEventHooks();
 	},
@@ -103,18 +116,20 @@ SnapLinks = new (Class.create({
 		if(e.button != SnapLinks.Prefs.SelectionButton)
 			return;
 
-		this.Document.releaseCapture();
+		if(this.Document) {
+			this.Document.releaseCapture();
 
-		if(this.Selection.DragStarted == true){
-//			snaplStopPopup=true;
-			this.StopNextContextMenuPopup();
-			if(e.ctrlKey && this.Selection.SelectedElementsType == 'Links') {
-				pop = document.getElementById('snaplMenu');
-				pop.openPopupAtScreen(e.screenX, e.screenY, true);
-			} else
-				this.ActivateSelection();
-		} else {
-			SnapLinks.Clear();
+			if(this.Selection.DragStarted == true){
+	//			snaplStopPopup=true;
+				this.StopNextContextMenuPopup();
+				if(e.ctrlKey && this.Selection.SelectedElementsType == 'Links') {
+					pop = document.getElementById('snaplMenu');
+					pop.openPopupAtScreen(e.screenX, e.screenY, true);
+				} else
+					this.ActivateSelection();
+			} else {
+				SnapLinks.Clear();
+			}
 		}
 	},
 
@@ -161,6 +176,7 @@ SnapLinks = new (Class.create({
 		this.StatusBarLabel = '';
 		this.SnapLinksStatus = '';
 		this.RemoveEventHooks();
+		delete this.Document;
 	},
 
 	ACTION: {
