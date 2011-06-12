@@ -35,6 +35,24 @@ var Selection = Class.create({
 		},
 	},
 	
+	/* Returns an array of elements representing the selected elements
+	 *	taking into account preferences for removing duplicate urls 
+	 */
+	FilteredElements: {
+		get: function() {
+			if(this.SelectedElementsType != 'Links')
+				return [ ];
+			
+			var Distinct = [ ];
+			return this.SelectedElements.filter( function(elem) {
+				if(!elem.href || (SnapLinks.Prefs.RemoveDuplicateUrls && Distinct.indexOf(elem.href) != -1))
+					return false;
+				Distinct.push(elem.href);
+				return true;
+			});
+		}
+	},
+	
 	/* Internal Flag indicating that a selection has been started */
 	DragStarted: false,
 	

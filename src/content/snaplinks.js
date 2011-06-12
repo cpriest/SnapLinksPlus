@@ -216,22 +216,22 @@ SnapLinks = new (Class.create({
 	
 	/* Opens the selected element links in tabs in the current window */
 	OpenTabs: function() {
-		this.Selection.SelectedElements.forEach( function(elem) {
+		this.Selection.FilteredElements.forEach( function(elem) {
 			if(elem.href)
-				getBrowser().addTab(elem.href, this.DocumentReferer);
-		} );
+				getBrowser().addTab(elem.href);
+		});
 	},
 	/* Opens the selected links in new windows */
 	OpenWindows: function() {
-		SnapLinks.Selection.SelectedElements.forEach( function(elem) {
+		SnapLinks.Selection.FilteredElements.forEach( function(elem) {
 			if(elem.href)
 				window.open(elem.href);
 		} );
 	},
 	/* Opens the selected links in one new window */
 	OpenTabsInNewWindow: function() {
-		if(SnapLinks.Selection.SelectedElements.length) {
-			var urls = SnapLinks.Selection.SelectedElements.map( function(elem) {
+		if(SnapLinks.Selection.FilteredElements.length) {
+			var urls = SnapLinks.Selection.FilteredElements.map( function(elem) {
 				return elem.href;
 			} ).join('|');
 
@@ -240,7 +240,7 @@ SnapLinks = new (Class.create({
 	},
 	/* Copies the selected links to the clip board */
 	CopyToClipboard: function() {
-		var Representations = SnapLinks.Selection.SelectedElements.reduce( function(acc, elem) {
+		var Representations = SnapLinks.Selection.FilteredElements.reduce( function(acc, elem) {
 			var text = elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
 
 			acc.html.push( '<a href="' + elem.href + '">' + text + '</a>' );
@@ -279,9 +279,9 @@ SnapLinks = new (Class.create({
 	},
 	/* Bookmarks the selected links */
 	BookmarkLinks: function() {
-		if(SnapLinks.Selection.SelectedElements.length) {
+		if(SnapLinks.Selection.FilteredElements.length) {
 			/* Does not work, find way to add bookmarks to FF4 - @BROKEN */
-			var linksInfo = SnapLinks.Selection.SelectedElements.map( function(elem) {
+			var linksInfo = SnapLinks.Selection.FilteredElements.map( function(elem) {
 				return {
 					name	: elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' '),
 					url		: elem.href,
@@ -297,10 +297,10 @@ SnapLinks = new (Class.create({
 	},
 	/* Downloads the selected links as files */
 	DownloadLinks: function() {
-		if(SnapLinks.Selection.SelectedElements.length) {
+		if(SnapLinks.Selection.FilteredElements.length) {
 			var TitlesUsed = { };
 
-			var links = SnapLinks.Selection.SelectedElements.map( function(elem) {
+			var links = SnapLinks.Selection.FilteredElements.map( function(elem) {
 				var Title = elem.textContent.replace(/\s{2,}/g, ' ').replace(/ /g,'_').replace(/[^a-zA-Z0-9_]+/g, '').substring(0, 75);
 
 				/* Ensure Uniqueness of Filename */

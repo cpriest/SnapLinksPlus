@@ -36,3 +36,4 @@ pref('extensions.snaplinks.HighlightCheckboxesForClicking', true);
 pref('extensions.snaplinks.ActivateRequiresAlt', false);
 pref('extensions.snaplinks.ActivateRequiresShift', false);
 pref('extensions.snaplinks.ActivateRequiresCtrl', false);
+pref('extensions.snaplinks.RemoveDuplicateUrls', true);

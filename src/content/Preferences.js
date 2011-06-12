@@ -36,6 +36,7 @@ SnapLinks.Prefs = new (Class.create(PrefsMapper, {
 		
 		HighlightCheckboxesForClicking:		{ Type: 'bool', Default: true },
 		HighlightButtonsForClicking:		{ Type: 'bool', Default: true },
+		RemoveDuplicateUrls:				{ Type: 'bool', Default: true },
 	},
 	initialize: function($super) {
 		$super(this.BasePath, this.map);
