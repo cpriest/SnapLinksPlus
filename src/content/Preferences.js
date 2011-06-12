@@ -33,6 +33,8 @@ SnapLinks.Prefs = new (Class.create(PrefsMapper, {
 		SelectionBorderWidth:				{ Type: 'int', 	Default: 3, 			Name: '.drawthick' },
 		SelectionBorderColor:				{ Type: 'char', Default: '#30AF00', 	Name: '.drawpicker' },
 		SelectedElementsBorderColor:		{ Type: 'char', Default: '#FF0000', 	Name: '.linkspicker' },
+
+		CopyToClipboardSeparator:			{ Type: 'char', Default: "\n" },
 		
 		HighlightCheckboxesForClicking:		{ Type: 'bool', Default: true },
 		HighlightButtonsForClicking:		{ Type: 'bool', Default: true },

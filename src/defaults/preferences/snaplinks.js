@@ -37,3 +37,5 @@ pref('extensions.snaplinks.ActivateRequiresAlt', false);
 pref('extensions.snaplinks.ActivateRequiresShift', false);
 pref('extensions.snaplinks.ActivateRequiresCtrl', false);
 pref('extensions.snaplinks.RemoveDuplicateUrls', true);
+
+pref('extensions.snaplinks.CopyToClipboardSeparator', "\n");
