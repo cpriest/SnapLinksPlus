@@ -1,6 +1,10 @@
-
 /*
- *  Copyright (C) 2011  Clint Priest
+ *  snaplinks.js
+ *
+ *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
+ *  Copyright (C) 2008  Atreus, MumblyJuergens
+ *  Copyright (C) 2009  Tommi Rautava
+ *  Copyright (C) 2011  Clint Priest, Tommi Rautava
  *
  *  This file is part of Snap Links.
  *
@@ -64,7 +68,7 @@ SnapLinks = new (Class.create({
 		this.PanelContainer.addEventListener('keypress', this.OnKeyPress.bind(this), true);
 
 		document.getElementById('snaplMenu')
-			.addEventListener('popuphidden',this.OnSnapLinksPopupHidden.bind(this),false)
+			.addEventListener('popuphidden',this.OnSnapLinksPopupHidden.bind(this),false);
 
 		this.Selection = new Selection(this.PanelContainer);
 
@@ -188,7 +192,7 @@ SnapLinks = new (Class.create({
 		DOWNLOAD_LINKS		: 'DownloadLinks',
 		ASK_USER			: 'AskUser',
 
-		CLICK_ELEMENTS		: 'ClickElements',
+		CLICK_ELEMENTS		: 'ClickElements'
 	},
 	
 	ActivateSelection: function(Action) {
@@ -196,7 +200,7 @@ SnapLinks = new (Class.create({
 		var ValidActions = {
 			'Links':		[ 'OpenTabs','OpenWindows','OpenTabsInNewWindow','CopyToClipboard','BookmarkLinks','DownloadLinks' ],
 			'Buttons':		[ 'ClickElements' ],
-			'Checkboxes':	[ 'ClickElements' ],
+			'Checkboxes':	[ 'ClickElements' ]
 		};
 
 		Action = Action || this.Prefs.DefaultAction;
@@ -286,12 +290,12 @@ SnapLinks = new (Class.create({
 			var linksInfo = SnapLinks.Selection.FilteredElements.map( function(elem) {
 				return {
 					name	: elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' '),
-					url		: elem.href,
+					url		: elem.href
 				};
 			} );
 			const BROWSER_ADD_BM_FEATURES = 'centerscreen,chrome,dialog=no,resizable=yes';
 
-			var dialogArgs = { name: gNavigatorBundle.getString("bookmarkAllTabsDefault") }
+			var dialogArgs = { name: gNavigatorBundle.getString("bookmarkAllTabsDefault") };
 			dialogArgs.bBookmarkAllTabs = true;
 			dialogArgs.objGroup = linksInfo;
 			openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "", BROWSER_ADD_BM_FEATURES, dialogArgs);
@@ -311,7 +315,7 @@ SnapLinks = new (Class.create({
 					if(j > 0)
 						TitleCheck += '' + j;
 					if(TitlesUsed[TitleCheck] == undefined) {
-						Title = TitleCheck
+						Title = TitleCheck;
 						break;
 					}
 				}
@@ -327,7 +331,7 @@ SnapLinks = new (Class.create({
 					catch(e) { }
 			} );
 		}
-	},
+	}
 }))();
 
 

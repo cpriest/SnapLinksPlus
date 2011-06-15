@@ -1,5 +1,7 @@
 /*
- *  Copyright (C) 2011  Clint Priest
+ *  Utility.js
+ *
+ *  Copyright (C) 2011  Clint Priest, Tommi Rautava
  *
  *  This file is part of Snap Links.
  *
@@ -38,7 +40,7 @@ Log.Warning = function(Message, Source, Line, Column) {
 							.createInstance(Components.interfaces.nsIScriptError);
 	ScriptMessage.init(Message, Source, null, Line, Column, 1, null);
 	ConsoleService.logMessage(ScriptMessage);
-}
+};
 
 /*
  * Prototype Imports -- Mozilla Organization may not like these...
@@ -47,14 +49,14 @@ Log.Warning = function(Message, Source, Line, Column) {
 /* Returns true if object is a function */
 Object.isFunction = function isFunction(object) {
 	return typeof object === 'function';
-}
+};
 
 /* Extends the destination object with properties from the source object */
 Object.extend = function extend(destination, source) {
 	for (var property in source)
 		destination[property] = source[property];
 	return destination;
-}
+};
 
 
 /* Returns an array of the argument names to the given function */
@@ -63,7 +65,7 @@ Function.argumentNames = function argumentNames(func) {
 					.replace(/\/\/.*?[\r\n]|\/\*(?:.|[\r\n])*?\*\//g, '')
 					.replace(/\s+/g, '').split(',');
 	return names.length == 1 && !names[0] ? [] : names;
-}
+};
 
 /** Returns the given func wrapped with wrapper */
 Function.wrap = function wrap(func, wrapper) {
@@ -78,8 +80,8 @@ Function.wrap = function wrap(func, wrapper) {
 	return function() {
 		var a = update([__method.bind(this)], arguments);
 		return wrapper.apply(this, a);
-	}
-}
+	};
+};
 
 
 /** Fully functioning prototype class inheritence, also allows for getters/setters including c# style getters/setters */
@@ -225,7 +227,7 @@ var PrefsMapper = Class.create({
 
 			Object.defineProperty(this, Property, {
 				get:	function() { return this.GetPref(Property); },
-				set:	function(x) { this.SetPref(Property, x); },
+				set:	function(x) { this.SetPref(Property, x); }
 			});
 
 			/* Ensure the value or default value is stored */
@@ -276,7 +278,7 @@ var PrefsDialogMapper = Class.create( {
 		radiogroup:		{ Property: 'value',		 	Type: 'char' },
 		menulist:		{ Property: 'selectedIndex', 	Type: 'int' },
 		colorpicker:	{ Property: 'color', 			Type: 'char' },
-		checkbox:		{ Property: 'checked', 			Type: 'bool' },
+		checkbox:		{ Property: 'checked', 			Type: 'bool' }
 	},
 
 	initialize: function() {
