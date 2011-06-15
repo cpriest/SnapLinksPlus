@@ -163,7 +163,6 @@
 		<description value="&snaplinks.usage.description;"/>
 		<description value="&snaplinks.usage.line0;"/>
 		<description value="&snaplinks.usage.line1;"/>
-		<description value="&snaplinks.usage.line2;"/>
 	</groupbox>
 </dialog>
 

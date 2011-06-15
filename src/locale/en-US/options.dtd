@@ -40,6 +40,3 @@
 <!ENTITY snaplinks.usage.description  "Drag with selected mouse button to select links:">
 <!ENTITY snaplinks.usage.line0        "- Hold the Shift key to select all links inside selection area">
 <!ENTITY snaplinks.usage.line1        "- Hold the Ctrl key while releasing the mouse button to show the actions popup menu">
-<!ENTITY snaplinks.usage.line2        "">
-
-
