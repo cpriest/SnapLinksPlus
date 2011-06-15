@@ -1,5 +1,7 @@
 /*
- *  Copyright (C) 2011  Clint Priest
+ *  Debug.js
+ *
+ *  Copyright (C) 2011  Clint Priest, Tommi Rautava
  *  
  *  This file is part of Snap Links.
  *
@@ -32,12 +34,12 @@ var SnapLinksDebug = new (Class.create({
 			
 			OnLoad: {
 				ApplyLinkStyle:			false,
-				ShowClientRects:		false,
+				ShowClientRects:		false
 			},
 			OnMouseOver: {
 				ApplyLinkStyle: 		false,
-				ShowClientRects:		false,
-			},
+				ShowClientRects:		false
+			}
 		}
 	},
 	
@@ -108,7 +110,7 @@ var SnapLinksDebug = new (Class.create({
 				left		: rect.left + 'px',
 				width		: (rect.right - rect.left) + 'px',
 				height		: (rect.bottom - rect.top) + 'px',
-				cursor		: 'pointer',
+				cursor		: 'pointer'
 			} );
 			ApplyStyle(elem, this.Flags.Links.ClientRectStyle);
 			

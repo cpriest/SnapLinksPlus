@@ -1,5 +1,7 @@
 /*
- *  Copyright (C) 2011  Clint Priest
+ *  options.js
+ *
+ *  Copyright (C) 2011  Clint Priest, Tommi Rautava
  *  
  *  This file is part of Snap Links.
  *
@@ -45,6 +47,6 @@ var PrefsDialog = new (Class.create(PrefsDialogMapper, {
 		var size = document.getElementById('snaplinks.drawthick').selectedIndex;
 		document.getElementById('snaplinks.drawId').setAttribute('style',
 			'border-top-width:' + size + 'px;border-top-color:' + color+';border-top-style:dashed');
-	},
+	}
 
 } ))();

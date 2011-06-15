@@ -1,5 +1,7 @@
 /*
- *  Copyright (C) 2011  Clint Priest
+ *  Preferences.js
+ *
+ *  Copyright (C) 2011  Clint Priest, Tommi Rautava
  *
  *  This file is part of Snap Links.
  *
@@ -21,13 +23,13 @@
 SnapLinks.Prefs = new (Class.create(PrefsMapper, {
 	BasePath:	'extensions.snaplinks',
 	map:	{
-		DevShowJSConsoleAtStartup:			{ Type: 'bool', Default: false, 		},
+		DevShowJSConsoleAtStartup:			{ Type: 'bool', Default: false	},
 		DefaultAction:						{ Type: 'char', Default: 'OpenTabs', 	Name: '.defaultaction' },	/* @Broken */
 		SelectionButton:					{ Type: 'int', 	Default: 2, 			Name: '.button' },
-		ActivateRequiresAlt:				{ Type: 'bool', Default: false,			},
-		ActivateRequiresShift:				{ Type: 'bool', Default: false,			},
-		ActivateRequiresCtrl:				{ Type: 'bool', Default: false,			},
-		HideSelectionOnMouseLeave:			{ Type: 'bool',	Default: false },
+		ActivateRequiresAlt:				{ Type: 'bool', Default: false	},
+		ActivateRequiresShift:				{ Type: 'bool', Default: false	},
+		ActivateRequiresCtrl:				{ Type: 'bool', Default: false	},
+		HideSelectionOnMouseLeave:			{ Type: 'bool',	Default: false	},
 		ShowSelectedCount:					{ Type: 'bool', Default: true, 			Name: '.shownumber' },
 		SelectedElementsBorderWidth:		{ Type: 'int', 	Default: 1, 			Name: '.linksthick' },
 		SelectionBorderWidth:				{ Type: 'int', 	Default: 3, 			Name: '.drawthick' },
@@ -38,7 +40,7 @@ SnapLinks.Prefs = new (Class.create(PrefsMapper, {
 		
 		HighlightCheckboxesForClicking:		{ Type: 'bool', Default: true },
 		HighlightButtonsForClicking:		{ Type: 'bool', Default: true },
-		RemoveDuplicateUrls:				{ Type: 'bool', Default: true },
+		RemoveDuplicateUrls:				{ Type: 'bool', Default: true }
 	},
 	initialize: function($super) {
 		$super(this.BasePath, this.map);
@@ -46,5 +48,5 @@ SnapLinks.Prefs = new (Class.create(PrefsMapper, {
 		/* Translate from older format */
 		if(this.pref.getPrefType(this.map.DefaultAction.Path) == this.pref.PREF_INT)
 			this.TranslatePref('DefaultAction', {	0:'OpenTabs', 1:'OpenWindows', 2:'OpenTabsInNewWindow', 3:'CopyToClipboard', 4:'BookmarkLinks', 5:'DownloadLinks' });
-	},
+	}
 }))();

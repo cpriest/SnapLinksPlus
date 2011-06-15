@@ -1,6 +1,8 @@
 /*
- *  Copyright (C) 2011  Clint Priest
- *  
+ *  Selection.js
+ *
+ *  Copyright (C) 2011  Clint Priest, Tommi Rautava
+ *
  *  This file is part of Snap Links.
  *
  *  Snap Links is free software: you can redistribute it and/or modify
@@ -31,8 +33,8 @@ var Selection = Class.create({
 	NormalizedRect: {
 		get: function() { 
 			return {	X1: Math.min(this.X1,this.X2),	Y1: Math.min(this.Y1,this.Y2),
-						X2: Math.max(this.X1,this.X2),	Y2: Math.max(this.Y1,this.Y2),	}
-		},
+						X2: Math.max(this.X1,this.X2),	Y2: Math.max(this.Y1,this.Y2)	};
+		}
 	},
 	
 	/* Returns an array of elements representing the selected elements
@@ -274,7 +276,7 @@ var Selection = Class.create({
 				width 	: Math.abs(this.X1-this.X2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
 				height 	: Math.abs(this.Y1-this.Y2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
 				top 	: Math.min(this.Y1,this.Y2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
-				left 	: Math.min(this.X1,this.X2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
+				left 	: Math.min(this.X1,this.X2) - SnapLinks.Prefs.SelectionBorderWidth + 'px'
 			} );
 			
 			this.CalcSelectedElements();
@@ -346,5 +348,5 @@ var Selection = Class.create({
 			} );
 			this.SelectedElementsType = Greatest;
 		}
-	},
+	}
 } );
