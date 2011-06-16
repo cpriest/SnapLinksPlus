@@ -2,7 +2,7 @@
 
 <!--
     build.xml
-    Copyright (C) 2008-2009	Tommi Rautava
+    Copyright (C) 2008, 2009, 2010, 2011  Tommi Rautava
     
     This file is part of Snap Links.
 
@@ -380,19 +380,19 @@
 	</target>
 	
 	
-	<target name="unpack-babelzilla-blank-bundle" depends="init-babelzilla">
-		<mkdir dir="${build.dir}/all_locales_blank" />
+	<target name="unpack-babelzilla-skipped-bundle" depends="init-babelzilla">
+		<mkdir dir="${build.dir}/all_locales_skipped" />
 		
-		<property name="babelzilla-blank-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_blank.tar.gz"/>
+		<property name="babelzilla-skipped-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_skipped.tar.gz"/>
 		
 		<!-- Unpack the string bundle. -->
-		<untar src="${basedir}/babelzilla/${babelzilla-blank-bundle-tar-gz}" dest="${build.dir}/all_locales_blank/locale"
+		<untar src="${basedir}/babelzilla/${babelzilla-skipped-bundle-tar-gz}" dest="${build.dir}/all_locales_skipped/locale"
 			compression="gzip" overwrite="true"/>
 		
 		<!-- Move all files except .properties to .xpi build directory. -->
 		<!-- Also, exclude the default locale (en-US) -->
 		<move todir="${build.dir}/babelzilla/chrome" overwrite="true">
-			<fileset dir="${build.dir}/all_locales_blank" 
+			<fileset dir="${build.dir}/all_locales_skipped" 
 				includes="*/**" 
 				excludes="**/*.dtd,**/*.properties,**/en-US/**,**/contents.rdf"/>
 		</move>
@@ -415,7 +415,7 @@
 				dir="${src.dir}"
 				includes="locale/en-US/*.dtd"/>
 			<fileset 
-				dir="${build.dir}/all_locales_blank"
+				dir="${build.dir}/all_locales_skipped"
 				includes="**/*.dtd"
 				excludes="**/en-US/**"/>
 			<mapper type="identity"/>
@@ -428,7 +428,7 @@
 		</native2ascii>
 		
 		<!-- Encode .properties from the bundle -->
-		<native2ascii src="${build.dir}/all_locales_blank" dest="${build.dir}/babelzilla/chrome" encoding="UTF-8">
+		<native2ascii src="${build.dir}/all_locales_skipped" dest="${build.dir}/babelzilla/chrome" encoding="UTF-8">
 			<include name="locale/**/*.properties"/>
 			<exclude name="locale/en-US/**"/>
 		</native2ascii>
@@ -467,9 +467,9 @@
 
 
 	<!-- Make a special .xpi for Babelzilla:
-	<!   - Untranslated strings are blank.
+	<!   - Untranslated strings are skipped.
 	<!   - Leave the contents unpacked (in other words, do not pack the content and the locale files into a jar file). -->
-	<target name="xpi-babelzilla" depends="set-xpi-name,copy-src-to-build,unpack-babelzilla-blank-bundle,jar">
+	<target name="xpi-babelzilla" depends="set-xpi-name,copy-src-to-build,unpack-babelzilla-skipped-bundle,jar">
 		<mkdir dir="${dist.dir}/babelzilla" />
 		
 		<delete file="${dist.dir}/babelzilla/${extension.xpi}" />
