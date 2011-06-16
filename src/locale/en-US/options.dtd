@@ -18,7 +18,6 @@
 <!ENTITY snaplinks.da.r5.download     "Download Links">
 <!ENTITY snaplinks.da.askuser     	  "Ask Me What To Do">
 
-
 <!ENTITY snaplinks.drawing.caption    "Selection Rectangle">
 <!ENTITY snaplinks.drawing.color      "Color:">
 <!ENTITY snaplinks.drawing.thick      "Thickness:">
@@ -28,9 +27,12 @@
 <!ENTITY snaplinks.links.thick        "Thickness:">
 
 <!ENTITY snaplinks.adv.caption        "Advanced Options">
+<!-- Choose checkboxes within the selection rectangle and click those when the action is executed. -->
 <!ENTITY snaplinks.adv.HighlightCheckboxes      "Highlight checkboxes within selection rectangle for clicking">
+<!-- Choose buttons within the selection rectangle and click those when the action is executed. -->
 <!ENTITY snaplinks.adv.HighlightButtons      	"Highlight buttons within selection rectangle for clicking">
-<!ENTITY snaplinks.adv.RemoveDuplicateUrls     	"Remove duplicate links from selected urls before performing action.">
+<!ENTITY snaplinks.adv.RemoveDuplicateUrls     	"Remove duplicate links from selected urls before performing action">
+<!-- If mouse moves outside the page area, the selection rectangle is hidden and no action is executed. If mouse is moved back to page area, the selection rectangle is restored. -->
 <!ENTITY snaplinks.adv.hideleave      "Hide selection rectangle when mouse leaves window">
 <!ENTITY snaplinks.adv.shownumber     "Show number of links selected in status bar">
 <!ENTITY snaplinks.adv.multiline      "Process correctly multi-line links (slower)">
