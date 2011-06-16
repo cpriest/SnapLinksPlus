@@ -1,6 +1,9 @@
 /*
- *  defaults/preferences/snaplinks.js 
+ *  defaults/preferences/snaplinks.js
+ *  
  *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
+ *  Copyright (C) 2008  Tommi Rautava
+ *  Copyright (C) 2011  Clint Priest
  *  
  *  This file is part of Snap Links.
  *
