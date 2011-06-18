@@ -1,50 +1,14 @@
 <?xml version="1.0"?>
 
-<RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
-	<RDF:Description about="urn:mozilla:install-manifest">
+	<Description about="urn:mozilla:install-manifest">
 		<em:id>@id@</em:id>
 		<em:name>Snap Links Plus</em:name>
 		<em:version>@version@</em:version>
 		<em:type>2</em:type>
-		<em:description>Opens multiple links contained in a selected area in new tabs</em:description>
 
-		<em:creator>savred (Pedro Fonseca)</em:creator>
-
-		<em:contributor>Atreus (FF3 update)</em:contributor>
-		<em:contributor>Mumbly Juergens (project member)</em:contributor>
-		<em:contributor>Jeff Sugar (project owner)</em:contributor>
-		<em:contributor>Tommi Rautava (project owner)</em:contributor>
-		<em:contributor>Clint Priest (project member)</em:contributor>
-
-		<em:translator>animarval (ca-AD)</em:translator>
-		<em:translator>Sam (cs)</em:translator>
-		<em:translator>MartinMeise, Team erweiterungen.de, Archaeopteryx (de)</em:translator>
-		<em:translator>savred (en-US)</em:translator>
-		<em:translator>RigoNet (es-ES)</em:translator>
-		<em:translator>kenmooda (fi-FI)</em:translator>
-		<em:translator>myahoo (fr)</em:translator>
-		<em:translator>akarlovic (hr-HR)</em:translator>
-		<em:translator>Cashman (hu-HU)</em:translator>
-		<em:translator>l0stintranslation (it-IT)</em:translator>
-		<em:translator>Norah (ja-JP)</em:translator>
-		<em:translator>markh (nl)</em:translator>
-		<em:translator>teo (pl)</em:translator>
-		<em:translator>gulego, edgard.magalhaes (pt-BR)</em:translator>
-		<em:translator>savred (pt-PT)</em:translator>
-		<em:translator>PiVV (ru-RU)</em:translator>
-		<em:translator>PeePay (sk-SK)</em:translator>
-		<em:translator>merihakar (tr-TR)</em:translator>
-		<em:translator>badboyinbests, loveleeyoungae (vi)</em:translator>
-		<em:translator>WangKing (zh-CN)</em:translator>
-		<em:translator>toomore (zh-TW)</em:translator>
-
-		<em:iconURL>chrome://snaplinks/content/icon.png</em:iconURL>
-		<em:homepageURL>@homepageURL@</em:homepageURL>
-		<em:updateURL>@updateURL@</em:updateURL>
-		<em:optionsURL>chrome://snaplinks/content/options.xul</em:optionsURL>
-	
 		<em:targetApplication>
 			<Description>
 				<!-- Firefox -->
@@ -63,5 +27,45 @@
 			</Description>
 		</em:targetApplication>
 
-	</RDF:Description>
-</RDF:RDF>
+		<em:description>Opens multiple links contained in a selected area in new tabs</em:description>
+
+		<em:creator>savred (Pedro Fonseca)</em:creator>
+
+		<em:developer>Mumbly Juergens</em:developer>
+		<em:developer>Jeff Sugar</em:developer>
+		<em:developer>Tommi Rautava</em:developer>
+		<em:developer>Clint Priest</em:developer>
+
+		<em:translator>animarval (ca-AD)</em:translator>
+		<em:translator>Sam, JTojnar (cs)</em:translator>
+		<em:translator>MartinMeise, Team erweiterungen.de, Archaeopteryx (de)</em:translator>
+		<em:translator>savred (en-US)</em:translator>
+		<em:translator>RigoNet (es-ES)</em:translator>
+		<em:translator>kenmooda (fi-FI)</em:translator>
+		<em:translator>myahoo (fr)</em:translator>
+		<em:translator>akarlovic (hr-HR)</em:translator>
+		<em:translator>Cashman (hu-HU)</em:translator>
+		<em:translator>l0stintranslation (it-IT)</em:translator>
+		<em:translator>Norah (ja-JP)</em:translator>
+		<em:translator>markh (nl)</em:translator>
+		<em:translator>teo (pl)</em:translator>
+		<em:translator>gulego, edgard.magalhaes (pt-BR)</em:translator>
+		<em:translator>savred, lloco (pt-PT)</em:translator>
+		<em:translator>PiVV (ru)</em:translator>
+		<em:translator>PeePay (sk-SK)</em:translator>
+		<em:translator>DakSrbija (sr)</em:translator>
+		<em:translator>Lakrits (sv-SE)</em:translator>
+		<em:translator>merihakar (tr-TR)</em:translator>
+		<em:translator>badboyinbests, loveleeyoungae (vi)</em:translator>
+		<em:translator>WangKing (zh-CN)</em:translator>
+		<em:translator>toomore (zh-TW)</em:translator>
+
+		<em:contributor>Atreus (FF3 update)</em:contributor>
+
+		<em:iconURL>chrome://snaplinks/content/icon.png</em:iconURL>
+		<em:icon64URL>chrome://snaplinks/content/icon64.png</em:icon64URL>
+		<em:homepageURL>@homepageURL@</em:homepageURL>
+		<em:updateURL>@updateURL@</em:updateURL>
+		<em:optionsURL>chrome://snaplinks/content/options.xul</em:optionsURL>
+	</Description>
+</RDF>
