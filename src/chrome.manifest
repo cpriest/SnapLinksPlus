@@ -21,6 +21,7 @@ locale snaplinks pt-PT jar:chrome/snaplinks.jar!/locale/pt-PT/
 locale snaplinks ru jar:chrome/snaplinks.jar!/locale/ru/
 locale snaplinks sk-SK jar:chrome/snaplinks.jar!/locale/sk-SK/
 locale snaplinks sr jar:chrome/snaplinks.jar!/locale/sr/
+locale snaplinks sv-SE jar:chrome/snaplinks.jar!/locale/sv-SE/
 locale snaplinks tr-TR jar:chrome/snaplinks.jar!/locale/tr-TR/
 locale snaplinks vi jar:chrome/snaplinks.jar!/locale/vi/
 locale snaplinks zh-CN jar:chrome/snaplinks.jar!/locale/zh-CN/
