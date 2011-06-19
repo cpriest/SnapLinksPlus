@@ -510,7 +510,7 @@ function executeAction(){
 				bookmarkLinks();
 				break;
 			case SNAPLACTION_DOWNLOAD:
-			    snaplAction = SNAPLACTION_UNDEF
+			    snaplAction = SNAPLACTION_UNDEF;
 				downloadLinks();
 		        snaplAction = SNAPLACTION_DEFAULT;
 				break;
