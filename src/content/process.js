@@ -1,8 +1,9 @@
 /*
- *  process.js 
+ *  process.js
+ *
  *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
- *  Copyright (C) 2009  Tommi Rautava
- *  
+ *  Copyright (C) 2008, 2009, 2010, 2011  Tommi Rautava
+ *
  *  This file is part of Snap Links.
  *
  *  Snap Links is free software: you can redistribute it and/or modify

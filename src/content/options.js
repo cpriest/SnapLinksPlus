@@ -1,9 +1,10 @@
 /*
- *  options.js 
+ *  options.js
+ *
  *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
  *  Copyright (C) 2008  Atreus, MumblyJuergens
- *  Copyright (C) 2009  Tommi Rautava
- *  
+ *  Copyright (C) 2008, 2009, 2011  Tommi Rautava
+ *
  *  This file is part of Snap Links.
  *
  *  Snap Links is free software: you can redistribute it and/or modify
