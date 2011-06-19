@@ -1,9 +1,10 @@
 /*
- *  snaplinks.js 
+ *  snaplinks.js
+ *
  *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
  *  Copyright (C) 2008  Atreus, MumblyJuergens
- *  Copyright (C) 2009  Tommi Rautava
- *  
+ *  Copyright (C) 2008, 2009, 2010, 2011  Tommi Rautava
+ *
  *  This file is part of Snap Links.
  *
  *  Snap Links is free software: you can redistribute it and/or modify
@@ -105,12 +106,12 @@ function start(e){
 	var snaplRendering = snaplContent.mPanelContainer;
 	snaplStarted = true;
 	snaplContextPopup = document.getElementById("contentAreaContextMenu");
-	snaplContextPopup.addEventListener("popupshowing", eventPopupshowing, false);
+	snaplContextPopup.addEventListener("popupshowing", eventPopupShowing, false);
 	snaplRendering.addEventListener("mouseup", eventMouseUp, true);
 	snaplRendering.addEventListener("mousedown", eventMouseDown, true);
 	snaplRendering.addEventListener("mouseout", eventMouseOut, true);
 	snaplRendering.addEventListener("mousemove", eventMouseMove, true);
-	snaplRendering.addEventListener("keypress", eventKeypress, true);
+	snaplRendering.addEventListener("keypress", eventKeyPress, true);
 	
 	snaplRendering.addEventListener("keydown", eventKeyDownUp, true);
 	snaplRendering.addEventListener("keyup", eventKeyDownUp, true);
@@ -132,7 +133,7 @@ function displayInfo(info){
 	statusbar.label=info;
 }
 
-function eventKeypress(e){
+function eventKeyPress(e){
 	if(e.keyCode == KeyboardEvent.DOM_VK_ESCAPE){
 		clearRect();
 	}
@@ -163,17 +164,19 @@ function eventOnScroll(e){
 	}
 }
 
-function eventPopupshowing(e){
+function eventPopupShowing(e){
 	if((snaplStopPopup==true) && (snaplButton==snaplRMB)){
 		e.preventDefault();
 		snaplStopPopup=false;
 		return false;
 	}
+	
+	return true;
 }
 
 function eventMouseUp(e){
-	if(e.button != snaplButton) return;
-	if(snaplPostLoadingActivate) return;
+	if(e.button != snaplButton) return true;
+	if(snaplPostLoadingActivate) return true;
 
 	if(snaplVisible == true){
 		snaplStopPopup=true;
@@ -190,28 +193,18 @@ function eventMouseUp(e){
 	else{
 		clearRect();
 		if(snaplButton == snaplRMB){
-			var evt = document.createEvent("MouseEvents");
 			snaplStopPopup=false;
 
-			// This code didnt work well with the spell checking in FF 2.0
-			//evt.initMouseEvent("contextmenu", true, true, e.originalTarget.defaultView, 0,
-			//	e.screenX, e.screenY, e.clientX, e.clientY, false, false, false, false, 2, null);
-			//	e.originalTarget.dispatchEvent(evt);
-
-			evt.initMouseEvent("contextmenu", true, true, window, 0,
+			var evt = document.createEvent("MouseEvents");
+			evt.initMouseEvent("contextmenu", e.bubbles, e.cancelable, e.view, e.detail,
 				e.screenX, e.screenY, e.clientX, e.clientY,
-				false, false, false, false, 2, null);
-				//e.originalTarget.dispatchEvent(evt);
+				e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
+				e.button, null);
 
 			if (gContextMenu)
 			{
 				var item = gContextMenu.target;
-				item.dispatchEvent(e);
-	
-			  	//document.popupNode = e.originalTarget;
-				//var obj = document.getElementById("contentAreaContextMenu");
-				//obj.showPopup(this, e.clientX, e.clientY, "context", null, null);
-				  
+				item.dispatchEvent(evt);
 				snaplStopPopup=true;
 			}
 		}
