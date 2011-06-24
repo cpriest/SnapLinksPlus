@@ -62,7 +62,7 @@
 
 		<em:contributor>Atreus (FF3 update)</em:contributor>
 
-		<em:iconURL>chrome://snaplinks/content/icon.png</em:iconURL>
+		<em:iconURL>chrome://snaplinks/content/icon32.png</em:iconURL>
 		<em:icon64URL>chrome://snaplinks/content/icon64.png</em:icon64URL>
 		<em:homepageURL>@homepageURL@</em:homepageURL>
 		<em:updateURL>@updateURL@</em:updateURL>
