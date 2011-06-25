@@ -39,10 +39,15 @@
 
 
 	<fileset id="src.root.files" dir="${src.dir}">
-		<include name="chrome.manifest" />
 		<include name="defaults/**" />
-		<include name="license.*" />
-		<include name="gpl.txt" />
+		<include name="*.*" />
+		<exclude name="**/.cvsignore" />
+	</fileset>
+
+
+	<fileset id="src.chrome.files" dir="${src.dir}">
+		<include name="content/**" />
+		<include name="skin/**" />
 		<exclude name="**/.cvsignore" />
 	</fileset>
 
@@ -95,21 +100,14 @@
 	</target>
 
 
-	<target name="copy-src-to-build" depends="init">
-		<copy todir="${build.dir}/src/chrome" overwrite="true">
-			<fileset dir="${src.dir}" includes="content/**,skin/**" excludes="**/.cvsignore" />
-		</copy>
-
+	<target name="copy-src-to-build" depends="init,unpack-locale-bundle-to-src">
 		<copy todir="${build.dir}/src" overwrite="true">
 			<fileset refid="src.root.files" />
 		</copy>
 
-		<replace file="${build.dir}/src/chrome.manifest">
-			<replacefilter token="jar:" value="" />
-			<replacefilter token="${ant.project.name}.jar!/" value="" />
-		</replace>
-
-		<copy todir="${build.dir}/src" file="${src.dir}/install.rdf" overwrite="true" />
+		<copy todir="${build.dir}/src/chrome" overwrite="true">
+			<fileset refid="src.chrome.files" />
+		</copy>
 
 		<!-- Patch install.rdf -->
 		<replace file="${build.dir}/src/install.rdf" propertyFile="${basedir}/release.properties" encoding="utf-8">
@@ -122,18 +120,6 @@
 			<replacefilter token="@seamonkeyMinVersion@" property="extension.seamonkey.minVersion" />
 			<replacefilter token="@seamonkeyMaxVersion@" property="extension.seamonkey.maxVersion" />
 		</replace>
-	</target>
-
-
-	<target name="copy-src-to-xpi-build" depends="init,copy-src-to-build">
-		<mkdir dir="${build.dir}/xpi" />
-		<mkdir dir="${build.dir}/xpi/chrome" />
-
-		<copy todir="${build.dir}/xpi" overwrite="true">
-			<fileset refid="src.root.files" />
-		</copy>
-
-		<copy todir="${build.dir}/xpi" file="${build.dir}/src/install.rdf" overwrite="true" />
 	</target>
 
 
@@ -234,15 +220,6 @@
 	</target>
 
 
-	<target name="jar" depends="copy-src-to-xpi-build,unpack-babelzilla-replaced-bundle">
-		<delete file="${build.dir}/xpi/chrome/${ant.project.name}.jar" />
-
-		<zip destfile="${build.dir}/xpi/chrome/${ant.project.name}.jar">
-			<zipfileset dir="${build.dir}/src/chrome" includes="**/*" excludes="**/amo.properties" />
-		</zip>
-	</target>
-
-
 	<target name="publish" depends="release.ini">
 	</target>
 
@@ -318,7 +295,7 @@
 	</target>
 
 
-	<target name="unpack-babelzilla-replaced-bundle" depends="init">
+	<target name="unpack-locale-bundle-to-src" depends="init">
 		<mkdir dir="${build.dir}/all_locales_replaced" />
 
 		<property name="babelzilla-replaced-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_replaced.tar.gz" />
@@ -351,17 +328,19 @@
 		<!   and store the results to the .xpi build directory. -->
 		<native2ascii src="${src.dir}" dest="${build.dir}/src/chrome" encoding="UTF-8">
 			<include name="locale/**/*.properties" />
+			<exclude name="**/amo.properties" />
 		</native2ascii>
 
 		<!-- Encode .properties from the bundle -->
 		<native2ascii src="${build.dir}/all_locales_replaced" dest="${build.dir}/src/chrome" encoding="UTF-8">
 			<include name="locale/**/*.properties" />
 			<exclude name="locale/en-US/**" />
+			<exclude name="**/amo.properties" />
 		</native2ascii>
 	</target>
 
 
-	<target name="unpack-babelzilla-skipped-bundle" depends="init-babelzilla">
+	<target name="unpack-locale-bundle-to-babelzilla-src" depends="init-babelzilla">
 		<mkdir dir="${build.dir}/all_locales_skipped" />
 
 		<property name="babelzilla-skipped-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_skipped.tar.gz" />
@@ -404,19 +383,29 @@
 	</target>
 
 
-	<target name="xpi" depends="set-xpi-name,unpack-babelzilla-replaced-bundle,jar">
+	<target name="xpi" depends="set-xpi-name,copy-src-to-build">
 		<delete file="${dist.dir}/${extension.xpi}" />
 
 		<zip destfile="${dist.dir}/${extension.xpi}">
-			<zipfileset dir="${build.dir}/xpi" includes="*/**" />
+			<zipfileset dir="${build.dir}/src" includes="*/**" />
 		</zip>
 	</target>
 
 
-	<target name="xpi-amo" depends="init-amo,set-xpi-name,unpack-babelzilla-replaced-bundle,jar">
+	<target name="xpi-dev" depends="set-xpi-name,copy-src-to-build">
+		<delete file="${dist.dir}/${extension.xpi}" />
+
+		<zip destfile="${dist.dir}/${extension.xpi}" filesonly="true">
+			<zipfileset dir="${build.dir}/src" includes="*/**" />
+		</zip>
+	</target>
+
+
+	<!-- Make a special .xpi for Addons.Mozilla.org. -->
+	<target name="xpi-amo" depends="init-amo,set-xpi-name,copy-src-to-build">
 		<mkdir dir="${build.dir}/amo" />
 
-		<copy file="${build.dir}/xpi/install.rdf" todir="${build.dir}/amo" overwrite="true" />
+		<copy file="${build.dir}/src/install.rdf" todir="${build.dir}/amo" overwrite="true" />
 
 		<!-- Comment out updateURL as AMO does not allow it. -->
 		<replace file="${build.dir}/amo/install.rdf" encoding="utf-8">
@@ -429,34 +418,21 @@
 		<delete file="${dist.dir}/amo/${extension.xpi}" />
 
 		<zip destfile="${dist.dir}/amo/${extension.xpi}">
-			<zipfileset dir="${build.dir}/xpi" includes="*/**" excludes="install.rdf" />
+			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="install.rdf" />
 			<zipfileset dir="${build.dir}/amo" includes="install.rdf" />
 		</zip>
 	</target>
 
 
-	<!-- Make a special .xpi for Babelzilla:
-	<!   - Untranslated strings are skipped.
-	<!   - Leave the contents unpacked (in other words, do not pack the content and the locale files into a jar file). -->
-	<target name="xpi-babelzilla" depends="set-xpi-name,copy-src-to-build,unpack-babelzilla-skipped-bundle,jar">
+	<!-- Make a special .xpi for BabelZilla.org. -->
+	<target name="xpi-babelzilla" depends="set-xpi-name,copy-src-to-build,unpack-locale-bundle-to-babelzilla-src">
 		<mkdir dir="${dist.dir}/babelzilla" />
 
 		<delete file="${dist.dir}/babelzilla/${extension.xpi}" />
 
 		<zip destfile="${dist.dir}/babelzilla/${extension.xpi}" filesonly="true">
-			<zipfileset dir="${build.dir}/src" includes="META-INF/zigbert.rsa" />
-			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="META-INF/zigbert.rsa,chrome/locale/**" />
+			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="chrome/locale/**" />
 			<zipfileset dir="${build.dir}/babelzilla" includes="*/**" />
-		</zip>
-	</target>
-
-
-	<target name="xpi-dev" depends="set-xpi-name,copy-src-to-build,unpack-babelzilla-replaced-bundle">
-		<delete file="${dist.dir}/${extension.xpi}" />
-
-		<zip destfile="${dist.dir}/${extension.xpi}" filesonly="true">
-			<zipfileset dir="${build.dir}/src" includes="META-INF/zigbert.rsa" />
-			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="META-INF/zigbert.rsa" />
 		</zip>
 	</target>
 
