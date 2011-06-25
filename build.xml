@@ -32,23 +32,23 @@
 	<property name="downloads.dir" value="${basedir}/downloads" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="www.dir" value="${basedir}/www" />
-	
-	<property name="releaseIni.file" value="${www.dir}/release.ini"/>
-	<property name="buildNumber.file" value="${basedir}/.buildNumbers/build.number.${extension.version}"/>
+
+	<property name="releaseIni.file" value="${www.dir}/release.ini" />
+	<property name="buildNumber.file" value="${basedir}/.buildNumbers/build.number.${extension.version}" />
 	<property name="credentials.file" value="${basedir}/credentials.properties" />
-	
-	
-	<fileset id="src.root.files" dir="${src.dir}"> 
-		<include name="chrome.manifest"/>
-		<include name="defaults/**"/> 
-		<include name="license.*"/> 
-		<include name="gpl.txt"/> 
-		<exclude name="**/.cvsignore"/>
-	</fileset>	
+
+
+	<fileset id="src.root.files" dir="${src.dir}">
+		<include name="chrome.manifest" />
+		<include name="defaults/**" />
+		<include name="license.*" />
+		<include name="gpl.txt" />
+		<exclude name="**/.cvsignore" />
+	</fileset>
 
 
 	<condition property="existsCredentialsFile">
-		<available file="${credentials.file}"/>
+		<available file="${credentials.file}" />
 	</condition>
 
 
@@ -58,30 +58,28 @@
 			<equals arg1="${babelzilla.password}" arg2="" />
 		</or>
 	</condition>
-	
-	
+
+
 	<target name="build-babelzilla" depends="clean,init,set-version-dev,copy-src-to-build,xpi-babelzilla">
 		<tstamp prefix="stop">
-			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
 		</tstamp>
 		<echo message="${extension.versionNumber.forThisBuild} ready ${stop.build.tstamp}" />
 	</target>
-	
-	
+
+
 	<target name="build-dev" depends="clean,init,set-version-dev,copy-src-to-build,xpi-dev,xpi-babelzilla">
 		<tstamp prefix="stop">
-			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
 		</tstamp>
 		<echo message="${extension.versionNumber.forThisBuild} ready ${stop.build.tstamp}" />
 	</target>
-	
-	
+
+
 	<target name="checksum">
-		<checksum file="${downloads.dir}/${extension.published.xpi}" 
-			algorithm="${extension.checksum.algorithm}" 
-			property="extension.checksum.value"/>
+		<checksum file="${downloads.dir}/${extension.published.xpi}" algorithm="${extension.checksum.algorithm}" property="extension.checksum.value" />
 	</target>
-	
+
 
 	<target name="clean">
 		<delete includeemptydirs="true">
@@ -89,23 +87,21 @@
 		</delete>
 	</target>
 
-	
+
 	<target name="clean-dist">
 		<delete includeemptydirs="true">
 			<fileset dir="${dist.dir}" includes="**/*" excludes=".cvsignore" />
 		</delete>
 	</target>
-	
-	
+
+
 	<target name="copy-src-to-build" depends="init">
 		<copy todir="${build.dir}/src/chrome" overwrite="true">
-			<fileset dir="${src.dir}" 
-				includes="content/**,skin/**" 
-				excludes="**/.cvsignore"/>
+			<fileset dir="${src.dir}" includes="content/**,skin/**" excludes="**/.cvsignore" />
 		</copy>
-		
+
 		<copy todir="${build.dir}/src" overwrite="true">
-			<fileset refid="src.root.files"/>
+			<fileset refid="src.root.files" />
 		</copy>
 
 		<replace file="${build.dir}/src/chrome.manifest">
@@ -113,10 +109,10 @@
 			<replacefilter token="${ant.project.name}.jar!/" value="" />
 		</replace>
 
-		<copy todir="${build.dir}/src" file="${src.dir}/install.rdf" overwrite="true"/>
+		<copy todir="${build.dir}/src" file="${src.dir}/install.rdf" overwrite="true" />
 
 		<!-- Patch install.rdf -->
-		<replace file="${build.dir}/src/install.rdf" propertyFile="${basedir}/release.properties">
+		<replace file="${build.dir}/src/install.rdf" propertyFile="${basedir}/release.properties" encoding="utf-8">
 			<replacefilter token="@id@" value="${extension.id}" />
 			<replacefilter token="@version@" value="${extension.versionNumber.forThisBuild}" />
 			<replacefilter token="@updateURL@" value="${extension.updateURL}" />
@@ -127,47 +123,44 @@
 			<replacefilter token="@seamonkeyMaxVersion@" property="extension.seamonkey.maxVersion" />
 		</replace>
 	</target>
-	
-	
+
+
 	<target name="copy-src-to-xpi-build" depends="init,copy-src-to-build">
 		<mkdir dir="${build.dir}/xpi" />
 		<mkdir dir="${build.dir}/xpi/chrome" />
 
 		<copy todir="${build.dir}/xpi" overwrite="true">
-			<fileset refid="src.root.files"/>
+			<fileset refid="src.root.files" />
 		</copy>
-	
-		<copy todir="${build.dir}/xpi" file="${build.dir}/src/install.rdf" overwrite="true"/>
+
+		<copy todir="${build.dir}/xpi" file="${build.dir}/src/install.rdf" overwrite="true" />
 	</target>
-	
+
 
 	<target name="create-credentials-file" unless="existsCredentialsFile">
 		<concat destfile="${credentials.file}">
 			<string value="babelzilla.username = &#0010;" />
 			<string value="babelzilla.password = &#0010;" />
 		</concat>
-		
-		<fail message="Enter your credentials to the newly created file: ${credentials.file}"/>
+
+		<fail message="Enter your credentials to the newly created file: ${credentials.file}" />
 	</target>
-	
+
 
 	<target name="dist" depends="clean,set-version-dist,xpi-babelzilla,xpi,xpi-amo">
-		<copy file="${dist.dir}/${extension.xpi}" todir="${downloads.dir}" overwrite="true"/>
-		
-		<checksum 
-			file="${downloads.dir}/${extension.xpi}" 
-			algorithm="${extension.checksum.algorithm}" 
-			property="extension.downloads.xpi.checksum"/>
-		
+		<copy file="${dist.dir}/${extension.xpi}" todir="${downloads.dir}" overwrite="true" />
+
+		<checksum file="${downloads.dir}/${extension.xpi}" algorithm="${extension.checksum.algorithm}" property="extension.downloads.xpi.checksum" />
+
 		<tstamp prefix="stop">
-			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
 		</tstamp>
-		
+
 		<echo message="${extension.versionNumber.forThisBuild} is ready ${stop.build.tstamp}" />
 		<echo message="${extension.checksum.algorithm} checsum is ${extension.downloads.xpi.checksum}" />
 	</target>
-	
-<!--
+
+	<!--
 	<target name="download-from-babelzilla" depends="download-from-babelzilla-prerequirements"
 		description="Download locale bundles from Babelzilla">
 		<exec executable="attrib" osfamily="windows">
@@ -201,64 +194,64 @@
 			username="${babelzilla.username}" password="${babelzilla.password}"/>
 	</target>
 -->
-	
+
 	<target name="download-from-babelzilla-prerequirements" depends="create-credentials-file" if="isUnsetBabelzillaCredentials">
 		<fail message="Credentials are not defined in ${credentials.file}" />
 	</target>
-		
-		
+
+
 	<target name="init" depends="init-build">
-		<echo level="info" message="Version ${extension.version}-${extension.subVersion} Build ${build.number} started ${build.tstamp}"/>
+		<echo level="info" message="Version ${extension.version}-${extension.subVersion} Build ${build.number} started ${build.tstamp}" />
 
 		<mkdir dir="${build.dir}/src" />
 		<mkdir dir="${build.dir}/src/chrome" />
 	</target>
-	
-	
+
+
 	<target name="init-amo" depends="init">
 		<mkdir dir="${build.dir}/amo" />
 	</target>
-	
+
 
 	<target name="init-babelzilla" depends="init">
 		<mkdir dir="${build.dir}/babelzilla" />
 		<mkdir dir="${build.dir}/babelzilla/chrome" />
 	</target>
-	
+
 
 	<target name="init-build">
 		<tstamp>
-			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z"/>
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
 		</tstamp>
-		
+
 		<!-- Make the build number file writable. -->
 		<exec executable="attrib" dir="${basedir}" osfamily="windows">
-			<arg value="-r"/>
-			<arg file="${buildNumber.file}"/>
+			<arg value="-r" />
+			<arg file="${buildNumber.file}" />
 		</exec>
 
-		<buildnumber file="${buildNumber.file}"/>
+		<buildnumber file="${buildNumber.file}" />
 	</target>
-	
-	
+
+
 	<target name="jar" depends="copy-src-to-xpi-build,unpack-babelzilla-replaced-bundle">
-		<delete file="${build.dir}/xpi/chrome/${ant.project.name}.jar"/>
-		
+		<delete file="${build.dir}/xpi/chrome/${ant.project.name}.jar" />
+
 		<zip destfile="${build.dir}/xpi/chrome/${ant.project.name}.jar">
-			<zipfileset dir="${build.dir}/src/chrome" includes="**/*" excludes="**/amo.properties"/>
+			<zipfileset dir="${build.dir}/src/chrome" includes="**/*" excludes="**/amo.properties" />
 		</zip>
 	</target>
-	
-	
+
+
 	<target name="publish" depends="release.ini">
 	</target>
-	
-	
+
+
 	<!-- Create release.ini file which is read by www/local.conf -->
 	<target name="release.ini" depends="set-pub-xpi-name,checksum">
 		<exec executable="attrib" dir="${basedir}" osfamily="windows">
-			<arg value="-r"/>
-			<arg file="${releaseIni.file}"/>
+			<arg value="-r" />
+			<arg file="${releaseIni.file}" />
 		</exec>
 
 		<concat destfile="${releaseIni.file}">
@@ -267,200 +260,176 @@
 			<string value="xpi = &quot;${extension.published.xpi}&quot;&#0010;" />
 			<string value="checksum = &quot;${extension.checksum.algorithm}:${extension.checksum.value}&quot;&#0010;" />
 		</concat>
-		
+
 		<echo>xpi: ${extension.published.xpi}</echo>
 		<echo>checksum: ${extension.checksum.algorithm}:${extension.checksum.value}</echo>
 	</target>
-	
-	
+
+
 	<!-- Repack an existing xpi file as AMO release. -->
 	<target name="repack-published-for-amo" depends="init-amo,set-pub-xpi-name">
-		<property name="repack.dir" value="${build.dir}/amo.${DSTAMP}.${TSTAMP}"/>
+		<property name="repack.dir" value="${build.dir}/amo.${DSTAMP}.${TSTAMP}" />
 
-		<mkdir dir="${repack.dir}"/>
+		<mkdir dir="${repack.dir}" />
 
-		<unzip src="${downloads.dir}/${extension.published.xpi}" dest="${repack.dir}"/>
+		<unzip src="${downloads.dir}/${extension.published.xpi}" dest="${repack.dir}" />
 
 		<!-- Comment out updateURL as AMO does not allow it. -->
-		<replace file="${repack.dir}/install.rdf">
-			<replacefilter token="&lt;em:updateURL&gt;" value="&lt;!-- &lt;em:updateURL&gt;"/>
-			<replacefilter token="&lt;/em:updateURL&gt;" value="&lt;/em:updateURL&gt; --&gt;"/>
+		<replace file="${repack.dir}/install.rdf" encoding="utf-8">
+			<replacefilter token="&lt;em:updateURL&gt;" value="&lt;!-- &lt;em:updateURL&gt;" />
+			<replacefilter token="&lt;/em:updateURL&gt;" value="&lt;/em:updateURL&gt; --&gt;" />
 		</replace>
 
 		<mkdir dir="${dist.dir}/amo" />
 
-		<delete file="${dist.dir}/amo/${extension.published.xpi}"/>
-		
+		<delete file="${dist.dir}/amo/${extension.published.xpi}" />
+
 		<zip destfile="${dist.dir}/amo/${extension.published.xpi}">
-			<zipfileset dir="${repack.dir}" includes="*/**"/>
+			<zipfileset dir="${repack.dir}" includes="*/**" />
 		</zip>
-		
-		<delete dir="${repack.dir}"/>
+
+		<delete dir="${repack.dir}" />
 	</target>
-	
-	
+
+
 	<target name="set-pub-xpi-name">
-		<property name="extension.published.xpi" value="${ant.project.name}-${extension.publishedVersion}${extension.appsPostfix}.xpi"/>
+		<property name="extension.published.xpi" value="${ant.project.name}-${extension.publishedVersion}${extension.appsPostfix}.xpi" />
 	</target>
 
-	
+
 	<target name="set-version">
-		<property name="extension.versionNumber" value="${extension.version}${extension.subVersion}"/>
-	</target>		
+		<property name="extension.versionNumber" value="${extension.version}${extension.subVersion}" />
+	</target>
 
-	
+
 	<target name="set-version-dev" depends="set-version">
-		<property name="extension.versionNumber.plusBuild" value="${extension.versionNumber}.0pre${build.number}"/>
-		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber.plusBuild}"/>
+		<property name="extension.versionNumber.plusBuild" value="${extension.versionNumber}.0pre${build.number}" />
+		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber.plusBuild}" />
 	</target>
-	
-	
+
+
 	<target name="set-version-dist" depends="set-version">
-		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber}"/>
+		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber}" />
 	</target>
-	
-	
+
+
 	<target name="set-xpi-name">
-		<property name="extension.xpi" value="${ant.project.name}-${extension.versionNumber.forThisBuild}${extension.appsPostfix}.xpi"/>
+		<property name="extension.xpi" value="${ant.project.name}-${extension.versionNumber.forThisBuild}${extension.appsPostfix}.xpi" />
 	</target>
-	
-	
+
+
 	<target name="unpack-babelzilla-replaced-bundle" depends="init">
 		<mkdir dir="${build.dir}/all_locales_replaced" />
-		
-		<property name="babelzilla-replaced-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_replaced.tar.gz"/>
-		
+
+		<property name="babelzilla-replaced-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_replaced.tar.gz" />
+
 		<!-- Unpack the string bundle. -->
-		<untar src="${basedir}/babelzilla/${babelzilla-replaced-bundle-tar-gz}" dest="${build.dir}/all_locales_replaced/locale"
-			compression="gzip" overwrite="true"/>
-		
+		<untar src="${basedir}/babelzilla/${babelzilla-replaced-bundle-tar-gz}" dest="${build.dir}/all_locales_replaced/locale" compression="gzip" overwrite="true" />
+
 		<!-- Move all files except .properties to .xpi build directory. -->
 		<!-- Also, exclude the default locale (en-US) -->
 		<move todir="${build.dir}/src/chrome" overwrite="true">
-			<fileset dir="${build.dir}/all_locales_replaced" 
-				includes="*/**" 
-				excludes="**/*.dtd,**/*.properties,locale/en-US/**,**/contents.rdf"/>
+			<fileset dir="${build.dir}/all_locales_replaced" includes="*/**" excludes="**/*.dtd,**/*.properties,locale/en-US/**,**/contents.rdf" />
 		</move>
-		
+
 		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
 		<copy todir="${build.dir}/src/chrome" overwrite="true">
-			<fileset dir="${src.dir}" 
-				includes="locale/**" 
-				excludes="**/.cvsignore,locale/**/*.properties,locale/**/*.dtd"/>
+			<fileset dir="${src.dir}" includes="locale/**" excludes="**/.cvsignore,locale/**/*.properties,locale/**/*.dtd" />
 		</copy>
-		
+
 		<!-- Convert DTD files to UTF-8. -->
-		<apply executable="${basedir}/utility/convertTextEncoding.exe"
-			dest="${build.dir}/src/chrome"
-			parallel="false">
-			<arg value="utf-8"/>
-			<srcfile/>
-			<targetfile/>
-			<fileset
-				dir="${src.dir}"
-				includes="locale/en-US/*.dtd"/>
-			<fileset 
-				dir="${build.dir}/all_locales_replaced"
-				includes="**/*.dtd"
-				excludes="locale/en-US/**"/>
-			<mapper type="identity"/>
+		<apply executable="${basedir}/utility/convertTextEncoding.exe" dest="${build.dir}/src/chrome" parallel="false">
+			<arg value="utf-8" />
+			<srcfile />
+			<targetfile />
+			<fileset dir="${src.dir}" includes="locale/en-US/*.dtd" />
+			<fileset dir="${build.dir}/all_locales_replaced" includes="**/*.dtd" excludes="locale/en-US/**" />
+			<mapper type="identity" />
 		</apply>
-		
+
 		<!-- Encode .properties files of the default locale
 		<!   and store the results to the .xpi build directory. -->
 		<native2ascii src="${src.dir}" dest="${build.dir}/src/chrome" encoding="UTF-8">
-			<include name="locale/**/*.properties"/>
+			<include name="locale/**/*.properties" />
 		</native2ascii>
-		
+
 		<!-- Encode .properties from the bundle -->
 		<native2ascii src="${build.dir}/all_locales_replaced" dest="${build.dir}/src/chrome" encoding="UTF-8">
-			<include name="locale/**/*.properties"/>
-			<exclude name="locale/en-US/**"/>
+			<include name="locale/**/*.properties" />
+			<exclude name="locale/en-US/**" />
 		</native2ascii>
 	</target>
-	
-	
+
+
 	<target name="unpack-babelzilla-skipped-bundle" depends="init-babelzilla">
 		<mkdir dir="${build.dir}/all_locales_skipped" />
-		
-		<property name="babelzilla-skipped-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_skipped.tar.gz"/>
-		
+
+		<property name="babelzilla-skipped-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_skipped.tar.gz" />
+
 		<!-- Unpack the string bundle. -->
-		<untar src="${basedir}/babelzilla/${babelzilla-skipped-bundle-tar-gz}" dest="${build.dir}/all_locales_skipped/locale"
-			compression="gzip" overwrite="true"/>
-		
+		<untar src="${basedir}/babelzilla/${babelzilla-skipped-bundle-tar-gz}" dest="${build.dir}/all_locales_skipped/locale" compression="gzip" overwrite="true" />
+
 		<!-- Move all files except .properties to .xpi build directory. -->
 		<!-- Also, exclude the default locale (en-US) -->
 		<move todir="${build.dir}/babelzilla/chrome" overwrite="true">
-			<fileset dir="${build.dir}/all_locales_skipped" 
-				includes="*/**" 
-				excludes="**/*.dtd,**/*.properties,**/en-US/**,**/contents.rdf"/>
+			<fileset dir="${build.dir}/all_locales_skipped" includes="*/**" excludes="**/*.dtd,**/*.properties,**/en-US/**,**/contents.rdf" />
 		</move>
-		
+
 		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
 		<copy todir="${build.dir}/babelzilla/chrome" overwrite="true">
-			<fileset dir="${src.dir}" 
-				includes="locale/**" 
-				excludes="**/.cvsignore,locale/**/*.properties,locale/**/*.dtd"/>
+			<fileset dir="${src.dir}" includes="locale/**" excludes="**/.cvsignore,locale/**/*.properties,locale/**/*.dtd" />
 		</copy>
-		
+
 		<!-- Convert DTD files to UTF-8. -->
-		<apply executable="${basedir}/utility/convertTextEncoding.exe"
-			dest="${build.dir}/babelzilla/chrome"
-			parallel="false">
-			<arg value="utf-8"/>
-			<srcfile/>
-			<targetfile/>
-			<fileset
-				dir="${src.dir}"
-				includes="locale/en-US/*.dtd"/>
-			<fileset 
-				dir="${build.dir}/all_locales_skipped"
-				includes="**/*.dtd"
-				excludes="**/en-US/**"/>
-			<mapper type="identity"/>
+		<apply executable="${basedir}/utility/convertTextEncoding.exe" dest="${build.dir}/babelzilla/chrome" parallel="false">
+			<arg value="utf-8" />
+			<srcfile />
+			<targetfile />
+			<fileset dir="${src.dir}" includes="locale/en-US/*.dtd" />
+			<fileset dir="${build.dir}/all_locales_skipped" includes="**/*.dtd" excludes="**/en-US/**" />
+			<mapper type="identity" />
 		</apply>
-		
+
 		<!-- Encode .properties files of the default locale
 		<!   and store the results to the .xpi build directory. -->
 		<native2ascii src="${src.dir}" dest="${build.dir}/babelzilla/chrome" encoding="UTF-8">
-			<include name="locale/**/*.properties"/>
+			<include name="locale/**/*.properties" />
 		</native2ascii>
-		
+
 		<!-- Encode .properties from the bundle -->
 		<native2ascii src="${build.dir}/all_locales_skipped" dest="${build.dir}/babelzilla/chrome" encoding="UTF-8">
-			<include name="locale/**/*.properties"/>
-			<exclude name="locale/en-US/**"/>
+			<include name="locale/**/*.properties" />
+			<exclude name="locale/en-US/**" />
 		</native2ascii>
 	</target>
-	
-	
+
+
 	<target name="xpi" depends="set-xpi-name,unpack-babelzilla-replaced-bundle,jar">
-		<delete file="${dist.dir}/${extension.xpi}"/>
+		<delete file="${dist.dir}/${extension.xpi}" />
 
 		<zip destfile="${dist.dir}/${extension.xpi}">
 			<zipfileset dir="${build.dir}/xpi" includes="*/**" />
 		</zip>
 	</target>
 
-	
+
 	<target name="xpi-amo" depends="init-amo,set-xpi-name,unpack-babelzilla-replaced-bundle,jar">
 		<mkdir dir="${build.dir}/amo" />
 
-		<copy file="${build.dir}/xpi/install.rdf" todir="${build.dir}/amo" overwrite="true"/>
-		
+		<copy file="${build.dir}/xpi/install.rdf" todir="${build.dir}/amo" overwrite="true" />
+
 		<!-- Comment out updateURL as AMO does not allow it. -->
-		<replace file="${build.dir}/amo/install.rdf">
-			<replacefilter token="&lt;em:updateURL&gt;" value="&lt;!-- &lt;em:updateURL&gt;"/>
-			<replacefilter token="&lt;/em:updateURL&gt;" value="&lt;/em:updateURL&gt; --&gt;"/>
+		<replace file="${build.dir}/amo/install.rdf" encoding="utf-8">
+			<replacefilter token="&lt;em:updateURL&gt;" value="&lt;!-- &lt;em:updateURL&gt;" />
+			<replacefilter token="&lt;/em:updateURL&gt;" value="&lt;/em:updateURL&gt; --&gt;" />
 		</replace>
-		
+
 		<mkdir dir="${dist.dir}/amo" />
-		
+
 		<delete file="${dist.dir}/amo/${extension.xpi}" />
 
 		<zip destfile="${dist.dir}/amo/${extension.xpi}">
-			<zipfileset dir="${build.dir}/xpi" includes="*/**" excludes="install.rdf"/>
+			<zipfileset dir="${build.dir}/xpi" includes="*/**" excludes="install.rdf" />
 			<zipfileset dir="${build.dir}/amo" includes="install.rdf" />
 		</zip>
 	</target>
@@ -471,24 +440,24 @@
 	<!   - Leave the contents unpacked (in other words, do not pack the content and the locale files into a jar file). -->
 	<target name="xpi-babelzilla" depends="set-xpi-name,copy-src-to-build,unpack-babelzilla-skipped-bundle,jar">
 		<mkdir dir="${dist.dir}/babelzilla" />
-		
+
 		<delete file="${dist.dir}/babelzilla/${extension.xpi}" />
 
 		<zip destfile="${dist.dir}/babelzilla/${extension.xpi}" filesonly="true">
-			<zipfileset dir="${build.dir}/src" includes="META-INF/zigbert.rsa"/>
-			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="META-INF/zigbert.rsa,chrome/locale/**"/>
-			<zipfileset dir="${build.dir}/babelzilla" includes="*/**"/>
+			<zipfileset dir="${build.dir}/src" includes="META-INF/zigbert.rsa" />
+			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="META-INF/zigbert.rsa,chrome/locale/**" />
+			<zipfileset dir="${build.dir}/babelzilla" includes="*/**" />
 		</zip>
 	</target>
 
 
 	<target name="xpi-dev" depends="set-xpi-name,copy-src-to-build,unpack-babelzilla-replaced-bundle">
-		<delete file="${dist.dir}/${extension.xpi}"/>
-		
+		<delete file="${dist.dir}/${extension.xpi}" />
+
 		<zip destfile="${dist.dir}/${extension.xpi}" filesonly="true">
-			<zipfileset dir="${build.dir}/src" includes="META-INF/zigbert.rsa"/>
-			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="META-INF/zigbert.rsa"/>
+			<zipfileset dir="${build.dir}/src" includes="META-INF/zigbert.rsa" />
+			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="META-INF/zigbert.rsa" />
 		</zip>
 	</target>
-	
+
 </project>
