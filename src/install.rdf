@@ -27,12 +27,12 @@
 			</Description>
 		</em:targetApplication>
 
-		<em:description>Opens multiple links contained in a selected area in new tabs</em:description>
+		<em:description>Opens multiple links contained in a selected area in new tabs.</em:description>
 
-		<em:creator>savred (Pedro Fonseca)</em:creator>
+		<em:creator>Pedro Fonseca (savred)</em:creator>
 
+		<em:developer>Jeff Sugar (Atreus)</em:developer>
 		<em:developer>Mumbly Juergens</em:developer>
-		<em:developer>Jeff Sugar</em:developer>
 		<em:developer>Tommi Rautava</em:developer>
 		<em:developer>Clint Priest</em:developer>
 
@@ -67,8 +67,6 @@
 		<em:translator>NGUYỄN Mạnh Hùng (loveleeyoungae) [vi]</em:translator>
 		<em:translator>WangKing [zh-CN]</em:translator>
 		<em:translator>toomore [zh-TW]</em:translator>
-
-		<em:contributor>Atreus (FF3 update)</em:contributor>
 
 		<em:iconURL>chrome://snaplinks/content/icon32.png</em:iconURL>
 		<em:icon64URL>chrome://snaplinks/content/icon64.png</em:icon64URL>
