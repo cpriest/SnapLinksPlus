@@ -39,15 +39,10 @@
 
 
 	<fileset id="src.root.files" dir="${src.dir}">
-		<include name="defaults/**" />
-		<include name="*.*" />
-		<exclude name="**/.cvsignore" />
-	</fileset>
-
-
-	<fileset id="src.chrome.files" dir="${src.dir}">
 		<include name="content/**" />
+		<include name="defaults/**" />
 		<include name="skin/**" />
+		<include name="*.*" />
 		<exclude name="**/.cvsignore" />
 	</fileset>
 
@@ -105,20 +100,9 @@
 			<fileset refid="src.root.files" />
 		</copy>
 
-		<copy todir="${build.dir}/src/chrome" overwrite="true">
-			<fileset refid="src.chrome.files" />
-		</copy>
-
-		<!-- Patch install.rdf -->
+		<!-- Patch version number into install.rdf. -->
 		<replace file="${build.dir}/src/install.rdf" propertyFile="${basedir}/release.properties" encoding="utf-8">
-			<replacefilter token="@id@" value="${extension.id}" />
-			<replacefilter token="@version@" value="${extension.versionNumber.forThisBuild}" />
-			<replacefilter token="@updateURL@" value="${extension.updateURL}" />
-			<replacefilter token="@homepageURL@" property="extension.homepageURL" />
-			<replacefilter token="@firefoxMinVersion@" property="extension.firefox.minVersion" />
-			<replacefilter token="@firefoxMaxVersion@" property="extension.firefox.maxVersion" />
-			<replacefilter token="@seamonkeyMinVersion@" property="extension.seamonkey.minVersion" />
-			<replacefilter token="@seamonkeyMaxVersion@" property="extension.seamonkey.maxVersion" />
+			<replacefilter token="&lt;em:version&gt;0&lt;/em:version&gt;" value="${extension.versionNumber.forThisBuild}" />
 		</replace>
 	</target>
 
@@ -190,7 +174,6 @@
 		<echo level="info" message="Version ${extension.version}-${extension.subVersion} Build ${build.number} started ${build.tstamp}" />
 
 		<mkdir dir="${build.dir}/src" />
-		<mkdir dir="${build.dir}/src/chrome" />
 	</target>
 
 
@@ -201,7 +184,6 @@
 
 	<target name="init-babelzilla" depends="init">
 		<mkdir dir="${build.dir}/babelzilla" />
-		<mkdir dir="${build.dir}/babelzilla/chrome" />
 	</target>
 
 
@@ -305,17 +287,17 @@
 
 		<!-- Move all files except .properties to .xpi build directory. -->
 		<!-- Also, exclude the default locale (en-US) -->
-		<move todir="${build.dir}/src/chrome" overwrite="true">
+		<move todir="${build.dir}/src" overwrite="true">
 			<fileset dir="${build.dir}/all_locales_replaced" includes="*/**" excludes="**/*.dtd,**/*.properties,locale/en-US/**,**/contents.rdf" />
 		</move>
 
 		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
-		<copy todir="${build.dir}/src/chrome" overwrite="true">
+		<copy todir="${build.dir}/src" overwrite="true">
 			<fileset dir="${src.dir}" includes="locale/**" excludes="**/.cvsignore,locale/**/*.properties,locale/**/*.dtd" />
 		</copy>
 
 		<!-- Convert DTD files to UTF-8. -->
-		<apply executable="${basedir}/utility/convertTextEncoding.exe" dest="${build.dir}/src/chrome" parallel="false">
+		<apply executable="${basedir}/utility/convertTextEncoding.exe" dest="${build.dir}/src" parallel="false">
 			<arg value="utf-8" />
 			<srcfile />
 			<targetfile />
@@ -326,13 +308,13 @@
 
 		<!-- Encode .properties files of the default locale
 		<!   and store the results to the .xpi build directory. -->
-		<native2ascii src="${src.dir}" dest="${build.dir}/src/chrome" encoding="UTF-8">
+		<native2ascii src="${src.dir}" dest="${build.dir}/src" encoding="UTF-8">
 			<include name="locale/**/*.properties" />
 			<exclude name="**/amo.properties" />
 		</native2ascii>
 
 		<!-- Encode .properties from the bundle -->
-		<native2ascii src="${build.dir}/all_locales_replaced" dest="${build.dir}/src/chrome" encoding="UTF-8">
+		<native2ascii src="${build.dir}/all_locales_replaced" dest="${build.dir}/src" encoding="UTF-8">
 			<include name="locale/**/*.properties" />
 			<exclude name="locale/en-US/**" />
 			<exclude name="**/amo.properties" />
@@ -350,17 +332,17 @@
 
 		<!-- Move all files except .properties to .xpi build directory. -->
 		<!-- Also, exclude the default locale (en-US) -->
-		<move todir="${build.dir}/babelzilla/chrome" overwrite="true">
+		<move todir="${build.dir}/babelzilla" overwrite="true">
 			<fileset dir="${build.dir}/all_locales_skipped" includes="*/**" excludes="**/*.dtd,**/*.properties,**/en-US/**,**/contents.rdf" />
 		</move>
 
 		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
-		<copy todir="${build.dir}/babelzilla/chrome" overwrite="true">
+		<copy todir="${build.dir}/babelzilla" overwrite="true">
 			<fileset dir="${src.dir}" includes="locale/**" excludes="**/.cvsignore,locale/**/*.properties,locale/**/*.dtd" />
 		</copy>
 
 		<!-- Convert DTD files to UTF-8. -->
-		<apply executable="${basedir}/utility/convertTextEncoding.exe" dest="${build.dir}/babelzilla/chrome" parallel="false">
+		<apply executable="${basedir}/utility/convertTextEncoding.exe" dest="${build.dir}/babelzilla" parallel="false">
 			<arg value="utf-8" />
 			<srcfile />
 			<targetfile />
@@ -371,12 +353,12 @@
 
 		<!-- Encode .properties files of the default locale
 		<!   and store the results to the .xpi build directory. -->
-		<native2ascii src="${src.dir}" dest="${build.dir}/babelzilla/chrome" encoding="UTF-8">
+		<native2ascii src="${src.dir}" dest="${build.dir}/babelzilla" encoding="UTF-8">
 			<include name="locale/**/*.properties" />
 		</native2ascii>
 
 		<!-- Encode .properties from the bundle -->
-		<native2ascii src="${build.dir}/all_locales_skipped" dest="${build.dir}/babelzilla/chrome" encoding="UTF-8">
+		<native2ascii src="${build.dir}/all_locales_skipped" dest="${build.dir}/babelzilla" encoding="UTF-8">
 			<include name="locale/**/*.properties" />
 			<exclude name="locale/en-US/**" />
 		</native2ascii>
@@ -431,7 +413,7 @@
 		<delete file="${dist.dir}/babelzilla/${extension.xpi}" />
 
 		<zip destfile="${dist.dir}/babelzilla/${extension.xpi}" filesonly="true">
-			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="chrome/locale/**" />
+			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="locale/**" />
 			<zipfileset dir="${build.dir}/babelzilla" includes="*/**" />
 		</zip>
 	</target>

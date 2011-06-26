@@ -4,17 +4,17 @@
 	xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
 	<Description about="urn:mozilla:install-manifest">
-		<em:id>@id@</em:id>
+		<em:id>snaplinks@snaplinks.mozdev.org</em:id>
 		<em:name>Snap Links Plus</em:name>
-		<em:version>@version@</em:version>
+		<em:version>0</em:version>
 		<em:type>2</em:type>
 
 		<em:targetApplication>
 			<Description>
 				<!-- Firefox -->
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-				<em:minVersion>@firefoxMinVersion@</em:minVersion>
-				<em:maxVersion>@firefoxMaxVersion@</em:maxVersion>
+				<em:minVersion>4.0</em:minVersion>
+				<em:maxVersion>5.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 
@@ -22,8 +22,8 @@
 			<Description>
 				<!-- SeaMonkey -->
 				<em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
-				<em:minVersion>@seamonkeyMinVersion@</em:minVersion>
-				<em:maxVersion>@seamonkeyMaxVersion@</em:maxVersion>
+				<em:minVersion>2.1</em:minVersion>
+				<em:maxVersion>2.1.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 
@@ -70,8 +70,8 @@
 
 		<em:iconURL>chrome://snaplinks/content/icon32.png</em:iconURL>
 		<em:icon64URL>chrome://snaplinks/content/icon64.png</em:icon64URL>
-		<em:homepageURL>@homepageURL@</em:homepageURL>
-		<em:updateURL>@updateURL@</em:updateURL>
+		<em:homepageURL>http://snaplinks.mozdev.org/</em:homepageURL>
+		<em:updateURL>https://www.mozdev.org/p/updates/snaplinks/snaplinks@snaplinks.mozdev.org/update.rdf</em:updateURL>
 		<em:optionsURL>chrome://snaplinks/content/options.xul</em:optionsURL>
 	</Description>
 </RDF>
