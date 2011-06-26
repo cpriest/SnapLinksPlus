@@ -44,6 +44,7 @@
 		<include name="skin/**" />
 		<include name="*.*" />
 		<exclude name="**/.cvsignore" />
+		<exclude name="CVS" />
 	</fileset>
 
 
@@ -102,8 +103,19 @@
 
 		<!-- Patch version number into install.rdf. -->
 		<replace file="${build.dir}/src/install.rdf" propertyFile="${basedir}/release.properties" encoding="utf-8">
-			<replacefilter token="&lt;em:version&gt;0&lt;/em:version&gt;" value="${extension.versionNumber.forThisBuild}" />
+			<replacefilter token="&lt;em:version&gt;0&lt;/em:version&gt;" value="&lt;em:version&gt;${extension.versionNumber.forThisBuild}&lt;/em:version&gt;" />
 		</replace>
+
+		<!-- Add locale definitions to chrome.manifest: -->
+		<!-- locale snaplinks en-US	locale/en-US/ -->
+		<dirset id="locale.dirs" dir="${build.dir}/all_locales_replaced/locale" includes="*" excludes="en-US" />
+		<pathconvert pathsep="${line.separator}" property="locale.list" refid="locale.dirs">
+			<chainedmapper>
+				<flattenmapper/>
+				<regexpmapper from="(.*)" to="locale snaplinks \1	locale/\1/" />
+			</chainedmapper>
+		</pathconvert>
+		<echo file="${build.dir}/src/chrome.manifest" append="yes">${locale.list}</echo>
 	</target>
 
 
@@ -293,7 +305,7 @@
 
 		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
 		<copy todir="${build.dir}/src" overwrite="true">
-			<fileset dir="${src.dir}" includes="locale/**" excludes="**/.cvsignore,locale/**/*.properties,locale/**/*.dtd" />
+			<fileset dir="${src.dir}" includes="locale/**" excludes="CVS,**/.cvsignore,locale/**/*.properties,locale/**/*.dtd" />
 		</copy>
 
 		<!-- Convert DTD files to UTF-8. -->
@@ -338,7 +350,7 @@
 
 		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
 		<copy todir="${build.dir}/babelzilla" overwrite="true">
-			<fileset dir="${src.dir}" includes="locale/**" excludes="**/.cvsignore,locale/**/*.properties,locale/**/*.dtd" />
+			<fileset dir="${src.dir}" includes="locale/**" excludes="CVS,**/.cvsignore,locale/**/*.properties,locale/**/*.dtd" />
 		</copy>
 
 		<!-- Convert DTD files to UTF-8. -->

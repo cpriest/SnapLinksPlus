@@ -4,26 +4,3 @@ overlay chrome://browser/content/browser.xul chrome://snaplinks/content/snaplink
 overlay chrome://navigator/content/navigator.xul chrome://snaplinks/content/snaplinks.xul application={92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
 
 locale snaplinks en-US	locale/en-US/
-locale snaplinks bg	locale/bg/
-locale snaplinks ca-AD	locale/ca-AD/
-locale snaplinks cs	locale/cs/
-locale snaplinks de	locale/de/
-locale snaplinks es-ES	locale/es-ES/
-locale snaplinks fi-FI	locale/fi-FI/
-locale snaplinks fr	locale/fr/
-locale snaplinks hr-HR	locale/hr-HR/
-locale snaplinks hu-HU	locale/hu-HU/
-locale snaplinks it-IT	locale/it-IT/
-locale snaplinks ja-JP	locale/ja-JP/
-locale snaplinks nl	locale/nl/
-locale snaplinks pl	locale/pl/
-locale snaplinks pt-BR	locale/pt-BR/
-locale snaplinks pt-PT	locale/pt-PT/
-locale snaplinks ru	locale/ru/
-locale snaplinks sk-SK	locale/sk-SK/
-locale snaplinks sr	locale/sr/
-locale snaplinks sv-SE	locale/sv-SE/
-locale snaplinks tr-TR	locale/tr-TR/
-locale snaplinks vi	locale/vi/
-locale snaplinks zh-CN	locale/zh-CN/
-locale snaplinks zh-TW	locale/zh-TW/
