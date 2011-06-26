@@ -48,6 +48,15 @@ SnapLinks = new (Class.create({
 	StatusBarLabel: {	set: function(x) { document.getElementById('statusbar-display').label = x; }	},
 
 	initialize: function() {
+
+		var StringBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
+		var LocaleStrings = StringBundleService.createBundle("chrome://snaplinks/locale/snaplinks.properties");
+		
+		this.LocaleStrings = {
+			Usage:		LocaleStrings.GetStringFromName("snaplinks.status.usage"),
+			Links:		LocaleStrings.GetStringFromName("snaplinks.panel.links")
+		};
+
 		this._OnMouseMove 	= this.OnMouseMove.bind(this);
 
 		this.PanelContainer = document.getElementById('content').mPanelContainer;
@@ -82,7 +91,7 @@ SnapLinks = new (Class.create({
 	},
 
 	UpdateStatusLabel: function() {
-		this.StatusBarLabel = msgStatusUsage;
+		this.StatusBarLabel = this.LocaleStrings.Usage;
 	},
 
 	OnMouseDown: function(e) {

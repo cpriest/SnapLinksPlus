@@ -162,7 +162,7 @@ var Selection = Class.create({
 
 				if(this.DragStarted) {
 					if(SnapLinks.Prefs.ShowSelectedCount)
-						SnapLinks.SnapLinksStatus = msgPanelLinks + ' 0';
+						SnapLinks.SnapLinksStatus = SnapLinks.LocaleStrings.Links + ' 0';
 
 					this.CalculateSnapRects();
 					return true;

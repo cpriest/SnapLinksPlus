@@ -30,11 +30,6 @@
  *
  */
 
-var gsnaplinksBundle = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
-var localeStrings = gsnaplinksBundle.createBundle("chrome://snaplinks/locale/snaplinks.properties");
-var msgStatusUsage = localeStrings.GetStringFromName("snaplinks.status.usage");
-var msgPanelLinks =  localeStrings.GetStringFromName("snaplinks.panel.links");
-
 var SnapLinks = { };
 var SnapLinksContext = { };
 
@@ -56,4 +51,5 @@ window.addEventListener('load', function() {
 	
 	if(SnapLinks.Prefs.DevShowJSConsoleAtStartup)
 		toJavaScriptConsole();
+	setTimeout(function(){ SnapLinksContext.Log(this);}, 1000);
 }, false);
