@@ -70,8 +70,6 @@ SnapLinks = new (Class.create({
 	
 	/* Evaluates a given event looking to see if the button and modifier keys are present */
 	ShouldActivate: function(e) {
-		if(e.SLIgnore == true)
-			return false;
 		if(e.button != SnapLinks.Prefs.SelectionButton)
 			return false;
 		if(this.Prefs.ActivateRequiresAlt && !e.altKey)
@@ -97,14 +95,13 @@ SnapLinks = new (Class.create({
 		this.Document = e.target.ownerDocument;
 		this.Document.body.setCapture(false);
 
-		/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218, 
-			we suppress the mouse down event on Linux, re-creating if necessary on mouse up */
-		if(navigator.userAgent.indexOf('Linux') != -1) {
-			this.LastMouseDownEvent = e;
-			e.preventDefault();
-		}
-		
 		this.InstallEventHooks();
+
+		/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218, 
+			we prevent the context menu from showing on mouse down here. */
+		if(navigator.userAgent.indexOf('Linux') != -1) {
+			this.StopNextContextMenuPopup();
+		}
 	},
 
 	OnMouseMove: function(e) {
@@ -127,17 +124,19 @@ SnapLinks = new (Class.create({
 					this.ActivateSelection();
 			} else {
 				SnapLinks.Clear();
+				
 				/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218
-					Re-create the original mouse down event and fire it */
+					we force the context menu to open up here*/
 				if(navigator.userAgent.indexOf('Linux') != -1) {
-					var evt = document.createEvent("MouseEvents");
-					var le = this.LastMouseDownEvent;
+					if (gContextMenu) {
+						var evt = document.createEvent("MouseEvents");
+						var le = this.LastMouseDownEvent;
 					
-					evt.initMouseEvent('mousedown', true, true, window, le.detail, 
-						le.screenX, le.screenY, le.clientX, le.clientY, 
-						le.ctrlKey, le.altKey, le.shiftKey, le.metaKey, le.button, le.relatedTarget);
-					evt.SLIgnore = true;
-					le.originalTarget.dispatchEvent(evt);
+						evt.initMouseEvent('contextmenu', true, true, window, 0, 
+							e.screenX, e.screenY, e.clientX, e.clientY,
+							false, false, false, false, 2, null);
+						gContextMenu.target.dispatchEvent(evt);
+					}
 				}
 			}
 		}
