@@ -46,43 +46,44 @@ Log.Warning = function(Message, Source, Line, Column) {
  * Prototype Imports -- Mozilla Organization may not like these...
  */
 
-/* Returns true if object is a function */
-Object.isFunction = function isFunction(object) {
-	return typeof object === 'function';
-};
+var Util = {
+	Object: {
+		/* Returns true if object is a function */
+		isFunction: function(object) {
+			return typeof object === 'function';
+		},
+		/* Extends the destination object with properties from the source object */
+		extend: function(destination, source) {
+			for (var property in source)
+				destination[property] = source[property];
+			return destination;
+		}
+	},
+	Function: {
+		/* Returns an array of the argument names to the given function */
+		ArgumentNames: function(func) {
+			var names = func.toString().match(/^[\s\(]*function[^(]*\(([^)]*)\)/)[1]
+							.replace(/\/\/.*?[\r\n]|\/\*(?:.|[\r\n])*?\*\//g, '')
+							.replace(/\s+/g, '').split(',');
+			return names.length == 1 && !names[0] ? [] : names;
+		},
+		/** Returns the given func wrapped with wrapper */
+		Wrap: function(func, wrapper) {
+			/* Localized version of Function.update from prototype */
+			function update(array, args) {
+				var arrayLength = array.length, length = args.length;
+				while (length--) array[arrayLength + length] = args[length];
+				return array;
+			}
 
-/* Extends the destination object with properties from the source object */
-Object.extend = function extend(destination, source) {
-	for (var property in source)
-		destination[property] = source[property];
-	return destination;
-};
-
-
-/* Returns an array of the argument names to the given function */
-Function.argumentNames = function argumentNames(func) {
-	var names = func.toString().match(/^[\s\(]*function[^(]*\(([^)]*)\)/)[1]
-					.replace(/\/\/.*?[\r\n]|\/\*(?:.|[\r\n])*?\*\//g, '')
-					.replace(/\s+/g, '').split(',');
-	return names.length == 1 && !names[0] ? [] : names;
-};
-
-/** Returns the given func wrapped with wrapper */
-Function.wrap = function wrap(func, wrapper) {
-	/* Localized version of Function.update from prototype */
-	function update(array, args) {
-		var arrayLength = array.length, length = args.length;
-		while (length--) array[arrayLength + length] = args[length];
-		return array;
+			var __method = func;
+			return function() {
+				var a = update([__method.bind(this)], arguments);
+				return wrapper.apply(this, a);
+			};
+		}	
 	}
-
-	var __method = func;
-	return function() {
-		var a = update([__method.bind(this)], arguments);
-		return wrapper.apply(this, a);
-	};
-};
-
+}
 
 /** Fully functioning prototype class inheritence, also allows for getters/setters including c# style getters/setters */
 var Class = (function() {
@@ -91,7 +92,7 @@ var Class = (function() {
 	function create() {
 
 		var parent = null, properties = $A(arguments);
-		if (Object.isFunction(properties[0]))
+		if (Util.Object.isFunction(properties[0]))
 			parent = properties.shift();
 
 		function klass() {
@@ -142,9 +143,9 @@ var Class = (function() {
 					if(value.get)
 						this.prototype.__defineGetter__(property, value.get);
 				} else {
-					if (ancestor && Object.isFunction(value) &&	Function.argumentNames(value)[0] == "$super") {
+					if (ancestor && Util.Object.isFunction(value) &&	Util.Function.ArgumentNames(value)[0] == "$super") {
 						var method = value;
-						value = Function.wrap(
+						value = Util.Function.Wrap(
 							(function(m) {
 								return function() { return ancestor[m].apply(this, arguments); };
 							})(property), method
