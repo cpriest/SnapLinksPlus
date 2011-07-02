@@ -36,37 +36,7 @@
 		<em:developer>Tommi Rautava</em:developer>
 		<em:developer>Clint Priest</em:developer>
 
-		<em:translator>BabelZilla.org:</em:translator>
-		<em:translator>Siad Kahul (frajjsen) [bg]</em:translator>
-		<em:translator>animarval [ca-AD]</em:translator>
-		<em:translator>Sam [cs]</em:translator>
-		<em:translator>JTojnar [cs]</em:translator>
-		<em:translator>MartinMeise [de]</em:translator>
-		<em:translator>Team erweiterungen.de [de]</em:translator>
-		<em:translator>Archaeopteryx [de]</em:translator>
-		<em:translator>savred [en-US]</em:translator>
-		<em:translator>RigoNet [es-ES]</em:translator>
-		<em:translator>kenmooda [fi-FI]</em:translator>
-		<em:translator>myahoo [fr]</em:translator>
-		<em:translator>akarlovic [hr-HR]</em:translator>
-		<em:translator>MIKES KASZMÁN István (Cashman) [hu-HU]</em:translator>
-		<em:translator>l0stintranslation [it-IT]</em:translator>
-		<em:translator>Norah [ja-JP]</em:translator>
-		<em:translator>markh [nl]</em:translator>
-		<em:translator>Leszek(teo)Życzkowski [pl]</em:translator>
-		<em:translator>gulego [pt-BR]</em:translator>
-		<em:translator>Edgard Dias Magalhaes (edgard.magalhaes) [pt-BR]</em:translator>
-		<em:translator>savred [pt-PT]</em:translator>
-		<em:translator>Carlos Simão (lloco) [pt-PT]</em:translator>
-		<em:translator>Пирятинский Виталий (PiVV) [ru]</em:translator>
-		<em:translator>PeePay [sk-SK]</em:translator>
-		<em:translator>ДакСРБИЈА (DakSrbija) [sr]</em:translator>
-		<em:translator>Mikael Hiort af Ornäs (Lakrits) [sv-SE]</em:translator>
-		<em:translator>Merih AKAR (merihakar) [tr-TR]</em:translator>
-		<em:translator>Trần Anh Minh (badboyinbests) [vi]</em:translator>
-		<em:translator>NGUYỄN Mạnh Hùng (loveleeyoungae) [vi]</em:translator>
-		<em:translator>WangKing [zh-CN]</em:translator>
-		<em:translator>toomore [zh-TW]</em:translator>
+		<em:translator>BabelZilla.org</em:translator>
 
 		<em:iconURL>chrome://snaplinks/content/icon32.png</em:iconURL>
 		<em:icon64URL>chrome://snaplinks/content/icon64.png</em:icon64URL>
