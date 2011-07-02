@@ -118,6 +118,7 @@
 		<!-- Patch version number into install.rdf. -->
 		<replace file="${build.dir}/src/install.rdf" propertyFile="${basedir}/release.properties" encoding="utf-8">
 			<replacefilter token="&lt;em:version&gt;0&lt;/em:version&gt;" value="&lt;em:version&gt;${extension.versionNumber.forThisBuild}&lt;/em:version&gt;" />
+			<replacefilter token="&lt;/em:homepageURL&gt;" value="?version=${extension.versionNumber.forThisBuild}&lt;/em:homepageURL&gt;" />
 		</replace>
 	</target>
 
