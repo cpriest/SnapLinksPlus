@@ -101,21 +101,81 @@
 			<fileset refid="src.root.files" />
 		</copy>
 
+		<antcall target="patch-install-rdf" />
+
+		<dirset id="locale.dirs" dir="${build.dir}/all_locales_replaced/locale" includes="*" excludes="en-US" />
+
+		<antcall target="patch-chrome-manifest" inheritrefs="yes">
+			<param name="dirset.id" value="locale.dirs"/>
+		</antcall>
+
+		<antcall target="generate-translator-block" inheritrefs="yes">
+			<param name="dirset.id" value="locale.dirs"/>
+		</antcall>
+	</target>
+
+	<target name="patch-install-rdf">
 		<!-- Patch version number into install.rdf. -->
 		<replace file="${build.dir}/src/install.rdf" propertyFile="${basedir}/release.properties" encoding="utf-8">
 			<replacefilter token="&lt;em:version&gt;0&lt;/em:version&gt;" value="&lt;em:version&gt;${extension.versionNumber.forThisBuild}&lt;/em:version&gt;" />
 		</replace>
+	</target>
 
+	<target name="patch-chrome-manifest">
 		<!-- Add locale definitions to chrome.manifest: -->
 		<!-- locale snaplinks en-US	locale/en-US/ -->
-		<dirset id="locale.dirs" dir="${build.dir}/all_locales_replaced/locale" includes="*" excludes="en-US" />
-		<pathconvert pathsep="${line.separator}" property="locale.list" refid="locale.dirs">
+		<pathconvert pathsep="${line.separator}" property="locale.list" refid="${dirset.id}">
 			<chainedmapper>
 				<flattenmapper/>
 				<regexpmapper from="(.*)" to="locale snaplinks \1	locale/\1/" />
 			</chainedmapper>
 		</pathconvert>
 		<echo file="${build.dir}/src/chrome.manifest" append="yes">${locale.list}</echo>
+	</target>
+		
+	<target name="generate-translator-block">
+		<!-- Generate contents of the template file. -->
+		<pathconvert pathsep="${line.separator}" property="translators.list" refid="${dirset.id}">
+			<chainedmapper>
+				<flattenmapper/>
+				<regexpmapper from="(.*)" to="$${translator.\1}" />
+			</chainedmapper>
+		</pathconvert>
+		
+		<!-- Write the template file. -->
+		<echo file="${build.dir}/translators-template.txt" append="no">${translators.list}</echo>
+
+		<!-- Encode names of the translators. -->
+		<native2ascii src="${babelzilla.dir}" dest="${build.dir}" encoding="utf-8" >
+			<include name="translators.properties" />
+		</native2ascii>
+		
+		<!-- Convert escape notation into XML format. -->
+		<replaceregexp file="${build.dir}/translators.properties" byline="yes" flags="g">
+			<regexp pattern="\\u(....)"/>
+			<substitution expression="&amp;#x\1;"/>
+		</replaceregexp>
+		
+		<!-- Load names of the translators. -->
+		<loadproperties srcfile="${build.dir}/translators.properties" >
+			<filterchain>
+			</filterchain>
+		</loadproperties>
+		
+		<!-- Load the template and expand the properties. -->
+		<loadfile property="translators.block" srcFile="${build.dir}/translators-template.txt" encoding="utf-8">
+			<filterchain>
+				<expandproperties/>
+			</filterchain>
+		</loadfile>
+
+		<!-- Write the ready block into a file. This is used for trace purposes only. -->
+		<echo file="${build.dir}/translators-block.xml.ent" append="no">${translators.block}</echo>
+
+		<!-- Patch the translator block into install.rdf. -->
+		<replace file="${build.dir}/src/install.rdf" encoding="utf-8">
+			<replacefilter token="&lt;/em:translator&gt;" value=":&lt;/em:translator&gt;&#13;&#10;${translators.block}" />
+		</replace>
 	</target>
 
 
