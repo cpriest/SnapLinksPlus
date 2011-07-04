@@ -31,8 +31,10 @@ SnapLinks = new (Class.create({
 	DocumentReferer: {
 		get: function() {
 			try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
-						.ioService.newURI(this.Document.location.href, null, null); }
-			catch(e) { }
+						.newURI(this.Document.location.href, null, null); }
+			catch(e) {
+				Components.utils.reportError(e + ":\n"+ e.stack);
+			}
 			return null;
 		}
 	},
@@ -236,10 +238,15 @@ SnapLinks = new (Class.create({
 	
 	/* Opens the selected element links in tabs in the current window */
 	OpenTabs: function() {
-		this.Selection.FilteredElements.forEach( function(elem) {
-			if(elem.href)
-				getBrowser().addTab(elem.href);
-		});
+		try {
+			this.Selection.FilteredElements.forEach( function(elem) {
+				if(elem.href)
+					getBrowser().addTab(elem.href, this.DocumentReferer);
+			}, this);
+		}
+		catch(e) {
+			Components.utils.reportError(e + ":\n"+ e.stack);
+		}
 	},
 	/* Opens the selected links in new windows */
 	OpenWindows: function() {
