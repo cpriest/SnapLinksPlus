@@ -40,13 +40,13 @@
 		<menupopup id="snaplMenu">
 			<menuitem label="&snaplinks.popup.newtabs;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.NEW_TABS)"/>
 			<menuitem label="&snaplinks.popup.newwindows;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.NEW_WINDOWS)"/>
-			<separator class="groove-thin"/>
+			<menuseparator/>
 			<menuitem label="&snaplinks.popup.bookmark;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.BOOKMARK_LINKS)"/>
 			<menuitem label="&snaplinks.popup.download;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.DOWNLOAD_LINKS)"/>
 			<menuitem label="&snaplinks.popup.clipboard;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.COPY_TO_CLIPBOARD)"/>
-			<separator class="groove-thin"/>
+			<menuseparator/>
 			<menuitem label="&snaplinks.popup.tabsinnewwin;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.TABS_IN_NEW_WINDOW)"/>
-			<separator class="groove-thin"/>
+			<menuseparator/>
 			<menuitem label="&snaplinks.popup.cancel;"/>
 		</menupopup>
 	</popupset>
