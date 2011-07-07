@@ -46,8 +46,6 @@
 			<menuitem label="&snaplinks.popup.clipboard;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.COPY_TO_CLIPBOARD)"/>
 			<menuseparator/>
 			<menuitem label="&snaplinks.popup.tabsinnewwin;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.TABS_IN_NEW_WINDOW)"/>
-			<menuseparator/>
-			<menuitem label="&snaplinks.popup.cancel;"/>
 		</menupopup>
 	</popupset>
 
