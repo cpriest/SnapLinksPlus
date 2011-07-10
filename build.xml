@@ -29,7 +29,6 @@
 	<property name="build.dir" value="${basedir}/build" />
 	<property name="cert.dir" value="${basedir}/cert" />
 	<property name="dist.dir" value="${basedir}/dist" />
-	<property name="downloads.dir" value="${basedir}/downloads" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="www.dir" value="${basedir}/www" />
 
@@ -78,7 +77,7 @@
 
 
 	<target name="checksum">
-		<checksum file="${downloads.dir}/${extension.published.xpi}" algorithm="${extension.checksum.algorithm}" property="extension.checksum.value" />
+		<checksum file="${dist.dir}/${extension.published.xpi}" algorithm="${extension.checksum.algorithm}" property="extension.checksum.value" />
 	</target>
 
 
@@ -191,16 +190,14 @@
 
 
 	<target name="dist" depends="clean,set-version-dist,xpi-babelzilla,xpi,xpi-amo">
-		<copy file="${dist.dir}/${extension.xpi}" todir="${downloads.dir}" overwrite="true" />
-
-		<checksum file="${downloads.dir}/${extension.xpi}" algorithm="${extension.checksum.algorithm}" property="extension.downloads.xpi.checksum" />
+		<checksum file="${dist.dir}/${extension.xpi}" algorithm="${extension.checksum.algorithm}" property="extension.dist.xpi.checksum" />
 
 		<tstamp prefix="stop">
 			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
 		</tstamp>
 
 		<echo message="${extension.versionNumber.forThisBuild} is ready ${stop.build.tstamp}" />
-		<echo message="${extension.checksum.algorithm} checsum is ${extension.downloads.xpi.checksum}" />
+		<echo message="${extension.checksum.algorithm} checsum is ${extension.dist.xpi.checksum}" />
 	</target>
 
 	<!--
@@ -246,7 +243,9 @@
 	<target name="init" depends="init-build">
 		<echo level="info" message="Version ${extension.version}-${extension.subVersion} Build ${build.number} started ${build.tstamp}" />
 
+		<mkdir dir="${build.dir}" />
 		<mkdir dir="${build.dir}/src" />
+		<mkdir dir="${dist.dir}" />
 	</target>
 
 
@@ -304,7 +303,7 @@
 
 		<mkdir dir="${repack.dir}" />
 
-		<unzip src="${downloads.dir}/${extension.published.xpi}" dest="${repack.dir}" />
+		<unzip src="${dist.dir}/${extension.published.xpi}" dest="${repack.dir}" />
 
 		<!-- Comment out updateURL as AMO does not allow it. -->
 		<replace file="${repack.dir}/install.rdf" encoding="utf-8">
