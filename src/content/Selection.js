@@ -298,26 +298,32 @@ var Selection = Class.create({
 					return !( SelectRect.X1 > Rect.right || SelectRect.X2 < Rect.left || SelectRect.Y1 > Rect.bottom || SelectRect.Y2 < Rect.top );
 				});
 				
-				if(Intersects) {
-					if(elem.tagName == 'A' && this.SelectLargestFontSizeIntersectionLinks) {
-						var sz=content.document.defaultView.getComputedStyle(elem, "font-size");
-						if(sz.fontSize.indexOf("px")>=0)
-							elem.SnapFontSize=parseFloat(sz.fontSize);
-						
-						if(elem.SnapFontSize > HighFontSize)
-							HighFontSize = elem.SnapFontSize;
-					}
-					if(elem.tagName == 'INPUT') {
-						switch(elem.getAttribute('type')) {
-							case 'checkbox':	TypeCounts.Checkbox++;	break;
-							case 'button':
-							case 'submit':		TypeCounts.Buttons++;	break;
-						}
-							
-					} else if(elem.tagName == 'A')
-						TypeCounts.Links++;
+				if (Intersects) {
+					var computedStyle = content.document.defaultView.getComputedStyle(elem, null);
+					var hidden = (computedStyle.getPropertyValue('visibility') == 'hidden' ||
+							computedStyle.getPropertyValue('display') == 'none');
 					
-					this.IntersectedElements.push(elem);
+					if (!hidden) {
+						if(elem.tagName == 'A' && this.SelectLargestFontSizeIntersectionLinks) {
+							var fontSize = computedStyle.getPropertyValue("font-size");
+							if(fontSize.indexOf("px")>=0)
+								elem.SnapFontSize=parseFloat(fontSize);
+							
+							if(elem.SnapFontSize > HighFontSize)
+								HighFontSize = elem.SnapFontSize;
+						}
+						if(elem.tagName == 'INPUT') {
+							switch(elem.getAttribute('type')) {
+								case 'checkbox':	TypeCounts.Checkbox++;	break;
+								case 'button':
+								case 'submit':		TypeCounts.Buttons++;	break;
+							}
+								
+						} else if(elem.tagName == 'A')
+							TypeCounts.Links++;
+						
+						this.IntersectedElements.push(elem);
+					}
 				}
 			}, this );
 			
