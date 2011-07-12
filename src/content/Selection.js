@@ -210,10 +210,29 @@ var Selection = Class.create({
 		var Inputs = (new Date()).getMilliseconds();;
 
 		$A(this.Document.body.querySelectorAll('LABEL')).forEach( function(label) {
-			var ForElement = label.getAttribute('for') && this.Document.body.querySelector('INPUT[type=checkbox]#'+label.getAttribute('for'));
-			if(ForElement != undefined) {
-				ForElement.SnapRects = ForElement.SnapRects.concat(GetElementRects(label, offset));
-				ForElement.SnapOutlines = [ ForElement, label ];
+			var forId = label.getAttribute('for');
+			if (forId != null && forId != '') {
+				var ForElement;
+
+				try {
+					ForElement = this.Document.body.querySelector('INPUT[type=checkbox]#'+forId);
+				}
+				catch(e) {
+					// If querySelector() fails, the ID is propably illegal.
+					// We can still find the elemement by using getElementById().
+					var idElem = this.Document.getElementById(forId);
+					if (idElem &&
+							idElem.tagName == 'INPUT' &&
+							idElem.type.toLowerCase() == 'checkbox'	) {
+						ForElement = idElem;
+					}
+				}
+
+				if (ForElement != undefined) {
+					ForElement.SnapRects = ForElement.SnapRects.concat(GetElementRects(label, offset));
+					ForElement.SnapOutlines = [ ForElement, label ];
+					Components.utils.reportError(ForElement +'='+ label);
+				}
 			}
 		}, this );
 		this.SelectableElements = SelectableElements;
