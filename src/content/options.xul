@@ -155,7 +155,15 @@
 		<checkbox label="&snaplinks.adv.HighlightButtons;" prefstring="extensions.snaplinks.HighlightButtonsForClicking"/>
 		<checkbox label="&snaplinks.adv.hideleave;" prefstring="extensions.snaplinks.HideSelectionOnMouseLeave"/>
 		<checkbox label="&snaplinks.adv.RemoveDuplicateUrls;" prefstring="extensions.snaplinks.RemoveDuplicateUrls"/>
-		<checkbox label="&snaplinks.adv.shownumber;" prefstring="extensions.snaplinks.shownumber"/>
+		<hbox>
+			<checkbox label="&snaplinks.adv.shownumber;" prefstring="extensions.snaplinks.shownumber"/>
+			<menulist prefstring="extensions.snaplinks.shownumber.where">
+				<menupopup>
+					<menuitem label="&snaplinks.adv.shownumber.statusbar;" value="AddonBar" />
+					<menuitem label="&snaplinks.adv.shownumber.hover;" value="Hover"/>
+				</menupopup>
+			</menulist>
+		</hbox>
 	</groupbox>
 
 	<groupbox>

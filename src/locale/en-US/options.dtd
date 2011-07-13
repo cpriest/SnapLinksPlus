@@ -34,7 +34,10 @@
 <!ENTITY snaplinks.adv.RemoveDuplicateUrls     	"Remove duplicate links from selected urls before performing action">
 <!-- If mouse moves outside the page area, the selection rectangle is hidden and no action is executed. If mouse is moved back to page area, the selection rectangle is restored. -->
 <!ENTITY snaplinks.adv.hideleave      "Hide selection rectangle when mouse leaves window">
-<!ENTITY snaplinks.adv.shownumber     "Show number of links selected in status bar">
+<!ENTITY snaplinks.adv.shownumber     "Show number of elements selected">
+<!ENTITY snaplinks.adv.shownumber.statusbar "in status bar">
+<!ENTITY snaplinks.adv.shownumber.hover "hovering next to cursor">
+
 <!ENTITY snaplinks.adv.multiline      "Process correctly multi-line links (slower)">
 <!ENTITY snaplinks.adv.preferbold     "Prefer bold links when equal-sized (slower)">
 

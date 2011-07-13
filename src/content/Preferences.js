@@ -21,20 +21,25 @@
 
 
 SnapLinks.Prefs = new (Class.create(PrefsMapper, {
+	
+	ShowCount_AddonBar	: 0,
+	ShowCount_Hover		: 1,
+	
 	BasePath:	'extensions.snaplinks',
 	map:	{
 		DevShowJSConsoleAtStartup:			{ Type: 'bool', Default: false	},
-		DefaultAction:						{ Type: 'char', Default: 'OpenTabs', 	Name: '.defaultaction' },	/* @Broken */
-		SelectionButton:					{ Type: 'int', 	Default: 2, 			Name: '.button' },
+		DefaultAction:						{ Type: 'char', Default: 'OpenTabs', 			Name: '.defaultaction' },	/* @Broken */
+		SelectionButton:					{ Type: 'int', 	Default: 2, 					Name: '.button' },
 		ActivateRequiresAlt:				{ Type: 'bool', Default: false	},
 		ActivateRequiresShift:				{ Type: 'bool', Default: false	},
 		ActivateRequiresCtrl:				{ Type: 'bool', Default: false	},
 		HideSelectionOnMouseLeave:			{ Type: 'bool',	Default: false	},
-		ShowSelectedCount:					{ Type: 'bool', Default: true, 			Name: '.shownumber' },
-		SelectedElementsBorderWidth:		{ Type: 'int', 	Default: 1, 			Name: '.linksthick' },
-		SelectionBorderWidth:				{ Type: 'int', 	Default: 3, 			Name: '.drawthick' },
-		SelectionBorderColor:				{ Type: 'char', Default: '#30AF00', 	Name: '.drawpicker' },
-		SelectedElementsBorderColor:		{ Type: 'char', Default: '#FF0000', 	Name: '.linkspicker' },
+		ShowSelectedCount:					{ Type: 'bool', Default: true, 					Name: '.shownumber' },
+		ShowCountWhere:						{ Type: 'int', 	Default: this.ShowCount_Hover,	Name: '.shownumber.where' },
+		SelectedElementsBorderWidth:		{ Type: 'int', 	Default: 1, 					Name: '.linksthick' },
+		SelectionBorderWidth:				{ Type: 'int', 	Default: 3, 					Name: '.drawthick' },
+		SelectionBorderColor:				{ Type: 'char', Default: '#30AF00', 			Name: '.drawpicker' },
+		SelectedElementsBorderColor:		{ Type: 'char', Default: '#FF0000', 			Name: '.linkspicker' },
 
 		CopyToClipboardSeparator:			{ Type: 'char', Default: "\n" },
 		
@@ -42,6 +47,7 @@ SnapLinks.Prefs = new (Class.create(PrefsMapper, {
 		HighlightButtonsForClicking:		{ Type: 'bool', Default: true },
 		RemoveDuplicateUrls:				{ Type: 'bool', Default: true }
 	},
+	
 	initialize: function($super) {
 		$super(this.BasePath, this.map);
 
