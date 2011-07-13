@@ -120,6 +120,7 @@ var Selection = Class.create({
 		} else {
 			this.ExpandSelectionTo(Math.min(e.pageX), e.pageY);
 		}
+		ApplyStyle(this.ElementCount, { top: e.pageY + 'px', left: (e.pageX + 18)+ 'px' } );
 	},
 	
 	OnMouseUp: function(e) {
@@ -157,7 +158,20 @@ var Selection = Class.create({
 				this.Element.style.left = this.X1 + 'px'; 
 				this.Element.style.top = this.Y1 + 'px';
 				InsertionNode.appendChild(this.Element);
-
+				
+				if(SnapLinks.Prefs.ShowCountWhere == SnapLinks.Prefs.ShowCount_Hover) {
+					this.ElementCount = this.Document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+					ApplyStyle(this.ElementCount, {
+						position		: 'absolute',
+						padding			: '2px 4px',
+						font			: '12px Verdana',
+						zIndex			: '10000',
+						border			: '1px solid black',
+						backgroundColor	: '#FFFFCC',
+					} );
+					InsertionNode.appendChild(this.ElementCount);
+				}
+ 
 				this.DragStarted = this.Element.parentNode != undefined;
 
 				if(this.DragStarted) {
@@ -247,6 +261,9 @@ var Selection = Class.create({
 		if (this.Element)
 			this.Element.parentNode.removeChild(this.Element);
 		delete this.Element;
+		
+		if(this.ElementCount && this.ElementCount.parentNode) 
+			this.ElementCount.parentNode.removeChild(this.ElementCount);
 		
 		this.ClearSelectedElements();
 		
@@ -372,6 +389,11 @@ var Selection = Class.create({
 				} );
 			} );
 			this.SelectedElementsType = Greatest;
+			
+			if(this.ElementCount)
+				this.ElementCount.innerHTML = 'Links: '+this.SelectedElements.length;
+			
+			SnapLinks.SnapLinksStatus = 'Links: '+this.SelectedElements.length;
 		}
 	}
 } );

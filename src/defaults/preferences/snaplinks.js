@@ -27,7 +27,7 @@ pref('extensions.snaplinks.button', 2);
 pref('extensions.snaplinks.defaultaction', 'OpenTabs');
 pref('extensions.snaplinks.HideSelectionOnMouseLeave', false);
 pref('extensions.snaplinks.shownumber', true);
-pref('extensions.snaplinks.shownumber.where', 'Hover');
+pref('extensions.snaplinks.shownumber.where', 1);
 
 pref('extensions.snaplinks.linkspicker','#FF0000');
 pref('extensions.snaplinks.linksthick',1);

@@ -51,5 +51,4 @@ window.addEventListener('load', function() {
 	
 	if(SnapLinks.Prefs.DevShowJSConsoleAtStartup)
 		toJavaScriptConsole();
-	setTimeout(function(){ SnapLinksContext.Log(this);}, 1000);
 }, false);

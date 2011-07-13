@@ -239,10 +239,11 @@ var PrefsMapper = Class.create({
 	GetPref: function(Property) {
 		if(this.pref.prefHasUserValue(this.map[Property].Path) == false)
 			return this.map[Property].Default;
-		switch(this.map[Property].Type) {
-			case 'bool':	return this.pref.getBoolPref(this.map[Property].Path);
-			case 'int':		return this.pref.getIntPref(this.map[Property].Path);
-			case 'char':	return this.pref.getCharPref(this.map[Property].Path);
+			
+		switch(this.pref.getPrefType(this.map[Property].Path)) {
+			case this.pref.PREF_STRING:	return this.pref.getCharPref(this.map[Property].Path);
+			case this.pref.PREF_INT:	return this.pref.getIntPref(this.map[Property].Path);
+			case this.pref.PREF_BOOL:	return this.pref.getBoolPref(this.map[Property].Path);
 		}
 	},
 	SetPref: function(Property, Value) {

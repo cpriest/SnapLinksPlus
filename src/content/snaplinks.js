@@ -41,9 +41,11 @@ SnapLinks = new (Class.create({
 	/* Setter to change the snap links status text */
 	SnapLinksStatus: {
 		set: function(x) {
-			var el = document.getElementById('snaplinks-panel') ;
-			el && (el.label = x);
-			el && (el.hidden = (x == ''));
+			if(SnapLinks.Prefs.ShowCountWhere == SnapLinks.Prefs.ShowCount_AddonBar) {
+				var el = document.getElementById('snaplinks-panel') ;
+				el && (el.label = x);
+				el && (el.hidden = (x == ''));
+			}
 		}
 	},
 	/* Setter to change the status bar text */
@@ -83,11 +85,11 @@ SnapLinks = new (Class.create({
 	ShouldActivate: function(e) {
 		if(e.button != SnapLinks.Prefs.SelectionButton)
 			return false;
-		if(this.Prefs.ActivateRequiresAlt && !e.altKey)
+		if(SnapLinks.Prefs.ActivateRequiresAlt && !e.altKey)
 			return false;
-		if(this.Prefs.ActivateRequiresShift && !e.shiftKey)
+		if(SnapLinks.Prefs.ActivateRequiresShift && !e.shiftKey)
 			return false;
-		if(this.Prefs.ActivateRequiresCtrl && !e.ctrlKey)
+		if(SnapLinks.Prefs.ActivateRequiresCtrl && !e.ctrlKey)
 			return false;
 		return true;
 	},
@@ -101,7 +103,7 @@ SnapLinks = new (Class.create({
 			return;
 
 		this.Clear();
-
+		
 		/* Capture the current working document */
 		this.Document = e.target.ownerDocument;
 		this.Document.body.setCapture(false);
@@ -219,7 +221,7 @@ SnapLinks = new (Class.create({
 			'Checkboxes':	[ 'ClickElements' ]
 		};
 
-		Action = Action || this.Prefs.DefaultAction;
+		Action = Action || SnapLinks.Prefs.DefaultAction;
 		
 		/* Check to see that the requested action is valid for the given SelectedElementsType */
 		if(ValidActions[this.Selection.SelectedElementsType].indexOf(Action) == -1)
@@ -283,7 +285,7 @@ SnapLinks = new (Class.create({
 			var TextContent = Components.classes["@mozilla.org/supports-string;1"]
 								.createInstance(Components.interfaces.nsISupportsString);
 			if(TextContent) {
-				TextContent.data = Representations.text.join(this.Prefs.CopyToClipboardSeparator);
+				TextContent.data = Representations.text.join(SnapLinks.Prefs.CopyToClipboardSeparator);
 
 				objData.addDataFlavor('text/unicode');
 				objData.setTransferData('text/unicode', TextContent, TextContent.data.length * 2);	/* Double byte data (len*2) */
@@ -292,7 +294,7 @@ SnapLinks = new (Class.create({
 			var HtmlContent = Components.classes["@mozilla.org/supports-string;1"]
 								.createInstance(Components.interfaces.nsISupportsString);
 			if(HtmlContent) {
-				HtmlContent.data = Representations.html.join(this.Prefs.CopyToClipboardSeparator);
+				HtmlContent.data = Representations.html.join(SnapLinks.Prefs.CopyToClipboardSeparator);
 
 				objData.addDataFlavor('text/html');
 				objData.setTransferData('text/html', HtmlContent, HtmlContent.data.length * 2);	/* Double byte data (len*2) */
