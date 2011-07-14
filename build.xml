@@ -35,6 +35,9 @@
 	<property name="releaseIni.file" value="${www.dir}/release.ini" />
 	<property name="buildNumber.file" value="${basedir}/.buildNumbers/build.number.${extension.version}" />
 	<property name="credentials.file" value="${basedir}/credentials.properties" />
+	
+	<!-- Compression level: 0=min/fast, 9=max/slow. -->
+	<property name="zip.compression.level" value="9" />
 
 
 	<fileset id="src.root.files" dir="${src.dir}">
@@ -315,7 +318,7 @@
 
 		<delete file="${dist.dir}/amo/${extension.published.xpi}" />
 
-		<zip destfile="${dist.dir}/amo/${extension.published.xpi}">
+		<zip destfile="${dist.dir}/amo/${extension.published.xpi}" level="${zip.compression.level}">
 			<zipfileset dir="${repack.dir}" includes="*/**" />
 		</zip>
 
@@ -440,7 +443,7 @@
 	<target name="xpi" depends="set-xpi-name,copy-src-to-build">
 		<delete file="${dist.dir}/${extension.xpi}" />
 
-		<zip destfile="${dist.dir}/${extension.xpi}">
+		<zip destfile="${dist.dir}/${extension.xpi}" level="${zip.compression.level}">
 			<zipfileset dir="${build.dir}/src" includes="*/**" />
 		</zip>
 	</target>
@@ -449,7 +452,7 @@
 	<target name="xpi-dev" depends="set-xpi-name,copy-src-to-build">
 		<delete file="${dist.dir}/${extension.xpi}" />
 
-		<zip destfile="${dist.dir}/${extension.xpi}" filesonly="true">
+		<zip destfile="${dist.dir}/${extension.xpi}" level="${zip.compression.level}" filesonly="true">
 			<zipfileset dir="${build.dir}/src" includes="*/**" />
 		</zip>
 	</target>
@@ -471,7 +474,7 @@
 
 		<delete file="${dist.dir}/amo/${extension.xpi}" />
 
-		<zip destfile="${dist.dir}/amo/${extension.xpi}">
+		<zip destfile="${dist.dir}/amo/${extension.xpi}" level="${zip.compression.level}">
 			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="install.rdf" />
 			<zipfileset dir="${build.dir}/amo" includes="install.rdf" />
 		</zip>
@@ -484,7 +487,7 @@
 
 		<delete file="${dist.dir}/babelzilla/${extension.xpi}" />
 
-		<zip destfile="${dist.dir}/babelzilla/${extension.xpi}" filesonly="true">
+		<zip destfile="${dist.dir}/babelzilla/${extension.xpi}" level="${zip.compression.level}" filesonly="true">
 			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="locale/**" />
 			<zipfileset dir="${build.dir}/babelzilla" includes="*/**" />
 		</zip>
