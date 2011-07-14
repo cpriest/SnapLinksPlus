@@ -285,7 +285,7 @@ SnapLinks = new (Class.create({
 			var TextContent = Components.classes["@mozilla.org/supports-string;1"]
 								.createInstance(Components.interfaces.nsISupportsString);
 			if(TextContent) {
-				TextContent.data = Representations.text.join(SnapLinks.Prefs.CopyToClipboardSeparator);
+				TextContent.data = Representations.text.join(unescape(SnapLinks.Prefs.CopyToClipboardSeparator));
 
 				objData.addDataFlavor('text/unicode');
 				objData.setTransferData('text/unicode', TextContent, TextContent.data.length * 2);	/* Double byte data (len*2) */
@@ -294,7 +294,7 @@ SnapLinks = new (Class.create({
 			var HtmlContent = Components.classes["@mozilla.org/supports-string;1"]
 								.createInstance(Components.interfaces.nsISupportsString);
 			if(HtmlContent) {
-				HtmlContent.data = Representations.html.join(SnapLinks.Prefs.CopyToClipboardSeparator);
+				HtmlContent.data = Representations.html.join(unescape(SnapLinks.Prefs.CopyToClipboardSeparator));
 
 				objData.addDataFlavor('text/html');
 				objData.setTransferData('text/html', HtmlContent, HtmlContent.data.length * 2);	/* Double byte data (len*2) */
