@@ -1,47 +1,51 @@
-<!ENTITY snaplinks.dialog.snaplink    "Snap Links Options">
+<!ENTITY snaplinks.options.title                "Snap Links Plus Options">
 
-<!ENTITY snaplinks.mouse.caption      "Start Selecting With">
-<!ENTITY snaplinks.mouse.shift        "Shift">
-<!ENTITY snaplinks.mouse.ctrl         "Control">
-<!ENTITY snaplinks.mouse.alt          "Alt">
-<!ENTITY snaplinks.mouse.left         "Left Button">
-<!ENTITY snaplinks.mouse.middle       "Middle Button">
-<!ENTITY snaplinks.mouse.right        "Right Button">
+<!ENTITY snaplinks.preftab.selection            "Selection">
+<!ENTITY snaplinks.preftab.action               "Action">
+<!ENTITY snaplinks.preftab.advanced             "Advanced">
 
-<!ENTITY snaplinks.da.caption         "Default Action">
-<!ENTITY snaplinks.da.description     "Executed action when the mouse button is released:">
-<!ENTITY snaplinks.da.r0.newtabs      "Open Links in new Tabs (default)">
-<!ENTITY snaplinks.da.r1.newwindows   "Open Links in new Windows">
-<!ENTITY snaplinks.da.r2.tabsinnewwin "Open Links in a new Window">
-<!ENTITY snaplinks.da.r3.clipboard    "Copy Links to Clipboard">
-<!ENTITY snaplinks.da.r4.bookmark     "Bookmark Links">
-<!ENTITY snaplinks.da.r5.download     "Download Links">
-<!ENTITY snaplinks.da.askuser     	  "Ask Me What To Do">
+<!ENTITY snaplinks.mouse.caption                "Start Selecting With">
+<!ENTITY snaplinks.mouse.shift                  "Shift">
+<!ENTITY snaplinks.mouse.ctrl                   "Control">
+<!ENTITY snaplinks.mouse.alt                    "Alt">
+<!ENTITY snaplinks.mouse.left                   "Left Button">
+<!ENTITY snaplinks.mouse.middle                 "Middle Button">
+<!ENTITY snaplinks.mouse.right                  "Right Button">
 
-<!ENTITY snaplinks.drawing.caption    "Selection Rectangle">
-<!ENTITY snaplinks.drawing.color      "Color:">
-<!ENTITY snaplinks.drawing.thick      "Thickness:">
+<!ENTITY snaplinks.da.caption                   "Default Action">
+<!ENTITY snaplinks.da.description               "Executed action when the mouse button is released:">
+<!ENTITY snaplinks.da.r0.newtabs                "Open Links in new Tabs (default)">
+<!ENTITY snaplinks.da.r1.newwindows             "Open Links in new Windows">
+<!ENTITY snaplinks.da.r2.tabsinnewwin           "Open Links in a new Window">
+<!ENTITY snaplinks.da.r3.clipboard              "Copy Links to Clipboard">
+<!ENTITY snaplinks.da.r4.bookmark               "Bookmark Links">
+<!ENTITY snaplinks.da.r5.download               "Download Links">
+<!ENTITY snaplinks.da.askuser                   "Ask Me What To Do">
 
-<!ENTITY snaplinks.links.caption      "Selected Elements Highlight">
-<!ENTITY snaplinks.links.color        "Color:">
-<!ENTITY snaplinks.links.thick        "Thickness:">
+<!ENTITY snaplinks.drawing.caption              "Selection Rectangle">
+<!ENTITY snaplinks.drawing.color                "Color:">
+<!ENTITY snaplinks.drawing.thick                "Thickness:">
+<!ENTITY snaplinks.drawing.sample               "Sample:">
 
-<!ENTITY snaplinks.adv.caption        "Advanced Options">
+<!ENTITY snaplinks.links.caption                "Selected Elements Highlight">
+<!ENTITY snaplinks.links.color                  "Color:">
+<!ENTITY snaplinks.links.thick                  "Thickness:">
+<!ENTITY snaplinks.links.sample                 "Sample:">
+
+<!ENTITY snaplinks.adv.caption                  "Advanced Options">
 <!-- Choose checkboxes within the selection rectangle and click those when the action is executed. -->
 <!ENTITY snaplinks.adv.HighlightCheckboxes      "Highlight checkboxes within selection rectangle for clicking">
 <!-- Choose buttons within the selection rectangle and click those when the action is executed. -->
-<!ENTITY snaplinks.adv.HighlightButtons      	"Highlight buttons within selection rectangle for clicking">
-<!ENTITY snaplinks.adv.RemoveDuplicateUrls     	"Remove duplicate links from selected urls before performing action">
+<!ENTITY snaplinks.adv.HighlightButtons         "Highlight buttons within selection rectangle for clicking">
+<!ENTITY snaplinks.adv.RemoveDuplicateUrls      "Remove duplicate links from selected urls before performing action">
 <!-- If mouse moves outside the page area, the selection rectangle is hidden and no action is executed. If mouse is moved back to page area, the selection rectangle is restored. -->
-<!ENTITY snaplinks.adv.hideleave      "Hide selection rectangle when mouse leaves window">
-<!ENTITY snaplinks.adv.shownumber     "Show number of elements selected">
-<!ENTITY snaplinks.adv.shownumber.statusbar "in status bar">
-<!ENTITY snaplinks.adv.shownumber.hover "hovering next to cursor">
+<!ENTITY snaplinks.adv.hideleave                "Hide selection rectangle when mouse leaves window">
 
-<!ENTITY snaplinks.adv.multiline      "Process correctly multi-line links (slower)">
-<!ENTITY snaplinks.adv.preferbold     "Prefer bold links when equal-sized (slower)">
+<!ENTITY snaplinks.adv.shownumber               "Show number of elements selected">
+<!ENTITY snaplinks.adv.shownumber.statusbar     "in status bar">
+<!ENTITY snaplinks.adv.shownumber.hover         "hovering next to cursor">
 
-<!ENTITY snaplinks.usage.caption      "Usage">
-<!ENTITY snaplinks.usage.description  "Drag with selected mouse button to select links:">
-<!ENTITY snaplinks.usage.line0        "- Hold the Shift key to select all links inside selection area">
-<!ENTITY snaplinks.usage.line1        "- Hold the Ctrl key while releasing the mouse button to show the actions popup menu">
+<!ENTITY snaplinks.usage.caption                "Usage">
+<!ENTITY snaplinks.usage.description            "Drag with selected mouse button to select links:">
+<!ENTITY snaplinks.usage.line0                  "- Hold the Shift key to select all links inside selection area">
+<!ENTITY snaplinks.usage.line1                  "- Hold the Ctrl key while releasing the mouse button to show the actions popup menu">

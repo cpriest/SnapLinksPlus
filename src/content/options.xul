@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://snaplinks/skin/options.css" type="text/css"?>
+
 <!DOCTYPE window [
 	<!ENTITY % options SYSTEM "chrome://snaplinks/locale/options.dtd">
 	%options;
@@ -12,7 +14,7 @@
 
 	Copyright (C) 2007  Pedro Fonseca (savred at gmail)
 	Copyright (C) 2008, 2009  Tommi Rautava
-	Copyright (C) 2011  Clint Priest
+	Copyright (C) 2011  Clint Priest, Tommi Rautava
 
 	This file is part of Snap Links.
 
@@ -30,147 +32,209 @@
 	along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<dialog buttons="accept, cancel"
+<prefwindow buttons="accept, cancel"
 		id="snaplinks-options-dialog"
 		ondialogaccept="PrefsDialog.SavePrefsFromDialog(this)"
 		onload="PrefsDialog.InitializeDialog(this)"
-		title="&snaplinks.dialog.snaplink;"
+		title="&snaplinks.options.title;"
+		persistent="lastSelected"
 		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-	<script type="application/x-javascript" src="chrome://snaplinks/content/options.js"/>
+	<prefpane id="snaplinks-options-selection-pane" label="&snaplinks.preftab.selection;">
+		<groupbox>
+			<caption label="&snaplinks.mouse.caption;"/>
 
-	<groupbox>
-		<caption label="&snaplinks.mouse.caption;"/>
-		<hbox>
-			<checkbox label="&snaplinks.mouse.shift;" prefstring="extensions.snaplinks.ActivateRequiresShift"/>
-			<checkbox label="&snaplinks.mouse.ctrl;" prefstring="extensions.snaplinks.ActivateRequiresCtrl"/>
-			<checkbox label="&snaplinks.mouse.alt;" prefstring="extensions.snaplinks.ActivateRequiresAlt"/>
+			<radiogroup prefstring="extensions.snaplinks.button">
+				<grid>
+					<columns equalsize="always">
+						<column/>
+						<column/>
+						<column/>
+					</columns>
+					<rows>
+						<row>
+							<checkbox label="&snaplinks.mouse.shift;" prefstring="extensions.snaplinks.ActivateRequiresShift"/>
+							<checkbox label="&snaplinks.mouse.ctrl;" prefstring="extensions.snaplinks.ActivateRequiresCtrl"/>
+							<checkbox label="&snaplinks.mouse.alt;" prefstring="extensions.snaplinks.ActivateRequiresAlt"/>
+						</row>
+						<row>
+							<radio label="&snaplinks.mouse.left;" value="0"/>
+							<radio label="&snaplinks.mouse.middle;" value="1"/>
+							<radio label="&snaplinks.mouse.right;" value="2"/>
+						</row>
+					</rows>
+				</grid>
+			</radiogroup>
+		</groupbox>
+	
+		<hbox flex="1">
+			<groupbox flex="1">
+				<caption label="&snaplinks.drawing.caption;"/>
+				
+				<hbox>
+					<grid>
+						<columns>
+							<column/>
+							<column/>
+						</columns>
+						
+						<rows>
+							<row align="center">
+								<label value="&snaplinks.drawing.color;"/>
+								<hbox>
+									<colorpicker type="button" id="snaplinks.drawpicker" prefstring="extensions.snaplinks.drawpicker" onchange="PrefsDialog.UpdateLinePreviews()"/>
+									<spacer flex="1"/>
+								</hbox>
+							</row>
+							<row align="center">
+								<label value="&snaplinks.drawing.thick;"/>
+								<hbox>
+									<menulist class="no-margin" id="snaplinks.drawthick" prefstring="extensions.snaplinks.drawthick">
+										<menupopup onpopuphidden="PrefsDialog.UpdateLinePreviews()">
+											<menuitem label="0" />
+											<menuitem label="1" />
+											<menuitem label="2" />
+											<menuitem label="3" />
+											<menuitem label="4" />
+											<menuitem label="5" />
+											<menuitem label="6" />
+											<menuitem label="7" />
+											<menuitem label="8" />
+											<menuitem label="9" />
+											<menuitem label="10" />
+											<menuitem label="11" />
+											<menuitem label="12" />
+										</menupopup>
+									</menulist>
+								</hbox>
+								<spacer flex="1"/>
+							</row>
+							<row align="center">
+								<label value="&snaplinks.drawing.sample;"/>
+								<hbox align="center">
+									<spacer flex="1"/>
+									<image id="snaplinks.drawId" width="80" src="trans.png"/>
+									<spacer flex="1"/>
+								</hbox>
+							</row>
+						</rows>
+					</grid>
+
+					<spacer flex="1"/>
+				</hbox>
+			</groupbox>
+			<groupbox flex="1">
+				<caption label="&snaplinks.links.caption;"/>
+
+				<hbox>
+					<grid>
+						<columns>
+							<column/>
+							<column/>
+						</columns>
+						
+						<rows>
+							<row align="center">
+								<label value="&snaplinks.links.color;"/>
+								<hbox>
+									<colorpicker type="button" id="snaplinks.linkspicker" prefstring="extensions.snaplinks.linkspicker" onchange="PrefsDialog.UpdateLinePreviews()"/>
+									<spacer flex="1"/>
+								</hbox>
+							</row>
+							<row align="center">
+								<label value="&snaplinks.links.thick;"/>
+								<hbox>
+									<menulist class="no-margin" id="snaplinks.linksthick" prefstring="extensions.snaplinks.linksthick">
+										<menupopup onpopuphidden="PrefsDialog.UpdateLinePreviews()">
+											<menuitem label="0" />
+											<menuitem label="1" />
+											<menuitem label="2" />
+											<menuitem label="3" />
+											<menuitem label="4" />
+											<menuitem label="5" />
+											<menuitem label="6" />
+											<menuitem label="7" />
+											<menuitem label="8" />
+											<menuitem label="9" />
+											<menuitem label="10" />
+											<menuitem label="11" />
+											<menuitem label="12" />
+										</menupopup>
+									</menulist>
+									<spacer flex="1"/>
+								</hbox>
+							</row>
+							<row align="center">
+								<label value="&snaplinks.links.sample;"/>
+								<hbox align="center">
+									<spacer flex="1"/>
+									<image id="snaplinks.linksId" width="80" src="trans.png"/>
+									<spacer flex="1"/>
+								</hbox>
+							</row>
+						</rows>
+					</grid>
+
+					<spacer flex="1"/>
+				</hbox>
+			</groupbox>
 		</hbox>
-		<radiogroup prefstring="extensions.snaplinks.button">
-			<hbox>
-				<radio label="&snaplinks.mouse.left;" value="0"/>
-				<radio label="&snaplinks.mouse.middle;" value="1"/>
-				<radio label="&snaplinks.mouse.right;" value="2"/>
-			</hbox>
-		</radiogroup>
-	</groupbox>
 
-	<groupbox>
-		<caption label="&snaplinks.da.caption;"/>
-		<description value="&snaplinks.da.description;"/>
-		<radiogroup prefstring="extensions.snaplinks.defaultaction">
-			<hbox>
+		<groupbox>
+			<caption label="&snaplinks.usage.caption;"/>
+			<description value="&snaplinks.usage.description;"/>
+			<description value="&snaplinks.usage.line0;"/>
+			<description value="&snaplinks.usage.line1;"/>
+		</groupbox>
+
+		<spacer flex="1"/>
+	</prefpane>
+
+	<prefpane id="snaplinks-options-action-pane" label="&snaplinks.preftab.action;">
+		<groupbox>
+			<caption label="&snaplinks.da.caption;"/>
+			<description value="&snaplinks.da.description;"/>
+			<radiogroup prefstring="extensions.snaplinks.defaultaction">
 				<vbox>
 					<radio label="&snaplinks.da.r0.newtabs;" value="OpenTabs"/>
 					<radio label="&snaplinks.da.r1.newwindows;" value="OpenWindows"/>
 					<radio label="&snaplinks.da.r2.tabsinnewwin;" value="OpenTabsInNewWindow"/>
-					<radio label="&snaplinks.da.askuser;" value="AskUser"/>
-				</vbox>
-				<vbox>
+					<menuseparator/>
 					<radio label="&snaplinks.da.r3.clipboard;" value="CopyToClipboard"/>
 					<radio label="&snaplinks.da.r4.bookmark;" value="BookmarkLinks"/>
 					<radio label="&snaplinks.da.r5.download;" value="DownloadLinks"/>
+					<menuseparator/>
+					<radio label="&snaplinks.da.askuser;" value="AskUser"/>
 				</vbox>
+			</radiogroup>
+		</groupbox>
+		
+		<spacer flex="1"/>
+	</prefpane>
+	
+	<prefpane id="snaplinks-options-advanced-pane" label="&snaplinks.preftab.advanced;">
+		<groupbox>
+			<caption label="&snaplinks.adv.caption;"/>
+			<checkbox label="&snaplinks.adv.HighlightCheckboxes;" prefstring="extensions.snaplinks.HighlightCheckboxesForClicking"/>
+			<checkbox label="&snaplinks.adv.HighlightButtons;" prefstring="extensions.snaplinks.HighlightButtonsForClicking"/>
+			<checkbox label="&snaplinks.adv.hideleave;" prefstring="extensions.snaplinks.HideSelectionOnMouseLeave"/>
+			<checkbox label="&snaplinks.adv.RemoveDuplicateUrls;" prefstring="extensions.snaplinks.RemoveDuplicateUrls"/>
+			<hbox align="center">
+				<checkbox label="&snaplinks.adv.shownumber;" prefstring="extensions.snaplinks.shownumber"/>
+				<menulist class="no-margin" prefstring="extensions.snaplinks.shownumber.where">
+					<menupopup>
+						<menuitem label="&snaplinks.adv.shownumber.statusbar;" value="AddonBar" />
+						<menuitem label="&snaplinks.adv.shownumber.hover;" value="Hover"/>
+					</menupopup>
+				</menulist>
 			</hbox>
-		</radiogroup>
-	</groupbox>
-
-
-	<hbox flex="1">
-		<groupbox flex="1">
-			<caption label="&snaplinks.drawing.caption;"/>
-			<vbox>
-				<hbox align="center">
-					<label value="&snaplinks.drawing.color;"/>
-					<colorpicker width="100" type="button" id="snaplinks.drawpicker" prefstring="extensions.snaplinks.drawpicker" onchange="PrefsDialog.UpdateLinePreviews()"/>
-					<spacer flex="2"/>
-				</hbox>
-				<hbox align="center">
-					<label value="&snaplinks.drawing.thick;"/>
-					<menulist id="snaplinks.drawthick" prefstring="extensions.snaplinks.drawthick">
-						<menupopup onpopuphidden="PrefsDialog.UpdateLinePreviews()">
-							<menuitem label="0" />
-							<menuitem label="1" />
-							<menuitem label="2" />
-							<menuitem label="3" />
-							<menuitem label="4" />
-							<menuitem label="5" />
-							<menuitem label="6" />
-							<menuitem label="7" />
-							<menuitem label="8" />
-							<menuitem label="9" />
-							<menuitem label="10" />
-							<menuitem label="11" />
-							<menuitem label="12" />
-						</menupopup>
-					</menulist>
-					<separator orient="vertical"/>
-					<image id="snaplinks.drawId" width="80" src="trans.png"/>
-					<separator orient="vertical"/>
-					<spacer flex="2"/>
-				</hbox>
-			</vbox>
-			<spacer flex="1"/>
 		</groupbox>
-		<groupbox flex="1">
-			<caption label="&snaplinks.links.caption;"/>
-			<vbox>
-				<hbox align="center">
-					<label value="&snaplinks.links.color;"/>
-					<colorpicker width="100" type="button" id="snaplinks.linkspicker" prefstring="extensions.snaplinks.linkspicker" onchange="PrefsDialog.UpdateLinePreviews()"/>
-					<spacer flex="2"/>
-				</hbox>
-				<hbox align="center">
-					<label value="&snaplinks.links.thick;"/>
-					<menulist id="snaplinks.linksthick" prefstring="extensions.snaplinks.linksthick">
-						<menupopup onpopuphidden="PrefsDialog.UpdateLinePreviews()">
-							<menuitem label="0" />
-							<menuitem label="1" />
-							<menuitem label="2" />
-							<menuitem label="3" />
-							<menuitem label="4" />
-							<menuitem label="5" />
-							<menuitem label="6" />
-							<menuitem label="7" />
-							<menuitem label="8" />
-							<menuitem label="9" />
-							<menuitem label="10" />
-							<menuitem label="11" />
-							<menuitem label="12" />
-						</menupopup>
-					</menulist>
-					<separator orient="vertical"/>
-					<image id="snaplinks.linksId" width="80" src="trans.png"/>
-					<separator orient="vertical"/>
-					<spacer flex="2"/>
-				</hbox>
-			</vbox>
-			<spacer flex="1"/>
-		</groupbox>
-	</hbox>
+		
+		<spacer flex="1"/>
+	</prefpane>
+	
+	<!-- All non-prefpane elements must appear after the last prefpane element. -->
+	
+	<script type="application/x-javascript" src="chrome://snaplinks/content/options.js"/>
 
-	<groupbox>
-		<caption label="&snaplinks.adv.caption;"/>
-		<checkbox label="&snaplinks.adv.HighlightCheckboxes;" prefstring="extensions.snaplinks.HighlightCheckboxesForClicking"/>
-		<checkbox label="&snaplinks.adv.HighlightButtons;" prefstring="extensions.snaplinks.HighlightButtonsForClicking"/>
-		<checkbox label="&snaplinks.adv.hideleave;" prefstring="extensions.snaplinks.HideSelectionOnMouseLeave"/>
-		<checkbox label="&snaplinks.adv.RemoveDuplicateUrls;" prefstring="extensions.snaplinks.RemoveDuplicateUrls"/>
-		<hbox>
-			<checkbox label="&snaplinks.adv.shownumber;" prefstring="extensions.snaplinks.shownumber"/>
-			<menulist prefstring="extensions.snaplinks.shownumber.where">
-				<menupopup>
-					<menuitem label="&snaplinks.adv.shownumber.statusbar;" value="AddonBar" />
-					<menuitem label="&snaplinks.adv.shownumber.hover;" value="Hover"/>
-				</menupopup>
-			</menulist>
-		</hbox>
-	</groupbox>
-
-	<groupbox>
-		<caption label="&snaplinks.usage.caption;"/>
-		<description value="&snaplinks.usage.description;"/>
-		<description value="&snaplinks.usage.line0;"/>
-		<description value="&snaplinks.usage.line1;"/>
-	</groupbox>
-</dialog>
-
+</prefwindow>
