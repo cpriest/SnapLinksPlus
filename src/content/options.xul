@@ -2,13 +2,6 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://snaplinks/skin/options.css" type="text/css"?>
 
-<!DOCTYPE window [
-	<!ENTITY % options SYSTEM "chrome://snaplinks/locale/options.dtd">
-	%options;
-	<!ENTITY % ISOlat1 SYSTEM "chrome://snaplinks/content/ISOlat1.dtd">
-	%ISOlat1;
-]>
-
 <!--
 	options.xul
 
@@ -32,19 +25,37 @@
 	along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
+<!DOCTYPE window [
+	<!ENTITY % options SYSTEM "chrome://snaplinks/locale/options.dtd">
+	%options;
+	<!ENTITY % ISOlat1 SYSTEM "chrome://snaplinks/content/ISOlat1.dtd">
+	%ISOlat1;
+]>
+
 <prefwindow buttons="accept, cancel"
 		id="snaplinks-options-dialog"
-		ondialogaccept="PrefsDialog.SavePrefsFromDialog(this)"
-		onload="PrefsDialog.InitializeDialog(this)"
+		onload="SnaplinksPrefsDialog.InitializeDialog(this)"
 		title="&snaplinks.options.title;"
 		persistent="lastSelected"
 		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 	<prefpane id="snaplinks-options-selection-pane" label="&snaplinks.preftab.selection;">
+		<preferences>
+			<preference type="int"      id="pref.snaplinks.button"                          name="extensions.snaplinks.button"/>
+			<preference type="bool"     id="pref.snaplinks.ActivateRequiresShift"           name="extensions.snaplinks.ActivateRequiresShift"/>
+			<preference type="bool"     id="pref.snaplinks.ActivateRequiresCtrl"            name="extensions.snaplinks.ActivateRequiresCtrl"/>
+			<preference type="bool"     id="pref.snaplinks.ActivateRequiresAlt"             name="extensions.snaplinks.ActivateRequiresAlt"/>
+
+			<preference type="string"   id="pref.snaplinks.drawpicker"                      name="extensions.snaplinks.drawpicker"/>
+			<preference type="int"      id="pref.snaplinks.drawthick"                       name="extensions.snaplinks.drawthick"/>
+			<preference type="string"   id="pref.snaplinks.linkspicker"                     name="extensions.snaplinks.linkspicker"/>
+			<preference type="int"      id="pref.snaplinks.linksthick"                      name="extensions.snaplinks.linksthick"/>
+		</preferences>
+		
 		<groupbox>
 			<caption label="&snaplinks.mouse.caption;"/>
 
-			<radiogroup prefstring="extensions.snaplinks.button">
+			<radiogroup preference="pref.snaplinks.button">
 				<grid>
 					<columns equalsize="always">
 						<column/>
@@ -53,9 +64,9 @@
 					</columns>
 					<rows>
 						<row>
-							<checkbox label="&snaplinks.mouse.shift;" prefstring="extensions.snaplinks.ActivateRequiresShift"/>
-							<checkbox label="&snaplinks.mouse.ctrl;" prefstring="extensions.snaplinks.ActivateRequiresCtrl"/>
-							<checkbox label="&snaplinks.mouse.alt;" prefstring="extensions.snaplinks.ActivateRequiresAlt"/>
+							<checkbox label="&snaplinks.mouse.shift;" preference="pref.snaplinks.ActivateRequiresShift"/>
+							<checkbox label="&snaplinks.mouse.ctrl;" preference="pref.snaplinks.ActivateRequiresCtrl"/>
+							<checkbox label="&snaplinks.mouse.alt;" preference="pref.snaplinks.ActivateRequiresAlt"/>
 						</row>
 						<row>
 							<radio label="&snaplinks.mouse.left;" value="0"/>
@@ -82,28 +93,28 @@
 							<row align="center">
 								<label value="&snaplinks.drawing.color;"/>
 								<hbox>
-									<colorpicker type="button" id="snaplinks.drawpicker" prefstring="extensions.snaplinks.drawpicker" onchange="PrefsDialog.UpdateLinePreviews()"/>
+									<colorpicker type="button" id="snaplinks.drawpicker" preference="pref.snaplinks.drawpicker" onchange="SnaplinksPrefsDialog.UpdateLinePreviews()"/>
 									<spacer flex="1"/>
 								</hbox>
 							</row>
 							<row align="center">
 								<label value="&snaplinks.drawing.thick;"/>
 								<hbox>
-									<menulist class="no-margin" id="snaplinks.drawthick" prefstring="extensions.snaplinks.drawthick">
-										<menupopup onpopuphidden="PrefsDialog.UpdateLinePreviews()">
-											<menuitem label="0" />
-											<menuitem label="1" />
-											<menuitem label="2" />
-											<menuitem label="3" />
-											<menuitem label="4" />
-											<menuitem label="5" />
-											<menuitem label="6" />
-											<menuitem label="7" />
-											<menuitem label="8" />
-											<menuitem label="9" />
-											<menuitem label="10" />
-											<menuitem label="11" />
-											<menuitem label="12" />
+									<menulist class="no-margin" id="snaplinks.drawthick" preference="pref.snaplinks.drawthick">
+										<menupopup onpopuphidden="SnaplinksPrefsDialog.UpdateLinePreviews()">
+											<menuitem label="0"  value="0"/>
+											<menuitem label="1"  value="1" />
+											<menuitem label="2"  value="2" />
+											<menuitem label="3"  value="3" />
+											<menuitem label="4"  value="4" />
+											<menuitem label="5"  value="5" />
+											<menuitem label="6"  value="6" />
+											<menuitem label="7"  value="7" />
+											<menuitem label="8"  value="8" />
+											<menuitem label="9"  value="9" />
+											<menuitem label="10" value="10" />
+											<menuitem label="11" value="11" />
+											<menuitem label="12" value="12" />
 										</menupopup>
 									</menulist>
 								</hbox>
@@ -137,28 +148,28 @@
 							<row align="center">
 								<label value="&snaplinks.links.color;"/>
 								<hbox>
-									<colorpicker type="button" id="snaplinks.linkspicker" prefstring="extensions.snaplinks.linkspicker" onchange="PrefsDialog.UpdateLinePreviews()"/>
+									<colorpicker type="button" id="snaplinks.linkspicker" preference="pref.snaplinks.linkspicker" onchange="SnaplinksPrefsDialog.UpdateLinePreviews()"/>
 									<spacer flex="1"/>
 								</hbox>
 							</row>
 							<row align="center">
 								<label value="&snaplinks.links.thick;"/>
 								<hbox>
-									<menulist class="no-margin" id="snaplinks.linksthick" prefstring="extensions.snaplinks.linksthick">
-										<menupopup onpopuphidden="PrefsDialog.UpdateLinePreviews()">
-											<menuitem label="0" />
-											<menuitem label="1" />
-											<menuitem label="2" />
-											<menuitem label="3" />
-											<menuitem label="4" />
-											<menuitem label="5" />
-											<menuitem label="6" />
-											<menuitem label="7" />
-											<menuitem label="8" />
-											<menuitem label="9" />
-											<menuitem label="10" />
-											<menuitem label="11" />
-											<menuitem label="12" />
+									<menulist class="no-margin" id="snaplinks.linksthick" preference="pref.snaplinks.linksthick">
+										<menupopup onpopuphidden="SnaplinksPrefsDialog.UpdateLinePreviews()">
+											<menuitem label="0"  value="0"/>
+											<menuitem label="1"  value="1" />
+											<menuitem label="2"  value="2" />
+											<menuitem label="3"  value="3" />
+											<menuitem label="4"  value="4" />
+											<menuitem label="5"  value="5" />
+											<menuitem label="6"  value="6" />
+											<menuitem label="7"  value="7" />
+											<menuitem label="8"  value="8" />
+											<menuitem label="9"  value="9" />
+											<menuitem label="10" value="10" />
+											<menuitem label="11" value="11" />
+											<menuitem label="12" value="12" />
 										</menupopup>
 									</menulist>
 									<spacer flex="1"/>
@@ -191,10 +202,14 @@
 	</prefpane>
 
 	<prefpane id="snaplinks-options-action-pane" label="&snaplinks.preftab.action;">
+		<preferences>
+			<preference type="string"   id="pref.snaplinks.defaultaction"                   name="extensions.snaplinks.defaultaction"/>
+		</preferences>
+		
 		<groupbox>
 			<caption label="&snaplinks.da.caption;"/>
 			<description value="&snaplinks.da.description;"/>
-			<radiogroup prefstring="extensions.snaplinks.defaultaction">
+			<radiogroup preference="pref.snaplinks.defaultaction">
 				<vbox>
 					<radio label="&snaplinks.da.r0.newtabs;" value="OpenTabs"/>
 					<radio label="&snaplinks.da.r1.newwindows;" value="OpenWindows"/>
@@ -213,18 +228,29 @@
 	</prefpane>
 	
 	<prefpane id="snaplinks-options-advanced-pane" label="&snaplinks.preftab.advanced;">
+		<preferences>
+			<preference type="bool"     id="pref.snaplinks.HighlightCheckboxesForClicking"  name="extensions.snaplinks.HighlightCheckboxesForClicking"/>
+			<preference type="bool"     id="pref.snaplinks.HighlightButtonsForClicking"     name="extensions.snaplinks.HighlightButtonsForClicking"/>
+			<preference type="bool"     id="pref.snaplinks.HideSelectionOnMouseLeave"       name="extensions.snaplinks.HideSelectionOnMouseLeave"/>
+			<preference type="bool"     id="pref.snaplinks.RemoveDuplicateUrls"             name="extensions.snaplinks.RemoveDuplicateUrls"/>
+			<preference type="bool"     id="pref.snaplinks.shownumber"                      name="extensions.snaplinks.shownumber"/>
+			<preference type="int"      id="pref.snaplinks.shownumber.where"                name="extensions.snaplinks.shownumber.where"/>
+
+			<preference type="string"   id="pref.snaplinks.CopyToClipboardSeparator"        name="extensions.snaplinks.CopyToClipboardSeparator"/>
+		</preferences>
+		
 		<groupbox>
 			<caption label="&snaplinks.adv.caption;"/>
-			<checkbox label="&snaplinks.adv.HighlightCheckboxes;" prefstring="extensions.snaplinks.HighlightCheckboxesForClicking"/>
-			<checkbox label="&snaplinks.adv.HighlightButtons;" prefstring="extensions.snaplinks.HighlightButtonsForClicking"/>
-			<checkbox label="&snaplinks.adv.hideleave;" prefstring="extensions.snaplinks.HideSelectionOnMouseLeave"/>
-			<checkbox label="&snaplinks.adv.RemoveDuplicateUrls;" prefstring="extensions.snaplinks.RemoveDuplicateUrls"/>
+			<checkbox label="&snaplinks.adv.HighlightCheckboxes;" preference="pref.snaplinks.HighlightCheckboxesForClicking"/>
+			<checkbox label="&snaplinks.adv.HighlightButtons;" preference="pref.snaplinks.HighlightButtonsForClicking"/>
+			<checkbox label="&snaplinks.adv.hideleave;" preference="pref.snaplinks.HideSelectionOnMouseLeave"/>
+			<checkbox label="&snaplinks.adv.RemoveDuplicateUrls;" preference="pref.snaplinks.RemoveDuplicateUrls"/>
 			<hbox align="center">
-				<checkbox label="&snaplinks.adv.shownumber;" prefstring="extensions.snaplinks.shownumber"/>
-				<menulist class="no-margin" prefstring="extensions.snaplinks.shownumber.where">
+				<checkbox label="&snaplinks.adv.shownumber;" preference="pref.snaplinks.shownumber"/>
+				<menulist class="no-margin" preference="pref.snaplinks.shownumber.where">
 					<menupopup>
-						<menuitem label="&snaplinks.adv.shownumber.statusbar;" value="AddonBar" />
-						<menuitem label="&snaplinks.adv.shownumber.hover;" value="Hover"/>
+						<menuitem label="&snaplinks.adv.shownumber.statusbar;" value="0" />
+						<menuitem label="&snaplinks.adv.shownumber.hover;" value="1"/>
 					</menupopup>
 				</menulist>
 			</hbox>

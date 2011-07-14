@@ -18,7 +18,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
 
 function LoadScript(path) {
 	Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
@@ -28,25 +27,30 @@ function LoadScript(path) {
 
 LoadScript('chrome://snaplinks/content/Utility.js');
 
-/* Includes some non-standard PrefsDialogMapper functionality like maintaining line previews */
-var PrefsDialog = new (Class.create(PrefsDialogMapper, {
-	InitializeDialog: function($super, dialog) {
-		$super(dialog);
+var SnaplinksPrefsDialog = new (Class.create({
+	_dialog: null,
+	
+	InitializeDialog: function(dialog) {
+		this._dialog = dialog;
 		this.UpdateLinePreviews();
 	},
 	
 	UpdateLinePreviews: function() {
-		/* Initialize Links Preview */
-		var color = document.getElementById('snaplinks.linkspicker').color;
-		var size = document.getElementById('snaplinks.linksthick').selectedIndex;
-		document.getElementById('snaplinks.linksId').setAttribute('style',
-			'border-top-width:' + size + 'px;border-top-color:' + color + ';border-top-style:solid');
-
 		/* Initialize Selection Rect Preview */
 		var color = document.getElementById('snaplinks.drawpicker').color;
-		var size = document.getElementById('snaplinks.drawthick').selectedIndex;
-		document.getElementById('snaplinks.drawId').setAttribute('style',
-			'border-top-width:' + size + 'px;border-top-color:' + color+';border-top-style:dashed');
+		var size = document.getElementById('snaplinks.drawthick').selectedItem.value;
+		var drawPreviewElem = document.getElementById('snaplinks.drawId');
+		drawPreviewElem.style.borderTopWidth = size +'px';
+		drawPreviewElem.style.borderTopColor = color;
+		drawPreviewElem.style.borderTopStyle = 'dashed';
+
+		/* Initialize Links Preview */
+		var color = document.getElementById('snaplinks.linkspicker').color;
+		var size = document.getElementById('snaplinks.linksthick').selectedItem.value;
+		var linksPreviewElem = document.getElementById('snaplinks.linksId');
+		linksPreviewElem.style.borderTopWidth = size +'px';
+		linksPreviewElem.style.borderTopColor = color;
+		linksPreviewElem.style.borderTopStyle = 'solid';
 	}
 
 } ))();

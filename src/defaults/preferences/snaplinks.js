@@ -3,7 +3,7 @@
  *  
  *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
  *  Copyright (C) 2008  Tommi Rautava
- *  Copyright (C) 2011  Clint Priest
+ *  Copyright (C) 2011  Clint Priest, Tommi Rautava
  *  
  *  This file is part of Snap Links.
  *
@@ -21,25 +21,25 @@
  *  along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-pref('extensions.snaplinks@snaplinks.mozdev.org.description', 'chrome://snaplinks/locale/snaplinks.properties');  
+pref('extensions.snaplinks@snaplinks.mozdev.org.description',   'chrome://snaplinks/locale/snaplinks.properties');  
 
-pref('extensions.snaplinks.button', 2);
-pref('extensions.snaplinks.defaultaction', 'OpenTabs');
-pref('extensions.snaplinks.HideSelectionOnMouseLeave', false);
-pref('extensions.snaplinks.shownumber', true);
-pref('extensions.snaplinks.shownumber.where', 1);
+pref('extensions.snaplinks.button',                             2);
+pref('extensions.snaplinks.ActivateRequiresAlt',                false);
+pref('extensions.snaplinks.ActivateRequiresShift',              false);
+pref('extensions.snaplinks.ActivateRequiresCtrl',               false);
 
-pref('extensions.snaplinks.linkspicker','#FF0000');
-pref('extensions.snaplinks.linksthick',1);
-pref('extensions.snaplinks.drawpicker','#30AF00');
-pref('extensions.snaplinks.drawthick',3);
+pref('extensions.snaplinks.drawpicker',                         '#30AF00');
+pref('extensions.snaplinks.drawthick',                          3);
+pref('extensions.snaplinks.linkspicker',                        '#FF0000');
+pref('extensions.snaplinks.linksthick',                         1);
 
-pref('extensions.snaplinks.HighlightButtonsForClicking', true);
-pref('extensions.snaplinks.HighlightCheckboxesForClicking', true);
+pref('extensions.snaplinks.defaultaction',                      'OpenTabs');
 
-pref('extensions.snaplinks.ActivateRequiresAlt', false);
-pref('extensions.snaplinks.ActivateRequiresShift', false);
-pref('extensions.snaplinks.ActivateRequiresCtrl', false);
-pref('extensions.snaplinks.RemoveDuplicateUrls', true);
+pref('extensions.snaplinks.HighlightButtonsForClicking',        true);
+pref('extensions.snaplinks.HighlightCheckboxesForClicking',     true);
+pref('extensions.snaplinks.HideSelectionOnMouseLeave',          false);
+pref('extensions.snaplinks.RemoveDuplicateUrls',                true);
+pref('extensions.snaplinks.shownumber',                         true);
+pref('extensions.snaplinks.shownumber.where',                   1);
 
-pref('extensions.snaplinks.CopyToClipboardSeparator', "\n");
+pref('extensions.snaplinks.CopyToClipboardSeparator',           "\n");
