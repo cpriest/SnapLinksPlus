@@ -167,7 +167,7 @@ var Selection = Class.create({
 						font			: '12px Verdana',
 						zIndex			: '10000',
 						border			: '1px solid black',
-						backgroundColor	: '#FFFFCC',
+						backgroundColor	: '#FFFFCC'
 					} );
 					InsertionNode.appendChild(this.ElementCount);
 				}
