@@ -1,4 +1,4 @@
-`<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
 <meta http-equiv="Expires" content="Fri, Jan 01 1900 00:00:00 GMT">
@@ -13,13 +13,37 @@
 <meta name="keywords" content="">
 <meta name="creation-date" content="01/01/2009">
 <meta name="revisit-after" content="15 days">
-<title>Untitled</title>
+<title>Snap Links Plus Test Page</title>
 <link rel="stylesheet" type="text/css" href="my.css">
 </head>
 <body>
+<h1>Snap Links Plus Test Page</h1>
+<h2>Basic Links</h2>
 	<p>
 		This is a test file for testing the link rect detection and drawing code.
 	</p>
+	<p>
+	<h3>Links Table</h3>
+	<table>
+		<tbody>
+			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+			</tr>
+			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+			</tr>
+			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+			</tr>
+		</tbody>
+	<table>
+	<h3>Links Within Text</h3>
 	<p>
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. <a href="http://en.wikipedia.org/wiki/Gold">Duis mollis dolor et ante tincidunt</a> accumsan vitae sed elit. Integer id arcu ipsum. Vestibulum molestie convallis eros et commodo. Vestibulum ut odio lectus, <a href="http://en.wikipedia.org/wiki/Gold">quis scelerisque lacus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</a> Nam tincidunt massa eu nibh interdum mattis. Sed porta augue tortor, et blandit justo. Integer ut enim nisl. Cras vel lacus neque, nec vulputate neque. Aenean volutpat ante et nibh facilisis dapibus. Nam at odio ac est pharetra egestas. Maecenas congue, risus vitae lacinia placerat, mauris velit fringilla elit, non iaculis augue ipsum non sem. Duis ornare vestibulum nibh porttitor consectetur.
 	</p>
@@ -35,6 +59,8 @@ Suspendisse nibh orci, sodales dapibus consectetur sit amet, venenatis id leo. <
 	<p>
 <a href="http://en.wikipedia.org/wiki/Gold"><img style="float: right;" src="http://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Ag-Au-Cu-colours-english.svg/220px-Ag-Au-Cu-colours-english.svg.png">Pellentesque</a> sit amet neque non tortor vehicula imperdiet vitae viverra velit. Morbi nunc arcu, dignissim quis ornare vel, mattis eget dui. Nulla urna massa, tincidunt sit amet auctor sit amet, dignissim et augue. Sed accumsan pharetra metus vel egestas. Phasellus semper elit nisl, at viverra dui. Donec faucibus tempus nibh, eu ullamcorper dolor varius et. Pellentesque venenatis odio a <a href="http://en.wikipedia.org/wiki/Gold">erat aliquam vehicula. Integer a odio sit amet lectus placerat blandit eget et quam. Aenean at</a> arcu nec urna pharetra eleifend non vel ligula. Ut velit ligula, cursus sit amet dapibus quis, consequat eu massa. Ut facilisis erat at magna sodales interdum. Cras sit amet eros sed elit convallis rutrum. Integer a ipsum vitae nibh auctor sagittis. Vestibulum sit amet turpis tortor, sit amet sagittis massa. Proin metus metus, elementum quis euismod id, tristique quis metus. Curabitur nisi arcu, ullamcorper eget facilisis non, blandit in odio. Quisque suscipit est sed dolor pretium vel semper orci adipiscing. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; 
 	</p>
+<hr/>
+<h2>Checkboxes &amp; Buttons</h2>
 	<p>
 		<input type="checkbox" value="0" checked> Non-Labeled Checkbox<br>
 		<input type="button" value="Button For Clicking"><br>
@@ -84,6 +110,54 @@ Suspendisse nibh orci, sodales dapibus consectetur sit amet, venenatis id leo. <
 			}
 		} );
 	}, false );
+</script>
+<hr/>
+<h2>JavaScript Links - Replace Location</h2>
+	<table>
+		<tbody>
+			<tr>
+				<td><a href="javascript:load_page('Gold')">Gold</a></td>
+				<td><a href="javascript:load_page('Gold')">Gold</a></td>
+				<td><a href="javascript:load_page('Gold')">Gold</a></td>
+			</tr>
+			<tr>
+				<td><a href="javascript:load_page('Silver')">Silver</a></td>
+				<td><a href="javascript:load_page('Silver')">Silver</a></td>
+				<td><a href="javascript:load_page('Silver')">Silver</a></td>
+			</tr>
+			<tr>
+				<td><a href="javascript:load_page('Bronze')">Bronze</a></td>
+				<td><a href="javascript:load_page('Bronze')">Bronze</a></td>
+				<td><a href="javascript:load_page('Bronze')">Bronze</a></td>
+			</tr>
+		</tbody>
+	<table>
+<script language="javascript">
+function load_page(page) { window.location.href = 'http://en.wikipedia.org/wiki/'+ page; }
+</script>
+<hr/>
+<h2>JavaScript Links - Popup Window</h2>
+	<table>
+		<tbody>
+			<tr>
+				<td><a href="javascript:popup_page('Gold')">Gold</a></td>
+				<td><a href="javascript:popup_page('Gold')">Gold</a></td>
+				<td><a href="javascript:popup_page('Gold')">Gold</a></td>
+			</tr>
+			<tr>
+				<td><a href="javascript:popup_page('Silver')">Silver</a></td>
+				<td><a href="javascript:popup_page('Silver')">Silver</a></td>
+				<td><a href="javascript:popup_page('Silver')">Silver</a></td>
+			</tr>
+			<tr>
+				<td><a href="javascript:popup_page('Bronze')">Bronze</a></td>
+				<td><a href="javascript:popup_page('Bronze')">Bronze</a></td>
+				<td><a href="javascript:popup_page('Bronze')">Bronze</a></td>
+			</tr>
+		</tbody>
+	<table>
+<script language="javascript">
+function popup_page(page) { window.open('http://en.wikipedia.org/wiki/'+ page); }
 </script>
 </body>
 </html>
