@@ -245,7 +245,6 @@ var Selection = Class.create({
 				if (ForElement != undefined) {
 					ForElement.SnapRects = ForElement.SnapRects.concat(GetElementRects(label, offset));
 					ForElement.SnapOutlines = [ ForElement, label ];
-					Components.utils.reportError(ForElement +'='+ label);
 				}
 			}
 		}, this );
