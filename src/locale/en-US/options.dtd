@@ -1,7 +1,11 @@
+<!-- The title of the options dialog. -->
 <!ENTITY snaplinks.options.title                "Snap Links Plus Options">
 
+<!-- A tab title. Selection (rectangle) related options. -->
 <!ENTITY snaplinks.preftab.selection            "Selection">
+<!-- A tab title. Action related options. -->
 <!ENTITY snaplinks.preftab.action               "Action">
+<!-- A tab title. Advanced options. -->
 <!ENTITY snaplinks.preftab.advanced             "Advanced">
 
 <!ENTITY snaplinks.mouse.caption                "Start Selecting With">
@@ -20,33 +24,42 @@
 <!ENTITY snaplinks.da.r3.clipboard              "Copy Links to Clipboard">
 <!ENTITY snaplinks.da.r4.bookmark               "Bookmark Links">
 <!ENTITY snaplinks.da.r5.download               "Download Links">
+<!-- A radio button option. When a selection ends, show the action popup and let the user decide what to do. -->
 <!ENTITY snaplinks.da.askuser                   "Ask Me What To Do">
 
 <!ENTITY snaplinks.drawing.caption              "Selection Rectangle">
 <!ENTITY snaplinks.drawing.color                "Color:">
 <!ENTITY snaplinks.drawing.thick                "Thickness:">
+<!-- A label preceding a sample, which shows the line style of the selection rectangle. -->
 <!ENTITY snaplinks.drawing.sample               "Sample:">
 
 <!ENTITY snaplinks.links.caption                "Selected Elements Highlight">
 <!ENTITY snaplinks.links.color                  "Color:">
 <!ENTITY snaplinks.links.thick                  "Thickness:">
+<!-- A label preceding a sample, which shows the line style of the bounding rectangle around the selected links. -->
 <!ENTITY snaplinks.links.sample                 "Sample:">
 
-<!ENTITY snaplinks.adv.caption                  "Advanced Options">
-
-<!-- Choose items within the selection rectangle and click those when the action is executed. -->
+<!-- A groupbox caption. Choose items within the selection rectangle and click those when the action is executed. -->
 <!ENTITY snaplinks.adv.SelectAndClick           "Select And Click">
+<!-- A checkbox option following snaplinks.adv.SelectAndClick. -->
 <!ENTITY snaplinks.adv.SelectAndClick.Checkboxes    "Checkboxes">
+<!-- A checkbox option following snaplinks.adv.SelectAndClick. -->
 <!ENTITY snaplinks.adv.SelectAndClick.Buttons       "Buttons">
+<!-- A checkbox option following snaplinks.adv.SelectAndClick. -->
 <!ENTITY snaplinks.adv.SelectAndClick.JsLinks       "JavaScript links">
 
-<!ENTITY snaplinks.adv.RemoveDuplicateUrls      "Remove duplicate links from selected urls before performing action">
-
+<!-- A groupbox caption. Misc advanced options. -->
+<!ENTITY snaplinks.adv.caption                  "Advanced Options">
+<!-- Should duplicate links be removed from selected URLs before performing an action? -->
+<!ENTITY snaplinks.adv.RemoveDuplicateUrls      "Remove duplicates from selected links before performing action">
 <!-- If mouse moves outside the page area, the selection rectangle is hidden and no action is executed. If mouse is moved back to page area, the selection rectangle is restored. -->
 <!ENTITY snaplinks.adv.hideleave                "Hide selection rectangle when mouse leaves window">
 
+<!-- This option text is followed by a drop-down-list which contains these strings: snaplinks.adv.shownumber.statusbar, snaplinks.adv.shownumber.hover -->
 <!ENTITY snaplinks.adv.shownumber               "Show number of elements selected">
+<!-- A drop-down-list option following snaplinks.adv.shownumber. -->
 <!ENTITY snaplinks.adv.shownumber.statusbar     "in status bar">
+<!-- A drop-down-list option following snaplinks.adv.shownumber. -->
 <!ENTITY snaplinks.adv.shownumber.hover         "hovering next to cursor">
 
 <!ENTITY snaplinks.usage.caption                "Usage">
