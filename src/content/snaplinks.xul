@@ -33,7 +33,7 @@
 		 xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 	<statusbar id="status-bar">
-		<statusbarpanel id="snaplinks-panel" label="zz" hidden="false"/>
+		<statusbarpanel id="snaplinks-panel" label="" hidden="true"/>
 	</statusbar>
 
 	<popupset id="mainPopupSet">
