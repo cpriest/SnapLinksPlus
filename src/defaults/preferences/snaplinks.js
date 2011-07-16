@@ -24,9 +24,9 @@
 pref('extensions.snaplinks@snaplinks.mozdev.org.description',   'chrome://snaplinks/locale/snaplinks.properties');  
 
 pref('extensions.snaplinks.button',                             2);
-pref('extensions.snaplinks.ActivateRequiresAlt',                false);
 pref('extensions.snaplinks.ActivateRequiresShift',              false);
 pref('extensions.snaplinks.ActivateRequiresCtrl',               false);
+pref('extensions.snaplinks.ActivateRequiresAlt',                false);
 
 pref('extensions.snaplinks.drawpicker',                         '#30AF00');
 pref('extensions.snaplinks.drawthick',                          3);
@@ -35,8 +35,9 @@ pref('extensions.snaplinks.linksthick',                         1);
 
 pref('extensions.snaplinks.defaultaction',                      'OpenTabs');
 
-pref('extensions.snaplinks.HighlightButtonsForClicking',        true);
 pref('extensions.snaplinks.HighlightCheckboxesForClicking',     true);
+pref('extensions.snaplinks.HighlightButtonsForClicking',        true);
+pref('extensions.snaplinks.HighlightJsLinksForClicking',        true);
 pref('extensions.snaplinks.HideSelectionOnMouseLeave',          false);
 pref('extensions.snaplinks.RemoveDuplicateUrls',                true);
 pref('extensions.snaplinks.shownumber',                         true);

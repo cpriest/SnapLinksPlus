@@ -22,6 +22,7 @@
 /** Selection class handles the selection rectangle and accompanying visible element */
 var Selection = Class.create({ 
 	X1: 0, Y1: 0, X2: 0, Y2: 0,
+	jsRegExp: /^javascript:/i,
 	
 	IntersectedElements: 	[ ],
 	SelectedElements: 		[ ],
@@ -199,10 +200,23 @@ var Selection = Class.create({
 		var Start = (new Date()).getMilliseconds();
 
 		$A(this.Document.links).forEach( function( link ) {
+			try {
+				link.SnapIsJsLink = this.jsRegExp.test(link.href); // Is a JavaScript link?
+
+				// Skip JavaScript links, if the option is disabled.
+				if (link.SnapIsJsLink &&
+						!SnapLinks.Prefs.HighlightJsLinksForClicking) {
+					return;
+				}
+			}
+			catch (e) {
+				Components.utils.reportError(e);
+			}
+			
 			link.SnapRects = GetElementRects(link, offset);
 			delete link.SnapFontSize;
 			SelectableElements.push(link);
-		});
+		}, this);
 
 		var Links = (new Date()).getMilliseconds();
 
@@ -211,7 +225,8 @@ var Selection = Class.create({
 				ElementRectsNode = input;
 			if(SnapLinks.Prefs.HighlightButtonsForClicking && (Type == 'submit' || Type == 'button')) {
 				SelectableElements.push(input);
-			} else if(SnapLinks.Prefs.HighlightCheckboxesForClicking && Type == 'checkbox') {
+			}
+			else if(SnapLinks.Prefs.HighlightCheckboxesForClicking && Type == 'checkbox') {
 				if(input.parentNode.tagName == 'LABEL') {
 					ElementRectsNode = input.parentNode;
 					input.SnapOutlines = [ input.parentNode ];
@@ -219,7 +234,7 @@ var Selection = Class.create({
 				SelectableElements.push(input);
 			}
 			input.SnapRects = GetElementRects(ElementRectsNode, offset);
-		});
+		}, this);
 
 		var Inputs = (new Date()).getMilliseconds();;
 
@@ -280,8 +295,8 @@ var Selection = Class.create({
 		this.SelectedElements.forEach( function(elem) {
 			(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
 				elem.style.MozOutline = '';
-			} );
-		} );
+			}, this );
+		}, this );
 		this.SelectedElements = [ ];
 	},
 
@@ -323,9 +338,11 @@ var Selection = Class.create({
 		this.ClearSelectedElements();
 		if(this.Element.style.display != 'none') {
 			var SelectRect = this.NormalizedRect;
-			var HighFontSize = 0;
+			var HighLinkFontSize = 0;
+			var HighJsLinkFontSize = 0;
 			
-			var TypeCounts = { 'Links': 0,	'Checkbox': 0, 'Buttons': 0};
+			var TypesInPriorityOrder = new Array('Links', 'JsLinks', 'Checkboxes', 'Buttons');
+			var TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0};
 			
 			/* Find Links Which Intersect With Selection Rectangle */
 			$A(this.SelectableElements).forEach( function( elem ) {
@@ -341,12 +358,20 @@ var Selection = Class.create({
 					if (!hidden) {
 						if(elem.tagName == 'A' && this.SelectLargestFontSizeIntersectionLinks) {
 							var fontSize = computedStyle.getPropertyValue("font-size");
+							
 							if(fontSize.indexOf("px")>=0)
 								elem.SnapFontSize=parseFloat(fontSize);
 							
-							if(elem.SnapFontSize > HighFontSize)
-								HighFontSize = elem.SnapFontSize;
+							if (elem.SnapIsJsLink) {
+								if(elem.SnapFontSize > HighJsLinkFontSize)
+									HighJsLinkFontSize = elem.SnapFontSize;
+							}
+							else {
+								if(elem.SnapFontSize > HighLinkFontSize)
+									HighLinkFontSize = elem.SnapFontSize;
+							}
 						}
+						
 						if(elem.tagName == 'INPUT') {
 							switch(elem.getAttribute('type')) {
 								case 'checkbox':	TypeCounts.Checkbox++;	break;
@@ -354,39 +379,60 @@ var Selection = Class.create({
 								case 'submit':		TypeCounts.Buttons++;	break;
 							}
 								
-						} else if(elem.tagName == 'A')
-							TypeCounts.Links++;
+						} else if(elem.tagName == 'A') {
+							if (elem.SnapIsJsLink)
+								TypeCounts.JsLinks++;
+							else
+								TypeCounts.Links++;
+						}
 						
 						this.IntersectedElements.push(elem);
 					}
 				}
 			}, this );
 			
-			var Greatest;
-			if(TypeCounts.Links > TypeCounts.Checkbox && TypeCounts.Links > TypeCounts.Buttons)
-				Greatest = 'Links';
-			else if(TypeCounts.Checkbox > TypeCounts.Buttons && TypeCounts.Checkbox > TypeCounts.Links)
-				Greatest = 'Checkboxes';
-			else
-				Greatest = 'Buttons';
+			// Init the greatest values with the first item.
+			var Greatest = TypesInPriorityOrder[0];
+			var GreatestValue = TypeCounts[Greatest];
 			
-			this.SelectedElements = this.IntersectedElements.filter( function(elem) {
-				switch(Greatest) {
-					case 'Links':
-						return elem.tagName == 'A' && !this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighFontSize;
-					case 'Checkboxes':
-						return elem.tagName == 'INPUT' && elem.getAttribute('type') == 'checkbox';
-					case 'Buttons':
-						return elem.tagName == 'INPUT' && (elem.getAttribute('type') == 'button' || elem.getAttribute('type') == 'submit');
+			// Check if any of the other values if greater.
+			for (var i = 1; i < TypesInPriorityOrder.length; ++i) {
+				var key = TypesInPriorityOrder[i];
+				
+				if (TypeCounts[key] > GreatestValue) {
+					Greatest = key;
+					GreatestValue = TypeCounts[key]; 
 				}
-			}, this);
+			}
 			
+			// Choose the filter function.
+			var filterFunction;
+			
+			switch(Greatest) {
+			case 'Links':
+				filterFunction = function(elem) { return elem.tagName == 'A' && !elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighLinkFontSize); };
+				break;
+			case 'JsLinks':
+				filterFunction = function(elem) { return elem.tagName == 'A' && elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighJsLinkFontSize); };
+				break;
+			case 'Checkboxes':
+				filterFunction = function(elem) { return elem.tagName == 'INPUT' && elem.getAttribute('type') == 'checkbox'; };
+				break;
+			case 'Buttons':
+				filterFunction = function(elem) { return elem.tagName == 'INPUT' && (elem.getAttribute('type') == 'button' || elem.getAttribute('type') == 'submit'); };
+				break;
+			}
+			
+			// Filter the elements.
+			this.SelectedElements = this.IntersectedElements.filter(filterFunction, this);
+			
+			// Apply the style on the selected elements.
 			var OutlineStyle = SnapLinks.Prefs.SelectedElementsBorderWidth + 'px solid ' + SnapLinks.Prefs.SelectedElementsBorderColor;
 			this.SelectedElements.forEach( function(elem) {
 				(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
 					elem.style.MozOutline = OutlineStyle;
 				} );
-			} );
+			}, this );
 			this.SelectedElementsType = Greatest;
 			
 			if(this.ElementCount)

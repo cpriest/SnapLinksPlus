@@ -231,6 +231,8 @@
 		<preferences>
 			<preference type="bool"     id="pref.snaplinks.HighlightCheckboxesForClicking"  name="extensions.snaplinks.HighlightCheckboxesForClicking"/>
 			<preference type="bool"     id="pref.snaplinks.HighlightButtonsForClicking"     name="extensions.snaplinks.HighlightButtonsForClicking"/>
+			<preference type="bool"     id="pref.snaplinks.HighlightJsLinksForClicking"     name="extensions.snaplinks.HighlightJsLinksForClicking"/>
+
 			<preference type="bool"     id="pref.snaplinks.HideSelectionOnMouseLeave"       name="extensions.snaplinks.HideSelectionOnMouseLeave"/>
 			<preference type="bool"     id="pref.snaplinks.RemoveDuplicateUrls"             name="extensions.snaplinks.RemoveDuplicateUrls"/>
 			<preference type="bool"     id="pref.snaplinks.shownumber"                      name="extensions.snaplinks.shownumber"/>
@@ -241,8 +243,7 @@
 		
 		<groupbox>
 			<caption label="&snaplinks.adv.caption;"/>
-			<checkbox label="&snaplinks.adv.HighlightCheckboxes;" preference="pref.snaplinks.HighlightCheckboxesForClicking"/>
-			<checkbox label="&snaplinks.adv.HighlightButtons;" preference="pref.snaplinks.HighlightButtonsForClicking"/>
+			
 			<checkbox label="&snaplinks.adv.hideleave;" preference="pref.snaplinks.HideSelectionOnMouseLeave"/>
 			<checkbox label="&snaplinks.adv.RemoveDuplicateUrls;" preference="pref.snaplinks.RemoveDuplicateUrls"/>
 			<hbox align="center">
@@ -254,6 +255,14 @@
 					</menupopup>
 				</menulist>
 			</hbox>
+		</groupbox>
+		
+		<groupbox>
+			<caption label="&snaplinks.adv.SelectAndClick;"/>
+			
+			<checkbox label="&snaplinks.adv.SelectAndClick.JsLinks;" preference="pref.snaplinks.HighlightJsLinksForClicking"/>
+			<checkbox label="&snaplinks.adv.SelectAndClick.Checkboxes;" preference="pref.snaplinks.HighlightCheckboxesForClicking"/>
+			<checkbox label="&snaplinks.adv.SelectAndClick.Buttons;" preference="pref.snaplinks.HighlightButtonsForClicking"/>
 		</groupbox>
 		
 		<spacer flex="1"/>

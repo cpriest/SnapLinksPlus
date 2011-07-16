@@ -189,7 +189,7 @@ function GetElementRects(node, offset) {
 
 	$A(node.querySelectorAll('IMG')).forEach( function(elem) {
 		Rects = Rects.concat( $A(elem.getClientRects()) );
-	} );
+	}, this );
 	return Rects.map( function(rect) {
 		return { 	top		: rect.top + offset.y,
 					left	: rect.left + offset.x,
@@ -204,7 +204,7 @@ function ApplyStyle(elem, style) {
 	Object.keys(style).forEach( function(name) {
 		OriginalStyle[name] = elem.style[name];
 		elem.style[name] = style[name];
-	} );
+	}, this );
 	return OriginalStyle;
 }
 

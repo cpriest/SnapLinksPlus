@@ -27,26 +27,29 @@ SnapLinks.Prefs = new (Class.create(PrefsMapper, {
 	
 	BasePath:	'extensions.snaplinks',
 	map:	{
-		DevShowJSConsoleAtStartup:			{ Type: 'bool', Default: false	},
-		DefaultAction:						{ Type: 'char', Default: 'OpenTabs',	Name: '.defaultaction' },	/* @Broken */
 		SelectionButton:					{ Type: 'int', 	Default: 2, 			Name: '.button' },
-		ActivateRequiresAlt:				{ Type: 'bool', Default: false	},
 		ActivateRequiresShift:				{ Type: 'bool', Default: false	},
 		ActivateRequiresCtrl:				{ Type: 'bool', Default: false	},
-		HideSelectionOnMouseLeave:			{ Type: 'bool',	Default: false	},
-		ShowSelectedCount:					{ Type: 'bool', Default: true, 			Name: '.shownumber' },
-		ShowCountWhere:						{ Type: 'int', 	Default: 1,				Name: '.shownumber.where' },
+		ActivateRequiresAlt:				{ Type: 'bool', Default: false	},
 		
-		SelectedElementsBorderWidth:		{ Type: 'int', 	Default: 1, 			Name: '.linksthick' },
-		SelectionBorderWidth:				{ Type: 'int', 	Default: 3, 			Name: '.drawthick' },
 		SelectionBorderColor:				{ Type: 'char', Default: '#30AF00', 	Name: '.drawpicker' },
+		SelectionBorderWidth:				{ Type: 'int', 	Default: 3, 			Name: '.drawthick' },
 		SelectedElementsBorderColor:		{ Type: 'char', Default: '#FF0000', 	Name: '.linkspicker' },
-
-		CopyToClipboardSeparator:			{ Type: 'char', Default: "\n" },
+		SelectedElementsBorderWidth:		{ Type: 'int', 	Default: 1, 			Name: '.linksthick' },
+		
+		DefaultAction:						{ Type: 'char', Default: 'OpenTabs',	Name: '.defaultaction' },	/* @Broken */
 		
 		HighlightCheckboxesForClicking:		{ Type: 'bool', Default: true },
 		HighlightButtonsForClicking:		{ Type: 'bool', Default: true },
-		RemoveDuplicateUrls:				{ Type: 'bool', Default: true }
+		HighlightJsLinksForClicking:		{ Type: 'bool', Default: true },
+		HideSelectionOnMouseLeave:			{ Type: 'bool',	Default: false	},
+		RemoveDuplicateUrls:				{ Type: 'bool', Default: true },
+		ShowSelectedCount:					{ Type: 'bool', Default: true, 			Name: '.shownumber' },
+		ShowCountWhere:						{ Type: 'int', 	Default: 1,				Name: '.shownumber.where' },
+		
+		CopyToClipboardSeparator:			{ Type: 'char', Default: "\n" },
+		
+		DevShowJSConsoleAtStartup:			{ Type: 'bool', Default: false	}
 	},
 	
 	initialize: function($super) {

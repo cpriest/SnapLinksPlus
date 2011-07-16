@@ -33,7 +33,7 @@ SnapLinks = new (Class.create({
 			try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
 						.newURI(this.Document.location.href, null, null); }
 			catch(e) {
-				Components.utils.reportError(e + ":\n"+ e.stack);
+				Components.utils.reportError(e);
 			}
 			return null;
 		}
@@ -107,7 +107,7 @@ SnapLinks = new (Class.create({
 		/* Capture the current working document */
 		this.Document = e.target.ownerDocument;
 		this.Document.body.setCapture(false);
-
+		
 		this.InstallEventHooks();
 
 		/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218, 
@@ -217,6 +217,7 @@ SnapLinks = new (Class.create({
 		/* Hash of valid actions by SelectedElementType  */
 		var ValidActions = {
 			'Links':		[ 'OpenTabs','OpenWindows','OpenTabsInNewWindow','CopyToClipboard','BookmarkLinks','DownloadLinks' ],
+			'JsLinks':		[ 'ClickElements' ],
 			'Buttons':		[ 'ClickElements' ],
 			'Checkboxes':	[ 'ClickElements' ]
 		};
@@ -235,28 +236,75 @@ SnapLinks = new (Class.create({
 	ClickElements: function() {
 		this.Selection.SelectedElements.forEach( function(elem) {
 			elem.click();
-		} );
+		}, this );
 	},
 	
 	/* Opens the selected element links in tabs in the current window */
 	OpenTabs: function() {
 		try {
 			this.Selection.FilteredElements.forEach( function(elem) {
-				if(elem.href)
-					getBrowser().addTab(elem.href, this.DocumentReferer);
+				if(elem.href) {
+					this.CurrentElement = elem;
+					
+					if (elem.SnapIsJsLink) {
+						elem.click(); // Click JS links.
+					}
+					else {
+						getBrowser().addTab(elem.href, this.DocumentReferer);
+					}
+					
+					this.CurrentElement = null;
+				}
 			}, this);
 		}
 		catch(e) {
-			Components.utils.reportError(e + ":\n"+ e.stack);
+			Components.utils.reportError(e);
 		}
 	},
+	
+	/** Opens a javascript link into a new tab. */
+/*
+	OpenJsInTab: function(elem) {
+		// Duplicate the current page on a new tab.
+		var docHref = this.Document.location.href;
+		var newTab = getBrowser().addTab(docHref, this.DocumentReferer);
+		
+		// Run our code when the new tab is ready.
+		var newTabBrowser = gBrowser.getBrowserForTab(newTab);
+		newTabBrowser.addEventListener("load", function () {
+			// Get the body element.
+			var body = newTabBrowser.contentDocument.body;
+			var dupeElem;
+			
+			// If the link element has an ID, lets use it.
+			if (elem.id) {
+				dupeElem = body.getElementById(elem.id);
+				if (dupeElem) {
+					dupeElem.click();
+				}
+			} else {
+				// Oh well, let's do this the hard way.
+				var links = body.getElementsByTagName("A");
+				for (var i = links.length - 1; i >= 0; --i) {
+					dupeElem = links[i];
+					if (dupeElem.href == elem.href) {
+						dupeElem.click();
+						break;
+					}
+				}
+			}
+		}, true);
+	},
+*/
+	
 	/* Opens the selected links in new windows */
 	OpenWindows: function() {
 		SnapLinks.Selection.FilteredElements.forEach( function(elem) {
 			if(elem.href)
 				window.open(elem.href);
-		} );
+		}, this );
 	},
+	
 	/* Opens the selected links in one new window */
 	OpenTabsInNewWindow: function() {
 		if(SnapLinks.Selection.FilteredElements.length) {
@@ -352,7 +400,7 @@ SnapLinks = new (Class.create({
 
 				try { saveURL(link.Url, link.FileName, false, BYPASS_CACHE, DONT_SKIP_PROMPT, this.DocumentReferer); }
 					catch(e) { }
-			} );
+			}, this);
 		}
 	}
 }))();

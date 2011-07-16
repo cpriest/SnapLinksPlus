@@ -72,7 +72,7 @@ var SnapLinksDebug = new (Class.create({
 	ClearClientRects: function(link) {
 		(link.SnapDebugNodes || []).forEach( function(elem) {
 			elem.parentNode.removeChild(elem);
-		} );
+		}, this );
 		link.SnapDebugNodes = [ ];
 	},
 	ClearVisualDebugAids: function(link) {
@@ -111,7 +111,7 @@ var SnapLinksDebug = new (Class.create({
 				width		: (rect.right - rect.left) + 'px',
 				height		: (rect.bottom - rect.top) + 'px',
 				cursor		: 'pointer'
-			} );
+			}, this );
 			ApplyStyle(elem, this.Flags.Links.ClientRectStyle);
 			
 			/* Pass through any clicks to this div to the original link */
