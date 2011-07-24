@@ -147,7 +147,8 @@ SnapLinks = new (Class.create({
 					
 						evt.initMouseEvent('contextmenu', true, true, window, 0, 
 							e.screenX, e.screenY, e.clientX, e.clientY,
-							false, false, false, false, 2, null);
+							false, false, false, false,
+							2, null);
 						gContextMenu.target.dispatchEvent(evt);
 					}
 				}
@@ -217,7 +218,7 @@ SnapLinks = new (Class.create({
 		/* Hash of valid actions by SelectedElementType  */
 		var ValidActions = {
 			'Links':		[ 'OpenTabs','OpenWindows','OpenTabsInNewWindow','CopyToClipboard','BookmarkLinks','DownloadLinks' ],
-			'JsLinks':		[ 'ClickElements' ],
+			'JsLinks':		[ 'ClickLinks' ],
 			'Buttons':		[ 'ClickElements' ],
 			'Checkboxes':	[ 'ClickElements' ]
 		};
@@ -233,10 +234,43 @@ SnapLinks = new (Class.create({
 		this.Clear();
 	},
 
+	ClickLinks: function() {
+		try {
+			this.Selection.FilteredElements.forEach( function(elem) {
+				if (elem.click) {
+					elem.click();
+				} else {
+					this.SimulateClick(elem); // Needed for FF4/SM2.1
+				}
+			}, this );
+		}
+		catch (e) {
+			Components.utils.reportError(e);
+		}
+	},
+	
+	/*
+	 * This is needed prior to Gecko 5.0, for Firefox 4.0 and SeaMonkey 2.1.
+	 */
+	SimulateClick: function(elem) {
+		var evt = document.createEvent("MouseEvents");
+		evt.initMouseEvent("click", true, true, window, 0,
+				0, 0, 0, 0,
+				false, false, false, false,
+				0, null);
+		return elem.dispatchEvent(evt);
+	},
+	
 	ClickElements: function() {
-		this.Selection.SelectedElements.forEach( function(elem) {
-			elem.click();
-		}, this );
+		try {
+			this.Selection.SelectedElements.forEach( function(elem) {
+					elem.click();
+				
+			}, this );
+		}
+		catch (e) {
+			Components.utils.reportError(e);
+		}
 	},
 	
 	/* Opens the selected element links in tabs in the current window */
@@ -314,6 +348,8 @@ SnapLinks = new (Class.create({
 
 			return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
 		}
+		
+		return null;
 	},
 	/* Copies the selected links to the clip board */
 	CopyToClipboard: function() {

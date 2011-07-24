@@ -43,8 +43,10 @@ var Selection = Class.create({
 	 */
 	FilteredElements: {
 		get: function() {
-			if(this.SelectedElementsType != 'Links')
+			if(this.SelectedElementsType != 'Links' &&
+					this.SelectedElementsType != 'JsLinks') {
 				return [ ];
+			}
 			
 			var Distinct = [ ];
 			return this.SelectedElements.filter( function(elem) {
@@ -374,7 +376,7 @@ var Selection = Class.create({
 						
 						if(elem.tagName == 'INPUT') {
 							switch(elem.getAttribute('type')) {
-								case 'checkbox':	TypeCounts.Checkbox++;	break;
+								case 'checkbox':	TypeCounts.Checkboxes++;	break;
 								case 'button':
 								case 'submit':		TypeCounts.Buttons++;	break;
 							}

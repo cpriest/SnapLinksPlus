@@ -236,6 +236,7 @@ var PrefsMapper = Class.create({
 				catch(e) { Log.Warning('Unable to retrieve or set preference: ' + this.map[Property].Path + '\r\n' + e.toString()); }
 		}, this);
 	},
+	
 	GetPref: function(Property) {
 		if(this.pref.prefHasUserValue(this.map[Property].Path) == false)
 			return this.map[Property].Default;
@@ -245,7 +246,10 @@ var PrefsMapper = Class.create({
 			case this.pref.PREF_INT:	return this.pref.getIntPref(this.map[Property].Path);
 			case this.pref.PREF_BOOL:	return this.pref.getBoolPref(this.map[Property].Path);
 		}
+		
+		return undefined;
 	},
+	
 	SetPref: function(Property, Value) {
 		if(Value == undefined)
 			Value = this.map[Property].Default;
@@ -255,7 +259,10 @@ var PrefsMapper = Class.create({
 			case 'int':		return this.pref.setIntPref(this.map[Property].Path, Value);
 			case 'char':	return this.pref.setCharPref(this.map[Property].Path, Value);
 		}
+		
+		return undefined;
 	},
+	
 	TranslatePref: function(Property, Map) {
 		var PreviousValue;
 
