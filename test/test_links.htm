@@ -18,32 +18,10 @@
 </head>
 <body>
 <h1>Snap Links Plus Test Page</h1>
-<h2>Basic Links</h2>
+<h2>Links Within Text</h2>
 	<p>
 		This is a test file for testing the link rect detection and drawing code.
 	</p>
-	<p>
-	<h3>Links Table</h3>
-	<table>
-		<tbody>
-			<tr>
-				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
-				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
-				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
-			</tr>
-			<tr>
-				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
-				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
-				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
-			</tr>
-			<tr>
-				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
-				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
-				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
-			</tr>
-		</tbody>
-	<table>
-	<h3>Links Within Text</h3>
 	<p>
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. <a href="http://en.wikipedia.org/wiki/Gold">Duis mollis dolor et ante tincidunt</a> accumsan vitae sed elit. Integer id arcu ipsum. Vestibulum molestie convallis eros et commodo. Vestibulum ut odio lectus, <a href="http://en.wikipedia.org/wiki/Gold">quis scelerisque lacus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</a> Nam tincidunt massa eu nibh interdum mattis. Sed porta augue tortor, et blandit justo. Integer ut enim nisl. Cras vel lacus neque, nec vulputate neque. Aenean volutpat ante et nibh facilisis dapibus. Nam at odio ac est pharetra egestas. Maecenas congue, risus vitae lacinia placerat, mauris velit fringilla elit, non iaculis augue ipsum non sem. Duis ornare vestibulum nibh porttitor consectetur.
 	</p>
@@ -108,48 +86,94 @@ Suspendisse nibh orci, sodales dapibus consectetur sit amet, venenatis id leo. <
 					}.bind(this), 3000);
 				}, false );
 			}
-		} );
+		}, this );
 	}, false );
 </script>
 <hr/>
 <h2>JavaScript Links - Replace Location</h2>
 	<table>
+		<thead>
+			<tr>
+				<th colspan="3">Normal</th>
+				<th colspan="3">JavaScript</th>
+			</tr>
+		</thead>
 		<tbody>
 			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: large;">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: medium;">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: small;">Gold</a></td>
+				<td><a href="javascript:load_page('Gold')" style="font-size: large;">Gold</a></td>
+				<td><a href="javascript:load_page('Gold')" style="font-size: medium;">Gold</a></td>
+				<td><a href="javascript:load_page('Gold')" style="font-size: small;">Gold</a></td>
+			</tr>
+			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
 				<td><a href="javascript:load_page('Gold')">Gold</a></td>
 				<td><a href="javascript:load_page('Gold')">Gold</a></td>
 				<td><a href="javascript:load_page('Gold')">Gold</a></td>
 			</tr>
 			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
 				<td><a href="javascript:load_page('Silver')">Silver</a></td>
 				<td><a href="javascript:load_page('Silver')">Silver</a></td>
 				<td><a href="javascript:load_page('Silver')">Silver</a></td>
 			</tr>
 			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
 				<td><a href="javascript:load_page('Bronze')">Bronze</a></td>
 				<td><a href="javascript:load_page('Bronze')">Bronze</a></td>
 				<td><a href="javascript:load_page('Bronze')">Bronze</a></td>
+			</tr>
+			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small;">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small;">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small;">Bronze</a></td>
+				<td><a href="javascript:load_page('Bronze')" style="font-size: small;">Bronze</a></td>
+				<td><a href="javascript:load_page('Bronze')" style="font-size: small;">Bronze</a></td>
+				<td><a href="javascript:load_page('Bronze')" style="font-size: small;">Bronze</a></td>
 			</tr>
 		</tbody>
 	<table>
 <script language="javascript">
-function load_page(page) { window.location.href = 'http://en.wikipedia.org/wiki/'+ page; }
+function load_page(page) { window.location.replace('http://en.wikipedia.org/wiki/'+ page); }
 </script>
 <hr/>
 <h2>JavaScript Links - Popup Window</h2>
 	<table>
+		<thead>
+			<tr>
+				<th colspan="3">Normal</th>
+				<th colspan="3">JavaScript</th>
+			</tr>
+		</thead>
 		<tbody>
 			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
 				<td><a href="javascript:popup_page('Gold')">Gold</a></td>
 				<td><a href="javascript:popup_page('Gold')">Gold</a></td>
 				<td><a href="javascript:popup_page('Gold')">Gold</a></td>
 			</tr>
 			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
 				<td><a href="javascript:popup_page('Silver')">Silver</a></td>
 				<td><a href="javascript:popup_page('Silver')">Silver</a></td>
 				<td><a href="javascript:popup_page('Silver')">Silver</a></td>
 			</tr>
 			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
 				<td><a href="javascript:popup_page('Bronze')">Bronze</a></td>
 				<td><a href="javascript:popup_page('Bronze')">Bronze</a></td>
 				<td><a href="javascript:popup_page('Bronze')">Bronze</a></td>
@@ -159,5 +183,35 @@ function load_page(page) { window.location.href = 'http://en.wikipedia.org/wiki/
 <script language="javascript">
 function popup_page(page) { window.open('http://en.wikipedia.org/wiki/'+ page); }
 </script>
+<hr/>
+<h2>Normal Links Table</h2>
+	<table>
+		<tbody>
+			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: large;">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: medium;">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: small;">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: large;">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: medium;">Gold</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: small;">Gold</a></td>
+			</tr>
+			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: large;">Silver</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: medium;">Silver</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: small;">Silver</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: large;">Silver</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: medium;">Silver</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: small;">Silver</a></td>
+			</tr>
+			<tr>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: large;">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: medium;">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small;">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: large;">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: medium;">Bronze</a></td>
+				<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small;">Bronze</a></td>
+			</tr>
+		</tbody>
+	<table>
 </body>
 </html>
