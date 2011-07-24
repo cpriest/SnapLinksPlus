@@ -6,21 +6,21 @@
     
     This file is part of Snap Links Plus.
 
-    Snap Links is free software: you can redistribute it and/or modify
+    Snap Links Plus is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Snap Links is distributed in the hope that it will be useful,
+    Snap Links Plus is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
+    along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<project name="snaplinks" default="build-dev">
+<project name="snaplinksplus" default="build-dev">
 
 	<property file="${basedir}/release.properties" />
 	<property file="${basedir}/credentials.properties" />
@@ -31,13 +31,20 @@
 	<property name="dist.dir" value="${basedir}/dist" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="www.dir" value="${basedir}/www" />
+	
+	<property name="extension.appsPostfix" value="-fx+sm" />
+	<property name="extension.checksumAlgorithm" value="sha1" />
+
+	<property name="localesBundle.filenamePrefix" value="Snap_Links_Plus" />
+	<property name="localesBundle.nameForNormalBuild" value="selected_locales_replaced" />
+	<property name="localesBundle.nameForBabelzillaBuild" value="all_locales_skipped" />
 
 	<property name="releaseIni.file" value="${www.dir}/release.ini" />
-	<property name="buildNumber.file" value="${basedir}/.buildNumbers/build.number.${extension.version}" />
+	<property name="buildNumber.file" value="${basedir}/.buildNumbers/build.number.${extension.version}.txt" />
 	<property name="credentials.file" value="${basedir}/credentials.properties" />
 	
 	<!-- Compression level: 0=min/fast, 9=max/slow. -->
-	<property name="zip.compression.level" value="9" />
+	<property name="zip.compressionLevel" value="9" />
 
 
 	<fileset id="src.root.files" dir="${src.dir}">
@@ -80,7 +87,7 @@
 
 
 	<target name="checksum">
-		<checksum file="${dist.dir}/${extension.published.xpi}" algorithm="${extension.checksum.algorithm}" property="extension.checksum.value" />
+		<checksum file="${dist.dir}/${extension.published.xpi}" algorithm="${extension.checksumAlgorithm}" property="extension.checksum.value" />
 	</target>
 
 
@@ -105,7 +112,7 @@
 
 		<antcall target="patch-install-rdf" />
 
-		<dirset id="locale.dirs" dir="${build.dir}/all_locales_replaced/locale" includes="*" excludes="en-US" />
+		<dirset id="locale.dirs" dir="${build.dir}/${localesBundle.nameForNormalBuild}/locale" includes="*" excludes="en-US" />
 
 		<antcall target="patch-chrome-manifest" inheritrefs="yes">
 			<param name="dirset.id" value="locale.dirs"/>
@@ -126,11 +133,11 @@
 
 	<target name="patch-chrome-manifest">
 		<!-- Add locale definitions to chrome.manifest: -->
-		<!-- locale snaplinks en-US	locale/en-US/ -->
+		<!-- locale snaplinksplus en-US	locale/en-US/ -->
 		<pathconvert pathsep="${line.separator}" property="locale.list" refid="${dirset.id}">
 			<chainedmapper>
 				<flattenmapper/>
-				<regexpmapper from="(.*)" to="locale snaplinks \1	locale/\1/" />
+				<regexpmapper from="(.*)" to="locale snaplinksplus \1	locale/\1/" />
 			</chainedmapper>
 		</pathconvert>
 		<echo file="${build.dir}/src/chrome.manifest" append="yes">${locale.list}</echo>
@@ -193,14 +200,14 @@
 
 
 	<target name="dist" depends="clean,set-version-dist,xpi-babelzilla,xpi,xpi-amo">
-		<checksum file="${dist.dir}/${extension.xpi}" algorithm="${extension.checksum.algorithm}" property="extension.dist.xpi.checksum" />
+		<checksum file="${dist.dir}/${extension.xpi}" algorithm="${extension.checksumAlgorithm}" property="extension.dist.xpi.checksum" />
 
 		<tstamp prefix="stop">
 			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
 		</tstamp>
 
 		<echo message="${extension.versionNumber.forThisBuild} is ready ${stop.build.tstamp}" />
-		<echo message="${extension.checksum.algorithm} checsum is ${extension.dist.xpi.checksum}" />
+		<echo message="${extension.checksumAlgorithm} checsum is ${extension.dist.xpi.checksum}" />
 	</target>
 
 	<!--
@@ -208,31 +215,31 @@
 		description="Download locale bundles from Babelzilla">
 		<exec executable="attrib" osfamily="windows">
 			<arg value="-r"/>
-			<arg file="${babelzilla.dir}\${extension.babelzillaFilenamePrefix}_all_locales_replaced.tar.gz"/>
+			<arg file="${babelzilla.dir}\${localesBundle.filenamePrefix}_${localesBundle.nameForNormalBuild}.tar.gz"/>
 		</exec>
 
 		<exec executable="attrib" osfamily="windows">
 			<arg value="-r"/>
-			<arg file="${babelzilla.dir}\${extension.babelzillaFilenamePrefix}_all_locales_blank.tar.gz"/>
+			<arg file="${babelzilla.dir}\${localesBundle.filenamePrefix}_all_locales_blank.tar.gz"/>
 		</exec>
 
 		<exec executable="attrib" osfamily="windows">
 			<arg value="-r"/>
-			<arg file="${babelzilla.dir}\${extension.babelzillaFilenamePrefix}_all_locales_skipped.tar.gz"/>
+			<arg file="${babelzilla.dir}\${localesBundle.filenamePrefix}_${localesBundle.nameForBabelzillaBuild}.tar.gz"/>
 		</exec>
 
 		<get src="http://www.babelzilla.org/index.php?option=com_wts&amp;Itemid=88&amp;type=downloadtar&amp;extension=4497"
-			dest="${babelzilla.dir}/${extension.babelzillaFilenamePrefix}_all_locales_replaced.tar.gz"
+			dest="${babelzilla.dir}/${localesBundle.filenamePrefix}_${localesBundle.nameForNormalBuild}.tar.gz"
 			verbose="true" ignoreerrors="false"
 			username="${babelzilla.username}" password="${babelzilla.password}"/>
 
 		<get src="http://www.babelzilla.org/index.php?option=com_wts&amp;Itemid=88&amp;type=downloadempty&amp;extension=4497"
-			dest="${babelzilla.dir}/${extension.babelzillaFilenamePrefix}_all_locales_blank.tar.gz"
+			dest="${babelzilla.dir}/${localesBundle.filenamePrefix}_all_locales_blank.tar.gz"
 			verbose="true" ignoreerrors="false"
 			username="${babelzilla.username}" password="${babelzilla.password}"/>
 
 		<get src="http://www.babelzilla.org/index.php?option=com_wts&amp;Itemid=88&amp;type=downloadskip&amp;extension=4497"
-			dest="${babelzilla.dir}/${extension.babelzillaFilenamePrefix}_all_locales_skipped.tar.gz"
+			dest="${babelzilla.dir}/${localesBundle.filenamePrefix}_${localesBundle.nameForBabelzillaBuild}.tar.gz"
 			verbose="true" ignoreerrors="false"
 			username="${babelzilla.username}" password="${babelzilla.password}"/>
 	</target>
@@ -292,11 +299,11 @@
 			<string value="[release]&#0010;" />
 			<string value="version = &quot;${extension.publishedVersion}&quot;&#0010;" />
 			<string value="xpi = &quot;${extension.published.xpi}&quot;&#0010;" />
-			<string value="checksum = &quot;${extension.checksum.algorithm}:${extension.checksum.value}&quot;&#0010;" />
+			<string value="checksum = &quot;${extension.checksumAlgorithm}:${extension.checksum.value}&quot;&#0010;" />
 		</concat>
 
 		<echo>xpi: ${extension.published.xpi}</echo>
-		<echo>checksum: ${extension.checksum.algorithm}:${extension.checksum.value}</echo>
+		<echo>checksum: ${extension.checksumAlgorithm}:${extension.checksum.value}</echo>
 	</target>
 
 
@@ -318,7 +325,7 @@
 
 		<delete file="${dist.dir}/amo/${extension.published.xpi}" />
 
-		<zip destfile="${dist.dir}/amo/${extension.published.xpi}" level="${zip.compression.level}">
+		<zip destfile="${dist.dir}/amo/${extension.published.xpi}" level="${zip.compressionLevel}">
 			<zipfileset dir="${repack.dir}" includes="*/**" />
 		</zip>
 
@@ -353,17 +360,17 @@
 
 
 	<target name="unpack-locale-bundle-to-src" depends="init">
-		<mkdir dir="${build.dir}/all_locales_replaced" />
+		<mkdir dir="${build.dir}/${localesBundle.nameForNormalBuild}" />
 
-		<property name="babelzilla-replaced-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_replaced.tar.gz" />
+		<property name="babelzilla-replaced-bundle-tar-gz" value="${localesBundle.filenamePrefix}_${localesBundle.nameForNormalBuild}.tar.gz" />
 
 		<!-- Unpack the string bundle. -->
-		<untar src="${basedir}/babelzilla/${babelzilla-replaced-bundle-tar-gz}" dest="${build.dir}/all_locales_replaced/locale" compression="gzip" overwrite="true" />
+		<untar src="${basedir}/babelzilla/${babelzilla-replaced-bundle-tar-gz}" dest="${build.dir}/${localesBundle.nameForNormalBuild}/locale" compression="gzip" overwrite="true" />
 
 		<!-- Move all files except .properties to .xpi build directory. -->
 		<!-- Also, exclude the default locale (en-US) -->
 		<move todir="${build.dir}/src" overwrite="true">
-			<fileset dir="${build.dir}/all_locales_replaced" includes="*/**" excludes="**/*.dtd,**/*.properties,locale/en-US/**,**/contents.rdf" />
+			<fileset dir="${build.dir}/${localesBundle.nameForNormalBuild}" includes="*/**" excludes="**/*.dtd,**/*.properties,locale/en-US/**,**/contents.rdf" />
 		</move>
 
 		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
@@ -377,7 +384,7 @@
 			<srcfile />
 			<targetfile />
 			<fileset dir="${src.dir}" includes="locale/en-US/*.dtd" />
-			<fileset dir="${build.dir}/all_locales_replaced" includes="**/*.dtd" excludes="locale/en-US/**" />
+			<fileset dir="${build.dir}/${localesBundle.nameForNormalBuild}" includes="**/*.dtd" excludes="locale/en-US/**" />
 			<mapper type="identity" />
 		</apply>
 
@@ -389,7 +396,7 @@
 		</native2ascii>
 
 		<!-- Encode .properties from the bundle -->
-		<native2ascii src="${build.dir}/all_locales_replaced" dest="${build.dir}/src" encoding="UTF-8">
+		<native2ascii src="${build.dir}/${localesBundle.nameForNormalBuild}" dest="${build.dir}/src" encoding="UTF-8">
 			<include name="locale/**/*.properties" />
 			<exclude name="locale/en-US/**" />
 			<exclude name="**/amo.properties" />
@@ -398,17 +405,17 @@
 
 
 	<target name="unpack-locale-bundle-to-babelzilla-src" depends="init-babelzilla">
-		<mkdir dir="${build.dir}/all_locales_skipped" />
+		<mkdir dir="${build.dir}/${localesBundle.nameForBabelzillaBuild}" />
 
-		<property name="babelzilla-skipped-bundle-tar-gz" value="${extension.babelzillaFilenamePrefix}_all_locales_skipped.tar.gz" />
+		<property name="babelzilla-skipped-bundle-tar-gz" value="${localesBundle.filenamePrefix}_${localesBundle.nameForBabelzillaBuild}.tar.gz" />
 
 		<!-- Unpack the string bundle. -->
-		<untar src="${basedir}/babelzilla/${babelzilla-skipped-bundle-tar-gz}" dest="${build.dir}/all_locales_skipped/locale" compression="gzip" overwrite="true" />
+		<untar src="${basedir}/babelzilla/${babelzilla-skipped-bundle-tar-gz}" dest="${build.dir}/${localesBundle.nameForBabelzillaBuild}/locale" compression="gzip" overwrite="true" />
 
 		<!-- Move all files except .properties to .xpi build directory. -->
 		<!-- Also, exclude the default locale (en-US) -->
 		<move todir="${build.dir}/babelzilla" overwrite="true">
-			<fileset dir="${build.dir}/all_locales_skipped" includes="*/**" excludes="**/*.dtd,**/*.properties,**/en-US/**,**/contents.rdf" />
+			<fileset dir="${build.dir}/${localesBundle.nameForBabelzillaBuild}" includes="*/**" excludes="**/*.dtd,**/*.properties,**/en-US/**,**/contents.rdf" />
 		</move>
 
 		<!-- Copy the files of the default locale to the .xpi build directory, but exclude .properties. -->
@@ -422,7 +429,7 @@
 			<srcfile />
 			<targetfile />
 			<fileset dir="${src.dir}" includes="locale/en-US/*.dtd" />
-			<fileset dir="${build.dir}/all_locales_skipped" includes="**/*.dtd" excludes="**/en-US/**" />
+			<fileset dir="${build.dir}/${localesBundle.nameForBabelzillaBuild}" includes="**/*.dtd" excludes="**/en-US/**" />
 			<mapper type="identity" />
 		</apply>
 
@@ -433,7 +440,7 @@
 		</native2ascii>
 
 		<!-- Encode .properties from the bundle -->
-		<native2ascii src="${build.dir}/all_locales_skipped" dest="${build.dir}/babelzilla" encoding="UTF-8">
+		<native2ascii src="${build.dir}/${localesBundle.nameForBabelzillaBuild}" dest="${build.dir}/babelzilla" encoding="UTF-8">
 			<include name="locale/**/*.properties" />
 			<exclude name="locale/en-US/**" />
 		</native2ascii>
@@ -443,7 +450,7 @@
 	<target name="xpi" depends="set-xpi-name,copy-src-to-build">
 		<delete file="${dist.dir}/${extension.xpi}" />
 
-		<zip destfile="${dist.dir}/${extension.xpi}" level="${zip.compression.level}">
+		<zip destfile="${dist.dir}/${extension.xpi}" level="${zip.compressionLevel}">
 			<zipfileset dir="${build.dir}/src" includes="*/**" />
 		</zip>
 	</target>
@@ -452,7 +459,7 @@
 	<target name="xpi-dev" depends="set-xpi-name,copy-src-to-build">
 		<delete file="${dist.dir}/${extension.xpi}" />
 
-		<zip destfile="${dist.dir}/${extension.xpi}" level="${zip.compression.level}" filesonly="true">
+		<zip destfile="${dist.dir}/${extension.xpi}" level="${zip.compressionLevel}" filesonly="true">
 			<zipfileset dir="${build.dir}/src" includes="*/**" />
 		</zip>
 	</target>
@@ -474,7 +481,7 @@
 
 		<delete file="${dist.dir}/amo/${extension.xpi}" />
 
-		<zip destfile="${dist.dir}/amo/${extension.xpi}" level="${zip.compression.level}">
+		<zip destfile="${dist.dir}/amo/${extension.xpi}" level="${zip.compressionLevel}">
 			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="install.rdf" />
 			<zipfileset dir="${build.dir}/amo" includes="install.rdf" />
 		</zip>
@@ -487,7 +494,7 @@
 
 		<delete file="${dist.dir}/babelzilla/${extension.xpi}" />
 
-		<zip destfile="${dist.dir}/babelzilla/${extension.xpi}" level="${zip.compression.level}" filesonly="true">
+		<zip destfile="${dist.dir}/babelzilla/${extension.xpi}" level="${zip.compressionLevel}" filesonly="true">
 			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="locale/**" />
 			<zipfileset dir="${build.dir}/babelzilla" includes="*/**" />
 		</zip>

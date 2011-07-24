@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://snaplinks/skin/options.css" type="text/css"?>
+<?xml-stylesheet href="chrome://snaplinksplus/skin/options.css" type="text/css"?>
 
 <!--
 	options.xul
@@ -11,24 +11,24 @@
 
 	This file is part of Snap Links Plus.
 
-	Snap Links is free software: you can redistribute it and/or modify
+	Snap Links Plus is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	Snap Links is distributed in the hope that it will be useful,
+	Snap Links Plus is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 
 	You should have received a copy of the GNU General Public License
-	along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
+	along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <!DOCTYPE window [
-	<!ENTITY % options SYSTEM "chrome://snaplinks/locale/options.dtd">
+	<!ENTITY % options SYSTEM "chrome://snaplinksplus/locale/options.dtd">
 	%options;
-	<!ENTITY % ISOlat1 SYSTEM "chrome://snaplinks/content/ISOlat1.dtd">
+	<!ENTITY % ISOlat1 SYSTEM "chrome://snaplinksplus/content/ISOlat1.dtd">
 	%ISOlat1;
 ]>
 
@@ -270,6 +270,6 @@
 	
 	<!-- All non-prefpane elements must appear after the last prefpane element. -->
 	
-	<script type="application/x-javascript" src="chrome://snaplinks/content/options.js"/>
+	<script type="application/x-javascript" src="chrome://snaplinksplus/content/options.js"/>
 
 </prefwindow>

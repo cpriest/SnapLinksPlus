@@ -8,18 +8,18 @@
  *
  *  This file is part of Snap Links Plus.
  *
- *  Snap Links is free software: you can redistribute it and/or modify
+ *  Snap Links Plus is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  Snap Links is distributed in the hope that it will be useful,
+ *  Snap Links Plus is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Snap Links.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 const snaplLMB  = 0;
@@ -38,7 +38,7 @@ SnapLinks = new (Class.create({
 			return null;
 		}
 	},
-	/* Setter to change the snap links status text */
+	/* Setter to change the status text */
 	SnapLinksStatus: {
 		set: function(x) {
 			if(SnapLinks.Prefs.ShowCountWhere == SnapLinks.Prefs.ShowCount_AddonBar) {
@@ -54,7 +54,7 @@ SnapLinks = new (Class.create({
 	initialize: function() {
 
 		var StringBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
-		var LocaleStrings = StringBundleService.createBundle("chrome://snaplinks/locale/snaplinks.properties");
+		var LocaleStrings = StringBundleService.createBundle("chrome://snaplinksplus/locale/snaplinks.properties");
 		
 		this.LocaleStrings = {
 			Usage:		LocaleStrings.GetStringFromName("snaplinks.status.usage"),
@@ -186,7 +186,7 @@ SnapLinks = new (Class.create({
 		ContentAreaContextMenu.addEventListener('popupshowing', _PreventEventDefault, false);
 	},
 	
-	/* This is fired when the snap links context menu is closed */
+	/* This is fired when the context menu is closed */
 	OnSnapLinksPopupHidden: function(e){
 		SnapLinks.Clear();
 	},
