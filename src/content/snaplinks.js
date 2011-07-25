@@ -237,11 +237,7 @@ SnapLinks = new (Class.create({
 	ClickLinks: function() {
 		try {
 			this.Selection.FilteredElements.forEach( function(elem) {
-				if (elem.click) {
-					elem.click();
-				} else {
-					this.SimulateClick(elem); // Needed for FF4/SM2.1
-				}
+				this.ClickLink(elem);
 			}, this );
 		}
 		catch (e) {
@@ -249,23 +245,27 @@ SnapLinks = new (Class.create({
 		}
 	},
 	
-	/*
-	 * This is needed prior to Gecko 5.0, for Firefox 4.0 and SeaMonkey 2.1.
-	 */
-	SimulateClick: function(elem) {
+	ClickLink: function(elem) {
+		if (elem.click) {
+			elem.click();
+			return;
+		}
+		
+		/* This is needed for JavaScript links on
+		 * Firefox 4.0 and SeaMonkey 2.1.
+		 */
 		var evt = document.createEvent("MouseEvents");
 		evt.initMouseEvent("click", true, true, window, 0,
 				0, 0, 0, 0,
 				false, false, false, false,
 				0, null);
-		return elem.dispatchEvent(evt);
+		elem.dispatchEvent(evt);
 	},
 	
 	ClickElements: function() {
 		try {
 			this.Selection.SelectedElements.forEach( function(elem) {
-					elem.click();
-				
+				elem.click();
 			}, this );
 		}
 		catch (e) {
@@ -281,7 +281,7 @@ SnapLinks = new (Class.create({
 					this.CurrentElement = elem;
 					
 					if (elem.SnapIsJsLink) {
-						elem.click(); // Click JS links.
+						this.ClickLink(elem); // Click JS links.
 					}
 					else {
 						getBrowser().addTab(elem.href, this.DocumentReferer);
@@ -344,7 +344,7 @@ SnapLinks = new (Class.create({
 		if(SnapLinks.Selection.FilteredElements.length) {
 			var urls = SnapLinks.Selection.FilteredElements.map( function(elem) {
 				return elem.href;
-			} ).join('|');
+			}, this ).join('|');
 
 			return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
 		}
@@ -392,20 +392,33 @@ SnapLinks = new (Class.create({
 	},
 	/* Bookmarks the selected links */
 	BookmarkLinks: function() {
-		if(SnapLinks.Selection.FilteredElements.length) {
-			/* Does not work, find way to add bookmarks to FF4 - @BROKEN */
-			var linksInfo = SnapLinks.Selection.FilteredElements.map( function(elem) {
-				return {
-					name	: elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' '),
-					url		: elem.href
-				};
-			} );
-			const BROWSER_ADD_BM_FEATURES = 'centerscreen,chrome,dialog=no,resizable=yes';
+		try {
+			var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
 
-			var dialogArgs = { name: gNavigatorBundle.getString("bookmarkAllTabsDefault") };
-			dialogArgs.bBookmarkAllTabs = true;
-			dialogArgs.objGroup = linksInfo;
-			openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "", BROWSER_ADD_BM_FEATURES, dialogArgs);
+			if(SnapLinks.Selection.FilteredElements.length) {
+				var uriList = SnapLinks.Selection.FilteredElements.map( function(elem) {
+					return ioService.newURI(elem.href, null, null);
+				}, this );
+				
+				// Use showBookmarkDialog() when it is available.
+				if (PlacesUIUtils.showBookmarkDialog) {
+					/* See documentation at the top of bookmarkProperties.js (Mozilla). */
+					var info = {
+							action: "add",
+							type: "folder",
+							hiddenRows: ["description"],
+							URIList: uriList
+					};
+					
+					PlacesUIUtils.showBookmarkDialog(info, window);
+				} else {
+					// Fallback to older showMinimalAddMultiBookmarkUI().
+					PlacesUIUtils.showMinimalAddMultiBookmarkUI(uriList);
+				}
+			}
+		}
+		catch (e) {
+			Components.utils.reportError(e);
 		}
 	},
 	/* Downloads the selected links as files */
@@ -429,7 +442,8 @@ SnapLinks = new (Class.create({
 				TitlesUsed[Title] = true;
 
 				return { FileName: Title, Url: elem.href };
-			} );
+			}, this );
+			
 			links.forEach( function( link ) {
 				const BYPASS_CACHE = true;
 				const DONT_SKIP_PROMPT = false;

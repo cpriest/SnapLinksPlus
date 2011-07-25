@@ -36,19 +36,28 @@ var SnapLinksContext = { };
 /* Load all resource files into the SnapLinksContext, SnapLinks is the main global used to reference this extension */
 
 window.addEventListener('load', function() {
-	function LoadScript(path) {
-		/* Loads the script into the SnapLinksContext object */
-		Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
-			.getService(Components.interfaces.mozIJSSubScriptLoader)
-			.loadSubScript(path, SnapLinksContext);
+	try {
+		var Cu = Components.utils;
+		Cu.import("resource://gre/modules/PlacesUtils.jsm");
+		Cu.import("resource://gre/modules/PlacesUIUtils.jsm");
+		
+		function LoadScript(path) {
+			/* Loads the script into the SnapLinksContext object */
+			Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
+				.getService(Components.interfaces.mozIJSSubScriptLoader)
+				.loadSubScript(path, SnapLinksContext);
+		}
+		
+		LoadScript('chrome://snaplinksplus/content/Utility.js');
+		LoadScript('chrome://snaplinksplus/content/Selection.js');
+		LoadScript('chrome://snaplinksplus/content/Debug.js');
+		LoadScript('chrome://snaplinksplus/content/Preferences.js');
+		LoadScript('chrome://snaplinksplus/content/snaplinks.js');
+		
+		if(SnapLinks.Prefs.DevShowJSConsoleAtStartup)
+			toJavaScriptConsole();
 	}
-
-	LoadScript('chrome://snaplinksplus/content/Utility.js');
-	LoadScript('chrome://snaplinksplus/content/Selection.js');
-	LoadScript('chrome://snaplinksplus/content/Debug.js');
-	LoadScript('chrome://snaplinksplus/content/Preferences.js');
-	LoadScript('chrome://snaplinksplus/content/snaplinks.js');
-	
-	if(SnapLinks.Prefs.DevShowJSConsoleAtStartup)
-		toJavaScriptConsole();
+	catch (e) {
+		Components.utils.reportError(e);
+	}
 }, false);
