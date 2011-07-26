@@ -70,24 +70,66 @@
 	</condition>
 
 
-	<target name="build-babelzilla" depends="clean,init,set-version-dev,copy-src-to-build,xpi-babelzilla">
-		<tstamp prefix="stop">
-			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
-		</tstamp>
-		<echo message="${extension.versionNumber.forThisBuild} ready ${stop.build.tstamp}" />
+	<target name="init-amo" depends="init">
+		<mkdir dir="${build.dir}/amo" />
 	</target>
 
 
-	<target name="build-dev" depends="clean,init,set-version-dev,copy-src-to-build,xpi-dev,xpi-babelzilla">
-		<tstamp prefix="stop">
-			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
-		</tstamp>
-		<echo message="${extension.versionNumber.forThisBuild} ready ${stop.build.tstamp}" />
+	<target name="init-babelzilla" depends="init">
+		<mkdir dir="${build.dir}/babelzilla" />
 	</target>
 
 
-	<target name="checksum">
-		<checksum file="${dist.dir}/${extension.published.xpi}" algorithm="${extension.checksumAlgorithm}" property="extension.checksum.value" />
+	<target name="init-dev" depends="init,set-version-dev">
+	</target>
+
+
+	<target name="init-dist" depends="init,set-version-dist">
+	</target>
+
+
+	<target name="init" depends="init-build">
+		<echo level="info" message="Version ${extension.version}-${extension.subVersion} Build ${build.number} started ${build.tstamp}" />
+
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dir}/src" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+
+
+	<target name="init-build">
+		<tstamp>
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
+		</tstamp>
+
+		<!-- Make the build number file writable. -->
+		<exec executable="attrib" dir="${basedir}" osfamily="windows">
+			<arg value="-r" />
+			<arg file="${buildNumber.file}" />
+		</exec>
+
+		<buildnumber file="${buildNumber.file}" />
+	</target>
+
+
+	<target name="set-version">
+		<property name="extension.versionNumber" value="${extension.version}${extension.subVersion}" />
+	</target>
+
+
+	<target name="set-version-dev" depends="set-version">
+		<property name="extension.versionNumber.plusBuild" value="${extension.versionNumber}.0pre${build.number}" />
+		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber.plusBuild}" />
+	</target>
+
+
+	<target name="set-version-dist" depends="set-version">
+		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber}" />
+	</target>
+
+
+	<target name="set-xpi-name">
+		<property name="extension.xpi" value="${ant.project.name}-${extension.versionNumber.forThisBuild}${extension.appsPostfix}.xpi" />
 	</target>
 
 
@@ -102,6 +144,22 @@
 		<delete includeemptydirs="true">
 			<fileset dir="${dist.dir}" includes="**/*" excludes=".cvsignore" />
 		</delete>
+	</target>
+
+
+	<target name="build-babelzilla-dev" depends="clean,init-dev,copy-src-to-build,xpi-babelzilla">
+		<tstamp prefix="stop">
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
+		</tstamp>
+		<echo message="${extension.versionNumber.forThisBuild} ready ${stop.build.tstamp}" />
+	</target>
+
+
+	<target name="build-dev" depends="clean,init-dev,copy-src-to-build,xpi-dev,xpi-babelzilla">
+		<tstamp prefix="stop">
+			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
+		</tstamp>
+		<echo message="${extension.versionNumber.forThisBuild} ready ${stop.build.tstamp}" />
 	</target>
 
 
@@ -199,7 +257,7 @@
 	</target>
 
 
-	<target name="dist" depends="clean,set-version-dist,xpi-babelzilla,xpi,xpi-amo">
+	<target name="dist" depends="clean,init-dist,xpi-babelzilla,xpi,xpi-amo">
 		<checksum file="${dist.dir}/${extension.xpi}" algorithm="${extension.checksumAlgorithm}" property="extension.dist.xpi.checksum" />
 
 		<tstamp prefix="stop">
@@ -250,70 +308,13 @@
 	</target>
 
 
-	<target name="init" depends="init-build">
-		<echo level="info" message="Version ${extension.version}-${extension.subVersion} Build ${build.number} started ${build.tstamp}" />
-
-		<mkdir dir="${build.dir}" />
-		<mkdir dir="${build.dir}/src" />
-		<mkdir dir="${dist.dir}" />
-	</target>
-
-
-	<target name="init-amo" depends="init">
-		<mkdir dir="${build.dir}/amo" />
-	</target>
-
-
-	<target name="init-babelzilla" depends="init">
-		<mkdir dir="${build.dir}/babelzilla" />
-	</target>
-
-
-	<target name="init-build">
-		<tstamp>
-			<format property="build.tstamp" timezone="GMT+0" pattern="yyyy-MM-dd HH:mm z" />
-		</tstamp>
-
-		<!-- Make the build number file writable. -->
-		<exec executable="attrib" dir="${basedir}" osfamily="windows">
-			<arg value="-r" />
-			<arg file="${buildNumber.file}" />
-		</exec>
-
-		<buildnumber file="${buildNumber.file}" />
-	</target>
-
-
-	<target name="publish" depends="release.ini">
-	</target>
-
-
-	<!-- Create release.ini file which is read by www/local.conf -->
-	<target name="release.ini" depends="set-pub-xpi-name,checksum">
-		<exec executable="attrib" dir="${basedir}" osfamily="windows">
-			<arg value="-r" />
-			<arg file="${releaseIni.file}" />
-		</exec>
-
-		<concat destfile="${releaseIni.file}">
-			<string value="[release]&#0010;" />
-			<string value="version = &quot;${extension.publishedVersion}&quot;&#0010;" />
-			<string value="xpi = &quot;${extension.published.xpi}&quot;&#0010;" />
-			<string value="checksum = &quot;${extension.checksumAlgorithm}:${extension.checksum.value}&quot;&#0010;" />
-		</concat>
-
-		<echo>xpi: ${extension.published.xpi}</echo>
-		<echo>checksum: ${extension.checksumAlgorithm}:${extension.checksum.value}</echo>
-	</target>
-
-
 	<!-- Repack an existing xpi file as AMO release. -->
-	<target name="repack-published-for-amo" depends="init-amo,set-pub-xpi-name">
+	<target name="repack-dist-for-amo" depends="init-amo,init-dist,set-xpi-name">
 		<property name="repack.dir" value="${build.dir}/amo.${DSTAMP}.${TSTAMP}" />
 
 		<mkdir dir="${repack.dir}" />
 
-		<unzip src="${dist.dir}/${extension.published.xpi}" dest="${repack.dir}" />
+		<unzip src="${dist.dir}/${extension.dist.xpi}" dest="${repack.dir}" />
 
 		<!-- Comment out updateURL as AMO does not allow it. -->
 		<replace file="${repack.dir}/install.rdf" encoding="utf-8">
@@ -323,39 +324,13 @@
 
 		<mkdir dir="${dist.dir}/amo" />
 
-		<delete file="${dist.dir}/amo/${extension.published.xpi}" />
+		<delete file="${dist.dir}/amo/${extension.dist.xpi}" />
 
-		<zip destfile="${dist.dir}/amo/${extension.published.xpi}" level="${zip.compressionLevel}">
+		<zip destfile="${dist.dir}/amo/${extension.dist.xpi}" level="${zip.compressionLevel}">
 			<zipfileset dir="${repack.dir}" includes="*/**" />
 		</zip>
 
 		<delete dir="${repack.dir}" />
-	</target>
-
-
-	<target name="set-pub-xpi-name">
-		<property name="extension.published.xpi" value="${ant.project.name}-${extension.publishedVersion}${extension.appsPostfix}.xpi" />
-	</target>
-
-
-	<target name="set-version">
-		<property name="extension.versionNumber" value="${extension.version}${extension.subVersion}" />
-	</target>
-
-
-	<target name="set-version-dev" depends="set-version">
-		<property name="extension.versionNumber.plusBuild" value="${extension.versionNumber}.0pre${build.number}" />
-		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber.plusBuild}" />
-	</target>
-
-
-	<target name="set-version-dist" depends="set-version">
-		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber}" />
-	</target>
-
-
-	<target name="set-xpi-name">
-		<property name="extension.xpi" value="${ant.project.name}-${extension.versionNumber.forThisBuild}${extension.appsPostfix}.xpi" />
 	</target>
 
 
@@ -489,7 +464,7 @@
 
 
 	<!-- Make a special .xpi for BabelZilla.org. -->
-	<target name="xpi-babelzilla" depends="set-xpi-name,copy-src-to-build,unpack-locale-bundle-to-babelzilla-src">
+	<target name="xpi-babelzilla" depends="init-babelzilla,set-xpi-name,copy-src-to-build,unpack-locale-bundle-to-babelzilla-src">
 		<mkdir dir="${dist.dir}/babelzilla" />
 
 		<delete file="${dist.dir}/babelzilla/${extension.xpi}" />
