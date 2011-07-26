@@ -162,7 +162,7 @@ var Selection = Class.create({
 				this.Element.style.top = this.Y1 + 'px';
 				InsertionNode.appendChild(this.Element);
 				
-				if(SnapLinks.Prefs.ShowCountWhere == SnapLinks.Prefs.ShowCount_Hover) {
+				if(SnapLinks.Prefs.ShowSelectedCount && SnapLinks.Prefs.ShowCountWhere == SnapLinks.Prefs.ShowCount_Hover) {
 					this.ElementCount = this.Document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
 					ApplyStyle(this.ElementCount, {
 						position		: 'absolute',

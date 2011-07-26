@@ -41,7 +41,7 @@ SnapLinks = new (Class.create({
 	/* Setter to change the status text */
 	SnapLinksStatus: {
 		set: function(x) {
-			if(SnapLinks.Prefs.ShowCountWhere == SnapLinks.Prefs.ShowCount_AddonBar) {
+			if(SnapLinks.Prefs.ShowSelectedCount && SnapLinks.Prefs.ShowCountWhere == SnapLinks.Prefs.ShowCount_AddonBar) {
 				var el = document.getElementById('snaplinks-panel') ;
 				el && (el.label = x);
 				el && (el.hidden = (x == ''));
