@@ -83,6 +83,8 @@ SnapLinks = new (Class.create({
 	
 	/* Evaluates a given event looking to see if the button and modifier keys are present */
 	ShouldActivate: function(e) {
+		if(e.view.location.protocol == 'about:')
+			return false;
 		if(e.button != SnapLinks.Prefs.SelectionButton)
 			return false;
 		if(SnapLinks.Prefs.ActivateRequiresAlt && !e.altKey)
