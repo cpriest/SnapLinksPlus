@@ -123,7 +123,10 @@ var Selection = Class.create({
 		} else {
 			this.ExpandSelectionTo(Math.min(e.pageX), e.pageY);
 		}
-		ApplyStyle(this.ElementCount, { top: e.pageY + 'px', left: (e.pageX + 18)+ 'px' } );
+		
+		if (this.ElementCount) {
+			ApplyStyle(this.ElementCount, { top: e.pageY + 'px', left: (e.pageX + 18)+ 'px' } );
+		}
 	},
 	
 	OnMouseUp: function(e) {
