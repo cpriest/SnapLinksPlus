@@ -41,7 +41,7 @@
 		<em:iconURL>chrome://snaplinksplus/content/icon32.png</em:iconURL>
 		<em:icon64URL>chrome://snaplinksplus/content/icon64.png</em:icon64URL>
 		<em:homepageURL>http://snaplinks.mozdev.org/</em:homepageURL>
-		<em:updateURL>https://www.mozdev.org/p/updates/snaplinks/snaplinks@snaplinks.mozdev.org/update.rdf</em:updateURL>
+		<em:updateURL>https://snaplinksplus.googlecode.com/hg/update.rdf</em:updateURL>
 		<em:optionsURL>chrome://snaplinksplus/content/options.xul</em:optionsURL>
 	</Description>
 </RDF>
