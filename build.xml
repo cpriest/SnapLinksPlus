@@ -23,8 +23,7 @@
 <project name="snaplinksplus" default="build-dev">
 
 	<property file="${basedir}/release.properties" />
-	<property file="${basedir}/credentials.properties" />
-
+	
 	<property name="babelzilla.dir" value="${basedir}/babelzilla" />
 	<property name="build.dir" value="${basedir}/build" />
 	<property name="cert.dir" value="${basedir}/cert" />
@@ -41,11 +40,9 @@
 
 	<property name="releaseIni.file" value="${www.dir}/release.ini" />
 	<property name="buildNumber.file" value="${basedir}/.buildNumbers/build.number.${extension.version}.txt" />
-	<property name="credentials.file" value="${basedir}/credentials.properties" />
 	
 	<!-- Compression level: 0=min/fast, 9=max/slow. -->
 	<property name="zip.compressionLevel" value="9" />
-
 
 	<fileset id="src.root.files" dir="${src.dir}">
 		<include name="content/**" />
@@ -55,19 +52,6 @@
 		<exclude name="**/.cvsignore" />
 		<exclude name="CVS" />
 	</fileset>
-
-
-	<condition property="existsCredentialsFile">
-		<available file="${credentials.file}" />
-	</condition>
-
-
-	<condition property="isUnsetBabelzillaCredentials">
-		<or>
-			<equals arg1="${babelzilla.username}" arg2="" />
-			<equals arg1="${babelzilla.password}" arg2="" />
-		</or>
-	</condition>
 
 
 	<target name="init-amo" depends="init">
@@ -88,7 +72,7 @@
 	</target>
 
 
-	<target name="init" depends="init-build">
+	<target name="init" depends="init-build,patch-min-and-max-versions">
 		<echo level="info" message="Version ${extension.version}-${extension.subVersion} Build ${build.number} started ${build.tstamp}" />
 
 		<mkdir dir="${build.dir}" />
@@ -185,8 +169,34 @@
 		<!-- Patch version number into install.rdf. -->
 		<replace file="${build.dir}/src/install.rdf" propertyFile="${basedir}/release.properties" encoding="utf-8">
 			<replacefilter token="&lt;em:version&gt;0&lt;/em:version&gt;" value="&lt;em:version&gt;${extension.versionNumber.forThisBuild}&lt;/em:version&gt;" />
-			<!-- <replacefilter token="&lt;/em:homepageURL&gt;" value="?version=${extension.versionNumber.forThisBuild}&lt;/em:homepageURL&gt;" /> -->
 		</replace>
+	</target>
+
+	<target name="patch-min-and-max-versions">
+		<antcall target="patch-min-and-max-version-for-single-app" inheritAll="no">
+			<param name="id" value="\{ec8030f7-c20a-464f-9b0e-13a3a9e97384\}" />
+			<param name="minVersion" value="${firefox.minVersion}" />
+			<param name="maxVersion" value="${firefox.maxVersion}" />
+		</antcall>
+
+		<antcall target="patch-min-and-max-version-for-single-app" inheritAll="no">
+			<param name="id" value="\{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a\}" />
+			<param name="minVersion" value="${seamonkey.minVersion}" />
+			<param name="maxVersion" value="${seamonkey.maxVersion}" />
+		</antcall>
+	</target>
+
+	<target name="patch-min-and-max-version-for-single-app">
+		<fileset id="rdf.files" dir="${basedir}">
+			<include name="update.rdf"/>
+			<include name="src/install.rdf"/>
+		</fileset>
+
+		<replaceregexp encoding="utf-8" flags="m">
+			<regexp pattern="(&lt;em:id&gt;${id}&lt;/em:id&gt;\s*\n\s*&lt;em:minVersion&gt;).*(&lt;/em:minVersion&gt;\s*\n\s*&lt;em:maxVersion&gt;).*(&lt;/em:maxVersion&gt;)" />
+			<substitution expression="\1${minVersion}\2${maxVersion}\3" />
+			<fileset refid="rdf.files" />
+		</replaceregexp>
 	</target>
 
 	<target name="patch-chrome-manifest">
@@ -247,16 +257,6 @@
 	</target>
 
 
-	<target name="create-credentials-file" unless="existsCredentialsFile">
-		<concat destfile="${credentials.file}">
-			<string value="babelzilla.username = &#0010;" />
-			<string value="babelzilla.password = &#0010;" />
-		</concat>
-
-		<fail message="Enter your credentials to the newly created file: ${credentials.file}" />
-	</target>
-
-
 	<target name="dist" depends="clean,init-dist,xpi-babelzilla,xpi,xpi-amo">
 		<checksum file="${dist.dir}/${extension.xpi}" algorithm="${extension.checksumAlgorithm}" property="extension.dist.xpi.checksum" />
 
@@ -268,47 +268,7 @@
 		<echo message="${extension.checksumAlgorithm} checsum is ${extension.dist.xpi.checksum}" />
 	</target>
 
-	<!--
-	<target name="download-from-babelzilla" depends="download-from-babelzilla-prerequirements"
-		description="Download locale bundles from Babelzilla">
-		<exec executable="attrib" osfamily="windows">
-			<arg value="-r"/>
-			<arg file="${babelzilla.dir}\${localesBundle.filenamePrefix}_${localesBundle.nameForNormalBuild}.tar.gz"/>
-		</exec>
 
-		<exec executable="attrib" osfamily="windows">
-			<arg value="-r"/>
-			<arg file="${babelzilla.dir}\${localesBundle.filenamePrefix}_all_locales_blank.tar.gz"/>
-		</exec>
-
-		<exec executable="attrib" osfamily="windows">
-			<arg value="-r"/>
-			<arg file="${babelzilla.dir}\${localesBundle.filenamePrefix}_${localesBundle.nameForBabelzillaBuild}.tar.gz"/>
-		</exec>
-
-		<get src="http://www.babelzilla.org/index.php?option=com_wts&amp;Itemid=88&amp;type=downloadtar&amp;extension=4497"
-			dest="${babelzilla.dir}/${localesBundle.filenamePrefix}_${localesBundle.nameForNormalBuild}.tar.gz"
-			verbose="true" ignoreerrors="false"
-			username="${babelzilla.username}" password="${babelzilla.password}"/>
-
-		<get src="http://www.babelzilla.org/index.php?option=com_wts&amp;Itemid=88&amp;type=downloadempty&amp;extension=4497"
-			dest="${babelzilla.dir}/${localesBundle.filenamePrefix}_all_locales_blank.tar.gz"
-			verbose="true" ignoreerrors="false"
-			username="${babelzilla.username}" password="${babelzilla.password}"/>
-
-		<get src="http://www.babelzilla.org/index.php?option=com_wts&amp;Itemid=88&amp;type=downloadskip&amp;extension=4497"
-			dest="${babelzilla.dir}/${localesBundle.filenamePrefix}_${localesBundle.nameForBabelzillaBuild}.tar.gz"
-			verbose="true" ignoreerrors="false"
-			username="${babelzilla.username}" password="${babelzilla.password}"/>
-	</target>
--->
-
-	<target name="download-from-babelzilla-prerequirements" depends="create-credentials-file" if="isUnsetBabelzillaCredentials">
-		<fail message="Credentials are not defined in ${credentials.file}" />
-	</target>
-
-
-	<!-- Repack an existing xpi file as AMO release. -->
 	<target name="repack-dist-for-amo" depends="init-amo,init-dist,set-xpi-name">
 		<property name="repack.dir" value="${build.dir}/amo.${DSTAMP}.${TSTAMP}" />
 
