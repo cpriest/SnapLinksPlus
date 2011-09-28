@@ -11,7 +11,7 @@
 								<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 								<em:minVersion>4.0</em:minVersion>
 								<em:maxVersion>8.0a2</em:maxVersion>
-								<em:updateLink>https://snaplinksplus.googlecode.com/files/snaplinksplus-2.1-fx+sm.xpi</em:updateLink>
+								<em:updateLink>https://snaplinksplus.googlecode.com/files/snaplinksplus-2.1.1-fx+sm.xpi</em:updateLink>
 								<em:updateInfoURL>http://wiki.snaplinksplus.googlecode.com/hg/VersionHistory.wiki</em:updateInfoURL>
 							</RDF:Description>
 						</em:targetApplication>
@@ -20,7 +20,7 @@
 								<em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
 								<em:minVersion>2.1</em:minVersion>
 								<em:maxVersion>2.5a2</em:maxVersion>
-								<em:updateLink>https://snaplinksplus.googlecode.com/files/snaplinksplus-2.1-fx+sm.xpi</em:updateLink>
+								<em:updateLink>https://snaplinksplus.googlecode.com/files/snaplinksplus-2.1.1-fx+sm.xpi</em:updateLink>
 								<em:updateInfoURL>http://wiki.snaplinksplus.googlecode.com/hg/VersionHistory.wiki</em:updateInfoURL>
 							</RDF:Description>
 						</em:targetApplication>
