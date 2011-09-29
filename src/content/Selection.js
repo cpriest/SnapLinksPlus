@@ -439,10 +439,19 @@ var Selection = Class.create({
 				} );
 			}, this );
 			this.SelectedElementsType = Greatest;
-			
+
+			// Remove the existing child elements.
+			while (this.ElementCount.firstChild) {
+				this.ElementCount.removeChild(this.ElementCount.firstChild);
+			};
+
+			// Add the links count.
 			if(this.ElementCount)
-				this.ElementCount.innerHTML = 'Links: '+this.SelectedElements.length;
-			
+			{
+				var linksText = document.createTextNode('Links: '+this.SelectedElements.length);
+				this.ElementCount.appendChild(linksText);
+			}
+
 			SnapLinks.SnapLinksStatus = 'Links: '+this.SelectedElements.length;
 		}
 	}
