@@ -51,7 +51,7 @@ var SnapLinksDebug = new (Class.create({
 			gBrowser.addEventListener('load', this.OnDocumentLoaded.bind(this), true);
 	},
 
-	OnDocumentLoaded: function(e) {			
+	OnDocumentLoaded: function(e) {
 		this.Document = e.target;
 		$A(e.target.links).forEach( function( link ) {
 			if(this.DebugLinksAtLoad) {
@@ -75,6 +75,7 @@ var SnapLinksDebug = new (Class.create({
 		}, this );
 		link.SnapDebugNodes = [ ];
 	},
+
 	ClearVisualDebugAids: function(link) {
 		this.ClearClientRects(link);
 		
@@ -94,8 +95,9 @@ var SnapLinksDebug = new (Class.create({
 		if(this.Flags.Links.OnMouseOver.ShowClientRects)
 			this.ShowClientElementRects(link);
 		
-		link.SnapDebugClearTimer = setTimeout(this.ClearVisualDebugAids.bind(this, link), 3000);
+		link.SnapDebugClearTimer = setTimeout(function(){SnapLinksDebug.ClearVisualDebugAids.bind(SnapLinksDebug, link);}, 3000, link);
 	},
+
 	ShowClientElementRects: function(link) {
 		this.ClearClientRects(link);
 
