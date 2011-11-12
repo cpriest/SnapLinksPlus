@@ -370,15 +370,19 @@
 
 		<!-- Encode .properties files of the default locale
 		<!   and store the results to the .xpi build directory. -->
-		<native2ascii src="${src.dir}" dest="${build.dir}/babelzilla" encoding="UTF-8">
-			<include name="locale/**/*.properties" />
-		</native2ascii>
+		<copy todir="${build.dir}/babelzilla" >
+			<fileset dir="${src.dir}">
+				<include name="locale/**/*.properties" />
+			</fileset>
+		</copy>
 
 		<!-- Encode .properties from the bundle -->
-		<native2ascii src="${build.dir}/${localesBundle.nameForBabelzillaBuild}" dest="${build.dir}/babelzilla" encoding="UTF-8">
-			<include name="locale/**/*.properties" />
-			<exclude name="locale/en-US/**" />
-		</native2ascii>
+		<copy todir="${build.dir}/babelzilla">
+			<fileset dir="${build.dir}/${localesBundle.nameForBabelzillaBuild}">
+				<include name="locale/**/*.properties" />
+				<exclude name="locale/en-US/**" />
+			</fileset>
+		</copy>
 	</target>
 
 

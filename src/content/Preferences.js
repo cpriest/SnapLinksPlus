@@ -28,28 +28,31 @@ SnapLinks.Prefs = new (Class.create(PrefsMapper, {
 	BasePath:	'extensions.snaplinks',
 	map:	{
 		SelectionButton:					{ Type: 'int', 	Default: 2, 			Name: '.button' },
-		ActivateRequiresShift:				{ Type: 'bool', Default: false	},
-		ActivateRequiresCtrl:				{ Type: 'bool', Default: false	},
-		ActivateRequiresAlt:				{ Type: 'bool', Default: false	},
+		ActivateRequiresShift:				{ Type: 'bool',	Default: false	},
+		ActivateRequiresCtrl:				{ Type: 'bool',	Default: false	},
+		ActivateRequiresAlt:				{ Type: 'bool',	Default: false	},
 		
-		SelectionBorderColor:				{ Type: 'char', Default: '#30AF00', 	Name: '.drawpicker' },
+		SelectionBorderColor:				{ Type: 'char',	Default: '#30AF00', 	Name: '.drawpicker' },
 		SelectionBorderWidth:				{ Type: 'int', 	Default: 3, 			Name: '.drawthick' },
-		SelectedElementsBorderColor:		{ Type: 'char', Default: '#FF0000', 	Name: '.linkspicker' },
+		SelectedElementsBorderColor:		{ Type: 'char',	Default: '#FF0000', 	Name: '.linkspicker' },
 		SelectedElementsBorderWidth:		{ Type: 'int', 	Default: 1, 			Name: '.linksthick' },
 		
-		DefaultAction:						{ Type: 'char', Default: 'OpenTabs',	Name: '.defaultaction' },	/* @Broken */
+		DefaultAction:						{ Type: 'char',	Default: 'OpenTabs',	Name: '.defaultaction' },	/* @Broken */
+		ActionInterval:						{ Type: 'int',	Default: 200 },
 		
-		HighlightCheckboxesForClicking:		{ Type: 'bool', Default: true },
-		HighlightButtonsForClicking:		{ Type: 'bool', Default: true },
-		HighlightJsLinksForClicking:		{ Type: 'bool', Default: true },
+		HighlightCheckboxesForClicking:		{ Type: 'bool',	Default: true },
+		HighlightButtonsForClicking:		{ Type: 'bool',	Default: true },
+		HighlightJsLinksForClicking:		{ Type: 'bool',	Default: true },
 		HideSelectionOnMouseLeave:			{ Type: 'bool',	Default: false	},
-		RemoveDuplicateUrls:				{ Type: 'bool', Default: true },
-		ShowSelectedCount:					{ Type: 'bool', Default: true, 			Name: '.shownumber' },
+		RemoveDuplicateUrls:				{ Type: 'bool',	Default: true },
+		AlwaysPromptDownloadName:			{ Type: 'bool',	Default: false },
+		ShowSelectedCount:					{ Type: 'bool',	Default: true, 			Name: '.shownumber' },
 		ShowCountWhere:						{ Type: 'int', 	Default: 1,				Name: '.shownumber.where' },
 		
-		CopyToClipboardSeparator:			{ Type: 'char', Default: "\n" },
+		CopyToClipboardSeparatorId:			{ Type: 'int',	Default: 1,				Name: '.CopyToClipboardSeparator.Id' },
+		CopyToClipboardSeparatorCustom:		{ Type: 'char',	Default: ',',			Name: '.CopyToClipboardSeparator.Custom' },
 		
-		DevShowJSConsoleAtStartup:			{ Type: 'bool', Default: false	}
+		DevShowJSConsoleAtStartup:			{ Type: 'bool',	Default: false	}
 	},
 	
 	initialize: function($super) {

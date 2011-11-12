@@ -62,6 +62,17 @@
 <!-- A drop-down-list option following snaplinks.adv.shownumber. -->
 <!ENTITY snaplinks.adv.shownumber.hover         "hovering next to cursor">
 
+<!ENTITY snaplinks.adv.AlwaysPromptDownloadName                 "Always ask me where to save files">
+<!ENTITY snaplinks.adv.AlwaysPromptDownloadName.Tooltip         "This option has no use when the global 'Always ask me where to save files' option is enabled.">
+
+<!ENTITY snaplinks.adv.ActionInterval                           "Delay between actions (in milliseconds)">
+
+<!ENTITY snaplinks.adv.CopyToClipboardSeparator                 "Link Separator:">
+<!ENTITY snaplinks.adv.CopyToClipboardSeparator.LineFeed        "New line">
+<!ENTITY snaplinks.adv.CopyToClipboardSeparator.Tab             "Tab">
+<!ENTITY snaplinks.adv.CopyToClipboardSeparator.Custom          "Custom">
+<!ENTITY snaplinks.adv.CopyToClipboardSeparator.Custom.Tooltip  "URL encoding allowed">
+
 <!ENTITY snaplinks.usage.caption                "Usage">
 <!ENTITY snaplinks.usage.description            "Drag with selected mouse button to select links:">
 <!ENTITY snaplinks.usage.line0                  "- Hold the Shift key to select all links inside selection area">

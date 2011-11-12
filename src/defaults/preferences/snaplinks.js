@@ -34,13 +34,16 @@ pref('extensions.snaplinks.linkspicker',                        '#FF0000');
 pref('extensions.snaplinks.linksthick',                         1);
 
 pref('extensions.snaplinks.defaultaction',                      'OpenTabs');
+pref('extensions.snaplinks.ActionInterval',                     200);
 
 pref('extensions.snaplinks.HighlightCheckboxesForClicking',     true);
 pref('extensions.snaplinks.HighlightButtonsForClicking',        true);
 pref('extensions.snaplinks.HighlightJsLinksForClicking',        true);
 pref('extensions.snaplinks.HideSelectionOnMouseLeave',          false);
 pref('extensions.snaplinks.RemoveDuplicateUrls',                true);
+pref('extensions.snaplinks.AlwaysPromptDownloadName',           false);
 pref('extensions.snaplinks.shownumber',                         true);
 pref('extensions.snaplinks.shownumber.where',                   1);
 
-pref('extensions.snaplinks.CopyToClipboardSeparator',           "\n");
+pref('extensions.snaplinks.CopyToClipboardSeparator.Id',        1);
+pref('extensions.snaplinks.CopyToClipboardSeparator.Custom',    ',');

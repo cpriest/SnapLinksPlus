@@ -27,7 +27,28 @@ const snaplMMB  = 1;
 const snaplRMB  = 2;
 
 SnapLinks = new (Class.create({
-	/* Returns an Mozilla URI pointed at the current documents referrer */
+
+	ACTION: {
+		NEW_TABS			: 'OpenTabs',
+		NEW_WINDOWS			: 'OpenWindows',
+		TABS_IN_NEW_WINDOW	: 'OpenTabsInNewWindow',
+		COPY_TO_CLIPBOARD	: 'CopyToClipboard',
+		BOOKMARK_LINKS		: 'BookmarkLinks',
+		DOWNLOAD_LINKS		: 'DownloadLinks',
+		ASK_USER			: 'AskUser',
+
+		CLICK_ELEMENTS		: 'ClickElements'
+	},
+	
+	COPY_TO_CLIPBOARD_SEPARATOR_ID: {
+		CUSTOM: 0,
+		NEWLINE: 1,
+		TAB: 2
+	},
+
+	/**
+	 * Returns an Mozilla URI pointed at the current documents referrer.
+	 */
 	DocumentReferer: {
 		get: function() {
 			try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
@@ -38,7 +59,31 @@ SnapLinks = new (Class.create({
 			return null;
 		}
 	},
-	/* Setter to change the status text */
+
+	/**
+	 * Returns the selected clipboard separator.
+	 */
+	ClipboardSeparator: {
+		get: function() {
+			switch (SnapLinks.Prefs.CopyToClipboardSeparatorId) {
+			case this.COPY_TO_CLIPBOARD_SEPARATOR_ID.CUSTOM:
+				return unescape(SnapLinks.Prefs.CopyToClipboardSeparatorCustom);
+				break;
+			case this.COPY_TO_CLIPBOARD_SEPARATOR_ID.NEWLINE:
+				return "\n";
+				break;
+			case this.COPY_TO_CLIPBOARD_SEPARATOR_ID.TAB:
+				return "\t";
+				break;
+			default:
+				return "\n";
+			}
+		}
+	},
+
+	/**
+	 * Setter to change the status text.
+	 */
 	SnapLinksStatus: {
 		set: function(x) {
 			if(SnapLinks.Prefs.ShowSelectedCount && SnapLinks.Prefs.ShowCountWhere == SnapLinks.Prefs.ShowCount_AddonBar) {
@@ -48,11 +93,17 @@ SnapLinks = new (Class.create({
 			}
 		}
 	},
-	/* Setter to change the status bar text */
-	StatusBarLabel: {	set: function(x) { document.getElementById('statusbar-display').label = x; }	},
+
+	/**
+	 * Setter to change the status bar text.
+	 */
+	StatusBarLabel: {
+		set: function(x) {
+			document.getElementById('statusbar-display').label = x;
+		}
+	},
 
 	initialize: function() {
-
 		var StringBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
 		var LocaleStrings = StringBundleService.createBundle("chrome://snaplinksplus/locale/snaplinks.properties");
 		
@@ -80,8 +131,10 @@ SnapLinks = new (Class.create({
 			this[Name] = SnapLinks[Name];
 		}, this);
 	},
-	
-	/* Evaluates a given event looking to see if the button and modifier keys are present */
+
+	/**
+	 * Evaluates a given event looking to see if the button and modifier keys are present.
+	 */
 	ShouldActivate: function(e) {
 		if(e.view.location.protocol == 'about:')
 			return false;
@@ -132,7 +185,9 @@ SnapLinks = new (Class.create({
 
 			if(this.Selection.DragStarted == true) {
 				this.StopNextContextMenuPopup();
-				if((e.ctrlKey || SnapLinks.Prefs.DefaultAction == this.ACTION.ASK_USER) && this.Selection.SelectedElementsType == 'Links') {
+				if((e.ctrlKey || SnapLinks.Prefs.DefaultAction == this.ACTION.ASK_USER) &&
+						this.Selection.SelectedElementsType == 'Links' &&
+						SnapLinks.Selection.FilteredElements.length) {
 					pop = document.getElementById('snaplMenu');
 					pop.openPopupAtScreen(e.screenX, e.screenY, true);
 				} else
@@ -171,7 +226,9 @@ SnapLinks = new (Class.create({
 			this.Clear();
 	},
 
-	/** Called to prevent the next context menu popup from showing */
+	/**
+	 * Called to prevent the next context menu popup from showing.
+	 */
 	StopNextContextMenuPopup: function() {
 		if(this.StoppingNextContextMenuPopup)
 			return;
@@ -188,13 +245,17 @@ SnapLinks = new (Class.create({
 		_PreventEventDefault = PreventEventDefault.bind(this);
 		ContentAreaContextMenu.addEventListener('popupshowing', _PreventEventDefault, false);
 	},
-	
-	/* This is fired when the context menu is closed */
+
+	/**
+	 * This is fired when the context menu is closed.
+	 */
 	OnSnapLinksPopupHidden: function(e){
 		SnapLinks.Clear();
 	},
 
-	/* Clears the selection and our internal state */
+	/**
+	 * Clears the selection and our internal state.
+	 */
 	Clear: function() {
 		this.Selection.Clear();
 
@@ -204,18 +265,6 @@ SnapLinks = new (Class.create({
 		delete this.Document;
 	},
 
-	ACTION: {
-		NEW_TABS			: 'OpenTabs',
-		NEW_WINDOWS			: 'OpenWindows',
-		TABS_IN_NEW_WINDOW	: 'OpenTabsInNewWindow',
-		COPY_TO_CLIPBOARD	: 'CopyToClipboard',
-		BOOKMARK_LINKS		: 'BookmarkLinks',
-		DOWNLOAD_LINKS		: 'DownloadLinks',
-		ASK_USER			: 'AskUser',
-
-		CLICK_ELEMENTS		: 'ClickElements'
-	},
-	
 	ActivateSelection: function(Action) {
 		/* Hash of valid actions by SelectedElementType  */
 		var ValidActions = {
@@ -236,17 +285,25 @@ SnapLinks = new (Class.create({
 		this.Clear();
 	},
 
+	/**
+	 * Click selected JavaScript links one by one.
+	 */
 	ClickLinks: function() {
 		try {
-			this.Selection.FilteredElements.forEach( function(elem) {
-				this.ClickLink(elem);
+			this.Selection.FilteredElements.forEach( function(elem, index) {
+				setTimeout(function() {
+					SnapLinks.ClickLink(elem);
+				}, this.Prefs.ActionInterval * index, elem);
 			}, this );
 		}
 		catch (e) {
 			Components.utils.reportError(e);
 		}
 	},
-	
+
+	/**
+	 * Click a single JavaScript link.
+	 */
 	ClickLink: function(elem) {
 		if (elem.click) {
 			elem.click();
@@ -263,10 +320,13 @@ SnapLinks = new (Class.create({
 				0, null);
 		elem.dispatchEvent(evt);
 	},
-	
+
+	/**
+	 * Click elements (buttons, checkboxes) without a delay in between.
+	 */
 	ClickElements: function() {
 		try {
-			this.Selection.SelectedElements.forEach( function(elem) {
+			this.Selection.SelectedElements.forEach( function(elem, index) {
 				elem.click();
 			}, this );
 		}
@@ -274,125 +334,166 @@ SnapLinks = new (Class.create({
 			Components.utils.reportError(e);
 		}
 	},
-	
-	/* Opens the selected element links in tabs in the current window */
+
+	/**
+	 * Opens the selected element links in tabs in the current window
+	 */
 	OpenTabs: function() {
 		try {
-			this.Selection.FilteredElements.forEach( function(elem) {
-				if(elem.href) {
-					this.CurrentElement = elem;
-					
-					if (elem.SnapIsJsLink) {
-						this.ClickLink(elem); // Click JS links.
+			this.CurrentReferer = this.DocumentReferer;
+			
+			this.Selection.FilteredElements.forEach( function(elem, index) {
+				setTimeout(function() {
+					if(elem.href) {
+						SnapLinks.CurrentElement = elem;
+						
+						if (elem.SnapIsJsLink) {
+							SnapLinks.ClickLink(elem); // Click JS links.
+						}
+						else {
+							getBrowser().addTab(elem.href, SnapLinks.CurrentReferer);
+						}
+						
+						SnapLinks.CurrentElement = null;
 					}
-					else {
-						getBrowser().addTab(elem.href, this.DocumentReferer);
-					}
-					
-					this.CurrentElement = null;
-				}
+				}, this.Prefs.ActionInterval * index, elem);
 			}, this);
 		}
 		catch(e) {
 			Components.utils.reportError(e);
 		}
 	},
-	
+
 	/** Opens a javascript link into a new tab. */
 /*
 	OpenJsInTab: function(elem) {
-		// Duplicate the current page on a new tab.
-		var docHref = this.Document.location.href;
-		var newTab = getBrowser().addTab(docHref, this.DocumentReferer);
-		
-		// Run our code when the new tab is ready.
-		var newTabBrowser = gBrowser.getBrowserForTab(newTab);
-		newTabBrowser.addEventListener("load", function () {
-			// Get the body element.
-			var body = newTabBrowser.contentDocument.body;
-			var dupeElem;
+		try {
+			// Duplicate the current page on a new tab.
+			var docHref = this.Document.location.href;
+			var newTab = getBrowser().addTab(docHref, this.DocumentReferer);
 			
-			// If the link element has an ID, lets use it.
-			if (elem.id) {
-				dupeElem = body.getElementById(elem.id);
-				if (dupeElem) {
-					dupeElem.click();
-				}
-			} else {
-				// Oh well, let's do this the hard way.
-				var links = body.getElementsByTagName("A");
-				for (var i = links.length - 1; i >= 0; --i) {
-					dupeElem = links[i];
-					if (dupeElem.href == elem.href) {
+			// Run our code when the new tab is ready.
+			var newTabBrowser = gBrowser.getBrowserForTab(newTab);
+			newTabBrowser.addEventListener("load", function () {
+				// Get the body element.
+				var body = newTabBrowser.contentDocument.body;
+				var dupeElem;
+				
+				// If the link element has an ID, lets use it.
+				if (elem.id) {
+					dupeElem = body.getElementById(elem.id);
+					if (dupeElem) {
 						dupeElem.click();
-						break;
+					}
+				} else {
+					// Oh well, let's do this the hard way.
+					var links = body.getElementsByTagName("A");
+					for (var i = links.length - 1; i >= 0; --i) {
+						dupeElem = links[i];
+						if (dupeElem.href == elem.href) {
+							dupeElem.click();
+							break;
+						}
 					}
 				}
-			}
-		}, true);
+			}, true);
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+		}
 	},
 */
-	
-	/* Opens the selected links in new windows */
-	OpenWindows: function() {
-		SnapLinks.Selection.FilteredElements.forEach( function(elem) {
-			if(elem.href)
-				window.open(elem.href);
-		}, this );
-	},
-	
-	/* Opens the selected links in one new window */
-	OpenTabsInNewWindow: function() {
-		if(SnapLinks.Selection.FilteredElements.length) {
-			var urls = SnapLinks.Selection.FilteredElements.map( function(elem) {
-				return elem.href;
-			}, this ).join('|');
 
-			return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
+	/**
+	 * Opens the selected links in new windows.
+	 */
+	OpenWindows: function() {
+		try {
+			SnapLinks.Selection.FilteredElements.forEach( function(elem, index) {
+				setTimeout(function() {
+					if(elem.href)
+						window.open(elem.href);
+				}, this.Prefs.ActionInterval * index, elem);
+			}, this );
+		}
+		catch(e) {
+			Components.utils.reportError(e);
+		}
+	},
+
+	/**
+	 * Opens the selected links in one new window.
+	 */
+	OpenTabsInNewWindow: function() {
+		try {
+			if(SnapLinks.Selection.FilteredElements.length) {
+				var urls = SnapLinks.Selection.FilteredElements.map( function(elem) {
+					return elem.href;
+				}, this ).join('|');
+	
+				return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
+			}
+		}
+		catch(e) {
+			Components.utils.reportError(e);
 		}
 		
 		return null;
 	},
-	/* Copies the selected links to the clip board */
+
+	/**
+	 * Copies the selected links to the clip board.
+	 */
 	CopyToClipboard: function() {
-		var Representations = SnapLinks.Selection.FilteredElements.reduce( function(acc, elem) {
-			var text = elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
-
-			acc.html.push( '<a href="' + elem.href + '">' + text + '</a>' );
-			acc.text.push( elem.href );
-			return acc;
-		}, { html: [ ], text: [ ] } );
-
-		// Create the transferable
-		var objData = Components.classes["@mozilla.org/widget/transferable;1"]
-						.createInstance(Components.interfaces.nsITransferable);
-
-		if(objData) {
-			var TextContent = Components.classes["@mozilla.org/supports-string;1"]
-								.createInstance(Components.interfaces.nsISupportsString);
-			if(TextContent) {
-				TextContent.data = Representations.text.join(unescape(SnapLinks.Prefs.CopyToClipboardSeparator));
-
-				objData.addDataFlavor('text/unicode');
-				objData.setTransferData('text/unicode', TextContent, TextContent.data.length * 2);	/* Double byte data (len*2) */
+		try {
+			var textSeparator = this.ClipboardSeparator;
+			var htmlSeparator = textSeparator.replace(/\n/g, "<br>");
+			
+			var Representations = SnapLinks.Selection.FilteredElements.reduce( function(acc, elem) {
+				var text = elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
+	
+				acc.html.push( '<a href="' + elem.href + '">' + text + '</a>' );
+				acc.text.push( elem.href );
+				return acc;
+			}, { html: [ ], text: [ ] } );
+	
+			// Create the transferable
+			var objData = Components.classes["@mozilla.org/widget/transferable;1"]
+							.createInstance(Components.interfaces.nsITransferable);
+	
+			if(objData) {
+				var TextContent = Components.classes["@mozilla.org/supports-string;1"]
+									.createInstance(Components.interfaces.nsISupportsString);
+				if(TextContent) {
+					TextContent.data = Representations.text.join(textSeparator);
+	
+					objData.addDataFlavor('text/unicode');
+					objData.setTransferData('text/unicode', TextContent, TextContent.data.length * 2);	/* Double byte data (len*2) */
+				}
+	
+				var HtmlContent = Components.classes["@mozilla.org/supports-string;1"]
+									.createInstance(Components.interfaces.nsISupportsString);
+				if(HtmlContent) {
+					HtmlContent.data = Representations.html.join(htmlSeparator);
+	
+					objData.addDataFlavor('text/html');
+					objData.setTransferData('text/html', HtmlContent, HtmlContent.data.length * 2);	/* Double byte data (len*2) */
+				}
+	
+				var objClipboard = Components.classes["@mozilla.org/widget/clipboard;1"]
+									.getService(Components.interfaces.nsIClipboard);
+				if (objClipboard)
+					objClipboard.setData(objData, null, Components.interfaces.nsIClipboard.kGlobalClipboard);
 			}
-
-			var HtmlContent = Components.classes["@mozilla.org/supports-string;1"]
-								.createInstance(Components.interfaces.nsISupportsString);
-			if(HtmlContent) {
-				HtmlContent.data = Representations.html.join(unescape(SnapLinks.Prefs.CopyToClipboardSeparator));
-
-				objData.addDataFlavor('text/html');
-				objData.setTransferData('text/html', HtmlContent, HtmlContent.data.length * 2);	/* Double byte data (len*2) */
-			}
-
-			var objClipboard = Components.classes["@mozilla.org/widget/clipboard;1"]
-								.getService(Components.interfaces.nsIClipboard);
-			if (objClipboard)
-				objClipboard.setData(objData, null, Components.interfaces.nsIClipboard.kGlobalClipboard);
+		}
+		catch(e) {
+			Components.utils.reportError(e);
 		}
 	},
-	/* Bookmarks the selected links */
+
+	/**
+	 * Bookmarks the selected links.
+	 */
 	BookmarkLinks: function() {
 		try {
 			var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
@@ -423,38 +524,54 @@ SnapLinks = new (Class.create({
 			Components.utils.reportError(e);
 		}
 	},
-	/* Downloads the selected links as files */
+
+	/**
+	 * Downloads the selected links as files.
+	 */
 	DownloadLinks: function() {
-		if(SnapLinks.Selection.FilteredElements.length) {
-			var TitlesUsed = { };
-
-			var links = SnapLinks.Selection.FilteredElements.map( function(elem) {
-				var Title = elem.textContent.replace(/\s{2,}/g, ' ').replace(/ /g,'_').replace(/[^a-zA-Z0-9_]+/g, '').substring(0, 75);
-
-				/* Ensure Uniqueness of Filename */
-				for(var j=0;j<99;j++) {
-					var TitleCheck = Title;
-					if(j > 0)
-						TitleCheck += '' + j;
-					if(TitlesUsed[TitleCheck] == undefined) {
-						Title = TitleCheck;
-						break;
+		try {
+			if(SnapLinks.Selection.FilteredElements.length) {
+				var TitlesUsed = { };
+	
+				var links = SnapLinks.Selection.FilteredElements.map( function(elem) {
+					var Title = elem.textContent.replace(/\s{2,}/g, ' ').replace(/ /g,'_').replace(/[^a-zA-Z0-9_]+/g, '').substring(0, 75);
+	
+					/* Ensure Uniqueness of Filename */
+					for(var j=0;j<99;j++) {
+						var TitleCheck = Title;
+						if(j > 0)
+							TitleCheck += '' + j;
+						if(TitlesUsed[TitleCheck] == undefined) {
+							Title = TitleCheck;
+							break;
+						}
 					}
+					TitlesUsed[Title] = true;
+	
+					return { FileName: Title, Url: elem.href };
+				}, this );
+				
+				this.CurrentReferer = this.DocumentReferer;
+				
+				var pref = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
+				var useDownloadDir = pref.getBoolPref("browser.download.useDownloadDir");
+
+				if (useDownloadDir && !SnapLinks.Prefs.AlwaysPromptDownloadName) {
+					links.forEach( function( link, index ) {
+						setTimeout(function() {
+							saveURL(link.Url, link.FileName, null, true, true, SnapLinks.CurrentReferer);
+						}, this.Prefs.ActionInterval * index, link);
+					}, this);
+				} else {
+					links.forEach( function( link, index ) {
+						// saveURL(aURL, aFileName, aFilePickerTitleKey, aShouldBypassCache, aSkipPrompt, aReferrer)
+						saveURL(link.Url, link.FileName, null, true, false, SnapLinks.CurrentReferer);
+					}, this);
 				}
-				TitlesUsed[Title] = true;
-
-				return { FileName: Title, Url: elem.href };
-			}, this );
-			
-			links.forEach( function( link ) {
-				const BYPASS_CACHE = true;
-				const DONT_SKIP_PROMPT = false;
-
-				try { saveURL(link.Url, link.FileName, false, BYPASS_CACHE, DONT_SKIP_PROMPT, this.DocumentReferer); }
-					catch(e) { }
-			}, this);
+			}
+		}
+		catch(e) {
+			Components.utils.reportError(e);
 		}
 	}
 }))();
-
-

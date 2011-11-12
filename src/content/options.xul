@@ -238,7 +238,11 @@
 			<preference type="bool"     id="pref.snaplinks.shownumber"                      name="extensions.snaplinks.shownumber"/>
 			<preference type="int"      id="pref.snaplinks.shownumber.where"                name="extensions.snaplinks.shownumber.where"/>
 
-			<preference type="string"   id="pref.snaplinks.CopyToClipboardSeparator"        name="extensions.snaplinks.CopyToClipboardSeparator"/>
+			<preference type="int"      id="pref.snaplinks.ActionInterval"                  name="extensions.snaplinks.ActionInterval"/>
+			<preference type="bool"     id="pref.snaplinks.AlwaysPromptDownloadName"        name="extensions.snaplinks.AlwaysPromptDownloadName"/>
+
+			<preference type="int"      id="pref.snaplinks.CopyToClipboardSeparator.Id"     name="extensions.snaplinks.CopyToClipboardSeparator.Id"/>
+			<preference type="string"   id="pref.snaplinks.CopyToClipboardSeparator.Custom" name="extensions.snaplinks.CopyToClipboardSeparator.Custom"/>
 		</preferences>
 		
 		<groupbox>
@@ -246,6 +250,8 @@
 			
 			<checkbox label="&snaplinks.adv.hideleave;" preference="pref.snaplinks.HideSelectionOnMouseLeave"/>
 			<checkbox label="&snaplinks.adv.RemoveDuplicateUrls;" preference="pref.snaplinks.RemoveDuplicateUrls"/>
+			<checkbox label="&snaplinks.adv.AlwaysPromptDownloadName;" preference="pref.snaplinks.AlwaysPromptDownloadName" id="snaplinks.checkbox.AlwaysPromptDownloadName"
+					tooltiptext="&snaplinks.adv.AlwaysPromptDownloadName.Tooltip;"/>
 			<hbox align="center">
 				<checkbox label="&snaplinks.adv.shownumber;" preference="pref.snaplinks.shownumber"/>
 				<menulist class="no-margin" preference="pref.snaplinks.shownumber.where">
@@ -255,16 +261,42 @@
 					</menupopup>
 				</menulist>
 			</hbox>
-		</groupbox>
-		
-		<groupbox>
-			<caption label="&snaplinks.adv.SelectAndClick;"/>
 			
-			<checkbox label="&snaplinks.adv.SelectAndClick.JsLinks;" preference="pref.snaplinks.HighlightJsLinksForClicking"/>
-			<checkbox label="&snaplinks.adv.SelectAndClick.Checkboxes;" preference="pref.snaplinks.HighlightCheckboxesForClicking"/>
-			<checkbox label="&snaplinks.adv.SelectAndClick.Buttons;" preference="pref.snaplinks.HighlightButtonsForClicking"/>
+			<menuseparator/>
+			
+			<hbox>
+				<label value="&snaplinks.adv.ActionInterval;"/>
+				<textbox preference="pref.snaplinks.ActionInterval"/>
+			</hbox>
 		</groupbox>
 		
+		<hbox>
+			<groupbox flex="1">
+				<caption label="&snaplinks.da.r3.clipboard;"/>
+				<label value="&snaplinks.adv.CopyToClipboardSeparator;"/>
+				
+				<radiogroup preference="pref.snaplinks.CopyToClipboardSeparator.Id">
+					<vbox>
+						<radio label="&snaplinks.adv.CopyToClipboardSeparator.LineFeed;" value="1"/>
+						<radio label="&snaplinks.adv.CopyToClipboardSeparator.Tab;" value="2"/>
+						<hbox>  
+							<radio label="&snaplinks.adv.CopyToClipboardSeparator.Custom;" value="0"/>
+							<textbox preference="pref.snaplinks.CopyToClipboardSeparator.Custom"
+									tooltiptext="&snaplinks.adv.CopyToClipboardSeparator.Custom.Tooltip;"/>
+						</hbox>
+					</vbox>
+				</radiogroup>
+			</groupbox>
+
+			<groupbox flex="1">
+				<caption label="&snaplinks.adv.SelectAndClick;"/>
+				
+				<checkbox label="&snaplinks.adv.SelectAndClick.JsLinks;" preference="pref.snaplinks.HighlightJsLinksForClicking"/>
+				<checkbox label="&snaplinks.adv.SelectAndClick.Checkboxes;" preference="pref.snaplinks.HighlightCheckboxesForClicking"/>
+				<checkbox label="&snaplinks.adv.SelectAndClick.Buttons;" preference="pref.snaplinks.HighlightButtonsForClicking"/>
+			</groupbox>
+		</hbox>
+
 		<spacer flex="1"/>
 	</prefpane>
 	

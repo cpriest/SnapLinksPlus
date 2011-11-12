@@ -33,6 +33,19 @@ var SnaplinksPrefsDialog = new (Class.create({
 	InitializeDialog: function(dialog) {
 		this._dialog = dialog;
 		this.UpdateLinePreviews();
+
+		var alwaysPrompt = document.getElementById("snaplinks.checkbox.AlwaysPromptDownloadName");
+		if (alwaysPrompt) {
+			var pref = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
+			var useDownloadDir = pref.getBoolPref("browser.download.useDownloadDir");
+
+			if (useDownloadDir) {
+				alwaysPrompt.removeAttribute('disabled');
+			}
+			else {
+				alwaysPrompt.setAttribute('disabled', true);
+			}
+		}
 	},
 	
 	UpdateLinePreviews: function() {
