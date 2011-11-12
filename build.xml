@@ -152,22 +152,48 @@
 			<fileset refid="src.root.files" />
 		</copy>
 
-		<antcall target="patch-install-rdf" />
+		<antcall target="patch-install-rdf">
+			<param name="dir.name" value="src"/>
+		</antcall>
 
-		<dirset id="locale.dirs" dir="${build.dir}/${localesBundle.nameForNormalBuild}/locale" includes="*" excludes="en-US" />
+		<dirset id="src.locale.dirs" dir="${build.dir}/${localesBundle.nameForNormalBuild}/locale" includes="*" excludes="en-US" />
 
 		<antcall target="patch-chrome-manifest" inheritrefs="yes">
-			<param name="dirset.id" value="locale.dirs"/>
+			<param name="dir.name" value="src"/>
+			<param name="dirset.id" value="src.locale.dirs"/>
 		</antcall>
 
 		<antcall target="generate-translator-block" inheritrefs="yes">
-			<param name="dirset.id" value="locale.dirs"/>
+			<param name="dir.name" value="src"/>
+			<param name="dirset.id" value="src.locale.dirs"/>
+		</antcall>
+	</target>
+	
+	
+	<target name="patch-for-babelzilla" depends="copy-src-to-build,unpack-locale-bundle-to-babelzilla-src">
+		<copy file="${src.dir}/install.rdf" todir="${build.dir}/babelzilla" overwrite="true" />
+		<copy file="${src.dir}/chrome.manifest" todir="${build.dir}/babelzilla" overwrite="true" />
+
+		<antcall target="patch-install-rdf">
+			<param name="dir.name" value="babelzilla"/>
+		</antcall>
+
+		<dirset id="babelzilla.locale.dirs" dir="${build.dir}/babelzilla/locale" includes="*" excludes="en-US" />
+
+		<antcall target="patch-chrome-manifest" inheritrefs="yes">
+			<param name="dir.name" value="babelzilla"/>
+			<param name="dirset.id" value="babelzilla.locale.dirs"/>
+		</antcall>
+
+		<antcall target="generate-translator-block" inheritrefs="yes">
+			<param name="dir.name" value="babelzilla"/>
+			<param name="dirset.id" value="babelzilla.locale.dirs"/>
 		</antcall>
 	</target>
 
 	<target name="patch-install-rdf">
 		<!-- Patch version number into install.rdf. -->
-		<replace file="${build.dir}/src/install.rdf" propertyFile="${basedir}/release.properties" encoding="utf-8">
+		<replace file="${build.dir}/${dir.name}/install.rdf" propertyFile="${basedir}/release.properties" encoding="utf-8">
 			<replacefilter token="&lt;em:version&gt;0&lt;/em:version&gt;" value="&lt;em:version&gt;${extension.versionNumber.forThisBuild}&lt;/em:version&gt;" />
 		</replace>
 	</target>
@@ -208,7 +234,7 @@
 				<regexpmapper from="(.*)" to="locale snaplinksplus \1	locale/\1/" />
 			</chainedmapper>
 		</pathconvert>
-		<echo file="${build.dir}/src/chrome.manifest" append="yes">${locale.list}</echo>
+		<echo file="${build.dir}/${dir.name}/chrome.manifest" append="yes">${locale.list}${line.separator}</echo>
 	</target>
 		
 	<target name="generate-translator-block">
@@ -221,37 +247,40 @@
 		</pathconvert>
 		
 		<!-- Write the template file. -->
-		<echo file="${build.dir}/translators-template.txt" append="no">${translators.list}</echo>
+		<echo file="${build.dir}/${dir.name}-translators-template.txt" append="no">${translators.list}${line.separator}</echo>
 
 		<!-- Encode names of the translators. -->
 		<native2ascii src="${babelzilla.dir}" dest="${build.dir}" encoding="utf-8" >
 			<include name="translators.properties" />
 		</native2ascii>
 		
+		<!-- Rename the file. -->
+		<move file="${build.dir}/translators.properties" tofile="${build.dir}/${dir.name}-translators.properties"/>
+		
 		<!-- Convert escape notation into XML format. -->
-		<replaceregexp file="${build.dir}/translators.properties" byline="yes" flags="g">
+		<replaceregexp file="${build.dir}/${dir.name}-translators.properties" byline="yes" flags="g">
 			<regexp pattern="\\u(....)"/>
 			<substitution expression="&amp;#x\1;"/>
 		</replaceregexp>
 		
 		<!-- Load names of the translators. -->
-		<loadproperties srcfile="${build.dir}/translators.properties" >
+		<loadproperties srcfile="${build.dir}/${dir.name}-translators.properties" >
 			<filterchain>
 			</filterchain>
 		</loadproperties>
 		
 		<!-- Load the template and expand the properties. -->
-		<loadfile property="translators.block" srcFile="${build.dir}/translators-template.txt" encoding="utf-8">
+		<loadfile property="translators.block" srcFile="${build.dir}/${dir.name}-translators-template.txt" encoding="utf-8">
 			<filterchain>
 				<expandproperties/>
 			</filterchain>
 		</loadfile>
 
 		<!-- Write the ready block into a file. This is used for trace purposes only. -->
-		<echo file="${build.dir}/translators-block.xml.ent" append="no">${translators.block}</echo>
+		<echo file="${build.dir}/${dir.name}-translators-block.xml.ent" append="no">${translators.block}</echo>
 
 		<!-- Patch the translator block into install.rdf. -->
-		<replace file="${build.dir}/src/install.rdf" encoding="utf-8">
+		<replace file="${build.dir}/${dir.name}/install.rdf" encoding="utf-8">
 			<replacefilter token="&lt;/em:translator&gt;" value=":&lt;/em:translator&gt;&#13;&#10;${translators.block}" />
 		</replace>
 	</target>
@@ -428,13 +457,13 @@
 
 
 	<!-- Make a special .xpi for BabelZilla.org. -->
-	<target name="xpi-babelzilla" depends="init-babelzilla,set-xpi-name,copy-src-to-build,unpack-locale-bundle-to-babelzilla-src">
+	<target name="xpi-babelzilla" depends="init-babelzilla,set-xpi-name,copy-src-to-build,unpack-locale-bundle-to-babelzilla-src,patch-for-babelzilla">
 		<mkdir dir="${dist.dir}/babelzilla" />
 
 		<delete file="${dist.dir}/babelzilla/${extension.xpi}" />
 
 		<zip destfile="${dist.dir}/babelzilla/${extension.xpi}" level="${zip.compressionLevel}" filesonly="true">
-			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="locale/**" />
+			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="locale/**,chrome.manifest,install.rdf" />
 			<zipfileset dir="${build.dir}/babelzilla" includes="*/**" />
 		</zip>
 	</target>
