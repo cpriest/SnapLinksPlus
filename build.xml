@@ -118,6 +118,7 @@
 
 
 	<target name="clean">
+		<mkdir dir="${build.dir}"/>
 		<delete includeemptydirs="true">
 			<fileset dir="${build.dir}" includes="**/*" excludes=".cvsignore" />
 		</delete>
@@ -125,6 +126,7 @@
 
 
 	<target name="clean-dist">
+		<mkdir dir="${dist.dir}"/>
 		<delete includeemptydirs="true">
 			<fileset dir="${dist.dir}" includes="**/*" excludes=".cvsignore" />
 		</delete>
