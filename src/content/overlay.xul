@@ -39,15 +39,16 @@
 
 	<popupset id="mainPopupSet">
 		<menupopup id="snaplMenu">
-			<menuitem label="&snaplinks.popup.newtabs;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.NEW_TABS)"/>
-			<menuitem label="&snaplinks.popup.newwindows;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.NEW_WINDOWS)"/>
-			<menuitem label="&snaplinks.popup.tabsinnewwin;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.TABS_IN_NEW_WINDOW)"/>
+			<menuitem label="&snaplinks.popup.newtabs;" oncommand="SnapLinksPlus.ActivateSelection(SnapLinksPlus.ACTION.NEW_TABS)"/>
+			<menuitem label="&snaplinks.popup.newwindows;" oncommand="SnapLinksPlus.ActivateSelection(SnapLinksPlus.ACTION.NEW_WINDOWS)"/>
+			<menuitem label="&snaplinks.popup.tabsinnewwin;" oncommand="SnapLinksPlus.ActivateSelection(SnapLinksPlus.ACTION.TABS_IN_NEW_WINDOW)"/>
 			<menuseparator/>
-			<menuitem label="&snaplinks.popup.bookmark;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.BOOKMARK_LINKS)"/>
-			<menuitem label="&snaplinks.popup.download;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.DOWNLOAD_LINKS)"/>
-			<menuitem label="&snaplinks.popup.clipboard;" oncommand="SnapLinks.ActivateSelection(SnapLinks.ACTION.COPY_TO_CLIPBOARD)"/>
+			<menuitem label="&snaplinks.popup.bookmark;" oncommand="SnapLinksPlus.ActivateSelection(SnapLinksPlus.ACTION.BOOKMARK_LINKS)"/>
+			<menuitem label="&snaplinks.popup.download;" oncommand="SnapLinksPlus.ActivateSelection(SnapLinksPlus.ACTION.DOWNLOAD_LINKS)"/>
+			<menuitem label="&snaplinks.popup.clipboard;" oncommand="SnapLinksPlus.ActivateSelection(SnapLinksPlus.ACTION.COPY_TO_CLIPBOARD)"/>
 		</menupopup>
 	</popupset>
 
+	<script type="application/x-javascript" src="snaplinks.js"/>
 	<script type="application/x-javascript" src="bootstrap.js"/>
 </overlay>

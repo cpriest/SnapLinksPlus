@@ -19,8 +19,16 @@
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var EXPORTED_SYMBOLS = ["SnapLinksPrefsClass"];
 
-SnapLinks.Prefs = new (Class.create(PrefsMapper, {
+try {
+	Components.utils.import("chrome://snaplinksplus/content/Utility.js");
+}
+catch(e) {
+	Components.utils.reportError(e + ":\n"+ e.stack);
+}
+
+var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 	
 	ShowCount_AddonBar	: 0,
 	ShowCount_Hover		: 1,
@@ -54,7 +62,7 @@ SnapLinks.Prefs = new (Class.create(PrefsMapper, {
 		
 		DevShowJSConsoleAtStartup:			{ Type: 'bool',	Default: false	}
 	},
-	
+
 	initialize: function($super) {
 		$super(this.BasePath, this.map);
 
@@ -62,4 +70,4 @@ SnapLinks.Prefs = new (Class.create(PrefsMapper, {
 		if(this.pref.getPrefType(this.map.DefaultAction.Path) == this.pref.PREF_INT)
 			this.TranslatePref('DefaultAction', {	0:'OpenTabs', 1:'OpenWindows', 2:'OpenTabsInNewWindow', 3:'CopyToClipboard', 4:'BookmarkLinks', 5:'DownloadLinks' });
 	}
-}))();
+});

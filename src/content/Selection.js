@@ -18,9 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
-  
+
+var EXPORTED_SYMBOLS = ["SnapLinksSelectionClass"];
+
+try {
+	Components.utils.import("chrome://snaplinksplus/content/Utility.js");
+}
+catch(e) {
+	Components.utils.reportError(e + ":\n"+ e.stack);
+}
+
 /** Selection class handles the selection rectangle and accompanying visible element */
-var Selection = Class.create({ 
+var SnapLinksSelectionClass = Class.create({
+	SnapLinksPlus: null,
 	X1: 0, Y1: 0, X2: 0, Y2: 0,
 	jsRegExp: /^javascript:/i,
 	
@@ -50,23 +60,24 @@ var Selection = Class.create({
 			
 			var Distinct = [ ];
 			return this.SelectedElements.filter( function(elem) {
-				if(!elem.href || (SnapLinks.Prefs.RemoveDuplicateUrls && Distinct.indexOf(elem.href) != -1))
+				if(!elem.href || (this.SnapLinksPlus.Prefs.RemoveDuplicateUrls && Distinct.indexOf(elem.href) != -1))
 					return false;
 				Distinct.push(elem.href);
 				return true;
-			});
+			}, this);
 		}
 	},
 	
 	/* Internal Flag indicating that a selection has been started */
 	DragStarted: false,
 	
-	initialize: function(PanelContainer) {
-		this.PanelContainer = PanelContainer;
+	initialize: function(SnapLinksPlus) {
+		this.SnapLinksPlus = SnapLinksPlus;
+		this.PanelContainer = this.SnapLinksPlus.PanelContainer;
 		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), false);
 		this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
 		
-		window.addEventListener('resize', this.OnWindowResize.bind(this), true);
+		this.SnapLinksPlus.Window.addEventListener('resize', this.OnWindowResize.bind(this), true);
 		
 		this._OnMouseMove 	= this.OnMouseMove.bind(this);
 		this._OnKeyDown		= this.OnKeyDown.bind(this);
@@ -75,13 +86,15 @@ var Selection = Class.create({
 	
 	/* Element bounding rectangles are calculated at the start, if the window is resized during a drag, then we recalculate */
 	OnWindowResize: function(e) {
+		this.Window = e.view;
 		if(this.DragStarted == true)
 			this.CalculateSnapRects();
 	},
 	
 	/* Starting Hook for beginning a selection */
 	OnMouseDown: function(e) {
-		if(!SnapLinks.ShouldActivate(e))
+		this.Window = e.view;
+		if(!this.SnapLinksPlus.ShouldActivate(e))
 			return;
 
 		this.Document = e.target.ownerDocument;
@@ -96,15 +109,16 @@ var Selection = Class.create({
 	},
 	
 	OnMouseMove: function(e) {
+		this.Window = e.view;
 		if(this.Element) {
-			if((e.clientX < 0 || e.clientY < 0 || e.clientX > this.PanelContainer.clientWidth || e.clientY > this.PanelContainer.clientHeight) && SnapLinks.Prefs.HideSelectionOnMouseLeave)
+			if((e.clientX < 0 || e.clientY < 0 || e.clientX > this.PanelContainer.clientWidth || e.clientY > this.PanelContainer.clientHeight) && this.SnapLinksPlus.Prefs.HideSelectionOnMouseLeave)
 				this.Element.style.display = 'none';
 			else
 				this.Element.style.display = '';
 		}
 
 		/* Disabled At The Moment */ 
-		if(false && e.altKey && !SnapLinks.Prefs.ActivateRequiresAlt) {
+		if(false && e.altKey && !this.SnapLinksPlus.Prefs.ActivateRequiresAlt) {
 			this.OffsetSelection(e.pageX - this.X2, e.pageY - this.Y2);
 
 			/** The below commented section of code causes the rectangle to shrink if it goes off screen, is this even a desired functionality? -- Clint - 5/22/2011 */
@@ -118,8 +132,8 @@ var Selection = Class.create({
 	//		var minHeight = tabbrowser.selectedBrowser.boxObject.height;
 	//		var minWidth = tabbrowser.selectedBrowser.boxObject.width;
 																													
-	//		SnapLinks.Selection.X1 = Math.max(Math.min(Math.max(this.Document.width,minWidth),SnapLinks.Selection.X1),0);
-	//		SnapLinks.Selection.Y1 = Math.max(Math.min(Math.max(this.Document.height,minHeight),SnapLinks.Selection.Y1),0);
+	//		this.SnapLinksPlus.Selection.X1 = Math.max(Math.min(Math.max(this.Document.width,minWidth),this.SnapLinksPlus.Selection.X1),0);
+	//		this.SnapLinksPlus.Selection.Y1 = Math.max(Math.min(Math.max(this.Document.height,minHeight),this.SnapLinksPlus.Selection.Y1),0);
 		} else {
 			this.ExpandSelectionTo(Math.min(e.pageX), e.pageY);
 		}
@@ -130,18 +144,21 @@ var Selection = Class.create({
 	},
 	
 	OnMouseUp: function(e) {
+		this.Window = e.view;
 		this.RemoveEventHooks();
 	},
 
 	OnKeyDown: function(e) {
-		if(e.keyCode == KeyboardEvent.DOM_VK_SHIFT ) {
+		this.Window = e.view;
+		if(e.keyCode == this.Window.KeyboardEvent.DOM_VK_SHIFT ) {
 			this.SelectLargestFontSizeIntersectionLinks = false;
 			this.UpdateElement();
 		}
 	},
 	
 	OnKeyUp: function(e) {
-		if(e.keyCode == KeyboardEvent.DOM_VK_SHIFT ) {
+		this.Window = e.view;
+		if(e.keyCode == this.Window.KeyboardEvent.DOM_VK_SHIFT ) {
 			this.SelectLargestFontSizeIntersectionLinks = true;
 			this.UpdateElement();
 		}
@@ -157,15 +174,16 @@ var Selection = Class.create({
 			
 			this.Element = this.Document.createElementNS('http://www.w3.org/1999/xhtml', 'snaplRect');
 			if(InsertionNode && this.Element) {
-				this.Element.style.color = SnapLinks.Prefs.SelectionBorderColor;
-				this.Element.style.border = SnapLinks.Prefs.SelectionBorderWidth + 'px dotted';
+				this.Element.style.color = this.SnapLinksPlus.Prefs.SelectionBorderColor;
+				this.Element.style.border = this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px dotted';
 				this.Element.style.position = 'absolute';
 				this.Element.style.zIndex = '10000';
 				this.Element.style.left = this.X1 + 'px'; 
 				this.Element.style.top = this.Y1 + 'px';
 				InsertionNode.appendChild(this.Element);
 				
-				if(SnapLinks.Prefs.ShowSelectedCount && SnapLinks.Prefs.ShowCountWhere == SnapLinks.Prefs.ShowCount_Hover) {
+				if(this.SnapLinksPlus.Prefs.ShowSelectedCount &&
+						this.SnapLinksPlus.Prefs.ShowCountWhere == this.SnapLinksPlus.Prefs.ShowCount_Hover) {
 					this.ElementCount = this.Document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
 					ApplyStyle(this.ElementCount, {
 						position		: 'absolute',
@@ -181,8 +199,8 @@ var Selection = Class.create({
 				this.DragStarted = this.Element.parentNode != undefined;
 
 				if(this.DragStarted) {
-					if(SnapLinks.Prefs.ShowSelectedCount)
-						SnapLinks.SnapLinksStatus = SnapLinks.LocaleStrings.Links + ' 0';
+					if(this.SnapLinksPlus.Prefs.ShowSelectedCount)
+						this.SnapLinksPlus.SnapLinksStatus = this.SnapLinksPlus.LocaleStrings.Links + ' 0';
 
 					this.CalculateSnapRects();
 					return true;
@@ -195,10 +213,10 @@ var Selection = Class.create({
 	/** Calculates and caches the rectangles that make up all document lengths */
 	CalculateSnapRects: function() {
 		/* If the last calculation was done at the same innerWidth, skip calculation */
-		if(this.CalculateWindowWidth == window.innerWidth)
+		if(this.CalculateWindowWidth == this.Window.innerWidth)
 			return;
 			
-		this.CalculateWindowWidth = window.innerWidth;
+		this.CalculateWindowWidth = this.Window.innerWidth;
 		var offset = { x: this.Document.defaultView.scrollX, y: this.Document.defaultView.scrollY };
 		var SelectableElements = [ ];
 		
@@ -210,7 +228,7 @@ var Selection = Class.create({
 
 				// Skip JavaScript links, if the option is disabled.
 				if (link.SnapIsJsLink &&
-						!SnapLinks.Prefs.HighlightJsLinksForClicking) {
+						!this.SnapLinksPlus.Prefs.HighlightJsLinksForClicking) {
 					return;
 				}
 			}
@@ -228,10 +246,10 @@ var Selection = Class.create({
 		$A(this.Document.body.querySelectorAll('INPUT')).forEach( function(input) {
 			var Type = input.getAttribute('type'),
 				ElementRectsNode = input;
-			if(SnapLinks.Prefs.HighlightButtonsForClicking && (Type == 'submit' || Type == 'button')) {
+			if(this.SnapLinksPlus.Prefs.HighlightButtonsForClicking && (Type == 'submit' || Type == 'button')) {
 				SelectableElements.push(input);
 			}
-			else if(SnapLinks.Prefs.HighlightCheckboxesForClicking && Type == 'checkbox') {
+			else if(this.SnapLinksPlus.Prefs.HighlightCheckboxesForClicking && Type == 'checkbox') {
 				if(input.parentNode.tagName == 'LABEL') {
 					ElementRectsNode = input.parentNode;
 					input.SnapOutlines = [ input.parentNode ];
@@ -328,10 +346,10 @@ var Selection = Class.create({
 	UpdateElement: function() {
 		if(this.Create()) {
 			ApplyStyle(this.Element, {
-				width 	: Math.abs(this.X1-this.X2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
-				height 	: Math.abs(this.Y1-this.Y2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
-				top 	: Math.min(this.Y1,this.Y2) - SnapLinks.Prefs.SelectionBorderWidth + 'px',
-				left 	: Math.min(this.X1,this.X2) - SnapLinks.Prefs.SelectionBorderWidth + 'px'
+				width 	: Math.abs(this.X1-this.X2) - this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px',
+				height 	: Math.abs(this.Y1-this.Y2) - this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px',
+				top 	: Math.min(this.Y1,this.Y2) - this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px',
+				left 	: Math.min(this.X1,this.X2) - this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px'
 			} );
 			
 			this.CalcSelectedElements();
@@ -356,7 +374,7 @@ var Selection = Class.create({
 				});
 				
 				if (Intersects) {
-					var computedStyle = content.document.defaultView.getComputedStyle(elem, null);
+					var computedStyle = this.Window.content.document.defaultView.getComputedStyle(elem, null);
 					var hidden = (computedStyle.getPropertyValue('visibility') == 'hidden' ||
 							computedStyle.getPropertyValue('display') == 'none');
 					
@@ -432,7 +450,7 @@ var Selection = Class.create({
 			this.SelectedElements = this.IntersectedElements.filter(filterFunction, this);
 			
 			// Apply the style on the selected elements.
-			var OutlineStyle = SnapLinks.Prefs.SelectedElementsBorderWidth + 'px solid ' + SnapLinks.Prefs.SelectedElementsBorderColor;
+			var OutlineStyle = this.SnapLinksPlus.Prefs.SelectedElementsBorderWidth + 'px solid ' + this.SnapLinksPlus.Prefs.SelectedElementsBorderColor;
 			this.SelectedElements.forEach( function(elem) {
 				(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
 					elem.style.MozOutline = OutlineStyle;
@@ -448,11 +466,11 @@ var Selection = Class.create({
 			// Add the links count.
 			if(this.ElementCount)
 			{
-				var linksText = document.createTextNode('Links: '+this.SelectedElements.length);
+				var linksText = this.Window.document.createTextNode('Links: '+this.SelectedElements.length);
 				this.ElementCount.appendChild(linksText);
 			}
 
-			SnapLinks.SnapLinksStatus = 'Links: '+this.SelectedElements.length;
+			this.SnapLinksPlus.SnapLinksStatus = 'Links: '+this.SelectedElements.length;
 		}
 	}
 } );
