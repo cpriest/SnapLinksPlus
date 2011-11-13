@@ -22,11 +22,24 @@
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const snaplLMB  = 0;
-const snaplMMB  = 1;
-const snaplRMB  = 2;
+var EXPORTED_SYMBOLS = ["SnapLinksClass"];
 
-SnapLinks = new (Class.create({
+try {
+	var Cu = Components.utils;
+	Cu.import("resource://gre/modules/PlacesUtils.jsm");
+	Cu.import("resource://gre/modules/PlacesUIUtils.jsm");
+	Cu.import("chrome://snaplinksplus/content/Utility.js");
+	Cu.import('chrome://snaplinksplus/content/Selection.js');
+	Cu.import('chrome://snaplinksplus/content/Preferences.js');
+}
+catch(e) {
+	Components.utils.reportError(e + ":\n"+ e.stack);
+}
+
+var SnapLinksClass = Class.create({
+	Window: null,
+	XulDocument: null,
+	PanelContainer: null,
 
 	ACTION: {
 		NEW_TABS			: 'OpenTabs',
@@ -54,7 +67,7 @@ SnapLinks = new (Class.create({
 			try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
 						.newURI(this.Document.location.href, null, null); }
 			catch(e) {
-				Components.utils.reportError(e);
+				Components.utils.reportError(e + ":\n"+ e.stack);
 			}
 			return null;
 		}
@@ -65,9 +78,9 @@ SnapLinks = new (Class.create({
 	 */
 	ClipboardSeparator: {
 		get: function() {
-			switch (SnapLinks.Prefs.CopyToClipboardSeparatorId) {
+			switch (this.Prefs.CopyToClipboardSeparatorId) {
 			case this.COPY_TO_CLIPBOARD_SEPARATOR_ID.CUSTOM:
-				return unescape(SnapLinks.Prefs.CopyToClipboardSeparatorCustom);
+				return unescape(this.Prefs.CopyToClipboardSeparatorCustom);
 				break;
 			case this.COPY_TO_CLIPBOARD_SEPARATOR_ID.NEWLINE:
 				return "\n";
@@ -86,8 +99,9 @@ SnapLinks = new (Class.create({
 	 */
 	SnapLinksStatus: {
 		set: function(x) {
-			if(SnapLinks.Prefs.ShowSelectedCount && SnapLinks.Prefs.ShowCountWhere == SnapLinks.Prefs.ShowCount_AddonBar) {
-				var el = document.getElementById('snaplinks-panel') ;
+			if(this.Prefs.ShowSelectedCount &&
+					this.Prefs.ShowCountWhere == this.Prefs.ShowCount_AddonBar) {
+				var el = this.XulDocument.getElementById('snaplinks-panel') ;
 				el && (el.label = x);
 				el && (el.hidden = (x == ''));
 			}
@@ -99,11 +113,14 @@ SnapLinks = new (Class.create({
 	 */
 	StatusBarLabel: {
 		set: function(x) {
-			document.getElementById('statusbar-display').label = x;
+			this.XulDocument.getElementById('statusbar-display').label = x;
 		}
 	},
 
-	initialize: function() {
+	initialize: function(Window, XulDocument) {
+		this.Window = Window;
+		this.XulDocument = XulDocument;
+		
 		var StringBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
 		var LocaleStrings = StringBundleService.createBundle("chrome://snaplinksplus/locale/snaplinks.properties");
 		
@@ -114,22 +131,18 @@ SnapLinks = new (Class.create({
 
 		this._OnMouseMove 	= this.OnMouseMove.bind(this);
 
-		this.PanelContainer = document.getElementById('content').mPanelContainer;
+		this.PanelContainer = this.XulDocument.getElementById('content').mPanelContainer;
 		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), false);
 		this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
 		this.PanelContainer.addEventListener('keypress', this.OnKeyPress.bind(this), true);
-
-		document.getElementById('snaplMenu')
+		
+		this.XulDocument.getElementById('snaplMenu')
 			.addEventListener('popuphidden',this.OnSnapLinksPopupHidden.bind(this),false);
 
-		this.Selection = new Selection(this.PanelContainer);
+		this.Selection = new SnapLinksSelectionClass(this);
+		this.Prefs = new SnapLinksPrefsClass(this.XulDocument);
 
 		this.SnapLinksStatus = '';
-
-		/* Import anything already defined into SnapLinks.* (like Prefs) */
-		Object.keys(SnapLinks).forEach( function(Name) {
-			this[Name] = SnapLinks[Name];
-		}, this);
 	},
 
 	/**
@@ -138,13 +151,13 @@ SnapLinks = new (Class.create({
 	ShouldActivate: function(e) {
 		if(e.view.location.protocol == 'about:')
 			return false;
-		if(e.button != SnapLinks.Prefs.SelectionButton)
+		if(e.button != this.Prefs.SelectionButton)
 			return false;
-		if(SnapLinks.Prefs.ActivateRequiresAlt && !e.altKey)
+		if(this.Prefs.ActivateRequiresAlt && !e.altKey)
 			return false;
-		if(SnapLinks.Prefs.ActivateRequiresShift && !e.shiftKey)
+		if(this.Prefs.ActivateRequiresShift && !e.shiftKey)
 			return false;
-		if(SnapLinks.Prefs.ActivateRequiresCtrl && !e.ctrlKey)
+		if(this.Prefs.ActivateRequiresCtrl && !e.ctrlKey)
 			return false;
 		return true;
 	},
@@ -167,7 +180,7 @@ SnapLinks = new (Class.create({
 
 		/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218, 
 			we prevent the context menu from showing on mouse down here. */
-		if(navigator.userAgent.indexOf('Linux') != -1) {
+		if(this.Window.navigator.userAgent.indexOf('Linux') != -1) {
 			this.StopNextContextMenuPopup();
 		}
 	},
@@ -177,7 +190,7 @@ SnapLinks = new (Class.create({
 	},
 
 	OnMouseUp: function(e) {
-		if(e.button != SnapLinks.Prefs.SelectionButton)
+		if(e.button != this.Prefs.SelectionButton)
 			return;
 
 		if(this.Document) {
@@ -185,24 +198,24 @@ SnapLinks = new (Class.create({
 
 			if(this.Selection.DragStarted == true) {
 				this.StopNextContextMenuPopup();
-				if((e.ctrlKey || SnapLinks.Prefs.DefaultAction == this.ACTION.ASK_USER) &&
+				if((e.ctrlKey || this.Prefs.DefaultAction == this.ACTION.ASK_USER) &&
 						this.Selection.SelectedElementsType == 'Links' &&
-						SnapLinks.Selection.FilteredElements.length) {
-					pop = document.getElementById('snaplMenu');
+						this.Selection.FilteredElements.length) {
+					pop = this.XulDocument.getElementById('snaplMenu');
 					pop.openPopupAtScreen(e.screenX, e.screenY, true);
 				} else
 					this.ActivateSelection();
 			} else {
-				SnapLinks.Clear();
+				this.Clear();
 				
 				/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218
 					we force the context menu to open up here*/
 				if(navigator.userAgent.indexOf('Linux') != -1) {
 					if (gContextMenu) {
-						var evt = document.createEvent("MouseEvents");
+						var evt = this.XulDocument.createEvent("MouseEvents");
 						var le = this.LastMouseDownEvent;
 					
-						evt.initMouseEvent('contextmenu', true, true, window, 0, 
+						evt.initMouseEvent('contextmenu', true, true, this.Window, 0, 
 							e.screenX, e.screenY, e.clientX, e.clientY,
 							false, false, false, false,
 							2, null);
@@ -222,7 +235,7 @@ SnapLinks = new (Class.create({
 	},
 
 	OnKeyPress: function(e) {
-		if(e.keyCode == KeyboardEvent.DOM_VK_ESCAPE)
+		if(e.keyCode == this.Window.KeyboardEvent.DOM_VK_ESCAPE)
 			this.Clear();
 	},
 
@@ -235,7 +248,7 @@ SnapLinks = new (Class.create({
 
 		this.StoppingNextContextMenuPopup = true;
 
-		var ContentAreaContextMenu = document.getElementById('contentAreaContextMenu');
+		var ContentAreaContextMenu = this.XulDocument.getElementById('contentAreaContextMenu');
 		var _PreventEventDefault;
 		function PreventEventDefault(e) {
 			e.preventDefault();
@@ -250,7 +263,7 @@ SnapLinks = new (Class.create({
 	 * This is fired when the context menu is closed.
 	 */
 	OnSnapLinksPopupHidden: function(e){
-		SnapLinks.Clear();
+		this.Clear();
 	},
 
 	/**
@@ -274,7 +287,7 @@ SnapLinks = new (Class.create({
 			'Checkboxes':	[ 'ClickElements' ]
 		};
 
-		Action = Action || SnapLinks.Prefs.DefaultAction;
+		Action = Action || this.Prefs.DefaultAction;
 		
 		/* Check to see that the requested action is valid for the given SelectedElementsType */
 		if(ValidActions[this.Selection.SelectedElementsType].indexOf(Action) == -1)
@@ -291,9 +304,11 @@ SnapLinks = new (Class.create({
 	ClickLinks: function() {
 		try {
 			this.Selection.FilteredElements.forEach( function(elem, index) {
-				setTimeout(function() {
-					SnapLinks.ClickLink(elem);
-				}, this.Prefs.ActionInterval * index, elem);
+				var callback = this;
+				
+				this.Window.setTimeout(function() {
+					callback.ClickLink(elem);
+				}, this.Prefs.ActionInterval * index, callback, elem);
 			}, this );
 		}
 		catch (e) {
@@ -313,8 +328,8 @@ SnapLinks = new (Class.create({
 		/* This is needed for JavaScript links on
 		 * Firefox 4.0 and SeaMonkey 2.1.
 		 */
-		var evt = document.createEvent("MouseEvents");
-		evt.initMouseEvent("click", true, true, window, 0,
+		var evt = this.Window.document.createEvent("MouseEvents");
+		evt.initMouseEvent("click", true, true, this.Window, 0,
 				0, 0, 0, 0,
 				false, false, false, false,
 				0, null);
@@ -336,31 +351,33 @@ SnapLinks = new (Class.create({
 	},
 
 	/**
-	 * Opens the selected element links in tabs in the current window
+	 * Opens the selected element links in tabs in the current window.
 	 */
 	OpenTabs: function() {
 		try {
 			this.CurrentReferer = this.DocumentReferer;
 			
 			this.Selection.FilteredElements.forEach( function(elem, index) {
-				setTimeout(function() {
+				var callback = this;
+				
+				this.Window.setTimeout(function() {
 					if(elem.href) {
-						SnapLinks.CurrentElement = elem;
+						callback.CurrentElement = elem;
 						
 						if (elem.SnapIsJsLink) {
-							SnapLinks.ClickLink(elem); // Click JS links.
+							callback.ClickLink(elem); // Click JS links.
 						}
 						else {
-							getBrowser().addTab(elem.href, SnapLinks.CurrentReferer);
+							callback.Window.getBrowser().addTab(elem.href, callback.CurrentReferer);
 						}
 						
-						SnapLinks.CurrentElement = null;
+						callback.CurrentElement = null;
 					}
-				}, this.Prefs.ActionInterval * index, elem);
+				}, this.Prefs.ActionInterval * index, callback, elem);
 			}, this);
 		}
 		catch(e) {
-			Components.utils.reportError(e);
+			Components.utils.reportError(e + ":\n"+ e.stack);
 		}
 	},
 
@@ -409,11 +426,13 @@ SnapLinks = new (Class.create({
 	 */
 	OpenWindows: function() {
 		try {
-			SnapLinks.Selection.FilteredElements.forEach( function(elem, index) {
-				setTimeout(function() {
+			this.Selection.FilteredElements.forEach( function(elem, index) {
+				var callback = this;
+				
+				this.Window.setTimeout(function() {
 					if(elem.href)
-						window.open(elem.href);
-				}, this.Prefs.ActionInterval * index, elem);
+						callback.Window.open(elem.href);
+				}, this.Prefs.ActionInterval * index, callback, elem);
 			}, this );
 		}
 		catch(e) {
@@ -426,12 +445,12 @@ SnapLinks = new (Class.create({
 	 */
 	OpenTabsInNewWindow: function() {
 		try {
-			if(SnapLinks.Selection.FilteredElements.length) {
-				var urls = SnapLinks.Selection.FilteredElements.map( function(elem) {
+			if(this.Selection.FilteredElements.length) {
+				var urls = this.Selection.FilteredElements.map( function(elem) {
 					return elem.href;
 				}, this ).join('|');
 	
-				return window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
+				return this.Window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
 			}
 		}
 		catch(e) {
@@ -449,7 +468,7 @@ SnapLinks = new (Class.create({
 			var textSeparator = this.ClipboardSeparator;
 			var htmlSeparator = textSeparator.replace(/\n/g, "<br>");
 			
-			var Representations = SnapLinks.Selection.FilteredElements.reduce( function(acc, elem) {
+			var Representations = this.Selection.FilteredElements.reduce( function(acc, elem) {
 				var text = elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
 	
 				acc.html.push( '<a href="' + elem.href + '">' + text + '</a>' );
@@ -498,8 +517,8 @@ SnapLinks = new (Class.create({
 		try {
 			var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
 
-			if(SnapLinks.Selection.FilteredElements.length) {
-				var uriList = SnapLinks.Selection.FilteredElements.map( function(elem) {
+			if(this.Selection.FilteredElements.length) {
+				var uriList = this.Selection.FilteredElements.map( function(elem) {
 					return ioService.newURI(elem.href, null, null);
 				}, this );
 				
@@ -513,7 +532,7 @@ SnapLinks = new (Class.create({
 							URIList: uriList
 					};
 					
-					PlacesUIUtils.showBookmarkDialog(info, window);
+					PlacesUIUtils.showBookmarkDialog(info, this.Window);
 				} else {
 					// Fallback to older showMinimalAddMultiBookmarkUI().
 					PlacesUIUtils.showMinimalAddMultiBookmarkUI(uriList);
@@ -530,10 +549,10 @@ SnapLinks = new (Class.create({
 	 */
 	DownloadLinks: function() {
 		try {
-			if(SnapLinks.Selection.FilteredElements.length) {
+			if(this.Selection.FilteredElements.length) {
 				var TitlesUsed = { };
 	
-				var links = SnapLinks.Selection.FilteredElements.map( function(elem) {
+				var links = this.Selection.FilteredElements.map( function(elem) {
 					var Title = elem.textContent.replace(/\s{2,}/g, ' ').replace(/ /g,'_').replace(/[^a-zA-Z0-9_]+/g, '').substring(0, 75);
 	
 					/* Ensure Uniqueness of Filename */
@@ -556,16 +575,18 @@ SnapLinks = new (Class.create({
 				var pref = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
 				var useDownloadDir = pref.getBoolPref("browser.download.useDownloadDir");
 
-				if (useDownloadDir && !SnapLinks.Prefs.AlwaysPromptDownloadName) {
+				if (useDownloadDir && !this.Prefs.AlwaysPromptDownloadName) {
 					links.forEach( function( link, index ) {
-						setTimeout(function() {
-							saveURL(link.Url, link.FileName, null, true, true, SnapLinks.CurrentReferer);
-						}, this.Prefs.ActionInterval * index, link);
+						var callback = this;
+						
+						this.Window.setTimeout(function() {
+							saveURL(link.Url, link.FileName, null, true, true, callback.CurrentReferer);
+						}, this.Prefs.ActionInterval * index, callback, link);
 					}, this);
 				} else {
 					links.forEach( function( link, index ) {
 						// saveURL(aURL, aFileName, aFilePickerTitleKey, aShouldBypassCache, aSkipPrompt, aReferrer)
-						saveURL(link.Url, link.FileName, null, true, false, SnapLinks.CurrentReferer);
+						saveURL(link.Url, link.FileName, null, true, false, this.CurrentReferer);
 					}, this);
 				}
 			}
@@ -574,4 +595,4 @@ SnapLinks = new (Class.create({
 			Components.utils.reportError(e);
 		}
 	}
-}))();
+});

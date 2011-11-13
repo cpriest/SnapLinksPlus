@@ -19,13 +19,13 @@
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function LoadScript(path) {
-	Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
-		.getService(Components.interfaces.mozIJSSubScriptLoader)
-		.loadSubScript(path);
+try {
+	Components.utils.import('chrome://snaplinksplus/content/Utility.js');
+}
+catch(e) {
+	Components.utils.reportError(e + ":\n"+ e.stack);
 }
 
-LoadScript('chrome://snaplinksplus/content/Utility.js');
 
 var SnaplinksPrefsDialog = new (Class.create({
 	_dialog: null,

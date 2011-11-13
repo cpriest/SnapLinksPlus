@@ -19,12 +19,22 @@
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
  
+var EXPORTED_SYMBOLS = ["SnapLinksDebugClass"];
+
+try {
+	Components.utils.import("chrome://snaplinksplus/content/Utility.js");
+}
+catch(e) {
+	Components.utils.reportError(e + ":\n"+ e.stack);
+}
+
 /* This class primarily was written to validate the selection rectangle and bounding rect element functionality
  *
  * It would seem this method of calculation should work wherever, but if there are problem pages this class can
  * be used to diagnose where there may be an issue with the algorithm.
  */
-var SnapLinksDebug = new (Class.create({
+var SnapLinksDebugClass = Class.create({
+	Window: null,
 	
 	/* Flags to indicate what should be highlighted at load and on mouse over, as well as how to highlight them */
 	Flags: {
@@ -46,7 +56,9 @@ var SnapLinksDebug = new (Class.create({
 	DebugLinksAtLoad: 		{ get: function() { return this.Flags.Links.OnLoad.ApplyLinkStyle || this.Flags.Links.OnLoad.ShowClientRects; }	},
 	DebugLinksOnMouseOver: 	{ get: function() { return this.Flags.Links.OnMouseOver.ApplyLinkStyle || this.Flags.Links.OnMouseOver.ShowClientRects; }	},
 	
-	initialize: function() {
+	initialize: function(Window) {
+		this.Window = Window;
+		
 		if(this.DebugLinksAtLoad || this.DebugLinksOnMouseOver)
 			gBrowser.addEventListener('load', this.OnDocumentLoaded.bind(this), true);
 	},
@@ -118,12 +130,12 @@ var SnapLinksDebug = new (Class.create({
 			
 			/* Pass through any clicks to this div to the original link */
 			elem.addEventListener('click', function(e) {
-				var evt = document.createEvent('MouseEvents');
-				evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+				var evt = this.Window.document.createEvent('MouseEvents');
+				evt.initMouseEvent('click', true, true, this.Window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 				link.dispatchEvent(evt); 
 			}, true);
 			link.ownerDocument.body.appendChild(elem);
 			link.SnapDebugNodes.push(elem);
 		}, this );
 	}
-}))();
+});

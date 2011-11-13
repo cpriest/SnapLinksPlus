@@ -19,7 +19,19 @@
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Log() logs info to the Firebug plugin if available, identical usage to console.log() from within a client page */
+var EXPORTED_SYMBOLS = ["Class",
+                        "PrefsDialogMapper",
+                        "PrefsMapper",
+                        "Util",
+                        "$A",
+                        "ApplyStyle",
+                        "GetElementRects",
+                        "Log"];
+
+/**
+ * Log() logs info to the Firebug plugin if available,
+ * identical usage to console.log() from within a client page.
+ */
 function Log() {
 	if(typeof Firebug != 'undefined') {
 		Firebug.Console.logFormatted(arguments);
@@ -32,7 +44,8 @@ function Log() {
 			mrbw.Firebug.Console.logFormatted(arguments);
 	}
 }
-/** Logs a warning to the standard console */
+
+/** Logs a warning to the standard console. */
 Log.Warning = function(Message, Source, Line, Column) {
 	var ConsoleService = Components.classes["@mozilla.org/consoleservice;1"]
 							.getService(Components.interfaces.nsIConsoleService);
@@ -42,50 +55,67 @@ Log.Warning = function(Message, Source, Line, Column) {
 	ConsoleService.logMessage(ScriptMessage);
 };
 
-/*
+/**
  * Prototype Imports -- Mozilla Organization may not like these...
  */
-
 var Util = {
 	Object: {
-		/* Returns true if object is a function */
+		/**
+		 * Returns true if object is a function.
+		 */
 		isFunction: function(object) {
 			return typeof object === 'function';
 		},
-		/* Extends the destination object with properties from the source object */
+
+		/**
+		 * Extends the destination object with properties
+		 * from the source object.
+		 */
 		extend: function(destination, source) {
 			for (var property in source)
 				destination[property] = source[property];
 			return destination;
 		}
 	},
+
 	Function: {
-		/* Returns an array of the argument names to the given function */
+		/**
+		 * Returns an array of the argument names to the given function.
+		 */
 		ArgumentNames: function(func) {
 			var names = func.toString().match(/^[\s\(]*function[^(]*\(([^)]*)\)/)[1]
 							.replace(/\/\/.*?[\r\n]|\/\*(?:.|[\r\n])*?\*\//g, '')
 							.replace(/\s+/g, '').split(',');
 			return names.length == 1 && !names[0] ? [] : names;
 		},
-		/** Returns the given func wrapped with wrapper */
+
+		/**
+		 * Returns the given func wrapped with wrapper.
+		 */
 		Wrap: function(func, wrapper) {
-			/* Localized version of Function.update from prototype */
+			/**
+			 * Localized version of Function.update from prototype.
+			 */
 			function update(array, args) {
-				var arrayLength = array.length, length = args.length;
+				var arrayLength = array.length;
+				var length = args.length;
+				
 				while (length--) array[arrayLength + length] = args[length];
 				return array;
 			}
 
 			var __method = func;
+			
 			return function() {
 				var a = update([__method.bind(this)], arguments);
 				return wrapper.apply(this, a);
 			};
 		}	
 	}
-}
+};
 
-/** Fully functioning prototype class inheritence, also allows for getters/setters including c# style getters/setters */
+/**
+ * Fully functioning prototype class inheritence, also allows for getters/setters including c# style getters/setters */
 var Class = (function() {
 	function subclass() {};
 
@@ -169,7 +199,9 @@ var Class = (function() {
 	};
 })();
 
-/* Converts an iterable element to an array */
+/**
+ * Converts an iterable element to an array.
+ */
 function $A(iterable) {
 	if (!iterable) return [];
 	if ('toArray' in Object(iterable)) return iterable.toArray();
@@ -198,7 +230,10 @@ function GetElementRects(node, offset) {
 	} );
 }
 
-/* Applies the given style to the given element returns a hash of what changed styles were originally */
+/**
+ * Applies the given style to the given element
+ * returns a hash of what changed styles were originally.
+ */
 function ApplyStyle(elem, style) {
 	var OriginalStyle = { };
 	Object.keys(style).forEach( function(name) {
@@ -208,7 +243,10 @@ function ApplyStyle(elem, style) {
 	return OriginalStyle;
 }
 
-/** Creates getters/setters on this class for each parameter specified in the map */
+/**
+ * Creates getters/setters on this class
+ * for each parameter specified in the map.
+ */
 var PrefsMapper = Class.create({
 	/**
 	 *	@param BasePath string 	- String representing the prefix for automatic preference names based on property name of map
@@ -240,7 +278,7 @@ var PrefsMapper = Class.create({
 	GetPref: function(Property) {
 		if(this.pref.prefHasUserValue(this.map[Property].Path) == false)
 			return this.map[Property].Default;
-			
+		
 		switch(this.pref.getPrefType(this.map[Property].Path)) {
 			case this.pref.PREF_STRING:	return this.pref.getCharPref(this.map[Property].Path);
 			case this.pref.PREF_INT:	return this.pref.getIntPref(this.map[Property].Path);
