@@ -122,11 +122,11 @@ var SnapLinksClass = Class.create({
 		this.XulDocument = XulDocument;
 		
 		var StringBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
-		var LocaleStrings = StringBundleService.createBundle("chrome://snaplinksplus/locale/snaplinks.properties");
+		this.LocaleBundle = StringBundleService.createBundle("chrome://snaplinksplus/locale/snaplinks.properties");
 		
 		this.LocaleStrings = {
-			Usage:		LocaleStrings.GetStringFromName("snaplinks.status.usage"),
-			Links:		LocaleStrings.GetStringFromName("snaplinks.panel.links")
+			Usage:		this.LocaleBundle.GetStringFromName("snaplinks.status.usage"),
+			//Links:		this.LocaleBundle.GetStringFromName("snaplinks.status.links")
 		};
 
 		this._OnMouseMove 	= this.OnMouseMove.bind(this);

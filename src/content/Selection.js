@@ -200,7 +200,10 @@ var SnapLinksSelectionClass = Class.create({
 
 				if(this.DragStarted) {
 					if(this.SnapLinksPlus.Prefs.ShowSelectedCount)
-						this.SnapLinksPlus.SnapLinksStatus = this.SnapLinksPlus.LocaleStrings.Links + ' 0';
+					{
+						var linksText = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", ['0'], 1);
+						this.SnapLinksPlus.SnapLinksStatus = linksText;
+					}
 
 					this.CalculateSnapRects();
 					return true;
@@ -458,19 +461,21 @@ var SnapLinksSelectionClass = Class.create({
 			}, this );
 			this.SelectedElementsType = Greatest;
 
-			// Remove the existing child elements.
-			while (this.ElementCount.firstChild) {
-				this.ElementCount.removeChild(this.ElementCount.firstChild);
-			};
+			var linksText = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", [this.SelectedElements.length], 1);
 
-			// Add the links count.
-			if(this.ElementCount)
+			this.SnapLinksPlus.SnapLinksStatus = linksText;
+
+			if (this.ElementCount)
 			{
-				var linksText = this.Window.document.createTextNode('Links: '+this.SelectedElements.length);
-				this.ElementCount.appendChild(linksText);
-			}
+				// Remove the existing child elements.
+				while (this.ElementCount.firstChild) {
+					this.ElementCount.removeChild(this.ElementCount.firstChild);
+				};
 
-			this.SnapLinksPlus.SnapLinksStatus = 'Links: '+this.SelectedElements.length;
+				// Add the links count.
+				var linksElem = this.Window.document.createTextNode(linksText);
+				this.ElementCount.appendChild(linksElem);
+			}
 		}
 	}
 } );

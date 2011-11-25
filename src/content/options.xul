@@ -39,7 +39,7 @@
 		persistent="lastSelected"
 		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-	<prefpane id="snaplinks-options-selection-pane" label="&snaplinks.preftab.selection;">
+	<prefpane id="snaplinks-options-selection-pane" label="&snaplinks.preftab.selection;" image="chrome://snaplinksplus/skin/selection.png">
 		<preferences>
 			<preference type="int"      id="pref.snaplinks.button"                          name="extensions.snaplinks.button"/>
 			<preference type="bool"     id="pref.snaplinks.ActivateRequiresShift"           name="extensions.snaplinks.ActivateRequiresShift"/>
@@ -201,7 +201,7 @@
 		<spacer flex="1"/>
 	</prefpane>
 
-	<prefpane id="snaplinks-options-action-pane" label="&snaplinks.preftab.action;">
+	<prefpane id="snaplinks-options-action-pane" label="&snaplinks.preftab.action;" image="chrome://snaplinksplus/skin/action.png">
 		<preferences>
 			<preference type="string"   id="pref.snaplinks.defaultaction"                   name="extensions.snaplinks.defaultaction"/>
 		</preferences>
@@ -227,7 +227,7 @@
 		<spacer flex="1"/>
 	</prefpane>
 	
-	<prefpane id="snaplinks-options-advanced-pane" label="&snaplinks.preftab.advanced;">
+	<prefpane id="snaplinks-options-advanced-pane" label="&snaplinks.preftab.advanced;" image="chrome://snaplinksplus/skin/advanced.png">
 		<preferences>
 			<preference type="bool"     id="pref.snaplinks.HighlightCheckboxesForClicking"  name="extensions.snaplinks.HighlightCheckboxesForClicking"/>
 			<preference type="bool"     id="pref.snaplinks.HighlightButtonsForClicking"     name="extensions.snaplinks.HighlightButtonsForClicking"/>
@@ -272,7 +272,7 @@
 		
 		<hbox>
 			<groupbox flex="1">
-				<caption label="&snaplinks.da.r3.clipboard;"/>
+				<caption label="&snaplinks.adv.CopyToClipboard.caption;"/>
 				<label value="&snaplinks.adv.CopyToClipboardSeparator;"/>
 				
 				<radiogroup preference="pref.snaplinks.CopyToClipboardSeparator.Id">

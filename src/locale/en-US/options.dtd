@@ -67,6 +67,7 @@
 
 <!ENTITY snaplinks.adv.ActionInterval                           "Delay between actions (in milliseconds)">
 
+<!ENTITY snaplinks.adv.CopyToClipboard.caption                  "Copy Links to Clipboard">
 <!ENTITY snaplinks.adv.CopyToClipboardSeparator                 "Link Separator:">
 <!ENTITY snaplinks.adv.CopyToClipboardSeparator.LineFeed        "New line">
 <!ENTITY snaplinks.adv.CopyToClipboardSeparator.Tab             "Tab">
