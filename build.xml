@@ -1,36 +1,36 @@
 <?xml version="1.0"?>
 
 <!--
-    build.xml
-    Copyright (C) 2008, 2009, 2010, 2011  Tommi Rautava
-    
-    This file is part of Snap Links Plus.
+	build.xml
+	Copyright (C) 2008, 2009, 2010, 2011  Tommi Rautava
 
-    Snap Links Plus is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This file is part of Snap Links Plus.
 
-    Snap Links Plus is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	Snap Links Plus is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    You should have received a copy of the GNU General Public License
-    along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
+	Snap Links Plus is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <project name="snaplinksplus" default="build-dev">
 
 	<property file="${basedir}/release.properties" />
-	
+
 	<property name="babelzilla.dir" value="${basedir}/babelzilla" />
 	<property name="build.dir" value="${basedir}/build" />
 	<property name="cert.dir" value="${basedir}/cert" />
 	<property name="dist.dir" value="${basedir}/dist" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="www.dir" value="${basedir}/www" />
-	
+
 	<property name="extension.appsPostfix" value="-fx+sm" />
 	<property name="extension.checksumAlgorithm" value="sha1" />
 
@@ -40,17 +40,21 @@
 
 	<property name="releaseIni.file" value="${www.dir}/release.ini" />
 	<property name="buildNumber.file" value="${basedir}/.buildNumbers/build.number.${extension.version}.txt" />
-	
+
 	<!-- Compression level: 0=min/fast, 9=max/slow. -->
 	<property name="zip.compressionLevel" value="9" />
+
+
+	<condition property="isWindows">
+		<os family="windows" />
+	</condition>
+
 
 	<fileset id="src.root.files" dir="${src.dir}">
 		<include name="content/**" />
 		<include name="defaults/**" />
 		<include name="skin/**" />
 		<include name="*.*" />
-		<exclude name="**/.cvsignore" />
-		<exclude name="CVS" />
 	</fileset>
 
 
@@ -104,21 +108,30 @@
 	<target name="set-version-dev" depends="set-version">
 		<property name="extension.versionNumber.plusBuild" value="${extension.versionNumber}.0pre${build.number}" />
 		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber.plusBuild}" />
+		<concat destfile="${build.dir}/build.latest">
+			<string value="extension.versionNumber.latest=${extension.versionNumber.forThisBuild}" />
+		</concat>
 	</target>
 
 
 	<target name="set-version-dist" depends="set-version">
 		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber}" />
+		<concat destfile="${build.dir}/build.latest">
+			<string value="extension.versionNumber.latest=${extension.versionNumber.forThisBuild}" />
+		</concat>
 	</target>
 
 
 	<target name="set-xpi-name">
 		<property name="extension.xpi" value="${ant.project.name}-${extension.versionNumber.forThisBuild}${extension.appsPostfix}.xpi" />
+		<concat destfile="${build.dir}/build.latest" append="true">
+			<string value="extension.xpi.latest=${extension.xpi}" />
+		</concat>
 	</target>
 
 
 	<target name="clean">
-		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.dir}" />
 		<delete includeemptydirs="true">
 			<fileset dir="${build.dir}" includes="**/*" excludes=".cvsignore" />
 		</delete>
@@ -126,7 +139,7 @@
 
 
 	<target name="clean-dist">
-		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}" />
 		<delete includeemptydirs="true">
 			<fileset dir="${dist.dir}" includes="**/*" excludes=".cvsignore" />
 		</delete>
@@ -170,8 +183,8 @@
 			<param name="dirset.id" value="src.locale.dirs"/>
 		</antcall>
 	</target>
-	
-	
+
+
 	<target name="patch-for-babelzilla" depends="copy-src-to-build,unpack-locale-bundle-to-babelzilla-src">
 		<copy file="${src.dir}/install.rdf" todir="${build.dir}/babelzilla" overwrite="true" />
 		<copy file="${src.dir}/chrome.manifest" todir="${build.dir}/babelzilla" overwrite="true" />
@@ -238,7 +251,7 @@
 		</pathconvert>
 		<echo file="${build.dir}/${dir.name}/chrome.manifest" append="yes">${locale.list}${line.separator}</echo>
 	</target>
-		
+
 	<target name="generate-translator-block">
 		<!-- Generate contents of the template file. -->
 		<pathconvert pathsep="${line.separator}" property="translators.list" refid="${dirset.id}">
@@ -247,7 +260,7 @@
 				<regexpmapper from="(.*)" to="$${translator.\1}" />
 			</chainedmapper>
 		</pathconvert>
-		
+
 		<!-- Write the template file. -->
 		<echo file="${build.dir}/${dir.name}-translators-template.txt" append="no">${translators.list}${line.separator}</echo>
 
@@ -255,22 +268,22 @@
 		<native2ascii src="${babelzilla.dir}" dest="${build.dir}" encoding="utf-8" >
 			<include name="translators.properties" />
 		</native2ascii>
-		
+
 		<!-- Rename the file. -->
 		<move file="${build.dir}/translators.properties" tofile="${build.dir}/${dir.name}-translators.properties"/>
-		
+
 		<!-- Convert escape notation into XML format. -->
 		<replaceregexp file="${build.dir}/${dir.name}-translators.properties" byline="yes" flags="g">
 			<regexp pattern="\\u(....)"/>
 			<substitution expression="&amp;#x\1;"/>
 		</replaceregexp>
-		
+
 		<!-- Load names of the translators. -->
 		<loadproperties srcfile="${build.dir}/${dir.name}-translators.properties" >
 			<filterchain>
 			</filterchain>
 		</loadproperties>
-		
+
 		<!-- Load the template and expand the properties. -->
 		<loadfile property="translators.block" srcFile="${build.dir}/${dir.name}-translators-template.txt" encoding="utf-8">
 			<filterchain>
@@ -468,6 +481,14 @@
 			<zipfileset dir="${build.dir}/src" includes="*/**" excludes="locale/**,chrome.manifest,install.rdf" />
 			<zipfileset dir="${build.dir}/babelzilla" includes="*/**" />
 		</zip>
+	</target>
+
+
+	<target name="install-to-firefox" if="isWindows">
+		<property file="${build.dir}/build.latest" />
+		<exec executable="c:/program files/mozilla firefox/firefox.exe">
+			<arg value="file:///${dist.dir}/${extension.xpi}" />
+		</exec>
 	</target>
 
 </project>
