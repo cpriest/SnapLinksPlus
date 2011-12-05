@@ -111,10 +111,54 @@ var SnapLinksSelectionClass = Class.create({
 	OnMouseMove: function(e) {
 		this.Window = e.view;
 		if(this.Element) {
-			if((e.clientX < 0 || e.clientY < 0 || e.clientX > this.PanelContainer.clientWidth || e.clientY > this.PanelContainer.clientHeight) && this.SnapLinksPlus.Prefs.HideSelectionOnMouseLeave)
+			if((e.clientX < 0 ||
+				e.clientY < 0 || 
+				e.clientX > this.Document.documentElement.clientWidth ||
+				e.clientY > this.Document.documentElement.clientHeight) &&
+				this.SnapLinksPlus.Prefs.HideSelectionOnMouseLeave)
+			{
 				this.Element.style.display = 'none';
-			else
+			}
+			else {
+				var offsetX = 0;
+				if (e.clientX < 0) {
+					offsetX = e.clientX;
+
+					if (offsetX > this.Window.scrollX) {
+						offsetX = this.Window.scrollX;
+					}
+				}
+				else if (e.clientX > this.Document.documentElement.clientWidth) {
+					offsetX = e.clientX - this.Document.documentElement.clientWidth;
+					var offsetMaxX = this.Window.scrollMaxX - this.Window.scrollX; 
+					
+					if (offsetX > offsetMaxX) {
+						offsetX = offsetMaxX;
+					}
+				}
+
+				var offsetY = 0;
+				if (e.clientY < 0) {
+					offsetY = e.clientY; 
+
+					if (offsetY > this.Window.scrollY) {
+						offsetY = this.Window.scrollY;
+					}
+				}
+				else if (e.clientY > this.Document.documentElement.clientHeight) {
+					offsetY = e.clientY - this.Document.documentElement.clientHeight;
+					var offsetMaxY = this.Window.scrollMaxY - this.Window.scrollY;
+					
+					if (offsetY > offsetMaxY) {
+						offsetY = offsetMaxY;
+					}
+				}
+
+				// Scroll.
+				if (offsetX != 0 || offsetY != 0) this.Window.scrollBy(offsetX, offsetY);
+
 				this.Element.style.display = '';
+			}
 		}
 
 		/* Disabled At The Moment */ 
@@ -135,7 +179,7 @@ var SnapLinksSelectionClass = Class.create({
 	//		this.SnapLinksPlus.Selection.X1 = Math.max(Math.min(Math.max(this.Document.width,minWidth),this.SnapLinksPlus.Selection.X1),0);
 	//		this.SnapLinksPlus.Selection.Y1 = Math.max(Math.min(Math.max(this.Document.height,minHeight),this.SnapLinksPlus.Selection.Y1),0);
 		} else {
-			this.ExpandSelectionTo(Math.min(e.pageX), e.pageY);
+			this.ExpandSelectionTo(e.pageX, e.pageY);
 		}
 		
 		if (this.ElementCount) {
@@ -341,7 +385,11 @@ var SnapLinksSelectionClass = Class.create({
 	
 	/* Expands the selection to the given X2, Y2 coordinates */
 	ExpandSelectionTo: function(X, Y) {
-		this.X2 = X;	this.Y2 = Y;
+		var pageWidth  = this.Document.documentElement.clientWidth  + this.Window.scrollMaxX;
+		var pageHeight = this.Document.documentElement.clientHeight + this.Window.scrollMaxY;
+
+		this.X2 = Math.max(0, Math.min(X, pageWidth));
+		this.Y2 = Math.max(0, Math.min(Y, pageHeight));
 		this.UpdateElement();
 	},
 	
@@ -349,10 +397,10 @@ var SnapLinksSelectionClass = Class.create({
 	UpdateElement: function() {
 		if(this.Create()) {
 			ApplyStyle(this.Element, {
-				width 	: Math.abs(this.X1-this.X2) - this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px',
-				height 	: Math.abs(this.Y1-this.Y2) - this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px',
-				top 	: Math.min(this.Y1,this.Y2) - this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px',
-				left 	: Math.min(this.X1,this.X2) - this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px'
+				width 	: Math.abs(this.X1-this.X2) - (2*this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px',
+				height 	: Math.abs(this.Y1-this.Y2) - (2*this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px',
+				top 	: Math.min(this.Y1,this.Y2) /*- this.SnapLinksPlus.Prefs.SelectionBorderWidth*/ + 'px',
+				left 	: Math.min(this.X1,this.X2) /*- this.SnapLinksPlus.Prefs.SelectionBorderWidth*/ + 'px'
 			} );
 			
 			this.CalcSelectedElements();
