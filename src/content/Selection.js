@@ -120,43 +120,7 @@ var SnapLinksSelectionClass = Class.create({
 				this.Element.style.display = 'none';
 			}
 			else {
-				var offsetX = 0;
-				if (e.clientX < 0) {
-					offsetX = e.clientX;
-
-					if (offsetX > this.Window.scrollX) {
-						offsetX = this.Window.scrollX;
-					}
-				}
-				else if (e.clientX > this.Document.documentElement.clientWidth) {
-					offsetX = e.clientX - this.Document.documentElement.clientWidth;
-					var offsetMaxX = this.Window.scrollMaxX - this.Window.scrollX; 
-					
-					if (offsetX > offsetMaxX) {
-						offsetX = offsetMaxX;
-					}
-				}
-
-				var offsetY = 0;
-				if (e.clientY < 0) {
-					offsetY = e.clientY; 
-
-					if (offsetY > this.Window.scrollY) {
-						offsetY = this.Window.scrollY;
-					}
-				}
-				else if (e.clientY > this.Document.documentElement.clientHeight) {
-					offsetY = e.clientY - this.Document.documentElement.clientHeight;
-					var offsetMaxY = this.Window.scrollMaxY - this.Window.scrollY;
-					
-					if (offsetY > offsetMaxY) {
-						offsetY = offsetMaxY;
-					}
-				}
-
-				// Scroll.
-				if (offsetX != 0 || offsetY != 0) this.Window.scrollBy(offsetX, offsetY);
-
+				this.scrollOnViewEdge(e);
 				this.Element.style.display = '';
 			}
 		}
@@ -183,7 +147,7 @@ var SnapLinksSelectionClass = Class.create({
 		}
 		
 		if (this.ElementCount) {
-			ApplyStyle(this.ElementCount, { top: e.pageY + 'px', left: (e.pageX + 18)+ 'px' } );
+			this.UpdateElementCount(e);
 		}
 	},
 	
@@ -397,16 +361,52 @@ var SnapLinksSelectionClass = Class.create({
 	UpdateElement: function() {
 		if(this.Create()) {
 			ApplyStyle(this.Element, {
-				width 	: Math.abs(this.X1-this.X2) - (2*this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px',
-				height 	: Math.abs(this.Y1-this.Y2) - (2*this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px',
-				top 	: Math.min(this.Y1,this.Y2) /*- this.SnapLinksPlus.Prefs.SelectionBorderWidth*/ + 'px',
-				left 	: Math.min(this.X1,this.X2) /*- this.SnapLinksPlus.Prefs.SelectionBorderWidth*/ + 'px'
+				left 	: Math.min(this.X1,this.X2) + 'px',
+				top 	: Math.min(this.Y1,this.Y2) + 'px',
+				width 	: Math.abs(this.X1-this.X2) - 2*this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px',
+				height 	: Math.abs(this.Y1-this.Y2) - 2*this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px'
 			} );
 			
 			this.CalcSelectedElements();
 		}
 	},
-	
+
+	UpdateElementCount: function(e) {
+		var margin = 6;
+		var hSpacing = 3;
+		var vSpacing = 3;
+		
+		var docRect = {
+			width: this.Document.documentElement.clientWidth,
+			height: this.Document.documentElement.clientHeight
+		};
+		var elemRect = this.ElementCount.getBoundingClientRect();
+
+		var offsetX = 0;
+		var offsetY = 0;
+		
+		if ((e.clientX + hSpacing) <= margin) {
+			offsetX = this.Window.scrollX + margin;
+		} else if ((e.clientX + hSpacing + elemRect.width) >= (docRect.width - margin)) {
+			offsetX = this.Window.scrollX + docRect.width - (elemRect.width + margin);
+		} else {
+			offsetX = e.pageX + hSpacing;
+		}
+		
+		if ((e.clientY - elemRect.height - vSpacing) <= margin) {
+			offsetY = this.Window.scrollY + margin;
+		} else if ((e.clientY - vSpacing) >= (docRect.height - margin)) {
+			offsetY = this.Window.scrollY + docRect.height - (elemRect.height + margin);
+		} else {
+			offsetY = e.pageY - elemRect.height - vSpacing;
+		}
+		
+		ApplyStyle(this.ElementCount, {
+			top:  offsetY + 'px',
+			left: offsetX + 'px'
+		} );
+	},
+
 	/* Calculates which elements intersect with the selection */
 	CalcSelectedElements: function() {
 		this.ClearSelectedElements();
@@ -525,5 +525,46 @@ var SnapLinksSelectionClass = Class.create({
 				this.ElementCount.appendChild(linksElem);
 			}
 		}
+	},
+	
+	/** Scroll on viewport edge. */
+	scrollOnViewEdge: function (e)
+	{
+		var offsetX = 0;
+		if (e.clientX < 0) {
+			offsetX = e.clientX;
+
+			if (offsetX > this.Window.scrollX) {
+				offsetX = this.Window.scrollX;
+			}
+		}
+		else if (e.clientX > this.Document.documentElement.clientWidth) {
+			offsetX = e.clientX - this.Document.documentElement.clientWidth;
+			var offsetMaxX = this.Window.scrollMaxX - this.Window.scrollX; 
+			
+			if (offsetX > offsetMaxX) {
+				offsetX = offsetMaxX;
+			}
+		}
+
+		var offsetY = 0;
+		if (e.clientY < 0) {
+			offsetY = e.clientY; 
+
+			if (offsetY > this.Window.scrollY) {
+				offsetY = this.Window.scrollY;
+			}
+		}
+		else if (e.clientY > this.Document.documentElement.clientHeight) {
+			offsetY = e.clientY - this.Document.documentElement.clientHeight;
+			var offsetMaxY = this.Window.scrollMaxY - this.Window.scrollY;
+			
+			if (offsetY > offsetMaxY) {
+				offsetY = offsetMaxY;
+			}
+		}
+
+		// Scroll.
+		if (offsetX != 0 || offsetY != 0) this.Window.scrollBy(offsetX, offsetY);
 	}
 } );
