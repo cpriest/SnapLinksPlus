@@ -208,9 +208,15 @@
 
 	<target name="patch-install-rdf">
 		<!-- Patch version number into install.rdf. -->
-		<replace file="${build.dir}/${dir.name}/install.rdf" propertyFile="${basedir}/release.properties" encoding="utf-8">
-			<replacefilter token="&lt;em:version&gt;0&lt;/em:version&gt;" value="&lt;em:version&gt;${extension.versionNumber.forThisBuild}&lt;/em:version&gt;" />
-		</replace>
+		<replaceregexp file="${src.dir}/install.rdf" encoding="utf-8" flags="m">
+			<regexp pattern="(&lt;em:version&gt;).*(&lt;/em:version&gt;)" />
+			<substitution expression="\1${extension.versionNumber.forThisBuild}\2" />
+		</replaceregexp>
+
+		<replaceregexp file="${build.dir}/${dir.name}/install.rdf" encoding="utf-8" flags="m">
+			<regexp pattern="(&lt;em:version&gt;).*(&lt;/em:version&gt;)" />
+			<substitution expression="\1${extension.versionNumber.forThisBuild}\2" />
+		</replaceregexp>
 	</target>
 
 	<target name="patch-min-and-max-versions">
