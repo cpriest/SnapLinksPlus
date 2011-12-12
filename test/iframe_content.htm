@@ -213,25 +213,5 @@ function popup_page(page) { window.open('http://en.wikipedia.org/wiki/'+ page); 
 			</tr>
 		</tbody>
 	<table>
-	
-<h2>IFRAME</h2>
-<div id="mouseBox" style="float:left; width:30%; height:300px; border:1px solid black;">
-</div>
-<script defer="defer" type="text/javascript">
-document.addEventListener('mousemove', function(e) {
-	var mouseBox = document.getElementById('mouseBox');
-	mouseBox.innerHTML = '<table>'+
-		'<tr><th>e.clientX</th><td>'+ e.clientX +'</td></tr>'+
-		'<tr><th>e.clientY</th><td>'+ e.clientY +'</td></tr>'+
-		'<tr><th>e.pageX</th><td>'+ e.pageX +'</td></tr>'+
-		'<tr><th>e.pageY</th><td>'+ e.pageY +'</td></tr>'+
-		'<tr><th>window.scrollX</th><td>'+ window.scrollX +'</td></tr>'+
-		'<tr><th>window.scrollY</th><td>'+ window.scrollY +'</td></tr>'+
-		'<tr><th>window.scrollMaxX</th><td>'+ window.scrollMaxX +'</td></tr>'+
-		'<tr><th>window.scrollMaxY</th><td>'+ window.scrollMaxY +'</td></tr>'+
-		'</table>';
-}, true);
-</script>
-<iframe src="iframe_content.htm" style="float:right; width:69%; height:300px; border:1px solid #000000; margin-bottom:50px;">
 </body>
 </html>
