@@ -103,6 +103,19 @@ var SnapLinksSelectionClass = Class.create({
 		this.X1 = this.X2 = Math.min(e.pageX,this.Document.documentElement.offsetWidth + this.Document.defaultView.pageXOffset);
 		this.Y1 = this.Y2 = e.pageY;
 
+		this.SubDocuments = { };
+		$A(this.Document.body.querySelectorAll('IFRAME')).forEach(function(elem) {
+			var contentWindow = elem.contentWindow,
+				offset = { x: 0, y: 0 }
+			do {
+				offset.x += elem.offsetLeft;
+				offset.y += elem.offsetTop;
+				elem = elem.offsetParent;
+			} while(elem != null);
+			this.SubDocuments[contentWindow] = offset;
+		}, this);
+		Log(this.SubDocuments);
+
 		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
 		this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
 		this.PanelContainer.addEventListener('keyup', this._OnKeyUp, true);
@@ -124,10 +137,18 @@ var SnapLinksSelectionClass = Class.create({
 				this.Element.style.display = '';
 			}
 		}
+		var pageX = e.pageX,
+			pageY = e.pageY;
+
+		/* If we are in a sub-document, offset our coordinates by the top/left of that sub-document element (IFRAME) */
+		if(e.view.document != this.Document) {
+			pageX += this.SubDocuments[e.view].x;
+			pageY += this.SubDocuments[e.view].y;
+		}
 
 		/* Disabled At The Moment */ 
 		if(false && e.altKey && !this.SnapLinksPlus.Prefs.ActivateRequiresAlt) {
-			this.OffsetSelection(e.pageX - this.X2, e.pageY - this.Y2);
+			this.OffsetSelection(pageX - this.X2, pageY - this.Y2);
 
 			/** The below commented section of code causes the rectangle to shrink if it goes off screen, is this even a desired functionality? -- Clint - 5/22/2011 */
 	//		var mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
@@ -143,7 +164,7 @@ var SnapLinksSelectionClass = Class.create({
 	//		this.SnapLinksPlus.Selection.X1 = Math.max(Math.min(Math.max(this.Document.width,minWidth),this.SnapLinksPlus.Selection.X1),0);
 	//		this.SnapLinksPlus.Selection.Y1 = Math.max(Math.min(Math.max(this.Document.height,minHeight),this.SnapLinksPlus.Selection.Y1),0);
 		} else {
-			this.ExpandSelectionTo(e.pageX, e.pageY);
+			this.ExpandSelectionTo(pageX, pageY);
 		}
 		
 		if (this.ElementCount) {

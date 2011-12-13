@@ -3,3 +3,5 @@ syntax: regexp
 ^build$
 syntax: regexp
 ^dist$
+syntax: glob
+.idea/
