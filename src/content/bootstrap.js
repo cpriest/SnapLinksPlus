@@ -45,5 +45,33 @@ window.addEventListener('load', function() {
 
 	if(SnapLinksPlus.Prefs.DevShowJSConsoleAtStartup) {
 		toJavaScriptConsole();
+
+		function CreateAnonymousElement(markup) {
+			var AnonymousElement = ((new DOMParser())
+				.parseFromString('<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">' + markup + '</overlay>', 'text/xml')
+				.firstChild
+				.firstChild);
+			AnonymousElement.parentNode.removeChild(AnonymousElement);
+			return AnonymousElement;
+		}
+
+		SnapLinksPlus.RestartBrowser = function() {
+			var iAppStartup = Components.interfaces.nsIAppStartup;
+			Components.classes["@mozilla.org/toolkit/app-startup;1"]
+				.getService(iAppStartup).quit(iAppStartup.eRestart | iAppStartup.eAttemptQuit);
+		}
+
+		/** Install pklib commands and keys */
+		var CommandSet = document.querySelector('commandset');
+		if(CommandSet) {
+			var Command = CreateAnonymousElement('<command id="cmd.SnapLinksPlus.Commands.RestartBrowser" oncommand="SnapLinksPlus.RestartBrowser()" />');
+			CommandSet.appendChild(Command);
+		}
+
+		var Keyset = document.querySelector('keyset');
+		if(Keyset) {
+			var Key = CreateAnonymousElement('<key id="key.SnapLinksPlus.Commands.RestartBrowser" modifiers="accel alt" key="R" command="cmd.SnapLinksPlus.Commands.RestartBrowser" />');
+			Keyset.appendChild(Key);
+		}
 	}
 }, false);
