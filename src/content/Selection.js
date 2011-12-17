@@ -31,7 +31,6 @@ catch(e) {
 /** Selection class handles the selection rectangle and accompanying visible element */
 var SnapLinksSelectionClass = Class.create({
 	SnapLinksPlus: null,
-	X1: 0, Y1: 0, X2: 0, Y2: 0,
 	jsRegExp: /^javascript:/i,
 	
 	IntersectedElements: 	[ ],
@@ -39,15 +38,7 @@ var SnapLinksSelectionClass = Class.create({
 	
 	/* Internal flag to control selecting all links or all links matching the greatest size */
 	SelectLargestFontSizeIntersectionLinks:		true,
-	
-	/* Returns a rect whos X1,Y1 are the closest to zero of the four corners */
-	NormalizedRect: {
-		get: function() { 
-			return {	X1: Math.min(this.X1,this.X2),	Y1: Math.min(this.Y1,this.Y2),
-						X2: Math.max(this.X1,this.X2),	Y2: Math.max(this.Y1,this.Y2)	};
-		}
-	},
-	
+
 	/* Returns an array of elements representing the selected elements
 	 *	taking into account preferences for removing duplicate urls 
 	 */
@@ -92,8 +83,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.TopDocument = e.target.ownerDocument.defaultView.top.document;
 
 		/** Initializes the starting mouse position */
-		this.X1 = this.X2 = Math.min(e.pageX,Document.documentElement.offsetWidth + Document.defaultView.pageXOffset);
-		this.Y1 = this.Y2 = e.pageY;
+		this.SelectionRect = new Rect(e.pageY, Math.min(e.pageX, Document.documentElement.offsetWidth + Document.defaultView.pageXOffset));
 
 		this.Documents = {
 		};
@@ -140,7 +130,7 @@ var SnapLinksSelectionClass = Class.create({
 
 		/* Disabled At The Moment */ 
 		if(false && e.altKey && !this.SnapLinksPlus.Prefs.ActivateRequiresAlt) {
-			this.OffsetSelection(pageX - this.X2, pageY - this.Y2);
+			this.OffsetSelection(pageX - this.SelectionRect.right, pageY - this.SelectionRect.bottom);
 
 			/** The below commented section of code causes the rectangle to shrink if it goes off screen, is this even a desired functionality? -- Clint - 5/22/2011 */
 	//		var mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
@@ -187,7 +177,7 @@ var SnapLinksSelectionClass = Class.create({
 		if(this.DragStarted == true)
 			return true;
 			
-		if(Math.abs(this.X1-this.X2) > 4 || Math.abs(this.Y1-this.Y2) > 4) {
+		if(this.SelectionRect.width > 4 || this.SelectionRect.height > 4) {
 			var InsertionNode = (this.TopDocument.documentElement) ? this.TopDocument.documentElement : this.TopDocument;
 			
 			this.Element = this.TopDocument.createElementNS('http://www.w3.org/1999/xhtml', 'snaplRect');
@@ -196,8 +186,8 @@ var SnapLinksSelectionClass = Class.create({
 				this.Element.style.border = this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px dotted';
 				this.Element.style.position = 'absolute';
 				this.Element.style.zIndex = '10000';
-				this.Element.style.left = this.X1 + 'px'; 
-				this.Element.style.top = this.Y1 + 'px';
+				this.Element.style.left = this.SelectionRect.left + 'px';
+				this.Element.style.top = this.SelectionRect.top + 'px';
 				InsertionNode.appendChild(this.Element);
 				
 				if(this.SnapLinksPlus.Prefs.ShowSelectedCount &&
@@ -327,8 +317,7 @@ var SnapLinksSelectionClass = Class.create({
 			this.ElementCount.parentNode.removeChild(this.ElementCount);
 		
 		this.ClearSelectedElements();
-		
-		this.X1=0; this.X2=0; this.Y1=0; this.Y2=0;
+
 		this.DragStarted = false;
 		this.SelectLargestFontSizeIntersectionLinks = true;
 		this.RemoveEventHooks();
@@ -355,29 +344,29 @@ var SnapLinksSelectionClass = Class.create({
 
 	/** Offsets the selection by the given coordinates */
 	OffsetSelection: function(X, Y) {
-		this.X1 += X;	this.Y1 += Y;
-		this.X2 += X;	this.Y2 += Y;
+		this.SelectionRect.Offset(X, Y);
 		this.UpdateElement();
 	},
 	
-	/* Expands the selection to the given X2, Y2 coordinates */
+	/* Expands the selection to the given X, Y coordinates */
 	ExpandSelectionTo: function(X, Y) {
 		var pageWidth  = this.TopDocument.documentElement.clientWidth  + this.Window.scrollMaxX;
 		var pageHeight = this.TopDocument.documentElement.clientHeight + this.Window.scrollMaxY;
 
-		this.X2 = Math.max(0, Math.min(X, pageWidth));
-		this.Y2 = Math.max(0, Math.min(Y, pageHeight));
+		this.SelectionRect.right = Math.max(0, Math.min(X, pageWidth));
+		this.SelectionRect.bottom = Math.max(0, Math.min(Y, pageHeight));
 		this.UpdateElement();
 	},
 	
 	/* Updates the visible position of the element */
 	UpdateElement: function() {
 		if(this.Create()) {
+			Log(this.SelectionRect);
 			ApplyStyle(this.Element, {
-				left 	: Math.min(this.X1,this.X2) + 'px',
-				top 	: Math.min(this.Y1,this.Y2) + 'px',
-				width 	: Math.abs(this.X1-this.X2) - 2*this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px',
-				height 	: Math.abs(this.Y1-this.Y2) - 2*this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px'
+				left 	: this.SelectionRect.left + 'px',
+				top 	: this.SelectionRect.top + 'px',
+				width 	: this.SelectionRect.width - (2 * this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px',
+				height 	: this.SelectionRect.height - (2 * this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px'
 			} );
 			
 			this.CalcSelectedElements();
@@ -424,7 +413,7 @@ var SnapLinksSelectionClass = Class.create({
 	CalcSelectedElements: function() {
 		this.ClearSelectedElements();
 		if(this.Element.style.display != 'none') {
-			var SelectRect = this.NormalizedRect;
+			var SelectRect = this.SelectionRect;
 			var HighLinkFontSize = 0;
 			var HighJsLinkFontSize = 0;
 			
@@ -437,7 +426,7 @@ var SnapLinksSelectionClass = Class.create({
 				/* Find Links Which Intersect With Selection Rectangle */
 				$A(this.Documents[href].SelectableElements).forEach(function(elem) {
 					var Intersects = elem.SnapRects.some(function(Rect) {
-						return !( SelectRect.X1 > Rect.right || SelectRect.X2 < Rect.left || SelectRect.Y1 > Rect.bottom || SelectRect.Y2 < Rect.top );
+						return !( SelectRect.left > Rect.right || SelectRect.right < Rect.left || SelectRect.top > Rect.bottom || SelectRect.bottom < Rect.top );
 					});
 
 					if(Intersects) {
@@ -517,7 +506,7 @@ var SnapLinksSelectionClass = Class.create({
 				filterFunction = function(elem) { return elem.tagName == 'INPUT' && (elem.getAttribute('type') == 'button' || elem.getAttribute('type') == 'submit'); };
 				break;
 			}
-			
+
 			// Filter the elements.
 			this.SelectedElements = this.IntersectedElements.filter(filterFunction, this);
 			

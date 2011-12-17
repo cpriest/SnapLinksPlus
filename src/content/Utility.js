@@ -26,7 +26,8 @@ var EXPORTED_SYMBOLS = ["Class",
                         "$A",
                         "ApplyStyle",
                         "GetElementRects",
-                        "Log"];
+                        "Log",
+						"Rect"];
 
 /**
  * Log() logs info to the Firebug plugin if available,
@@ -314,3 +315,42 @@ var PrefsMapper = Class.create({
 		Log.Warning("Translated Preference (" + this.map[Property].Path + ") from " + PreviousValue + " to " + this[Property]);
 	}
 } );
+
+var Rect = Class.create({
+	initialize:function(top, left, bottom, right) {
+		this._top = top;
+		this._left = left;
+		this._bottom = bottom || top;
+		this._right = right || left;
+	},
+	get top()       { return Math.min(this._top, this._bottom);	},
+	set top(top)    { this._top = top; },
+
+	get left()      { return Math.min(this._left, this._right); },
+	set left(left)  { this._left = left; },
+
+	get bottom()    { return Math.max(this._top, this._bottom); },
+	set bottom(bottom) { return this._bottom = bottom; },
+
+	get right()     { return Math.max(this._left, this._right); },
+	set right(right) { return this._right = right; },
+
+	get width()     { return this.right - this.left; },
+	get height()    { return this.bottom - this.top; },
+
+	Offset:function(x, y) {
+		this._left += x;
+		this._right += x;
+		this._top += y;
+		this._bottom += y;
+	},
+	Shrink:function(x, y) {
+		this._left += x;
+		this._right -= x;
+		this._top += y;
+		this._bottom -= y;
+	},
+	Expand:function(x, y) {
+		this.Shrink(-x, -y);
+	}
+});
