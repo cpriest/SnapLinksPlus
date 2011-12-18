@@ -224,10 +224,8 @@ function GetElementRects(node, offset) {
 		Rects = Rects.concat( $A(elem.getClientRects()) );
 	}, this );
 	return Rects.map( function(rect) {
-		return { 	top		: rect.top + offset.y,
-					left	: rect.left + offset.x,
-					bottom	: rect.top + rect.height + offset.y,
-					right	: rect.left + rect.width + offset.x };
+		return new Rect(rect.top + offset.y, rect.left + offset.x,
+						rect.top + rect.height + offset.y, rect.left + rect.width + offset.x);
 	} );
 }
 
@@ -338,19 +336,40 @@ var Rect = Class.create({
 	get width()     { return this.right - this.left; },
 	get height()    { return this.bottom - this.top; },
 
+	get IsInverted() { return this._left > this._right || this._top > this._bottom; },
+
 	Offset:function(x, y) {
 		this._left += x;
 		this._right += x;
 		this._top += y;
 		this._bottom += y;
+
+		return this;
 	},
 	Shrink:function(x, y) {
 		this._left += x;
 		this._right -= x;
 		this._top += y;
 		this._bottom -= y;
+
+		return this;
 	},
 	Expand:function(x, y) {
 		this.Shrink(-x, -y);
+
+		return this;
+	},
+	GetIntersectRect: function(r) {
+		var i = new Rect(Math.max(this.top, r.top), Math.max(this.left, r.left),
+							Math.min(this.bottom, r.bottom), Math.min(this.right, r.right));
+		if(i.IsInverted)
+			return false;
+		return i;
+	},
+	IntersectsWith: function(r) {
+		return this.GetIntersectRect(r) !== false;
+	},
+	toString: function() {
+		return ['t:'+this.top, 'l:'+this.left, 'b:'+this.bottom, 'r:'+this.right].join(' ');
 	}
 });

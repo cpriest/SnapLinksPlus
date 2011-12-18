@@ -82,11 +82,14 @@ var SnapLinksSelectionClass = Class.create({
 		var Document = e.target.ownerDocument;
 		this.TopDocument = e.target.ownerDocument.defaultView.top.document;
 
+		/* Store the starting scroll height and width for the top document for out-of-bounds processing */
+		this.TopDocumentScrollDims = { bottom: this.TopDocument.body.scrollHeight, right: this.TopDocument.body.scrollWidth };
+
 		/** Initializes the starting mouse position */
 		this.SelectionRect = new Rect(e.pageY, Math.min(e.pageX, Document.documentElement.offsetWidth + Document.defaultView.pageXOffset));
 
-		this.Documents = {
-		};
+		/** Store all documents and sub-documents as well as their offset positions relative to top document */
+		this.Documents = { };
 		$A(this.TopDocument.body.querySelectorAll('IFRAME')).forEach(function(elem) {
 			var contentWindow = elem.contentWindow,
 				offset = { x: 0, y: 0 }
@@ -95,8 +98,15 @@ var SnapLinksSelectionClass = Class.create({
 				offset.y += elem.offsetTop;
 				elem = elem.offsetParent;
 			} while(elem != null);
-			this.Documents[contentWindow.location.href] = { document: contentWindow.document, offset: offset };
+			this.Documents[contentWindow.location.href] = { Document: contentWindow.document, offset: offset };
 		}, this);
+		this.Documents[this.TopDocument.location.href] = { Document: this.TopDocument, offset: {x: 0, y: 0} };
+
+		/* If we aren't starting in the top document, change rect coordinates to top document origin */
+		if(Document != this.TopDocument) {
+			this.SelectionRect.Offset(-Document.body.scrollLeft, -Document.body.scrollTop);
+			this.SelectionRect.Offset(this.Documents[Document.location.href].offset.x, this.Documents[Document.location.href].offset.y);
+		}
 
 		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
 		this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
@@ -106,17 +116,14 @@ var SnapLinksSelectionClass = Class.create({
 	OnMouseMove: function(e) {
 		this.CalculateSnapRects(e.target.ownerDocument);
 
-		if(this.Element) {
-			if((e.clientX < 0 ||
-				e.clientY < 0 ||
-				e.clientX > this.TopDocument.documentElement.clientWidth ||
-				e.clientY > this.TopDocument.documentElement.clientHeight) &&
-				this.SnapLinksPlus.Prefs.HideSelectionOnMouseLeave)
-			{
-				this.Element.style.display = 'none';
-			} else {
-				this.scrollOnViewEdge(e);
-				this.Element.style.display = '';
+		if(this.Element && e.target.ownerDocument == this.TopDocument) {
+			if(e.clientX < 0 || e.clientY < 0 || e.clientX > this.TopDocument.body.clientWidth || e.clientY > this.TopDocument.body.clientHeight) {
+				if(this.SnapLinksPlus.Prefs.HideSelectionOnMouseLeave)
+					this.Element.style.display = 'none';
+				else {
+					this.Element.style.display = '';
+					this.scrollOnViewEdge(e);
+				}
 			}
 		}
 		var pageX = e.pageX,
@@ -124,8 +131,8 @@ var SnapLinksSelectionClass = Class.create({
 
 		/* If we are in a sub-document, offset our coordinates by the top/left of that sub-document element (IFRAME) */
 		if(e.view.document != this.TopDocument) {
-			pageX += this.Documents[e.view.location.href].offset.x;
-			pageY += this.Documents[e.view.location.href].offset.y;
+			pageX += this.Documents[e.view.location.href].offset.x - e.target.ownerDocument.body.scrollLeft;
+			pageY += this.Documents[e.view.location.href].offset.y - e.target.ownerDocument.body.scrollTop;
 		}
 
 		/* Disabled At The Moment */ 
@@ -231,7 +238,7 @@ var SnapLinksSelectionClass = Class.create({
 
 		this.CalculateWindowWidth = this.Window.innerWidth;
 
-		var offset = { x:this.TopDocument.defaultView.scrollX, y:this.TopDocument.defaultView.scrollY };
+		var offset = { x: Document.defaultView.scrollX, y: Document.defaultView.scrollY };
 		var SelectableElements = [ ];
 		
 		var Start = (new Date()).getMilliseconds();
@@ -273,7 +280,7 @@ var SnapLinksSelectionClass = Class.create({
 			input.SnapRects = GetElementRects(ElementRectsNode, offset);
 		}, this);
 
-		var Inputs = (new Date()).getMilliseconds();;
+		var Inputs = (new Date()).getMilliseconds();
 
 		$A(Document.body.querySelectorAll('LABEL')).forEach( function(label) {
 			var forId = label.getAttribute('for');
@@ -282,8 +289,7 @@ var SnapLinksSelectionClass = Class.create({
 
 				try {
 					ForElement = Document.body.querySelector('INPUT[type=checkbox]#'+forId);
-				}
-				catch(e) {
+				} catch(e) {
 					// If querySelector() fails, the ID is propably illegal.
 					// We can still find the elemement by using getElementById().
 					var idElem = Document.getElementById(forId);
@@ -350,18 +356,14 @@ var SnapLinksSelectionClass = Class.create({
 	
 	/* Expands the selection to the given X, Y coordinates */
 	ExpandSelectionTo: function(X, Y) {
-		var pageWidth  = this.TopDocument.documentElement.clientWidth  + this.Window.scrollMaxX;
-		var pageHeight = this.TopDocument.documentElement.clientHeight + this.Window.scrollMaxY;
-
-		this.SelectionRect.right = Math.max(0, Math.min(X, pageWidth));
-		this.SelectionRect.bottom = Math.max(0, Math.min(Y, pageHeight));
+		this.SelectionRect.right = Math.max(0, Math.min(X, this.TopDocumentScrollDims.right));
+		this.SelectionRect.bottom = Math.max(0, Math.min(Y, this.TopDocumentScrollDims.bottom));
 		this.UpdateElement();
 	},
 	
 	/* Updates the visible position of the element */
 	UpdateElement: function() {
 		if(this.Create()) {
-			Log(this.SelectionRect);
 			ApplyStyle(this.Element, {
 				left 	: this.SelectionRect.left + 'px',
 				top 	: this.SelectionRect.top + 'px',
@@ -413,7 +415,6 @@ var SnapLinksSelectionClass = Class.create({
 	CalcSelectedElements: function() {
 		this.ClearSelectedElements();
 		if(this.Element.style.display != 'none') {
-			var SelectRect = this.SelectionRect;
 			var HighLinkFontSize = 0;
 			var HighJsLinkFontSize = 0;
 			
@@ -421,58 +422,68 @@ var SnapLinksSelectionClass = Class.create({
 			var TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0};
 
 			for(var href in this.Documents) {
-				var Document = this.Documents[href].Document;
+				var ti = this.Documents[href];
+				var DocRect = new Rect(0, 0, ti.Document.body.scrollHeight, ti.Document.body.scrollWidth)
+					.Offset(ti.offset.x, ti.offset.y);
+				var SelectRect = this.SelectionRect.GetIntersectRect(DocRect);
 
-				/* Find Links Which Intersect With Selection Rectangle */
-				$A(this.Documents[href].SelectableElements).forEach(function(elem) {
-					var Intersects = elem.SnapRects.some(function(Rect) {
-						return !( SelectRect.left > Rect.right || SelectRect.right < Rect.left || SelectRect.top > Rect.bottom || SelectRect.bottom < Rect.top );
-					});
-
-					if(Intersects) {
-						var computedStyle = this.Window.content.document.defaultView.getComputedStyle(elem, null);
-						var hidden = (computedStyle.getPropertyValue('visibility') == 'hidden' ||
-							computedStyle.getPropertyValue('display') == 'none');
-
-						if(!hidden) {
-							if(elem.tagName == 'A' && this.SelectLargestFontSizeIntersectionLinks) {
-								var fontSize = computedStyle.getPropertyValue("font-size");
-
-								if(fontSize.indexOf("px") >= 0)
-									elem.SnapFontSize = parseFloat(fontSize);
-
-								if(elem.SnapIsJsLink) {
-									if(elem.SnapFontSize > HighJsLinkFontSize)
-										HighJsLinkFontSize = elem.SnapFontSize;
-								}
-								else {
-									if(elem.SnapFontSize > HighLinkFontSize)
-										HighLinkFontSize = elem.SnapFontSize;
-								}
-							}
-
-							if(elem.tagName == 'INPUT') {
-								switch(elem.getAttribute('type')) {
-									case 'checkbox':
-										TypeCounts.Checkboxes++;
-										break;
-									case 'button':
-									case 'submit':
-										TypeCounts.Buttons++;
-										break;
-								}
-
-							} else if(elem.tagName == 'A') {
-								if(elem.SnapIsJsLink)
-									TypeCounts.JsLinks++;
-								else
-									TypeCounts.Links++;
-							}
-
-							this.IntersectedElements.push(elem);
-						}
+				/* If we have no SelectRect then there is no intersection with ti.Document's coordinates */
+				if(SelectRect !== false) {
+					/* If we're not in the top document, translate SelectRect to document coordinates */
+					if(ti.Document != this.TopDocument) {
+						SelectRect.Offset(-ti.offset.x, -ti.offset.y);
+						SelectRect.Offset(ti.Document.body.scrollLeft, ti.Document.body.scrollTop);
 					}
-				}, this);
+
+					/* Find Links Which Intersect With SelectRect */
+					$A(ti.SelectableElements).forEach(function(elem) {
+						var Intersects = elem.SnapRects.some( SelectRect.IntersectsWith.bind(SelectRect) );
+
+						if(Intersects) {
+							var computedStyle = this.Window.content.document.defaultView.getComputedStyle(elem, null);
+							var hidden = (computedStyle.getPropertyValue('visibility') == 'hidden' ||
+								computedStyle.getPropertyValue('display') == 'none');
+
+							if(!hidden) {
+								if(elem.tagName == 'A' && this.SelectLargestFontSizeIntersectionLinks) {
+									var fontSize = computedStyle.getPropertyValue("font-size");
+
+									if(fontSize.indexOf("px") >= 0)
+										elem.SnapFontSize = parseFloat(fontSize);
+
+									if(elem.SnapIsJsLink) {
+										if(elem.SnapFontSize > HighJsLinkFontSize)
+											HighJsLinkFontSize = elem.SnapFontSize;
+									}
+									else {
+										if(elem.SnapFontSize > HighLinkFontSize)
+											HighLinkFontSize = elem.SnapFontSize;
+									}
+								}
+
+								if(elem.tagName == 'INPUT') {
+									switch(elem.getAttribute('type')) {
+										case 'checkbox':
+											TypeCounts.Checkboxes++;
+											break;
+										case 'button':
+										case 'submit':
+											TypeCounts.Buttons++;
+											break;
+									}
+
+								} else if(elem.tagName == 'A') {
+									if(elem.SnapIsJsLink)
+										TypeCounts.JsLinks++;
+									else
+										TypeCounts.Links++;
+								}
+
+								this.IntersectedElements.push(elem);
+							}
+						}
+					}, this);
+				}
 			}
 
 			// Init the greatest values with the first item.
@@ -493,18 +504,18 @@ var SnapLinksSelectionClass = Class.create({
 			var filterFunction;
 			
 			switch(Greatest) {
-			case 'Links':
-				filterFunction = function(elem) { return elem.tagName == 'A' && !elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighLinkFontSize); };
-				break;
-			case 'JsLinks':
-				filterFunction = function(elem) { return elem.tagName == 'A' && elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighJsLinkFontSize); };
-				break;
-			case 'Checkboxes':
-				filterFunction = function(elem) { return elem.tagName == 'INPUT' && elem.getAttribute('type') == 'checkbox'; };
-				break;
-			case 'Buttons':
-				filterFunction = function(elem) { return elem.tagName == 'INPUT' && (elem.getAttribute('type') == 'button' || elem.getAttribute('type') == 'submit'); };
-				break;
+				case 'Links':
+					filterFunction = function(elem) { return elem.tagName == 'A' && !elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighLinkFontSize); };
+					break;
+				case 'JsLinks':
+					filterFunction = function(elem) { return elem.tagName == 'A' && elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighJsLinkFontSize); };
+					break;
+				case 'Checkboxes':
+					filterFunction = function(elem) { return elem.tagName == 'INPUT' && elem.getAttribute('type') == 'checkbox'; };
+					break;
+				case 'Buttons':
+					filterFunction = function(elem) { return elem.tagName == 'INPUT' && (elem.getAttribute('type') == 'button' || elem.getAttribute('type') == 'submit'); };
+					break;
 			}
 
 			// Filter the elements.
@@ -538,8 +549,7 @@ var SnapLinksSelectionClass = Class.create({
 	},
 	
 	/** Scroll on viewport edge. */
-	scrollOnViewEdge: function (e)
-	{
+	scrollOnViewEdge: function (e) {
 		var offsetX = 0;
 		if (e.clientX < 0) {
 			offsetX = e.clientX;
@@ -547,9 +557,8 @@ var SnapLinksSelectionClass = Class.create({
 			if (offsetX > this.Window.scrollX) {
 				offsetX = this.Window.scrollX;
 			}
-		}
-		else if (e.clientX > this.TopDocument.documentElement.clientWidth) {
-			offsetX = e.clientX - this.TopDocument.documentElement.clientWidth;
+		} else if (e.clientX > this.TopDocument.body.clientWidth) {
+			offsetX = e.clientX - this.TopDocument.body.clientWidth;
 			var offsetMaxX = this.Window.scrollMaxX - this.Window.scrollX; 
 			
 			if (offsetX > offsetMaxX) {
@@ -564,9 +573,8 @@ var SnapLinksSelectionClass = Class.create({
 			if (offsetY > this.Window.scrollY) {
 				offsetY = this.Window.scrollY;
 			}
-		}
-		else if (e.clientY > this.TopDocument.documentElement.clientHeight) {
-			offsetY = e.clientY - this.TopDocument.documentElement.clientHeight;
+		} else if (e.clientY > this.TopDocument.body.clientHeight) {
+			offsetY = e.clientY - this.TopDocument.body.clientHeight;
 			var offsetMaxY = this.Window.scrollMaxY - this.Window.scrollY;
 			
 			if (offsetY > offsetMaxY) {

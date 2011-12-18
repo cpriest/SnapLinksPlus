@@ -173,7 +173,7 @@ var SnapLinksClass = Class.create({
 		this.Clear();
 		
 		/* Capture the current working document */
-		this.Document = e.target.ownerDocument;
+		this.Document = e.target.ownerDocument.defaultView.top.document;
 		this.Document.body.setCapture(false);
 		
 		this.InstallEventHooks();
