@@ -359,21 +359,18 @@ var SnapLinksClass = Class.create({
 			
 			this.Selection.FilteredElements.forEach( function(elem, index) {
 				var callback = this;
-				
-				this.Window.setTimeout(function() {
-					if(elem.href) {
-						callback.CurrentElement = elem;
-						
-						if (elem.SnapIsJsLink) {
+
+				if(elem.SnapIsJsLink) {
+					this.Window.setTimeout(function() {
+						if(elem.href) {
+							callback.CurrentElement = elem;
 							callback.ClickLink(elem); // Click JS links.
+							callback.CurrentElement = null;
 						}
-						else {
-							callback.Window.getBrowser().addTab(elem.href, callback.CurrentReferer);
-						}
-						
-						callback.CurrentElement = null;
-					}
-				}, this.Prefs.ActionInterval * index, callback, elem);
+					}, this.Prefs.ActionInterval * index, callback, elem);
+				} else {
+					callback.Window.getBrowser().addTab(elem.href, callback.CurrentReferer);
+				}
 			}, this);
 		}
 		catch(e) {
