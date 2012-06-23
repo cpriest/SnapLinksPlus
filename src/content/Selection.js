@@ -523,11 +523,9 @@ var SnapLinksSelectionClass = Class.create({
 
 			// Apply the style on the selected elements.
 			var OutlineStyle = this.SnapLinksPlus.Prefs.SelectedElementsBorderWidth + 'px solid ' + this.SnapLinksPlus.Prefs.SelectedElementsBorderColor;
-			Log(OutlineStyle);
 			this.SelectedElements.forEach( function(elem) {
 				(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
 					elem.style.outline = OutlineStyle;
-					Log(elem, elem.style.outline);
 				} );
 			}, this );
 			this.SelectedElementsType = Greatest;
