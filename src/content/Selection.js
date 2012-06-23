@@ -336,7 +336,7 @@ var SnapLinksSelectionClass = Class.create({
 
 		this.SelectedElements.forEach( function(elem) {
 			(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
-				elem.style.MozOutline = '';
+				elem.style.outline = '';
 			}, this );
 		}, this );
 		this.SelectedElements = [ ];
@@ -520,12 +520,14 @@ var SnapLinksSelectionClass = Class.create({
 
 			// Filter the elements.
 			this.SelectedElements = this.IntersectedElements.filter(filterFunction, this);
-			
+
 			// Apply the style on the selected elements.
 			var OutlineStyle = this.SnapLinksPlus.Prefs.SelectedElementsBorderWidth + 'px solid ' + this.SnapLinksPlus.Prefs.SelectedElementsBorderColor;
+			Log(OutlineStyle);
 			this.SelectedElements.forEach( function(elem) {
 				(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
-					elem.style.MozOutline = OutlineStyle;
+					elem.style.outline = OutlineStyle;
+					Log(elem, elem.style.outline);
 				} );
 			}, this );
 			this.SelectedElementsType = Greatest;
