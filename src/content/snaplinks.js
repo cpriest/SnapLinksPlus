@@ -143,6 +143,14 @@ var SnapLinksClass = Class.create({
 		this.Prefs = new SnapLinksPrefsClass(this.XulDocument);
 
 		this.SnapLinksStatus = '';
+
+		/* Install context menu popup prevention hook */
+		this.StopNextContextMenuPopup = false;
+		this.XulDocument.getElementById('contentAreaContextMenu').addEventListener('popupshowing', function (e) {
+			if(this.StopNextContextMenuPopup)
+				e.preventDefault();
+			this.StopNextContextMenuPopup = false;
+		}.bind(this), false);
 	},
 
 	/**
@@ -180,8 +188,8 @@ var SnapLinksClass = Class.create({
 
 		/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218, 
 			we prevent the context menu from showing on mouse down here. */
-		if(this.Window.navigator.userAgent.indexOf('Linux') != -1) {
-			this.StopNextContextMenuPopup();
+		if(e.button == 2 /* RMB */ && this.Window.navigator.userAgent.indexOf('Linux') != -1) {
+			this.StopNextContextMenuPopup = true;
 		}
 	},
 
@@ -197,7 +205,7 @@ var SnapLinksClass = Class.create({
 			this.Document.releaseCapture();
 
 			if(this.Selection.DragStarted == true) {
-				this.StopNextContextMenuPopup();
+				this.StopNextContextMenuPopup = true;
 				if((e.ctrlKey || this.Prefs.DefaultAction == this.ACTION.ASK_USER) &&
 						this.Selection.SelectedElementsType == 'Links' &&
 						this.Selection.FilteredElements.length) {
@@ -213,8 +221,7 @@ var SnapLinksClass = Class.create({
 				if(navigator.userAgent.indexOf('Linux') != -1) {
 					if (gContextMenu) {
 						var evt = this.XulDocument.createEvent("MouseEvents");
-						var le = this.LastMouseDownEvent;
-					
+
 						evt.initMouseEvent('contextmenu', true, true, this.Window, 0, 
 							e.screenX, e.screenY, e.clientX, e.clientY,
 							false, false, false, false,
@@ -224,6 +231,8 @@ var SnapLinksClass = Class.create({
 				}
 			}
 		}
+		/* Clear any StopNextContextMenuPopup regardless of it's use on next idle moment */
+		setTimeout(function() { this.StopNextContextMenuPopup = false}.bind(this), 0);
 	},
 
 	InstallEventHooks: function() {
@@ -237,26 +246,6 @@ var SnapLinksClass = Class.create({
 	OnKeyPress: function(e) {
 		if(e.keyCode == this.Window.KeyboardEvent.DOM_VK_ESCAPE)
 			this.Clear();
-	},
-
-	/**
-	 * Called to prevent the next context menu popup from showing.
-	 */
-	StopNextContextMenuPopup: function() {
-		if(this.StoppingNextContextMenuPopup)
-			return;
-
-		this.StoppingNextContextMenuPopup = true;
-
-		var ContentAreaContextMenu = this.XulDocument.getElementById('contentAreaContextMenu');
-		var _PreventEventDefault;
-		function PreventEventDefault(e) {
-			e.preventDefault();
-			this.StoppingNextContextMenuPopup = false;
-			ContentAreaContextMenu.removeEventListener('popupshowing', _PreventEventDefault, false);
-		}
-		_PreventEventDefault = PreventEventDefault.bind(this);
-		ContentAreaContextMenu.addEventListener('popupshowing', _PreventEventDefault, false);
 	},
 
 	/**
