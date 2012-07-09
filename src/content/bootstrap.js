@@ -32,6 +32,14 @@
 
 var SnapLinksPlus = { };
 
+
+try {
+	var Cu = Components.utils;
+	Cu.import("chrome://snaplinksplus/content/snaplinks.js");
+} catch(e) {
+	Components.utils.reportError(e + ":\n"+ e.stack);
+}
+
 window.addEventListener('load', function() {
 	SnapLinksPlus = new SnapLinksClass(window, document);
 

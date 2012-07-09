@@ -49,6 +49,5 @@
 		</menupopup>
 	</popupset>
 
-	<script type="application/x-javascript" src="snaplinks.js"/>
 	<script type="application/x-javascript" src="bootstrap.js"/>
 </overlay>
