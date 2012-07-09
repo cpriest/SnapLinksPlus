@@ -344,23 +344,22 @@ var SnapLinksClass = Class.create({
 	 */
 	OpenTabs: function() {
 		try {
-			this.CurrentReferer = this.DocumentReferer;
-			
-			this.Selection.FilteredElements.forEach( function(elem, index) {
-				var callback = this;
+			var CurrentReferer = this.DocumentReferer;
+			var FilteredElements = this.Selection.FilteredElements;
+			var IntervalTimerID = this.Window.setInterval(function() {
+				var elem = FilteredElements.shift();
 
-				if(elem.SnapIsJsLink) {
-					this.Window.setTimeout(function() {
-						if(elem.href) {
-							callback.CurrentElement = elem;
-							callback.ClickLink(elem); // Click JS links.
-							callback.CurrentElement = null;
-						}
-					}, this.Prefs.ActionInterval * index, callback, elem);
-				} else {
-					callback.Window.getBrowser().addTab(elem.href, callback.CurrentReferer);
+				if(elem.href) {
+					if (elem.SnapIsJsLink) {
+						this.ClickLink(elem); // Click JS links.
+					} else {
+						this.Window.getBrowser().addTab(elem.href, CurrentReferer);
+					}
 				}
-			}, this);
+				if(FilteredElements.length == 0)
+					this.Window.clearInterval(IntervalTimerID);
+
+			}.bind(this), this.Prefs.ActionInterval);
 		}
 		catch(e) {
 			Components.utils.reportError(e + ":\n"+ e.stack);
@@ -556,7 +555,7 @@ var SnapLinksClass = Class.create({
 					return { FileName: Title, Url: elem.href };
 				}, this );
 				
-				this.CurrentReferer = this.DocumentReferer;
+				var CurrentReferer = this.DocumentReferer;
 				
 				var pref = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
 				var useDownloadDir = pref.getBoolPref("browser.download.useDownloadDir");
@@ -566,13 +565,13 @@ var SnapLinksClass = Class.create({
 						var callback = this;
 						
 						this.Window.setTimeout(function() {
-							saveURL(link.Url, link.FileName, null, true, true, callback.CurrentReferer);
+							saveURL(link.Url, link.FileName, null, true, true, CurrentReferer);
 						}, this.Prefs.ActionInterval * index, callback, link);
 					}, this);
 				} else {
 					links.forEach( function( link, index ) {
 						// saveURL(aURL, aFileName, aFilePickerTitleKey, aShouldBypassCache, aSkipPrompt, aReferrer)
-						saveURL(link.Url, link.FileName, null, true, false, this.CurrentReferer);
+						saveURL(link.Url, link.FileName, null, true, false, CurrentReferer);
 					}, this);
 				}
 			}
