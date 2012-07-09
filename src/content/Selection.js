@@ -336,6 +336,7 @@ var SnapLinksSelectionClass = Class.create({
 
 		this.SelectedElements.forEach( function(elem) {
 			(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
+				elem.style.MozOutline = '';	/* Pre FF13 */
 				elem.style.outline = '';
 			}, this );
 		}, this );
@@ -525,6 +526,7 @@ var SnapLinksSelectionClass = Class.create({
 			var OutlineStyle = this.SnapLinksPlus.Prefs.SelectedElementsBorderWidth + 'px solid ' + this.SnapLinksPlus.Prefs.SelectedElementsBorderColor;
 			this.SelectedElements.forEach( function(elem) {
 				(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
+					elem.style.MozOutline = OutlineStyle;	/* Pre FF13 */
 					elem.style.outline = OutlineStyle;
 				} );
 			}, this );
