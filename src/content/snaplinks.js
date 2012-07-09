@@ -232,7 +232,7 @@ var SnapLinksClass = Class.create({
 			}
 		}
 		/* Clear any StopNextContextMenuPopup regardless of it's use on next idle moment */
-		setTimeout(function() { this.StopNextContextMenuPopup = false}.bind(this), 0);
+		this.Window.setTimeout(function() { this.StopNextContextMenuPopup = false}.bind(this), 0);
 	},
 
 	InstallEventHooks: function() {
@@ -347,6 +347,10 @@ var SnapLinksClass = Class.create({
 			var CurrentReferer = this.DocumentReferer;
 			var FilteredElements = this.Selection.FilteredElements;
 			var IntervalTimerID = this.Window.setInterval(function() {
+				if(FilteredElements.length == 0) {
+					this.Window.clearInterval(IntervalTimerID);
+					return;
+				}
 				var elem = FilteredElements.shift();
 
 				if(elem.href) {
@@ -356,9 +360,6 @@ var SnapLinksClass = Class.create({
 						this.Window.getBrowser().addTab(elem.href, CurrentReferer);
 					}
 				}
-				if(FilteredElements.length == 0)
-					this.Window.clearInterval(IntervalTimerID);
-
 			}.bind(this), this.Prefs.ActionInterval);
 		}
 		catch(e) {
