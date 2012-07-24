@@ -452,13 +452,13 @@ var SnapLinksClass = Class.create({
 	CopyToClipboard: function() {
 		try {
 			var textSeparator = this.ClipboardSeparator;
-			var htmlSeparator = textSeparator.replace(/\n/g, "<br>");
+			var htmlSeparator = textSeparator.replace(/\n/g, "<br>\n");
 			
 			var Representations = this.Selection.FilteredElements.reduce( function(acc, elem) {
-				var text = elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' ');
+				var text = htmlentities(elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' '));
 	
-				acc.html.push( '<a href="' + elem.href + '">' + text + '</a>' );
-				acc.text.push( elem.href );
+				acc.html.push( '<a href="' + escapeHTML(elem.href) + '">' + text + '</a>' );
+				acc.text.push( escapeHTML(elem.href) );
 				return acc;
 			}, { html: [ ], text: [ ] } );
 	
