@@ -295,7 +295,7 @@
 				<checkbox label="&snaplinks.adv.SelectAndClick.JsLinks;" preference="pref.snaplinks.HighlightJsLinksForClicking"/>
 				<checkbox label="&snaplinks.adv.SelectAndClick.Checkboxes;" preference="pref.snaplinks.HighlightCheckboxesForClicking"/>
 				<checkbox label="&snaplinks.adv.SelectAndClick.Buttons;" preference="pref.snaplinks.HighlightButtonsForClicking"/>
-				<checkbox label="&snaplinks.adv.SelectAndClick.RadioButtons;" style="border: 1px solid red;" preference="pref.snaplinks.HighlightRadioButtonsForClicking"/>
+				<checkbox label="&snaplinks.adv.SelectAndClick.RadioButtons;" preference="pref.snaplinks.HighlightRadioButtonsForClicking"/>
 			</groupbox>
 		</hbox>
 
