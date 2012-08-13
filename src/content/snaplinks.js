@@ -273,7 +273,8 @@ var SnapLinksClass = Class.create({
 			'Links':		[ 'OpenTabs','OpenWindows','OpenTabsInNewWindow','CopyToClipboard','BookmarkLinks','DownloadLinks' ],
 			'JsLinks':		[ 'ClickLinks' ],
 			'Buttons':		[ 'ClickElements' ],
-			'Checkboxes':	[ 'ClickElements' ]
+			'Checkboxes':	[ 'ClickElements' ],
+			'RadioButtons': [ 'ClickElements' ],
 		};
 
 		Action = Action || this.Prefs.DefaultAction;

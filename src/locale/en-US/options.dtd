@@ -46,6 +46,8 @@
 <!-- A checkbox option following snaplinks.adv.SelectAndClick. -->
 <!ENTITY snaplinks.adv.SelectAndClick.Buttons       "Buttons">
 <!-- A checkbox option following snaplinks.adv.SelectAndClick. -->
+<!ENTITY snaplinks.adv.SelectAndClick.RadioButtons  "Radio Buttons">
+<!-- A checkbox option following snaplinks.adv.SelectAndClick. -->
 <!ENTITY snaplinks.adv.SelectAndClick.JsLinks       "JavaScript links">
 
 <!-- A groupbox caption. Misc advanced options. -->

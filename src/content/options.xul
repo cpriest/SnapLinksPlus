@@ -229,9 +229,10 @@
 	
 	<prefpane id="snaplinks-options-advanced-pane" label="&snaplinks.preftab.advanced;" image="chrome://snaplinksplus/skin/advanced.png">
 		<preferences>
-			<preference type="bool"     id="pref.snaplinks.HighlightCheckboxesForClicking"  name="extensions.snaplinks.HighlightCheckboxesForClicking"/>
-			<preference type="bool"     id="pref.snaplinks.HighlightButtonsForClicking"     name="extensions.snaplinks.HighlightButtonsForClicking"/>
-			<preference type="bool"     id="pref.snaplinks.HighlightJsLinksForClicking"     name="extensions.snaplinks.HighlightJsLinksForClicking"/>
+			<preference type="bool"     id="pref.snaplinks.HighlightCheckboxesForClicking"  	name="extensions.snaplinks.HighlightCheckboxesForClicking"/>
+			<preference type="bool"     id="pref.snaplinks.HighlightButtonsForClicking"     	name="extensions.snaplinks.HighlightButtonsForClicking"/>
+			<preference type="bool"     id="pref.snaplinks.HighlightJsLinksForClicking"     	name="extensions.snaplinks.HighlightJsLinksForClicking"/>
+			<preference type="bool"     id="pref.snaplinks.HighlightRadioButtonsForClicking"    name="extensions.snaplinks.HighlightRadioButtonsForClicking"/>
 
 			<preference type="bool"     id="pref.snaplinks.HideSelectionOnMouseLeave"       name="extensions.snaplinks.HideSelectionOnMouseLeave"/>
 			<preference type="bool"     id="pref.snaplinks.RemoveDuplicateUrls"             name="extensions.snaplinks.RemoveDuplicateUrls"/>
@@ -294,6 +295,7 @@
 				<checkbox label="&snaplinks.adv.SelectAndClick.JsLinks;" preference="pref.snaplinks.HighlightJsLinksForClicking"/>
 				<checkbox label="&snaplinks.adv.SelectAndClick.Checkboxes;" preference="pref.snaplinks.HighlightCheckboxesForClicking"/>
 				<checkbox label="&snaplinks.adv.SelectAndClick.Buttons;" preference="pref.snaplinks.HighlightButtonsForClicking"/>
+				<checkbox label="&snaplinks.adv.SelectAndClick.RadioButtons;" style="border: 1px solid red;" preference="pref.snaplinks.HighlightRadioButtonsForClicking"/>
 			</groupbox>
 		</hbox>
 

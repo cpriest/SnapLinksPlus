@@ -38,6 +38,7 @@ pref('extensions.snaplinks.ActionInterval',                     200);
 
 pref('extensions.snaplinks.HighlightCheckboxesForClicking',     true);
 pref('extensions.snaplinks.HighlightButtonsForClicking',        true);
+pref('extensions.snaplinks.HighlightRadioButtonsForClicking',   true);
 pref('extensions.snaplinks.HighlightJsLinksForClicking',        true);
 pref('extensions.snaplinks.HideSelectionOnMouseLeave',          false);
 pref('extensions.snaplinks.RemoveDuplicateUrls',                true);

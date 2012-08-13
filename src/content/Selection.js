@@ -270,6 +270,9 @@ var SnapLinksSelectionClass = Class.create({
 			if(this.SnapLinksPlus.Prefs.HighlightButtonsForClicking && (Type == 'submit' || Type == 'button')) {
 				SelectableElements.push(input);
 			}
+			if(this.SnapLinksPlus.Prefs.HighlightRadioButtonsForClicking && Type == 'radio') {
+				SelectableElements.push(input);
+			}
 			else if(this.SnapLinksPlus.Prefs.HighlightCheckboxesForClicking && Type == 'checkbox') {
 				if(input.parentNode.tagName == 'LABEL') {
 					ElementRectsNode = input.parentNode;
@@ -419,8 +422,8 @@ var SnapLinksSelectionClass = Class.create({
 			var HighLinkFontSize = 0;
 			var HighJsLinkFontSize = 0;
 			
-			var TypesInPriorityOrder = new Array('Links', 'JsLinks', 'Checkboxes', 'Buttons');
-			var TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0};
+			var TypesInPriorityOrder = new Array('Links', 'JsLinks', 'Checkboxes', 'Buttons', 'RadioButtons');
+			var TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0, 'RadioButtons': 0};
 
 			for(var href in this.Documents) {
 				var ti = this.Documents[href];
@@ -467,6 +470,9 @@ var SnapLinksSelectionClass = Class.create({
 										case 'checkbox':
 											TypeCounts.Checkboxes++;
 											break;
+										case 'radio':
+											TypeCounts.RadioButtons++;
+											break;
 										case 'button':
 										case 'submit':
 											TypeCounts.Buttons++;
@@ -487,6 +493,7 @@ var SnapLinksSelectionClass = Class.create({
 				}
 			}
 
+			Log(TypeCounts);
 			// Init the greatest values with the first item.
 			var Greatest = TypesInPriorityOrder[0];
 			var GreatestValue = TypeCounts[Greatest];
@@ -503,7 +510,8 @@ var SnapLinksSelectionClass = Class.create({
 			
 			// Choose the filter function.
 			var filterFunction;
-			
+
+			Log(Greatest);
 			switch(Greatest) {
 				case 'Links':
 					filterFunction = function(elem) { return elem.tagName == 'A' && !elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighLinkFontSize); };
@@ -516,6 +524,9 @@ var SnapLinksSelectionClass = Class.create({
 					break;
 				case 'Buttons':
 					filterFunction = function(elem) { return elem.tagName == 'INPUT' && (elem.getAttribute('type') == 'button' || elem.getAttribute('type') == 'submit'); };
+					break;
+				case 'RadioButtons':
+					filterFunction = function(elem) { Log(elem, elem.tagName, elem.getAttribute('type')); return elem.tagName == 'INPUT' && elem.getAttribute('type') == 'radio'; };
 					break;
 			}
 

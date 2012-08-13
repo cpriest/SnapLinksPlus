@@ -52,6 +52,7 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 		HighlightButtonsForClicking:		{ Type: 'bool',	Default: true },
 		HighlightJsLinksForClicking:		{ Type: 'bool',	Default: true },
 		HideSelectionOnMouseLeave:			{ Type: 'bool',	Default: false	},
+		HighlightRadioButtonsForClicking:	{ Type: 'bool',	Default: true },
 		RemoveDuplicateUrls:				{ Type: 'bool',	Default: true },
 		AlwaysPromptDownloadName:			{ Type: 'bool',	Default: false },
 		ShowSelectedCount:					{ Type: 'bool',	Default: true, 			Name: '.shownumber' },
