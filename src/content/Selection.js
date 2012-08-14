@@ -493,7 +493,6 @@ var SnapLinksSelectionClass = Class.create({
 				}
 			}
 
-			Log(TypeCounts);
 			// Init the greatest values with the first item.
 			var Greatest = TypesInPriorityOrder[0];
 			var GreatestValue = TypeCounts[Greatest];
@@ -511,7 +510,6 @@ var SnapLinksSelectionClass = Class.create({
 			// Choose the filter function.
 			var filterFunction;
 
-			Log(Greatest);
 			switch(Greatest) {
 				case 'Links':
 					filterFunction = function(elem) { return elem.tagName == 'A' && !elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighLinkFontSize); };

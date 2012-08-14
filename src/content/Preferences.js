@@ -32,6 +32,11 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 	
 	ShowCount_AddonBar	: 0,
 	ShowCount_Hover		: 1,
+
+	/* Checkbox Mixed State Action */
+	CMSA_Uncheck	: 0,
+	CMSA_Check		: 1,
+	CMSA_Toggle		: 2,
 	
 	BasePath:	'extensions.snaplinks',
 	map:	{
@@ -57,7 +62,9 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 		AlwaysPromptDownloadName:			{ Type: 'bool',	Default: false },
 		ShowSelectedCount:					{ Type: 'bool',	Default: true, 			Name: '.shownumber' },
 		ShowCountWhere:						{ Type: 'int', 	Default: 1,				Name: '.shownumber.where' },
-		
+
+		CheckboxMixedStateAction:			{ Type: 'int', 	Default: 0,				Name: '.checkbox_mixedstate' },
+
 		CopyToClipboardSeparatorId:			{ Type: 'int',	Default: 1,				Name: '.CopyToClipboardSeparator.Id' },
 		CopyToClipboardSeparatorCustom:		{ Type: 'char',	Default: ',',			Name: '.CopyToClipboardSeparator.Custom' },
 		

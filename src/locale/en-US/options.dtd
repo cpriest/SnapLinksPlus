@@ -64,6 +64,15 @@
 <!-- A drop-down-list option following snaplinks.adv.shownumber. -->
 <!ENTITY snaplinks.adv.shownumber.hover         "hovering next to cursor">
 
+<!-- This option text is followed by a drop-down-list which contains these strings: snaplinks.adv.checkbox_mixedstate.checkall, snaplinks.adv.checkbox_mixedstate.uncheckall, snaplinks.adv.checkbox_mixedstate.toggle -->
+<!ENTITY snaplinks.adv.checkbox_mixedstate      "When selected checkboxes have mixed state: ">
+<!-- A drop-down-list option following snaplinks.adv.checkbox_mixedstate.checkall. -->
+<!ENTITY snaplinks.adv.checkbox_mixedstate.checkall     "Check all">
+<!-- A drop-down-list option following snaplinks.adv.checkbox_mixedstate.uncheckall. -->
+<!ENTITY snaplinks.adv.checkbox_mixedstate.uncheckall   "Uncheck All">
+<!-- A drop-down-list option following snaplinks.adv.checkbox_mixedstate.toggle. -->
+<!ENTITY snaplinks.adv.checkbox_mixedstate.toggle       "Toggle Each Individually">
+
 <!ENTITY snaplinks.adv.AlwaysPromptDownloadName                 "Always ask me where to save files">
 <!ENTITY snaplinks.adv.AlwaysPromptDownloadName.Tooltip         "This option has no use when the global 'Always ask me where to save files' option is enabled.">
 

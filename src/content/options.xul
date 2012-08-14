@@ -239,6 +239,8 @@
 			<preference type="bool"     id="pref.snaplinks.shownumber"                      name="extensions.snaplinks.shownumber"/>
 			<preference type="int"      id="pref.snaplinks.shownumber.where"                name="extensions.snaplinks.shownumber.where"/>
 
+			<preference type="int"      id="pref.snaplinks.checkbox_mixedstate"             name="extensions.snaplinks.checkbox_mixedstate"/>
+
 			<preference type="int"      id="pref.snaplinks.ActionInterval"                  name="extensions.snaplinks.ActionInterval"/>
 			<preference type="bool"     id="pref.snaplinks.AlwaysPromptDownloadName"        name="extensions.snaplinks.AlwaysPromptDownloadName"/>
 
@@ -262,7 +264,17 @@
 					</menupopup>
 				</menulist>
 			</hbox>
-			
+			<hbox align="center">
+				<label value="&snaplinks.adv.checkbox_mixedstate;"/>
+				<menulist class="no-margin" preference="pref.snaplinks.checkbox_mixedstate">
+					<menupopup>
+						<menuitem label="&snaplinks.adv.checkbox_mixedstate.checkall;" value="1" />
+						<menuitem label="&snaplinks.adv.checkbox_mixedstate.uncheckall;" value="0"/>
+						<menuitem label="&snaplinks.adv.checkbox_mixedstate.toggle;" value="2"/>
+					</menupopup>
+				</menulist>
+			</hbox>
+
 			<menuseparator/>
 			
 			<hbox>

@@ -273,12 +273,12 @@ var SnapLinksClass = Class.create({
 			'Links':		[ 'OpenTabs','OpenWindows','OpenTabsInNewWindow','CopyToClipboard','BookmarkLinks','DownloadLinks' ],
 			'JsLinks':		[ 'ClickLinks' ],
 			'Buttons':		[ 'ClickElements' ],
-			'Checkboxes':	[ 'ClickElements' ],
+			'Checkboxes':	[ 'ClickCheckboxes' ],
 			'RadioButtons': [ 'ClickElements' ],
 		};
 
 		Action = Action || this.Prefs.DefaultAction;
-		
+
 		/* Check to see that the requested action is valid for the given SelectedElementsType */
 		if(ValidActions[this.Selection.SelectedElementsType].indexOf(Action) == -1)
 			Action = ValidActions[this.Selection.SelectedElementsType][0];
@@ -333,6 +333,35 @@ var SnapLinksClass = Class.create({
 		try {
 			this.Selection.SelectedElements.forEach( function(elem, index) {
 				elem.click();
+			}, this );
+		}
+		catch (e) {
+			Components.utils.reportError(e);
+		}
+	},
+
+	/**
+	 * Click elements (buttons, checkboxes) without a delay in between.
+	 */
+	ClickCheckboxes: function() {
+		try {
+			var MixedState = false,
+				FirstState = this.Selection.SelectedElements[0].checked;
+			this.Selection.SelectedElements.forEach( function(elem, index) {
+				if(MixedState == false && elem.checked != FirstState)
+					MixedState = true;
+			});
+			Log(MixedState);
+			this.Selection.SelectedElements.forEach( function(elem, index) {
+				if(MixedState == false || this.Prefs.CheckboxMixedStateAction == this.Prefs.CMSA_Toggle)
+					elem.click();
+				else if(this.Prefs.CheckboxMixedStateAction == this.Prefs.CMSA_Check) {
+					if(elem.checked  == false)
+						elem.click();
+				} else {
+					if(elem.checked == true)
+						elem.click();
+				}
 			}, this );
 		}
 		catch (e) {
