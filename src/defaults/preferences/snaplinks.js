@@ -46,5 +46,7 @@ pref('extensions.snaplinks.AlwaysPromptDownloadName',           false);
 pref('extensions.snaplinks.shownumber',                         true);
 pref('extensions.snaplinks.shownumber.where',                   1);
 
+pref('extensions.snaplinks.checkbox_mixedstate',                0);
+
 pref('extensions.snaplinks.CopyToClipboardSeparator.Id',        1);
 pref('extensions.snaplinks.CopyToClipboardSeparator.Custom',    ',');
