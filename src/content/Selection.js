@@ -83,7 +83,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.TopDocument = e.target.ownerDocument.defaultView.top.document;
 
 		/* Store the starting scroll height and width for the top document for out-of-bounds processing */
-		this.TopDocumentScrollDims = { bottom: this.TopDocument.body.scrollHeight, right: this.TopDocument.body.scrollWidth };
+		this.TopDocumentScrollDims = { bottom: this.TopDocument.documentElement.scrollHeight, right: this.TopDocument.documentElement.scrollWidth };
 
 		/** Initializes the starting mouse position */
 		this.SelectionRect = new Rect(e.pageY, Math.min(e.pageX, Document.documentElement.offsetWidth + Document.defaultView.pageXOffset));
@@ -117,7 +117,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.CalculateSnapRects(e.target.ownerDocument);
 
 		if(this.Element && e.target.ownerDocument == this.TopDocument) {
-			if(e.clientX < 0 || e.clientY < 0 || e.clientX > this.TopDocument.body.clientWidth || e.clientY > this.TopDocument.body.clientHeight) {
+			if(e.clientX < 0 || e.clientY < 0 || e.clientX > this.TopDocument.documentElement.clientWidth || e.clientY > this.TopDocument.documentElement.clientHeight) {
 				if(this.SnapLinksPlus.Prefs.HideSelectionOnMouseLeave)
 					this.Element.style.display = 'none';
 				else {
@@ -427,7 +427,7 @@ var SnapLinksSelectionClass = Class.create({
 
 			for(var href in this.Documents) {
 				var ti = this.Documents[href];
-				var DocRect = new Rect(0, 0, ti.Document.body.scrollHeight, ti.Document.body.scrollWidth)
+				var DocRect = new Rect(0, 0, ti.Document.documentElement.scrollHeight, ti.Document.documentElement.scrollWidth)
 					.Offset(ti.offset.x, ti.offset.y);
 				var SelectRect = this.SelectionRect.GetIntersectRect(DocRect);
 
@@ -436,7 +436,7 @@ var SnapLinksSelectionClass = Class.create({
 					/* If we're not in the top document, translate SelectRect to document coordinates */
 					if(ti.Document != this.TopDocument) {
 						SelectRect.Offset(-ti.offset.x, -ti.offset.y);
-						SelectRect.Offset(ti.Document.body.scrollLeft, ti.Document.body.scrollTop);
+						SelectRect.Offset(ti.Document.documentElement.scrollLeft, ti.Document.documentElement.scrollTop);
 					}
 
 					/* Find Links Which Intersect With SelectRect */
@@ -524,7 +524,7 @@ var SnapLinksSelectionClass = Class.create({
 					filterFunction = function(elem) { return elem.tagName == 'INPUT' && (elem.getAttribute('type') == 'button' || elem.getAttribute('type') == 'submit'); };
 					break;
 				case 'RadioButtons':
-					filterFunction = function(elem) { Log(elem, elem.tagName, elem.getAttribute('type')); return elem.tagName == 'INPUT' && elem.getAttribute('type') == 'radio'; };
+					filterFunction = function(elem) { return elem.tagName == 'INPUT' && elem.getAttribute('type') == 'radio'; };
 					break;
 			}
 
