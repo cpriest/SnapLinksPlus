@@ -34,6 +34,7 @@ pref('extensions.snaplinks.linkspicker',                        '#FF0000');
 pref('extensions.snaplinks.linksthick',                         1);
 
 pref('extensions.snaplinks.defaultaction',                      'OpenTabs');
+pref('extensions.snaplinks.SwitchToFirstNewTab',        	   	true);
 pref('extensions.snaplinks.ActionInterval',                     200);
 
 pref('extensions.snaplinks.HighlightCheckboxesForClicking',     true);
