@@ -18,7 +18,7 @@
 
 <!ENTITY snaplinks.da.caption                   "Default Action">
 <!ENTITY snaplinks.da.description               "Executed action when the mouse button is released:">
-<!ENTITY snaplinks.da.r0.newtabs                "Open Links in new Tabs (default)">
+<!ENTITY snaplinks.da.r0.newtabs                "Open Links in new background Tabs (default)">
 <!ENTITY snaplinks.da.r1.newwindows             "Open Links in new Windows">
 <!ENTITY snaplinks.da.r2.tabsinnewwin           "Open Links in a new Window">
 <!ENTITY snaplinks.da.r3.clipboard              "Copy Links to Clipboard">
@@ -26,6 +26,8 @@
 <!ENTITY snaplinks.da.r5.download               "Download Links">
 <!-- A radio button option. When a selection ends, show the action popup and let the user decide what to do. -->
 <!ENTITY snaplinks.da.askuser                   "Ask Me What To Do">
+
+<!ENTITY snaplinks.da.c1.switch_to_first_tab	"Switch to first new tab created">
 
 <!ENTITY snaplinks.drawing.caption              "Selection Rectangle">
 <!ENTITY snaplinks.drawing.color                "Color:">

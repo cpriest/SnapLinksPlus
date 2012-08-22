@@ -204,6 +204,7 @@
 	<prefpane id="snaplinks-options-action-pane" label="&snaplinks.preftab.action;" image="chrome://snaplinksplus/skin/action.png">
 		<preferences>
 			<preference type="string"   id="pref.snaplinks.defaultaction"                   name="extensions.snaplinks.defaultaction"/>
+			<preference type="bool"   id="pref.snaplinks.SwitchToFirstNewTab"				name="extensions.snaplinks.SwitchToFirstNewTab"/>
 		</preferences>
 		
 		<groupbox>
@@ -212,6 +213,7 @@
 			<radiogroup preference="pref.snaplinks.defaultaction">
 				<vbox>
 					<radio label="&snaplinks.da.r0.newtabs;" value="OpenTabs"/>
+						<checkbox label="&snaplinks.da.c1.switch_to_first_tab;" preference="pref.snaplinks.SwitchToFirstNewTab" class="indent" />
 					<radio label="&snaplinks.da.r1.newwindows;" value="OpenWindows"/>
 					<radio label="&snaplinks.da.r2.tabsinnewwin;" value="OpenTabsInNewWindow"/>
 					<menuseparator/>

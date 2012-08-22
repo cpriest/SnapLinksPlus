@@ -376,6 +376,9 @@ var SnapLinksClass = Class.create({
 		try {
 			var CurrentReferer = this.DocumentReferer;
 			var FilteredElements = this.Selection.FilteredElements;
+			var TabsCreated = 0;
+			var Browser = this.Window.getBrowser();
+
 			var IntervalTimerID = this.Window.setInterval(function() {
 				if(FilteredElements.length == 0) {
 					this.Window.clearInterval(IntervalTimerID);
@@ -387,7 +390,10 @@ var SnapLinksClass = Class.create({
 					if (elem.SnapIsJsLink) {
 						this.ClickLink(elem); // Click JS links.
 					} else {
-						this.Window.getBrowser().addTab(elem.href, CurrentReferer);
+						var NewTab = Browser.addTab(elem.href, CurrentReferer);
+						TabsCreated++;
+						if(TabsCreated == 1 && this.Prefs.SwitchToFirstNewTab)
+							Browser.tabContainer.selectedItem = NewTab;
 					}
 				}
 			}.bind(this), this.Prefs.ActionInterval);

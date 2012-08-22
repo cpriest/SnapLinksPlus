@@ -51,6 +51,7 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 		SelectedElementsBorderWidth:		{ Type: 'int', 	Default: 1, 			Name: '.linksthick' },
 		
 		DefaultAction:						{ Type: 'char',	Default: 'OpenTabs',	Name: '.defaultaction' },	/* @Broken */
+		SwitchToFirstNewTab:				{ Type: 'bool', Default: true },
 		ActionInterval:						{ Type: 'int',	Default: 200 },
 		
 		HighlightCheckboxesForClicking:		{ Type: 'bool',	Default: true },
