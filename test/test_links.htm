@@ -15,6 +15,13 @@
 <meta name="revisit-after" content="15 days">
 <title>Snap Links Plus Test Page</title>
 <link rel="stylesheet" type="text/css" href="my.css">
+	<style>
+		#JS_Click_Events_Tester IMG 				{ border: 2px solid transparent; cursor: pointer; }
+		#JS_Click_Events_Tester SPAN 				{ padding: 0px 2px; border: 2px solid transparent; cursor: pointer; }
+		#JS_Click_Events_Tester DIV 				{ padding: 0px 2px; border: 2px solid transparent; cursor: pointer; }
+		#JS_Click_Events_Tester IMG.highlighted 	{ padding: 2px; }
+		#JS_Click_Events_Tester .highlighted { border: 2px solid black !important; }
+	</style>
 </head>
 <body>
 <h1>Snap Links Plus Test Page</h1>
@@ -164,7 +171,7 @@ Suspendisse nibh orci, sodales dapibus consectetur sit amet, venenatis id leo. <
 				<td><a href="javascript:load_page('Bronze')" style="font-size: small;">Bronze</a></td>
 			</tr>
 		</tbody>
-	<table>
+	</table>
 <script language="javascript">
 function load_page(page) { window.location.replace('http://en.wikipedia.org/wiki/'+ page); }
 </script>
@@ -203,7 +210,7 @@ function load_page(page) { window.location.replace('http://en.wikipedia.org/wiki
 				<td><a href="javascript:popup_page('Bronze')">Bronze</a></td>
 			</tr>
 		</tbody>
-	<table>
+	</table>
 <script language="javascript">
 function popup_page(page) { window.open('http://en.wikipedia.org/wiki/'+ page); }
 </script>
@@ -236,8 +243,33 @@ function popup_page(page) { window.open('http://en.wikipedia.org/wiki/'+ page); 
 				<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small;">Bronze</a></td>
 			</tr>
 		</tbody>
-	<table>
-	
+	</table>
+<hr/>
+<h2>Javascript Elements with click handlers (targeted for .click() because they have cursor: pointer</h2>
+<table id="JS_Click_Events_Tester" cellspacing="6">
+	<tr><th></th>			<TH>IMG</TH>	<TH>SPAN</TH>	<TH>DIV</TH></tr>
+	<tr>						<th>"onclick"</th>				<td><img src="http://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/22px-Flag_of_the_United_States.svg.png" onclick="this.classList.toggle('highlighted')"></td>
+																<td><span onclick="this.classList.toggle('highlighted')">span</span></td>
+																<td><div onclick="this.classList.toggle('highlighted')">div</div></td></tr>
+	<tr id="onclick-via-js">	<th>.onclick</th>				<td><img src="http://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/22px-Flag_of_the_United_States.svg.png"></td>
+																<td><span>span</span></td>
+																<td><div>div</div></td></tr>
+	<tr id="click_via_addEvent">		<th>.addEventListener</th>		<td><img src="http://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/22px-Flag_of_the_United_States.svg.png"></td>
+																<td><span>span</span></td>
+																<td><div>div</div></td></tr>
+</table>
+<script language="javascript">
+	var elem = document.getElementById('onclick-via-js');
+	Array.prototype.forEach.call(elem.querySelectorAll('td > *'), function(elem) {
+		elem.onclick = function() this.classList.toggle('highlighted');
+	});
+
+	var elem = document.getElementById('click_via_addEvent');
+	Array.prototype.forEach.call(elem.querySelectorAll('td > *'), function(elem) {
+		elem.addEventListener('click', function() this.classList.toggle('highlighted'));
+	});
+
+</script>
 <h2>IFRAME</h2>
 <div id="mouseBox" style="float:left; width:30%; height:300px; border:1px solid black;">
 </div>

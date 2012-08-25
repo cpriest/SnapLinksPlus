@@ -309,11 +309,23 @@ var SnapLinksSelectionClass = Class.create({
 				}
 			}
 		}, this );
+
+		/* Any IMG/SPAN/DIV with a .onclick or event listener */
+		var Clickable = (new Date()).getMilliseconds();
+
+		$A(Document.body.querySelectorAll('IMG, SPAN, DIV')).forEach( function(elem) {
+			if(elem.SnapLinksClickable || elem.ownerDocument.defaultView.getComputedStyle(elem).cursor == 'pointer') {
+				elem.SnapLinksClickable = true;
+				elem.SnapRects = GetElementRects(elem, offset);
+				SelectableElements.push(elem);
+			}
+		}, this );
+
 		this.Documents[Document.location.href].SelectableElements = SelectableElements;
 
 		var End = (new Date()).getMilliseconds();
-//		Log("Links: %sms, Inputs: %sms, Labels: %sms, Total: %sms", 
-//			Math.round(Links - Start, 2), Math.round(Inputs - Links, 2), Math.round(End - Inputs, 2), Math.round(End - Start, 2));
+//		Log("Links: %sms, Inputs: %sms, Labels: %sms, Clickable: %sms, Total: %sms",
+//			Math.round(Links - Start, 2), Math.round(Inputs - Links, 2), Math.round(Clickable - Inputs, 2), Math.round(End - Clickable, 2), Math.round(End - Start, 2));
 	},
 
 	/** Clears the selection by removing the element, also clears some other non-refactored but moved code */
@@ -422,8 +434,8 @@ var SnapLinksSelectionClass = Class.create({
 			var HighLinkFontSize = 0;
 			var HighJsLinkFontSize = 0;
 			
-			var TypesInPriorityOrder = new Array('Links', 'JsLinks', 'Checkboxes', 'Buttons', 'RadioButtons');
-			var TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0, 'RadioButtons': 0};
+			var TypesInPriorityOrder = new Array('Links', 'JsLinks', 'Checkboxes', 'Buttons', 'RadioButtons', 'Clickable');
+			var TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0, 'RadioButtons': 0, Clickable: 0};
 
 			for(var href in this.Documents) {
 				var ti = this.Documents[href];
@@ -484,6 +496,8 @@ var SnapLinksSelectionClass = Class.create({
 										TypeCounts.JsLinks++;
 									else
 										TypeCounts.Links++;
+								} else if(elem.SnapLinksClickable == true) {
+									TypeCounts.Clickable++;
 								}
 
 								this.IntersectedElements.push(elem);
@@ -526,6 +540,9 @@ var SnapLinksSelectionClass = Class.create({
 				case 'RadioButtons':
 					filterFunction = function(elem) { return elem.tagName == 'INPUT' && elem.getAttribute('type') == 'radio'; };
 					break;
+				case 'Clickable':
+					filterFunction = function(elem) { return elem.SnapLinksClickable; };
+					break;
 			}
 
 			// Filter the elements.
@@ -545,12 +562,11 @@ var SnapLinksSelectionClass = Class.create({
 
 			this.SnapLinksPlus.SnapLinksStatus = linksText;
 
-			if (this.ElementCount)
-			{
+			if (this.ElementCount) {
 				// Remove the existing child elements.
 				while (this.ElementCount.firstChild) {
 					this.ElementCount.removeChild(this.ElementCount.firstChild);
-				};
+				}
 
 				// Add the links count.
 				var linksElem = this.Window.document.createTextNode(linksText);
