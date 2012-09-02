@@ -1,7 +1,7 @@
 /*
  *  bootstrap.js
  *
- *  Copyright (C) 2011  Clint Priest, Tommi Rautava
+ *  Copyright (C) 2011, 2012  Clint Priest, Tommi Rautava
  *
  *  This file is part of Snap Links Plus.
  *
@@ -67,7 +67,7 @@ window.addEventListener('load', function() {
 			var iAppStartup = Components.interfaces.nsIAppStartup;
 			Components.classes["@mozilla.org/toolkit/app-startup;1"]
 				.getService(iAppStartup).quit(iAppStartup.eRestart | iAppStartup.eAttemptQuit);
-		}
+		};
 
 		/** Install pklib commands and keys */
 		var CommandSet = document.querySelector('commandset');

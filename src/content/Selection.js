@@ -1,7 +1,7 @@
 /*
  *  Selection.js
  *
- *  Copyright (C) 2011  Clint Priest, Tommi Rautava
+ *  Copyright (C) 2011, 2012  Clint Priest, Tommi Rautava
  *
  *  This file is part of Snap Links Plus.
  *
@@ -92,7 +92,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.Documents = { };
 		$A(this.TopDocument.body.querySelectorAll('IFRAME')).forEach(function(elem) {
 			var contentWindow = elem.contentWindow,
-				offset = { x: 0, y: 0 }
+				offset = { x: 0, y: 0 };
 			do {
 				offset.x += elem.offsetLeft;
 				offset.y += elem.offsetTop;

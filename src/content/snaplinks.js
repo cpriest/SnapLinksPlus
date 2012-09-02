@@ -4,7 +4,7 @@
  *  Copyright (C) 2007  Pedro Fonseca (savred at gmail)
  *  Copyright (C) 2008  Atreus, MumblyJuergens
  *  Copyright (C) 2009  Tommi Rautava
- *  Copyright (C) 2011  Clint Priest, Tommi Rautava
+ *  Copyright (C) 2011, 2012  Clint Priest, Tommi Rautava
  *
  *  This file is part of Snap Links Plus.
  *
@@ -233,7 +233,7 @@ var SnapLinksClass = Class.create({
 			}
 		}
 		/* Clear any StopNextContextMenuPopup regardless of it's use on next idle moment */
-		this.Window.setTimeout(function() { this.StopNextContextMenuPopup = false}.bind(this), 0);
+		this.Window.setTimeout(function() { this.StopNextContextMenuPopup = false; }.bind(this), 0);
 	},
 
 	InstallEventHooks: function() {
