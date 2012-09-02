@@ -311,15 +311,15 @@ var SnapLinksSelectionClass = Class.create({
 		}, this );
 
 		/* Any IMG/SPAN/DIV with a .onclick or event listener */
-		var Clickable = (new Date()).getMilliseconds();
-
-		$A(Document.body.querySelectorAll('IMG, SPAN, DIV')).forEach( function(elem) {
-			if(elem.SnapLinksClickable || elem.ownerDocument.defaultView.getComputedStyle(elem).cursor == 'pointer') {
-				elem.SnapLinksClickable = true;
-				elem.SnapRects = GetElementRects(elem, offset);
-				SelectableElements.push(elem);
-			}
-		}, this );
+//		var Clickable = (new Date()).getMilliseconds();
+//
+//		$A(Document.body.querySelectorAll('IMG, SPAN, DIV')).forEach( function(elem) {
+//			if(elem.SnapLinksClickable || elem.ownerDocument.defaultView.getComputedStyle(elem).cursor == 'pointer') {
+//				elem.SnapLinksClickable = true;
+//				elem.SnapRects = GetElementRects(elem, offset);
+//				SelectableElements.push(elem);
+//			}
+//		}, this );
 
 		this.Documents[Document.location.href].SelectableElements = SelectableElements;
 
@@ -333,9 +333,10 @@ var SnapLinksSelectionClass = Class.create({
 		if (this.Element)
 			this.Element.parentNode.removeChild(this.Element);
 		delete this.Element;
-		
-		if(this.ElementCount && this.ElementCount.parentNode) 
+
+		if(this.ElementCount && this.ElementCount.parentNode)
 			this.ElementCount.parentNode.removeChild(this.ElementCount);
+		delete this.ElementCount;
 		
 		this.ClearSelectedElements();
 
