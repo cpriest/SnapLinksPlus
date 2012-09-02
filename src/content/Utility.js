@@ -1,7 +1,7 @@
 /*
  *  Utility.js
  *
- *  Copyright (C) 2011  Clint Priest, Tommi Rautava
+ *  Copyright (C) 2011, 2012  Clint Priest, Tommi Rautava
  *
  *  This file is part of Snap Links Plus.
  *
@@ -19,32 +19,38 @@
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var EXPORTED_SYMBOLS = ["Class",
-                        "PrefsDialogMapper",
-                        "PrefsMapper",
-                        "Util",
-                        "$A",
-                        "ApplyStyle",
-                        "GetElementRects",
-                        "Log",
-						"Rect",
-						'htmlentities',
-						'escapeHTML'];
+var EXPORTED_SYMBOLS = ['Class',
+                        'PrefsDialogMapper',
+                        'PrefsMapper',
+                        'Util',
+                        '$A',
+                        'ApplyStyle',
+                        'GetElementRects',
+                        'Log',
+                        'Rect',
+                        'htmlentities',
+                        'escapeHTML'];
 
 /**
  * Log() logs info to the Firebug plugin if available,
  * identical usage to console.log() from within a client page.
  */
 function Log() {
-	if(typeof Firebug != 'undefined') {
-		Firebug.Console.logFormatted(arguments);
-	} else {
-		/* If Firebug not in our current context, try seeing if there is a recent browser window context that has it, if so, use it. */
-		var mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-					.getService(Components.interfaces.nsIWindowMediator)
-					.getMostRecentWindow("navigator:browser");
-		if(typeof mrbw.Firebug != 'undefined')
-			mrbw.Firebug.Console.logFormatted(arguments);
+	try {
+		if(typeof Firebug != 'undefined') {
+			Firebug.Console.logFormatted(arguments);
+		} else {
+			/* If Firebug not in our current context, try seeing if there is a recent browser window context that has it, if so, use it. */
+			var mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+						.getService(Components.interfaces.nsIWindowMediator)
+						.getMostRecentWindow("navigator:browser");
+			if(typeof mrbw.Firebug != 'undefined')
+				mrbw.Firebug.Console.logFormatted(arguments);
+		}
+	}
+	catch (e)
+	{
+		Components.utils.reportError(e +':\n'+ e.stack);
 	}
 }
 
