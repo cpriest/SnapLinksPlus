@@ -117,7 +117,8 @@ var SnapLinksSelectionClass = Class.create({
 		this.CalculateSnapRects(e.target.ownerDocument);
 
 		if(this.Element && e.target.ownerDocument == this.TopDocument) {
-			if(e.clientX < 0 || e.clientY < 0 || e.clientX > this.TopDocument.documentElement.clientWidth || e.clientY > this.TopDocument.documentElement.clientHeight) {
+			Log('e.Y: %s, c.Y: %s', e.clientY, this.TopDocument.defaultView.innerHeight);
+			if(e.clientX < 0 || e.clientY < 0 || e.clientX > this.TopDocument.defaultView.innerWidth || e.clientY > this.TopDocument.defaultView.innerHeight) {
 				if(this.SnapLinksPlus.Prefs.HideSelectionOnMouseLeave)
 					this.Element.style.display = 'none';
 				else {
@@ -578,6 +579,7 @@ var SnapLinksSelectionClass = Class.create({
 	
 	/** Scroll on viewport edge. */
 	scrollOnViewEdge: function (e) {
+		Log(e, this.TopDocument);
 		var offsetX = 0;
 		if (e.clientX < 0) {
 			offsetX = e.clientX;
@@ -585,8 +587,8 @@ var SnapLinksSelectionClass = Class.create({
 			if (offsetX > this.Window.scrollX) {
 				offsetX = this.Window.scrollX;
 			}
-		} else if (e.clientX > this.TopDocument.body.clientWidth) {
-			offsetX = e.clientX - this.TopDocument.body.clientWidth;
+		} else if (e.clientX > this.TopDocument.defaultView.innerWidth) {
+			offsetX = e.clientX - this.TopDocument.defaultView.innerWidth;
 			var offsetMaxX = this.Window.scrollMaxX - this.Window.scrollX; 
 			
 			if (offsetX > offsetMaxX) {
@@ -601,8 +603,8 @@ var SnapLinksSelectionClass = Class.create({
 			if (offsetY > this.Window.scrollY) {
 				offsetY = this.Window.scrollY;
 			}
-		} else if (e.clientY > this.TopDocument.body.clientHeight) {
-			offsetY = e.clientY - this.TopDocument.body.clientHeight;
+		} else if (e.clientY > this.TopDocument.defaultView.innerHeight) {
+			offsetY = e.clientY - this.TopDocument.defaultView.innerHeight;
 			var offsetMaxY = this.Window.scrollMaxY - this.Window.scrollY;
 			
 			if (offsetY > offsetMaxY) {
