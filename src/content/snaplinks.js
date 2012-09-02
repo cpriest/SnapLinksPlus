@@ -213,12 +213,13 @@ var SnapLinksClass = Class.create({
 					pop.openPopupAtScreen(e.screenX, e.screenY, true);
 				} else
 					this.ActivateSelection();
+				e.preventDefault();
 			} else {
 				this.Clear();
 				
 				/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218
 					we force the context menu to open up here*/
-				if(navigator.userAgent.indexOf('Linux') != -1) {
+				if(this.Window.navigator.userAgent.indexOf('Linux') != -1) {
 					if (gContextMenu) {
 						var evt = this.XulDocument.createEvent("MouseEvents");
 
@@ -275,6 +276,7 @@ var SnapLinksClass = Class.create({
 			'Buttons':		[ 'ClickElements' ],
 			'Checkboxes':	[ 'ClickCheckboxes' ],
 			'RadioButtons': [ 'ClickElements' ],
+			'Clickable':	[ 'ClickElements'],
 		};
 
 		Action = Action || this.Prefs.DefaultAction;
@@ -351,7 +353,7 @@ var SnapLinksClass = Class.create({
 				if(MixedState == false && elem.checked != FirstState)
 					MixedState = true;
 			});
-			Log(MixedState);
+
 			this.Selection.SelectedElements.forEach( function(elem, index) {
 				if(MixedState == false || this.Prefs.CheckboxMixedStateAction == this.Prefs.CMSA_Toggle)
 					elem.click();
