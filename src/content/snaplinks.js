@@ -290,17 +290,38 @@ var SnapLinksClass = Class.create({
 		this.Clear();
 	},
 
+	/** CollectElementsInfo() -
+	 *   New FF code makes closed page elements invalid almost immediately, this function
+	 *   collects the needed info before processing begins
+	 *
+	 * @param FilteredElements
+	 */
+	CollectElementsInfo: function(FilteredElements) {
+		var out = [ ];
+		FilteredElements.forEach( function(elem) {
+			var x = { };
+			[ 'href', 'SnapIsJsLink' ].forEach( function(name) {
+				x[name] = elem[name];
+			});
+			x.elem = elem;
+			out.push( x );
+		});
+		return out;
+	},
+
 	/**
 	 * Click selected JavaScript links one by one.
 	 */
 	ClickLinks: function() {
 		try {
-			this.Selection.FilteredElements.forEach( function(elem, index) {
+			var CollectedElementsInfo = this.CollectElementsInfo(this.Selection.FilteredElements);
+
+			CollectedElementsInfo.forEach( function(info, index) {
 				var callback = this;
 				
 				this.Window.setTimeout(function() {
-					callback.ClickLink(elem);
-				}, this.Prefs.ActionInterval * index, callback, elem);
+					callback.ClickLink(info.elem);
+				}, this.Prefs.ActionInterval * index, callback);
 			}, this );
 		}
 		catch (e) {
@@ -377,22 +398,22 @@ var SnapLinksClass = Class.create({
 	OpenTabs: function() {
 		try {
 			var CurrentReferer = this.DocumentReferer;
-			var FilteredElements = this.Selection.FilteredElements;
+			var CollectedElementsInfo = this.CollectElementsInfo(this.Selection.FilteredElements);
 			var TabsCreated = 0;
 			var Browser = this.Window.getBrowser();
 
 			var IntervalTimerID = this.Window.setInterval(function() {
-				if(FilteredElements.length == 0) {
+				if(CollectedElementsInfo.length == 0) {
 					this.Window.clearInterval(IntervalTimerID);
 					return;
 				}
-				var elem = FilteredElements.shift();
+				var info = CollectedElementsInfo.shift();
 
-				if(elem.href) {
-					if (elem.SnapIsJsLink) {
-						this.ClickLink(elem); // Click JS links.
+				if(info.href) {
+					if (info.SnapIsJsLink) {
+						this.ClickLink(info.elem); // Click JS links.
 					} else {
-						var NewTab = Browser.addTab(elem.href, CurrentReferer);
+						var NewTab = Browser.addTab(info.href, CurrentReferer);
 						TabsCreated++;
 						if(TabsCreated == 1 && this.Prefs.SwitchToFirstNewTab)
 							Browser.tabContainer.selectedItem = NewTab;
@@ -450,13 +471,15 @@ var SnapLinksClass = Class.create({
 	 */
 	OpenWindows: function() {
 		try {
-			this.Selection.FilteredElements.forEach( function(elem, index) {
+			var CollectedElementsInfo = this.CollectElementsInfo(this.Selection.FilteredElements);
+
+			CollectedElementsInfo.forEach( function(info, index) {
 				var callback = this;
 				
 				this.Window.setTimeout(function() {
-					if(elem.href)
-						callback.Window.open(elem.href);
-				}, this.Prefs.ActionInterval * index, callback, elem);
+					if(info.href)
+						callback.Window.open(info.href);
+				}, this.Prefs.ActionInterval * index, callback);
 			}, this );
 		}
 		catch(e) {
