@@ -117,7 +117,6 @@ var SnapLinksSelectionClass = Class.create({
 		this.CalculateSnapRects(e.target.ownerDocument);
 
 		if(this.Element && e.target.ownerDocument == this.TopDocument) {
-			Log('e.Y: %s, c.Y: %s', e.clientY, this.TopDocument.defaultView.innerHeight);
 			if(e.clientX < 0 || e.clientY < 0 || e.clientX > this.TopDocument.defaultView.innerWidth || e.clientY > this.TopDocument.defaultView.innerHeight) {
 				if(this.SnapLinksPlus.Prefs.HideSelectionOnMouseLeave)
 					this.Element.style.display = 'none';
@@ -579,7 +578,6 @@ var SnapLinksSelectionClass = Class.create({
 	
 	/** Scroll on viewport edge. */
 	scrollOnViewEdge: function (e) {
-		Log(e, this.TopDocument);
 		var offsetX = 0;
 		if (e.clientX < 0) {
 			offsetX = e.clientX;

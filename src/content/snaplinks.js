@@ -27,7 +27,7 @@ var EXPORTED_SYMBOLS = ["SnapLinksClass"];
 try {
 	var Cu = Components.utils;
 	Cu.import("resource://gre/modules/PlacesUtils.jsm");
-	Cu.import("resource://gre/modules/PlacesUIUtils.jsm");
+	Cu.import("resource:///modules/PlacesUIUtils.jsm");
 	Cu.import("chrome://snaplinksplus/content/Utility.js");
 	Cu.import('chrome://snaplinksplus/content/Selection.js');
 	Cu.import('chrome://snaplinksplus/content/Preferences.js');
@@ -220,14 +220,14 @@ var SnapLinksClass = Class.create({
 				/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218
 					we force the context menu to open up here*/
 				if(this.Window.navigator.userAgent.indexOf('Linux') != -1) {
-					if (gContextMenu) {
+					if (this.Window.gContextMenu) {
 						var evt = this.XulDocument.createEvent("MouseEvents");
 
 						evt.initMouseEvent('contextmenu', true, true, this.Window, 0, 
 							e.screenX, e.screenY, e.clientX, e.clientY,
 							false, false, false, false,
 							2, null);
-						gContextMenu.target.dispatchEvent(evt);
+						this.Window.gContextMenu.target.dispatchEvent(evt);
 					}
 				}
 			}

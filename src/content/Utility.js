@@ -44,7 +44,7 @@ function Log() {
 			var mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
 						.getService(Components.interfaces.nsIWindowMediator)
 						.getMostRecentWindow("navigator:browser");
-			if(typeof mrbw.Firebug != 'undefined')
+			if(typeof mrbw.Firebug != 'undefined' && typeof mrbw.Firebug.Console != 'undefined')
 				mrbw.Firebug.Console.logFormatted(arguments);
 		}
 	}
