@@ -336,7 +336,9 @@ var SnapLinksSelectionClass = Class.create({
 		this.DragStarted = false;
 		this.SelectLargestFontSizeIntersectionLinks = true;
 		this.RemoveEventHooks();
-		
+
+		/* No longer need to reference these */
+		delete this.Documents;
 		delete this.CalculateWindowWidth;
 	},
 	/* Clears the selection style from the currently selected elements */
