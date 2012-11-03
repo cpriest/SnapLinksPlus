@@ -26,43 +26,65 @@ var EXPORTED_SYMBOLS = ['Class',
                         '$A',
                         'ApplyStyle',
                         'GetElementRects',
-                        'Log',
                         'Rect',
                         'htmlentities',
-                        'escapeHTML'];
+                        'escapeHTML',
+						'Log',
+						'dc'];
 
-/**
- * Log() logs info to the Firebug plugin if available,
- * identical usage to console.log() from within a client page.
- */
-function Log() {
-	try {
-		if(typeof Firebug != 'undefined') {
-			Firebug.Console.logFormatted(arguments);
-		} else {
-			/* If Firebug not in our current context, try seeing if there is a recent browser window context that has it, if so, use it. */
-			var mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-						.getService(Components.interfaces.nsIWindowMediator)
-						.getMostRecentWindow("navigator:browser");
-			if(typeof mrbw.Firebug != 'undefined' && typeof mrbw.Firebug.Console != 'undefined')
-				mrbw.Firebug.Console.logFormatted(arguments);
+
+var iPrefs = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
+var DevMode = iPrefs.getPrefType('extensions.snaplinks.DevMode') && iPrefs.getBoolPref('extensions.snaplinks.DevMode') || false;
+
+var dc, Log;
+
+if(DevMode) {
+	/**
+	 * Log() logs info to the Firebug plugin if available,
+	 * identical usage to console.log() from within a client page.
+	 */
+	Log = function() {
+		try {
+			if(typeof Firebug != 'undefined') {
+				Firebug.Console.logFormatted(arguments);
+			} else {
+				/* If Firebug not in our current context, try seeing if there is a recent browser window context that has it, if so, use it. */
+				var mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+							.getService(Components.interfaces.nsIWindowMediator)
+							.getMostRecentWindow("navigator:browser");
+				if(typeof mrbw.Firebug != 'undefined' && typeof mrbw.Firebug.Console != 'undefined') {
+					mrbw.Firebug.Console.logFormatted(arguments);
+				}
+			}
+		} catch (e) {
+			Components.utils.reportError(e +':\n'+ e.stack);
+		}
+	};
+
+	/** Logs a warning to the standard console. */
+	Log.Warning = function(Message, Source, Line, Column) {
+		var ConsoleService = Components.classes["@mozilla.org/consoleservice;1"]
+								.getService(Components.interfaces.nsIConsoleService);
+		var ScriptMessage = Components.classes["@mozilla.org/scripterror;1"]
+								.createInstance(Components.interfaces.nsIScriptError);
+		ScriptMessage.init(Message, Source, null, Line, Column, 1, null);
+		ConsoleService.logMessage(ScriptMessage);
+	};
+
+	dc = function() {
+		var args = $A(arguments);
+		var DevChannels = (iPrefs.getPrefType('extensions.snaplinks.DevChannels') && iPrefs.getCharPref('extensions.snaplinks.DevChannels') || '').split(',');
+		var channel = args.shift();
+		if(DevChannels.indexOf(channel) != -1) {
+			args[0] = channel+': '+args[0];
+			Log.apply(Log, args);
 		}
 	}
-	catch (e)
-	{
-		Components.utils.reportError(e +':\n'+ e.stack);
-	}
+} else {
+	dc = function() { };
+	Log = function() { };
+	Log.Warning = function() { };
 }
-
-/** Logs a warning to the standard console. */
-Log.Warning = function(Message, Source, Line, Column) {
-	var ConsoleService = Components.classes["@mozilla.org/consoleservice;1"]
-							.getService(Components.interfaces.nsIConsoleService);
-	var ScriptMessage = Components.classes["@mozilla.org/scripterror;1"]
-							.createInstance(Components.interfaces.nsIScriptError);
-	ScriptMessage.init(Message, Source, null, Line, Column, 1, null);
-	ConsoleService.logMessage(ScriptMessage);
-};
 
 /**
  * Prototype Imports -- Mozilla Organization may not like these...

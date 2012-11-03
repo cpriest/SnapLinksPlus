@@ -120,10 +120,9 @@ var SnapLinksClass = Class.create({
 	initialize: function(Window, XulDocument) {
 		this.Window = Window;
 		this.XulDocument = XulDocument;
-		
 		var StringBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
 		this.LocaleBundle = StringBundleService.createBundle("chrome://snaplinksplus/locale/snaplinks.properties");
-		
+
 		this.LocaleStrings = {
 			Usage:		this.LocaleBundle.GetStringFromName("snaplinks.status.usage"),
 			//Links:		this.LocaleBundle.GetStringFromName("snaplinks.status.links")

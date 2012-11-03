@@ -311,7 +311,7 @@ var SnapLinksSelectionClass = Class.create({
 		}, this );
 
 		/* Any IMG/SPAN/DIV with a .onclick or event listener */
-//		var Clickable = (new Date()).getMilliseconds();
+		var Clickable = (new Date()).getMilliseconds();
 //
 //		$A(Document.body.querySelectorAll('IMG, SPAN, DIV')).forEach( function(elem) {
 //			if(elem.SnapLinksClickable || elem.ownerDocument.defaultView.getComputedStyle(elem).cursor == 'pointer') {
@@ -324,8 +324,8 @@ var SnapLinksSelectionClass = Class.create({
 		this.Documents[Document.location.href].SelectableElements = SelectableElements;
 
 		var End = (new Date()).getMilliseconds();
-//		Log("Links: %sms, Inputs: %sms, Labels: %sms, Clickable: %sms, Total: %sms",
-//			Math.round(Links - Start, 2), Math.round(Inputs - Links, 2), Math.round(Clickable - Inputs, 2), Math.round(End - Clickable, 2), Math.round(End - Start, 2));
+		dc('performance', "CalculateSnapRects() -> Links: %sms, Inputs: %sms, Labels: %sms, Clickable: %sms, Total: %sms",
+			Math.round(Links - Start, 2), Math.round(Inputs - Links, 2), Math.round(Clickable - Inputs, 2), Math.round(End - Clickable, 2), Math.round(End - Start, 2));
 	},
 
 	/** Clears the selection by removing the element, also clears some other non-refactored but moved code */

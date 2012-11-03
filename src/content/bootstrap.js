@@ -48,7 +48,7 @@ window.addEventListener('load', function() {
 		SnapLinksPlus.Debug = new SnapLinksDebugClass();
 	}
 	catch(e) {
-		 /* Ignored */ 
+		 /* Ignored */
 	}
 
 	if(SnapLinksPlus.Prefs.DevShowJSConsoleAtStartup) {

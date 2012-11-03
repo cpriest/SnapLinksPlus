@@ -23,8 +23,7 @@ var EXPORTED_SYMBOLS = ["SnapLinksDebugClass"];
 
 try {
 	Components.utils.import("chrome://snaplinksplus/content/Utility.js");
-}
-catch(e) {
+} catch(e) {
 	Components.utils.reportError(e + ":\n"+ e.stack);
 }
 

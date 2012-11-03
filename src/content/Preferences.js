@@ -68,7 +68,10 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 
 		CopyToClipboardSeparatorId:			{ Type: 'int',	Default: 1,				Name: '.CopyToClipboardSeparator.Id' },
 		CopyToClipboardSeparatorCustom:		{ Type: 'char',	Default: ',',			Name: '.CopyToClipboardSeparator.Custom' },
-		
+
+
+		DevMode:							{ Type: 'bool', default: false,			Name: '.DevMode' },
+		DevChannels:						{ Type: 'char', default: '',			Name: '.DevChannels' },
 		DevShowJSConsoleAtStartup:			{ Type: 'bool',	Default: false	}
 	},
 
