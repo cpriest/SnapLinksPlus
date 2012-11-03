@@ -21,17 +21,39 @@
 		#JS_Click_Events_Tester DIV 				{ padding: 0px 2px; border: 2px solid transparent; cursor: pointer; }
 		#JS_Click_Events_Tester IMG.highlighted 	{ padding: 2px; }
 		#JS_Click_Events_Tester .highlighted { border: 2px solid black !important; }
+
+		DIV.Issues { margin-left: 25px; }
+		DIV.Issues DIV { font-weight: bold; margin-bottom: 15px;}
+		DIV.Issues A { font-weight: normal; }
 	</style>
 </head>
 <body>
 <h1>Snap Links Plus Test Page</h1>
 <h2>Previous Problem Sites for Testing:</h2>
-<ul>
-	<li><a href="http://www.iltalehti.fi/" target="_blank">http://www.iltalehti.fi/</a>
-	<li><a href="http://www.cnn.com/" target="_blank">http://www.cnn.com/</a>
-	<li><a href="http://www.yahoo.com/" target="_blank">http://www.yahoo.com/</a>
-	<li><a href="http://www.idarionis.com:9500" target="_blank">http://www.idarionis.com:9500</a>
-</ul>
+<DIV class="Issues">
+	<div>
+		This websites body.scrollHeight is not correct<br>
+		<a href="http://www.iltalehti.fi/" target="_blank">http://www.iltalehti.fi/</a><br>
+		Fixed by <a href="http://code.google.com/p/snaplinksplus/source/detail?r=4dc264a0c378d27a931689a1dbba12c2f0e16916">4dc264a0c378</a><br>
+	</div>
+	<div>
+		This websites documentElement.scrollHeight is not correct<br>
+		<a href="http://www.idarionis.com:9500" target="_blank">http://www.idarionis.com:9500</a><br>
+		Broken by <a href="http://code.google.com/p/snaplinksplus/source/detail?r=4dc264a0c378d27a931689a1dbba12c2f0e16916">4dc264a0c378</a><br>
+		<a href="http://code.google.com/p/snaplinksplus/issues/detail?id=31">Issue 31</a> Fixed by <a href="http://code.google.com/p/snaplinksplus/source/detail?r=593d646f7ee60b2d696b19e35545b604456103b1">593d646f7ee6</a><br>
+	</div>
+	<div>
+		This websites has a scrollable element within it's page<br>
+		<a href="https://groups.google.com/forum/#!msg/snaplinksplus/7a18LX7n6uM/5A39Mdlx5RQJ">https://groups.google.com/forum/#!msg/snaplinksplus/7a18LX7n6uM/5A39Mdlx5RQJ</a><br>
+		<a href="http://code.google.com/p/snaplinksplus/issues/detail?id=30">Issue 30</a> Not Yet Fixed
+	</div>
+	<div>
+		General Testing Sites<br>
+		<a href="http://www.cnn.com/" target="_blank">http://www.cnn.com/</a><br>
+		<a href="http://www.yahoo.com/" target="_blank">http://www.yahoo.com/</a>
+	</div>
+</div>
+
 <h2>Links Within Text</h2>
 	<p>
 		This is a test file for testing the link rect detection and drawing code.
