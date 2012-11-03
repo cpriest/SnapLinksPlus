@@ -82,9 +82,6 @@ var SnapLinksSelectionClass = Class.create({
 		var Document = e.target.ownerDocument;
 		this.TopDocument = e.target.ownerDocument.defaultView.top.document;
 
-		/* Store the starting scroll height and width for the top document for out-of-bounds processing */
-		this.TopDocumentScrollDims = { bottom: this.TopDocument.documentElement.scrollHeight, right: this.TopDocument.documentElement.scrollWidth };
-
 		/** Initializes the starting mouse position */
 		this.SelectionRect = new Rect(e.pageY, Math.min(e.pageX, Document.documentElement.offsetWidth + Document.defaultView.pageXOffset));
 
@@ -98,9 +95,19 @@ var SnapLinksSelectionClass = Class.create({
 				offset.y += elem.offsetTop;
 				elem = elem.offsetParent;
 			} while(elem != null);
-			this.Documents[contentWindow.location.href] = { Document: contentWindow.document, offset: offset };
+			this.Documents[contentWindow.location.href] = {
+				Document: 	contentWindow.document,
+				height:		Math.max(contentWindow.document.documentElement.scrollHeight, contentWindow.document.body.scrollHeight),
+				width:		Math.max(contentWindow.document.documentElement.scrollWidth, contentWindow.document.body.scrollWidth),
+				offset: 	offset
+			};
 		}, this);
-		this.Documents[this.TopDocument.location.href] = { Document: this.TopDocument, offset: {x: 0, y: 0} };
+		this.Documents[this.TopDocument.location.href] = {
+			Document: 	this.TopDocument,
+			height:		Math.max(this.TopDocument.documentElement.scrollHeight, this.TopDocument.body.scrollHeight),
+			width:		Math.max(this.TopDocument.documentElement.scrollWidth, this.TopDocument.body.scrollWidth),
+			offset: 	{x: 0, y: 0}
+		};
 
 		/* If we aren't starting in the top document, change rect coordinates to top document origin */
 		if(Document != this.TopDocument) {
@@ -135,23 +142,9 @@ var SnapLinksSelectionClass = Class.create({
 			pageY += this.Documents[e.view.location.href].offset.y - e.target.ownerDocument.body.scrollTop;
 		}
 
-		/* Disabled At The Moment */ 
+		/* Disabled At The Moment */
 		if(false && e.altKey && !this.SnapLinksPlus.Prefs.ActivateRequiresAlt) {
 			this.OffsetSelection(pageX - this.SelectionRect.right, pageY - this.SelectionRect.bottom);
-
-			/** The below commented section of code causes the rectangle to shrink if it goes off screen, is this even a desired functionality? -- Clint - 5/22/2011 */
-	//		var mainWindow = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-	//			.getInterface(Components.interfaces.nsIWebNavigation)
-	//			.QueryInterface(Components.interfaces.nsIDocShellTreeItem)
-	//			.rootTreeItem
-	//			.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-	//			.getInterface(Components.interfaces.nsIDOMWindow);
-	//		var tabbrowser = mainWindow.document.getElementById('content');
-	//		var minHeight = tabbrowser.selectedBrowser.boxObject.height;
-	//		var minWidth = tabbrowser.selectedBrowser.boxObject.width;
-																													
-	//		this.SnapLinksPlus.Selection.X1 = Math.max(Math.min(Math.max(this.Document.width,minWidth),this.SnapLinksPlus.Selection.X1),0);
-	//		this.SnapLinksPlus.Selection.Y1 = Math.max(Math.min(Math.max(this.Document.height,minHeight),this.SnapLinksPlus.Selection.Y1),0);
 		} else {
 			this.ExpandSelectionTo(pageX, pageY);
 		}
@@ -373,8 +366,8 @@ var SnapLinksSelectionClass = Class.create({
 	
 	/* Expands the selection to the given X, Y coordinates */
 	ExpandSelectionTo: function(X, Y) {
-		this.SelectionRect.right = Math.max(0, Math.min(X, this.TopDocumentScrollDims.right));
-		this.SelectionRect.bottom = Math.max(0, Math.min(Y, this.TopDocumentScrollDims.bottom));
+		this.SelectionRect.right = Math.max(0, Math.min(X, this.Documents[this.TopDocument.location.href].width));
+		this.SelectionRect.bottom = Math.max(0, Math.min(Y, this.Documents[this.TopDocument.location.href].height));
 		this.UpdateElement();
 	},
 	
@@ -440,7 +433,7 @@ var SnapLinksSelectionClass = Class.create({
 
 			for(var href in this.Documents) {
 				var ti = this.Documents[href];
-				var DocRect = new Rect(0, 0, ti.Document.documentElement.scrollHeight, ti.Document.documentElement.scrollWidth)
+				var DocRect = new Rect(0, 0, ti.height, ti.width)
 					.Offset(ti.offset.x, ti.offset.y);
 				var SelectRect = this.SelectionRect.GetIntersectRect(DocRect);
 
@@ -449,7 +442,7 @@ var SnapLinksSelectionClass = Class.create({
 					/* If we're not in the top document, translate SelectRect to document coordinates */
 					if(ti.Document != this.TopDocument) {
 						SelectRect.Offset(-ti.offset.x, -ti.offset.y);
-						SelectRect.Offset(ti.Document.documentElement.scrollLeft, ti.Document.documentElement.scrollTop);
+						SelectRect.Offset(ti.Document.body.scrollLeft, ti.Document.body.scrollTop);
 					}
 
 					/* Find Links Which Intersect With SelectRect */
