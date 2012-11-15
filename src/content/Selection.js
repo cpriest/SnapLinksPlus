@@ -544,18 +544,27 @@ var SnapLinksSelectionClass = Class.create({
 			this.SelectedElements = this.IntersectedElements.filter(filterFunction, this);
 
 			if(Greatest == 'Links') {
-				/* Detect duplicate links by filtering links which are contained fully within other links - Issue #37 */
+				/* Detect duplicate links by filtering links which are contained fully within other links - Issue #37
+				 * 	Note: Identical links are allowed through here. */
 				var Urls = this.SelectedElements.map(function(elem) { return elem.href; } );
 				Urls = Urls.filter(function(outerUrl, outerIndex) {
 					return !Urls.some(function(innerUrl, innerIndex) {
-						if(innerIndex == outerIndex)
+						if(innerIndex == outerIndex || innerUrl == outerUrl)
 							return false;
-						var x = outerUrl.indexOf(innerUrl) != -1;
-						return x;
+						return outerUrl.indexOf(innerUrl) != -1;
 					} );
 				} );
+				/* Identical links are filtered here */
+				var Allowed = [ ];
 				this.SelectedElements = this.SelectedElements.filter( function(elem) {
-					return Urls.indexOf(elem.href) != -1;
+					if(Allowed.indexOf(elem.href) != -1)
+						return false;
+
+					if(Urls.indexOf(elem.href) != -1) {
+						Allowed.push(elem.href);
+						return true;
+					}
+					return false;
 				} );
 			}
 
