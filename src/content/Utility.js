@@ -368,6 +368,8 @@ var Rect = Class.create({
 
 	get IsInverted() { return this._left > this._right || this._top > this._bottom; },
 
+	get area() { return this.width * this.height; },
+
 	Offset:function(x, y) {
 		this._left += x;
 		this._right += x;
@@ -384,23 +386,20 @@ var Rect = Class.create({
 
 		return this;
 	},
-	Expand:function(x, y) {
+	Expand: function(x, y) {
 		this.Shrink(-x, -y);
 
 		return this;
 	},
 	GetIntersectRect: function(r) {
-		var i = new Rect(Math.max(this.top, r.top), Math.max(this.left, r.left),
+		return new Rect(Math.max(this.top, r.top), Math.max(this.left, r.left),
 							Math.min(this.bottom, r.bottom), Math.min(this.right, r.right));
-		if(i.IsInverted)
-			return false;
-		return i;
 	},
 	IntersectsWith: function(r) {
-		return this.GetIntersectRect(r) !== false;
+		return !this.GetIntersectRect(r).IsInverted;
 	},
 	toString: function() {
-		return ['t:'+this.top, 'l:'+this.left, 'b:'+this.bottom, 'r:'+this.right].join(' ');
+		return ['t:'+this.top, 'l:'+this.left, 'b:'+this.bottom, 'r:'+this.right, 'w:'+this.width, 'h:'+this.height].join(' ');
 	}
 });
 

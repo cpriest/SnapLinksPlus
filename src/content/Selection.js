@@ -234,7 +234,7 @@ var SnapLinksSelectionClass = Class.create({
 		var offset = { x: Document.defaultView.scrollX, y: Document.defaultView.scrollY };
 		var SelectableElements = [ ];
 		
-		var Start = (new Date()).getMilliseconds();
+		var Start = (new Date()).getTime();
 
 		$A(Document.links).forEach( function( link ) {
 			try {
@@ -255,7 +255,7 @@ var SnapLinksSelectionClass = Class.create({
 			SelectableElements.push(link);
 		}, this);
 
-		var Links = (new Date()).getMilliseconds();
+		var Links = (new Date()).getTime();
 
 		$A(Document.body.querySelectorAll('INPUT')).forEach( function(input) {
 			var Type = input.getAttribute('type'),
@@ -276,7 +276,7 @@ var SnapLinksSelectionClass = Class.create({
 			input.SnapRects = GetElementRects(ElementRectsNode, offset);
 		}, this);
 
-		var Inputs = (new Date()).getMilliseconds();
+		var Inputs = (new Date()).getTime();
 
 		$A(Document.body.querySelectorAll('LABEL')).forEach( function(label) {
 			var forId = label.getAttribute('for');
@@ -303,8 +303,7 @@ var SnapLinksSelectionClass = Class.create({
 			}
 		}, this );
 
-		/* Any IMG/SPAN/DIV with a .onclick or event listener */
-		var Clickable = (new Date()).getMilliseconds();
+		var Labels = (new Date()).getTime();
 //
 //		$A(Document.body.querySelectorAll('IMG, SPAN, DIV')).forEach( function(elem) {
 //			if(elem.SnapLinksClickable || elem.ownerDocument.defaultView.getComputedStyle(elem).cursor == 'pointer') {
@@ -316,9 +315,9 @@ var SnapLinksSelectionClass = Class.create({
 
 		this.Documents[Document.location.href].SelectableElements = SelectableElements;
 
-		var End = (new Date()).getMilliseconds();
+		var End = (new Date()).getTime();
 		dc('performance', "CalculateSnapRects() -> Links: %sms, Inputs: %sms, Labels: %sms, Clickable: %sms, Total: %sms",
-			Math.round(Links - Start, 2), Math.round(Inputs - Links, 2), Math.round(Clickable - Inputs, 2), Math.round(End - Clickable, 2), Math.round(End - Start, 2));
+			Links - Start, Inputs - Links, Labels - Inputs, End - Labels, End - Start);
 	},
 
 	/** Clears the selection by removing the element, also clears some other non-refactored but moved code */
@@ -330,7 +329,7 @@ var SnapLinksSelectionClass = Class.create({
 		if(this.ElementCount && this.ElementCount.parentNode)
 			this.ElementCount.parentNode.removeChild(this.ElementCount);
 		delete this.ElementCount;
-		
+
 		this.ClearSelectedElements();
 
 		this.DragStarted = false;
@@ -544,7 +543,23 @@ var SnapLinksSelectionClass = Class.create({
 			// Filter the elements.
 			this.SelectedElements = this.IntersectedElements.filter(filterFunction, this);
 
-			// Apply the style on the selected elements.
+			if(Greatest == 'Links') {
+				/* Detect duplicate links by filtering links which are contained fully within other links - Issue #37 */
+				var Urls = this.SelectedElements.map(function(elem) { return elem.href; } );
+				Urls = Urls.filter(function(outerUrl, outerIndex) {
+					return !Urls.some(function(innerUrl, innerIndex) {
+						if(innerIndex == outerIndex)
+							return false;
+						var x = outerUrl.indexOf(innerUrl) != -1;
+						return x;
+					} );
+				} );
+				this.SelectedElements = this.SelectedElements.filter( function(elem) {
+					return Urls.indexOf(elem.href) != -1;
+				} );
+			}
+
+ 			// Apply the style on the selected elements.
 			var OutlineStyle = this.SnapLinksPlus.Prefs.SelectedElementsBorderWidth + 'px solid ' + this.SnapLinksPlus.Prefs.SelectedElementsBorderColor;
 			this.SelectedElements.forEach( function(elem) {
 				(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
