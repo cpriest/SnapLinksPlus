@@ -543,7 +543,7 @@ var SnapLinksSelectionClass = Class.create({
 			// Filter the elements.
 			this.SelectedElements = this.IntersectedElements.filter(filterFunction, this);
 
-			if(Greatest == 'Links') {
+			if(Greatest == 'Links' && this.SnapLinksPlus.Prefs.RemoveDuplicateUrls) {
 				/* Detect duplicate links by filtering links which are contained fully within other links - Issue #37
 				 * 	Note: Identical links are allowed through here. */
 				var Urls = this.SelectedElements.map(function(elem) { return elem.href; } );
