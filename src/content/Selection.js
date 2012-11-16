@@ -115,6 +115,11 @@ var SnapLinksSelectionClass = Class.create({
 			this.SelectionRect.Offset(this.Documents[Document.location.href].offset.x, this.Documents[Document.location.href].offset.y);
 		}
 
+		if(e.target && e.target.tagName == 'A') {
+			var computedStyle = e.target.ownerDocument.defaultView.getComputedStyle(e.target, null);
+			this.SelectedFixedFontSize = parseFloat(computedStyle.getPropertyValue("font-size"));
+		}
+
 		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
 		this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
 		this.PanelContainer.addEventListener('keyup', this._OnKeyUp, true);
@@ -339,6 +344,7 @@ var SnapLinksSelectionClass = Class.create({
 		/* No longer need to reference these */
 		delete this.Documents;
 		delete this.CalculateWindowWidth;
+		delete this.SelectedFixedFontSize;
 	},
 	/* Clears the selection style from the currently selected elements */
 	ClearSelectedElements: function() {
@@ -521,10 +527,10 @@ var SnapLinksSelectionClass = Class.create({
 
 			switch(Greatest) {
 				case 'Links':
-					filterFunction = function(elem) { return elem.tagName == 'A' && !elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighLinkFontSize); };
+					filterFunction = function(elem) { return elem.tagName == 'A' && !elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == (this.SelectedFixedFontSize || HighLinkFontSize)); };
 					break;
 				case 'JsLinks':
-					filterFunction = function(elem) { return elem.tagName == 'A' && elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == HighJsLinkFontSize); };
+					filterFunction = function(elem) { return elem.tagName == 'A' && elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == (this.SelectedFixedFontSize || HighJsLinkFontSize)); };
 					break;
 				case 'Checkboxes':
 					filterFunction = function(elem) { return elem.tagName == 'INPUT' && elem.getAttribute('type') == 'checkbox'; };
