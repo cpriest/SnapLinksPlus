@@ -309,14 +309,14 @@ var SnapLinksSelectionClass = Class.create({
 		}, this );
 
 		var Labels = (new Date()).getTime();
-//
-//		$A(Document.body.querySelectorAll('IMG, SPAN, DIV')).forEach( function(elem) {
-//			if(elem.SnapLinksClickable || elem.ownerDocument.defaultView.getComputedStyle(elem).cursor == 'pointer') {
-//				elem.SnapLinksClickable = true;
-//				elem.SnapRects = GetElementRects(elem, offset);
-//				SelectableElements.push(elem);
-//			}
-//		}, this );
+
+		$A(Document.body.querySelectorAll('IMG, SPAN, DIV')).forEach( function(elem) {
+			if(elem.SnapLinksClickable || elem.ownerDocument.defaultView.getComputedStyle(elem).cursor == 'pointer') {
+				elem.SnapLinksClickable = true;
+				elem.SnapRects = GetElementRects(elem, offset);
+				SelectableElements.push(elem);
+			}
+		}, this );
 
 		this.Documents[Document.location.href].SelectableElements = SelectableElements;
 
