@@ -31,7 +31,7 @@
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="www.dir" value="${basedir}/www" />
 
-	<property name="extension.appsPostfix" value="-fx+sm" />
+	<property name="extension.appsPostfix" value="" />
 	<property name="extension.checksumAlgorithm" value="sha1" />
 
 	<property name="localesBundle.filenamePrefix" value="Snap_Links_Plus" />
@@ -106,7 +106,7 @@
 
 
 	<target name="set-version-dev" depends="set-version">
-		<property name="extension.versionNumber.plusBuild" value="${extension.versionNumber}.0pre${build.number}" />
+		<property name="extension.versionNumber.plusBuild" value="${extension.versionNumber}b${build.number}" />
 		<property name="extension.versionNumber.forThisBuild" value="${extension.versionNumber.plusBuild}" />
 		<concat destfile="${build.dir}/build.latest">
 			<string value="extension.versionNumber.latest=${extension.versionNumber.forThisBuild}" />
