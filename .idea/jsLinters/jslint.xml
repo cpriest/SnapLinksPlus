@@ -3,7 +3,6 @@
   <component name="JSLintConfiguration">
     <option bitwise="true" />
     <option browser="true" />
-    <option cap="true" />
     <option continue="true" />
     <option devel="true" />
     <option eqeq="true" />
