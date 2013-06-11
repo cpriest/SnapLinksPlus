@@ -212,8 +212,7 @@ var SnapLinksSelectionClass = Class.create({
 				this.DragStarted = this.Element.parentNode != undefined;
 
 				if(this.DragStarted) {
-					if(this.SnapLinksPlus.Prefs.ShowSelectedCount)
-					{
+					if(this.SnapLinksPlus.Prefs.ShowSelectedCount) {
 						var linksText = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", ['0'], 1);
 						this.SnapLinksPlus.SnapLinksStatus = linksText;
 					}
@@ -452,6 +451,7 @@ var SnapLinksSelectionClass = Class.create({
 						SelectRect.Offset(ti.Document.body.scrollLeft, ti.Document.body.scrollTop);
 					}
 
+					dc('calc-elements', '%o.SelectableElements = %o', ti, ti.SelectableElements);
 					/* Find Links Which Intersect With SelectRect */
 					$A(ti.SelectableElements).forEach(function(elem) {
 						var Intersects = elem.SnapRects.some( SelectRect.IntersectsWith.bind(SelectRect) );
@@ -507,6 +507,7 @@ var SnapLinksSelectionClass = Class.create({
 					}, this);
 				}
 			}
+			dc('calc-elements', 'IntersectedElements = %o', this.IntersectedElements);
 
 			// Init the greatest values with the first item.
 			var Greatest = TypesInPriorityOrder[0];
@@ -549,30 +550,33 @@ var SnapLinksSelectionClass = Class.create({
 			// Filter the elements.
 			this.SelectedElements = this.IntersectedElements.filter(filterFunction, this);
 
-			if(Greatest == 'Links' && this.SnapLinksPlus.Prefs.RemoveDuplicateUrls) {
-				/* Detect duplicate links by filtering links which are contained fully within other links - Issue #37
-				 * 	Note: Identical links are allowed through here. */
-				var Urls = this.SelectedElements.map(function(elem) { return elem.href; } );
-				Urls = Urls.filter(function(outerUrl, outerIndex) {
-					return !Urls.some(function(innerUrl, innerIndex) {
-						if(innerIndex == outerIndex || innerUrl == outerUrl)
-							return false;
-						return outerUrl.indexOf(innerUrl) != -1;
-					} );
-				} );
-				/* Identical links are filtered here */
-				var Allowed = [ ];
-				this.SelectedElements = this.SelectedElements.filter( function(elem) {
-					if(Allowed.indexOf(elem.href) != -1)
-						return false;
+			dc('calc-elements', 'AfterFilter: Greatest=%s, SelectedElements = %o', Greatest, this.SelectedElements);
 
-					if(Urls.indexOf(elem.href) != -1) {
-						Allowed.push(elem.href);
-						return true;
-					}
-					return false;
-				} );
-			}
+//			if(Greatest == 'Links' && this.SnapLinksPlus.Prefs.RemoveDuplicateUrls) {
+//				/* Detect duplicate links by filtering links which are contained fully within other links - Issue #37
+//				 * 	Note: Identical links are allowed through here. */
+//				var Urls = this.SelectedElements.map(function(elem) { return elem.href; } );
+//				Urls = Urls.filter(function(outerUrl, outerIndex) {
+//					return !Urls.some(function(innerUrl, innerIndex) {
+//						if(innerIndex == outerIndex || innerUrl == outerUrl)
+//							return false;
+//						return outerUrl.indexOf(innerUrl) != -1;
+//					} );
+//				} );
+//				dc('temp', '%o', Urls);
+//				/* Identical links are filtered here */
+//				var Allowed = [ ];
+//				this.SelectedElements = this.SelectedElements.filter( function(elem) {
+//					if(Allowed.indexOf(elem.href) != -1)
+//						return false;
+//
+//					if(Urls.indexOf(elem.href) != -1) {
+//						Allowed.push(elem.href);
+//						return true;
+//					}
+//					return false;
+//				} );
+//			}
 
  			// Apply the style on the selected elements.
 			var OutlineStyle = this.SnapLinksPlus.Prefs.SelectedElementsBorderWidth + 'px solid ' + this.SnapLinksPlus.Prefs.SelectedElementsBorderColor;
@@ -599,6 +603,7 @@ var SnapLinksSelectionClass = Class.create({
 				this.ElementCount.appendChild(linksElem);
 			}
 		}
+		dc('calc-elements', 'Final: SelectedElements = %o', this.SelectedElements);
 	},
 	
 	/** Scroll on viewport edge. */
