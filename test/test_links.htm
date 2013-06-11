@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Expires" content="Fri, Jan 01 1900 00:00:00 GMT">
@@ -14,8 +14,10 @@
 <meta name="creation-date" content="01/01/2009">
 <meta name="revisit-after" content="15 days">
 <title>Snap Links Plus Test Page</title>
-<link rel="stylesheet" type="text/css" href="my.css">
-	<style>
+	<style type="text/css">
+		BODY { font-family: Verdana, sans-serif; }
+		A { color: blue; text-decoration: underline; }
+
 		#JS_Click_Events_Tester IMG 				{ border: 2px solid transparent; cursor: pointer; }
 		#JS_Click_Events_Tester SPAN 				{ padding: 0px 2px; border: 2px solid transparent; cursor: pointer; }
 		#JS_Click_Events_Tester DIV 				{ padding: 0px 2px; border: 2px solid transparent; cursor: pointer; }
@@ -25,39 +27,73 @@
 		DIV.Issues { margin-left: 25px; }
 		DIV.Issues DIV { font-weight: bold; margin-bottom: 15px;}
 		DIV.Issues A { font-weight: normal; }
-		A { color: blue; }
+		DIV.Issues H1 > A,
+		DIV.Issues H1 > SPAN{ color: red; }
+		DIV.Issues H1 > A.Fixed,
+		DIV.Issues H1 > SPAN.Fixed { color: green; text-decoration: line-through; }
+		DIV.Issues H1 > A.Reverted,
+		DIV.Issues H1 > SPAN.Reverted { color: gray; text-decoration: line-through; }
+
+		DIV.Issues H1 { cursor: pointer; font: bold 14px Verdana; padding-left: 15px; margin: 0px 5px 0px 3px; background: url(triangle_right.gif) no-repeat left center; border: 1px solid transparent; }
+		DIV.Issues H1:hover { border: 1px solid #AAAAAA; }
+		DIV.Issues H1.Open { background-image: url(triangle_down.gif); }
+		DIV.Issues H1 + DIV { margin-left: 6px; padding: 3px 0px 3px 10px; border-left: 1px solid #AAAAAA; display: none; }
+		DIV.Issues H1.Open + DIV { display: block; }
 	</style>
 </head>
 <body>
 <h1>Snap Links Plus Test Page</h1>
-<h2>Previous Problem Sites for Testing:</h2>
+<h2>Previous Problem Sites / Issues for Testing:</h2>
 <DIV class="Issues">
+	<h1><span class="Fixed">Fixed</span> This websites' body.scrollHeight is not correct</h1>
 	<div>
-		This websites body.scrollHeight is not correct<br>
-		<a href="http://www.iltalehti.fi/" target="_blank">http://www.iltalehti.fi/</a><br>
+		<a href="http://www.iltalehti.fi/" target="_blank">http://www.iltalehti.fi/</a><br><br>
+
 		Fixed by <a href="http://code.google.com/p/snaplinksplus/source/detail?r=4dc264a0c378d27a931689a1dbba12c2f0e16916">4dc264a0c378</a><br>
 	</div>
+	<h1><a class="Reverted" href="http://code.google.com/p/snaplinksplus/issues/detail?id=31">Issue 31</a> - This websites' documentElement.scrollHeight is not correct</h1>
 	<div>
-		This websites documentElement.scrollHeight is not correct<br>
 		<a href="http://www.idarionis.com:9500" target="_blank">http://www.idarionis.com:9500</a><br>
 		Broken by <a href="http://code.google.com/p/snaplinksplus/source/detail?r=4dc264a0c378d27a931689a1dbba12c2f0e16916">4dc264a0c378</a><br>
-		<a href="http://code.google.com/p/snaplinksplus/issues/detail?id=31">Issue 31</a> Fixed by <a href="http://code.google.com/p/snaplinksplus/source/detail?r=593d646f7ee60b2d696b19e35545b604456103b1">593d646f7ee6</a><br>
+		Fixed by <a href="http://code.google.com/p/snaplinksplus/source/detail?r=593d646f7ee60b2d696b19e35545b604456103b1">593d646f7ee6</a><br>
+		Reverted by <a href="https://github.com/cpriest/SnapLinksPlus/commit/ece03f88a34013322370ce063681803e1fa62c3a">ece03f88a34013322370ce063681803e1fa62c3a</a> - Clint on 6/11/2013 - Google no longer has that wierd interface and the code screwed every other site up
 	</div>
+	<h1><a href="http://code.google.com/p/snaplinksplus/issues/detail?id=30">Issue 30</a> - This websites has a scrollable element within it's page</h1>
 	<div>
-		This websites has a scrollable element within it's page<br>
 		<a href="https://groups.google.com/forum/#!msg/snaplinksplus/7a18LX7n6uM/5A39Mdlx5RQJ">https://groups.google.com/forum/#!msg/snaplinksplus/7a18LX7n6uM/5A39Mdlx5RQJ</a><br>
-		<a href="http://code.google.com/p/snaplinksplus/issues/detail?id=30">Issue 30</a> Not Yet Fixed
 	</div>
+	<h1><a href="http://code.google.com/p/snaplinksplus/issues/detail?id=37">Issue 37</a> - Hover over an image for popover, drag over larger image, large image link and underlying (hidden) image links are both chosen</h1>
 	<div>
-		Hover over an image for popover, drag over larger image, large image link and underlying (hidden) image links are both chosen<br>
 		<a href="http://images.google.com/search?num=10&hl=en&site=&tbm=isch&source=hp&biw=1600&bih=1089&q=gold&oq=gold&gs_l=img.3..0l10.536.854.0.973.4.4.0.0.0.0.107.313.3j1.4.0...0.0...1ac.1.wdGShMYujzA#q=gold&hl=en&sa=X&tbas=0&tbm=isch&tbas=0&ei=EwiXUJjfM5LzqwHA-oG4Dg&ved=0CBYQuAs&bav=on.2,or.r_gc.r_pw.r_qf.&fp=d96a74ebefcc27a8&bpcl=37189454&biw=1600&bih=1089">Google Images Search for Gold</a><br>
-		<a href="http://code.google.com/p/snaplinksplus/issues/detail?id=37">Issue 37</a> Not Yet Fixed
 	</div>
 	<div>
-		General Testing Sites<br>
-		<a href="http://www.cnn.com/" target="_blank">http://www.cnn.com/</a><br>
-		<a href="http://www.yahoo.com/" target="_blank">http://www.yahoo.com/</a>
+		<h1><a class="Fixed" href="http://code.google.com/p/snaplinksplus/issues/detail?id=46">Issue 46</a> - Links with common root url not captured properly</h1>
+		<div>
+			<table>
+			        <tr><td>
+			                <a href="http://www.csi.milano.it/">csi milano</a>
+			        </td></tr>
+			        <tr><td>
+			                <a href="http://www.csi.milano.it/main.cfm?mode=provvedimenti&campionato=3&sport=CA">csi milano - provvedimenti calcio a 7</a>
+			        </td></tr>
+			        <tr><td>
+			                <a href="http://www.csi.milano.it/main.cfm?mode=provvedimenti&campionato=6&sport=PV">csi milano - provvedimenti pvo</a>
+			        </td></tr>
+			        <tr><td>
+			                <a href="http://www.csi.milano.it/main.cfm?mode=provvedimenti&campionato=7&sport=PC">csi milano - provvedimenti basket</a>
+			        </td></tr>
+			</table>
+			Fixed by <a href="https://github.com/cpriest/SnapLinksPlus/commit/ece03f88a34013322370ce063681803e1fa62c3a">ece03f88a34013322370ce063681803e1fa62c3a</a>
+		</div>
 	</div>
+	<h1 class="Open">General Testing Sites</h1>
+	<div>
+		<ul>
+			<li><a href="http://www.cnn.com/" target="_blank">http://www.cnn.com/</a></li>
+			<li><a href="http://www.yahoo.com/" target="_blank">http://www.yahoo.com/</a></li>
+		</ul>
+	</div>
+
 </div>
 
 <h2>Links Within Text</h2>
@@ -80,6 +116,12 @@ Suspendisse nibh orci, sodales dapibus consectetur sit amet, venenatis id leo. <
 <a href="http://en.wikipedia.org/wiki/Gold"><img style="float: right;" src="http://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Ag-Au-Cu-colours-english.svg/220px-Ag-Au-Cu-colours-english.svg.png">Pellentesque</a> sit amet neque non tortor vehicula imperdiet vitae viverra velit. Morbi nunc arcu, dignissim quis ornare vel, mattis eget dui. Nulla urna massa, tincidunt sit amet auctor sit amet, dignissim et augue. Sed accumsan pharetra metus vel egestas. Phasellus semper elit nisl, at viverra dui. Donec faucibus tempus nibh, eu ullamcorper dolor varius et. Pellentesque venenatis odio a <a href="http://en.wikipedia.org/wiki/Gold">erat aliquam vehicula. Integer a odio sit amet lectus placerat blandit eget et quam. Aenean at</a> arcu nec urna pharetra eleifend non vel ligula. Ut velit ligula, cursus sit amet dapibus quis, consequat eu massa. Ut facilisis erat at magna sodales interdum. Cras sit amet eros sed elit convallis rutrum. Integer a ipsum vitae nibh auctor sagittis. Vestibulum sit amet turpis tortor, sit amet sagittis massa. Proin metus metus, elementum quis euismod id, tristique quis metus. Curabitur nisi arcu, ullamcorper eget facilisis non, blandit in odio. Quisque suscipit est sed dolor pretium vel semper orci adipiscing. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; 
 	</p>
 <hr/>
+<h2>Download Url Targets (image files)</h2>
+<ul>
+	<li><a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYmikzzyFUXbVH1OZXdxjbn2R3J3ia-t2BFxIVm98HEgG3xUrV">Sample Image 1</a></li>
+	<li><a href="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQ-s6qdzk5C2JInyvLKbNnzDN7oh97bxJnI8lXqWw8achzXwt4C">Sample Image 2</a></li>
+	<li><a href="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTEDAJs_hJKiNUhV7bp5rbMw6hzV3T0zLZIjsUbqupcY-GIUtgWjg">Sample Image 3</a></li>
+</ul>
 <h2>Links with dangerous content (copy to clipboard sanitize)</h2>
 <ul>
 	<li><a href="http://en.wikipedia.org/wiki/Gold">This link title contains a < and > in it</a></li>
@@ -330,6 +372,15 @@ document.addEventListener('mousemove', function(e) {
 		'<tr><th>window.scrollMaxY</th><td>'+ window.scrollMaxY +'</td></tr>'+
 		'</table>';
 }, true);
+	document.querySelector('DIV.Issues').addEventListener('click', function(e) {
+		console.log(e.target);
+		if(e.target.nodeType == 1 && e.target.tagName == 'H1') {
+			console.log(e.target);
+			e.target.className = e.target.className == ""
+				? 'Open'
+				: '';
+		}
+	} );
 </script>
 <div>
 	<iframe src="iframe_content.htm" style="float:right; width:69%; height:300px; border:1px solid #000000; margin-bottom:50px;">
