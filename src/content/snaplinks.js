@@ -24,15 +24,18 @@
 
 var EXPORTED_SYMBOLS = ["SnapLinksClass"];
 
+var Cc = Components.classes,
+	Cu = Components.utils,
+	Ci = Components.interfaces;
+
 try {
-	var Cu = Components.utils;
 	Cu.import("resource://gre/modules/PlacesUtils.jsm");
 	Cu.import("resource:///modules/PlacesUIUtils.jsm");
 	Cu.import("chrome://snaplinksplus/content/Utility.js");
+	Cu.import("chrome://snaplinksplus/content/WindowFaker.js");
 	Cu.import('chrome://snaplinksplus/content/Selection.js');
 	Cu.import('chrome://snaplinksplus/content/Preferences.js');
-}
-catch(e) {
+} catch(e) {
 	Components.utils.reportError(e + ":\n"+ e.stack);
 }
 

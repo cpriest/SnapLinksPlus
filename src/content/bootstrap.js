@@ -46,13 +46,16 @@ window.addEventListener('load', function() {
 	try {
 		Components.utils.import('chrome://snaplinksplus/content/Debug.js');
 		SnapLinksPlus.Debug = new SnapLinksDebugClass();
-	}
-	catch(e) {
+	} catch(e) {
 		 /* Ignored */
 	}
 
 	if(SnapLinksPlus.Prefs.DevShowJSConsoleAtStartup) {
-		toJavaScriptConsole();
+		try {
+			Cu.import("resource:///modules/HUDService.jsm", {}).HUDService.consoleUI.toggleBrowserConsole();
+		} catch(e) {
+			toJavascriptConsole();
+		}
 
 		function CreateAnonymousElement(markup) {
 			var AnonymousElement = ((new DOMParser())

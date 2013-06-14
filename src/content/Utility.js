@@ -29,46 +29,29 @@ var EXPORTED_SYMBOLS = ['Class',
                         'Rect',
                         'htmlentities',
                         'escapeHTML',
-						'Log',
-						'dc'];
+						'console',
+						'dc',
+						'DumpWindowFrameStructure'];
 
+var Cu = Components.utils,
+	Cc = Components.classes,
+	Ci = Components.interfaces;
 
-var iPrefs = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
+var iPrefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefBranch);
 var DevMode = iPrefs.getPrefType('extensions.snaplinks.DevMode') && iPrefs.getBoolPref('extensions.snaplinks.DevMode') || false;
 
-var dc, Log;
+var console = {
+	__noSuchMethod__: function() { }
+};
+var dc = function() { };
 
 if(DevMode) {
-	/**
-	 * Log() logs info to the Firebug plugin if available,
-	 * identical usage to console.log() from within a client page.
-	 */
-	Log = function() {
-		try {
-			if(typeof Firebug != 'undefined') {
-				Firebug.Console.logFormatted(arguments);
-			} else {
-				/* If Firebug not in our current context, try seeing if there is a recent browser window context that has it, if so, use it. */
-				var mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-							.getService(Components.interfaces.nsIWindowMediator)
-							.getMostRecentWindow("navigator:browser");
-				if(typeof mrbw.Firebug != 'undefined' && typeof mrbw.Firebug.Console != 'undefined') {
-					mrbw.Firebug.Console.logFormatted(arguments);
-				}
-			}
-		} catch (e) {
-			Components.utils.reportError(e +':\n'+ e.stack);
-		}
-	};
+	console = (Cu.import("resource://gre/modules/devtools/Console.jsm", {})).console;
 
-	/** Logs a warning to the standard console. */
-	Log.Warning = function(Message, Source, Line, Column) {
-		var ConsoleService = Components.classes["@mozilla.org/consoleservice;1"]
-								.getService(Components.interfaces.nsIConsoleService);
-		var ScriptMessage = Components.classes["@mozilla.org/scripterror;1"]
-								.createInstance(Components.interfaces.nsIScriptError);
-		ScriptMessage.init(Message, Source, null, Line, Column, 1, null);
-		ConsoleService.logMessage(ScriptMessage);
+	console.warn("Warning, console.clear() is being over-ridden (at this time, it's defined but empty, may have changed.) Defined In:  Console.jsm");
+	console.clear = function() {
+		let bc = Cu.import("resource:///modules/HUDService.jsm", {}).HUDService.consoleUI.browserConsole;
+		bc.jsterm.clearOutput();
 	};
 
 	dc = function() {
@@ -77,15 +60,10 @@ if(DevMode) {
 		var channel = args.shift();
 		if(DevChannels.indexOf(channel) != -1) {
 			args[0] = channel+': '+args[0];
-			Log.apply(Log, args);
+			console.log.apply(console.log, args);
 		}
 	}
-} else {
-	dc = function() { };
-	Log = function() { };
-	Log.Warning = function() { };
 }
-
 /**
  * Prototype Imports -- Mozilla Organization may not like these...
  */
@@ -130,18 +108,18 @@ var Util = {
 			function update(array, args) {
 				var arrayLength = array.length;
 				var length = args.length;
-				
+
 				while (length--) array[arrayLength + length] = args[length];
 				return array;
 			}
 
 			var __method = func;
-			
+
 			return function() {
 				var a = update([__method.bind(this)], arguments);
 				return wrapper.apply(this, a);
 			};
-		}	
+		}
 	}
 };
 
@@ -273,6 +251,22 @@ function ApplyStyle(elem, style) {
 }
 
 /**
+ * Dumps the win.frames and sub-frame.frames structure recursively
+ */
+function DumpWindowFrameStructure(win) {
+	var path = ['0'];
+	function dump(win) {
+		console.log('%s: %o, %o, %o', path.join('.'), win, win.document, win.document.body);
+		for(var j=0;j<win.frames.length;j++) {
+			path.push(j);
+			dump(win.frames[j]);
+			path.pop();
+		}
+	}
+	dump(win);
+}
+
+/**
  * Creates getters/setters on this class
  * for each parameter specified in the map.
  */
@@ -287,7 +281,7 @@ var PrefsMapper = Class.create({
 	initialize: function(BasePath, map) {
 		this.BasePath = BasePath;
 		this.map = map || {};
-		this.pref = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
+		this.pref = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefBranch);
 
 		Object.keys(this.map).forEach( function(Property) {
 			this.map[Property].Type = this.map[Property].Type || 'char';
@@ -300,7 +294,7 @@ var PrefsMapper = Class.create({
 
 			/* Ensure the value or default value is stored */
 			try { this[Property] = this[Property]; }
-				catch(e) { Log.Warning('Unable to retrieve or set preference: ' + this.map[Property].Path + '\r\n' + e.toString()); }
+				catch(e) { log.warn('Unable to retrieve or set preference: ' + this.map[Property].Path + '\r\n' + e.toString()); }
 		}, this);
 	},
 	
@@ -340,7 +334,7 @@ var PrefsMapper = Class.create({
 		}
 		this.pref.deleteBranch(this.map[Property].Path);
 		this[Property] = Map[PreviousValue];
-		Log.Warning("Translated Preference (" + this.map[Property].Path + ") from " + PreviousValue + " to " + this[Property]);
+		log.warn("Translated Preference (" + this.map[Property].Path + ") from " + PreviousValue + " to " + this[Property]);
 	}
 } );
 

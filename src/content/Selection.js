@@ -21,10 +21,13 @@
 
 var EXPORTED_SYMBOLS = ["SnapLinksSelectionClass"];
 
+var Cu = Components.utils,
+	Cc = Components.classes,
+	Ci = Components.interfaces;
+
 try {
-	Components.utils.import("chrome://snaplinksplus/content/Utility.js");
-}
-catch(e) {
+	Cu.import("chrome://snaplinksplus/content/Utility.js");
+} catch(e) {
 	Components.utils.reportError(e + ":\n"+ e.stack);
 }
 
@@ -88,21 +91,21 @@ var SnapLinksSelectionClass = Class.create({
 		/** Store all documents and sub-documents as well as their offset positions relative to top document */
 		this.Documents = { };
 		$A(this.TopDocument.body.querySelectorAll('IFRAME')).forEach(function(elem) {
-			var contentWindow = elem.contentWindow,
+			var elemDoc = elem.contentDocument,
 				offset = { x: 0, y: 0 };
 			do {
 				offset.x += elem.offsetLeft;
 				offset.y += elem.offsetTop;
 				elem = elem.offsetParent;
 			} while(elem != null);
-			this.Documents[contentWindow.location.href] = {
-				Document: 	contentWindow.document,
-				height:		Math.max(contentWindow.document.documentElement.scrollHeight, contentWindow.document.body.scrollHeight),
-				width:		Math.max(contentWindow.document.documentElement.scrollWidth, contentWindow.document.body.scrollWidth),
+			this.Documents[elemDoc.URL] = {
+				Document: 	elemDoc,
+				height:		Math.max(elemDoc.documentElement.scrollHeight, elemDoc.body.scrollHeight),
+				width:		Math.max(elemDoc.documentElement.scrollWidth, elemDoc.body.scrollWidth),
 				offset: 	offset
 			};
 		}, this);
-		this.Documents[this.TopDocument.location.href] = {
+		this.Documents[this.TopDocument.URL] = {
 			Document: 	this.TopDocument,
 			height:		Math.max(this.TopDocument.documentElement.scrollHeight, this.TopDocument.body.scrollHeight),
 			width:		Math.max(this.TopDocument.documentElement.scrollWidth, this.TopDocument.body.scrollWidth),
@@ -112,7 +115,7 @@ var SnapLinksSelectionClass = Class.create({
 		/* If we aren't starting in the top document, change rect coordinates to top document origin */
 		if(Document != this.TopDocument) {
 			this.SelectionRect.Offset(-Document.body.scrollLeft, -Document.body.scrollTop);
-			this.SelectionRect.Offset(this.Documents[Document.location.href].offset.x, this.Documents[Document.location.href].offset.y);
+			this.SelectionRect.Offset(this.Documents[Document.URL].offset.x, this.Documents[Document.URL].offset.y);
 		}
 
 		if(e.target && e.target.tagName == 'A') {
@@ -143,8 +146,8 @@ var SnapLinksSelectionClass = Class.create({
 
 		/* If we are in a sub-document, offset our coordinates by the top/left of that sub-document element (IFRAME) */
 		if(e.view.document != this.TopDocument) {
-			pageX += this.Documents[e.view.location.href].offset.x - e.target.ownerDocument.body.scrollLeft;
-			pageY += this.Documents[e.view.location.href].offset.y - e.target.ownerDocument.body.scrollTop;
+			pageX += this.Documents[e.view.document.URL].offset.x - e.target.ownerDocument.body.scrollLeft;
+			pageY += this.Documents[e.view.document.URL].offset.y - e.target.ownerDocument.body.scrollTop;
 		}
 
 		/* Disabled At The Moment */
@@ -226,11 +229,11 @@ var SnapLinksSelectionClass = Class.create({
 
 	/** Calculates and caches the rectangles that make up all document lengths */
 	CalculateSnapRects: function(Document) {
-		if(!this.Documents[Document.location.href])
-			this.Documents[Document.location.href] = { Document: Document };
+		if(!this.Documents[Document.URL])
+			this.Documents[Document.URL] = { Document: Document };
 
 		/* If the last calculation was done at the same innerWidth, skip calculation */
-		if(this.CalculateWindowWidth == this.Window.innerWidth && this.Documents[Document.location.href].SelectableElements != undefined)
+		if(this.CalculateWindowWidth == this.Window.innerWidth && this.Documents[Document.URL].SelectableElements != undefined)
 			return;
 
 		this.CalculateWindowWidth = this.Window.innerWidth;
@@ -317,7 +320,7 @@ var SnapLinksSelectionClass = Class.create({
 			}
 		}, this );
 
-		this.Documents[Document.location.href].SelectableElements = SelectableElements;
+		this.Documents[Document.URL].SelectableElements = SelectableElements;
 
 		var End = (new Date()).getTime();
 		dc('performance', "CalculateSnapRects() -> Links: %sms, Inputs: %sms, Labels: %sms, Clickable: %sms, Total: %sms",
@@ -372,8 +375,8 @@ var SnapLinksSelectionClass = Class.create({
 	
 	/* Expands the selection to the given X, Y coordinates */
 	ExpandSelectionTo: function(X, Y) {
-		this.SelectionRect.right = Math.max(0, Math.min(X, this.Documents[this.TopDocument.location.href].width));
-		this.SelectionRect.bottom = Math.max(0, Math.min(Y, this.Documents[this.TopDocument.location.href].height));
+		this.SelectionRect.right = Math.max(0, Math.min(X, this.Documents[this.TopDocument.URL].width));
+		this.SelectionRect.bottom = Math.max(0, Math.min(Y, this.Documents[this.TopDocument.URL].height));
 		this.UpdateElement();
 	},
 	
@@ -420,7 +423,7 @@ var SnapLinksSelectionClass = Class.create({
 		} else {
 			offsetY = e.pageY - elemRect.height - vSpacing;
 		}
-		
+
 		ApplyStyle(this.ElementCount, {
 			top:  offsetY + 'px',
 			left: offsetX + 'px'
