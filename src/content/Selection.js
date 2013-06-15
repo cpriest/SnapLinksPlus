@@ -35,10 +35,10 @@ try {
 var SnapLinksSelectionClass = Class.create({
 	SnapLinksPlus: null,
 	jsRegExp: /^javascript:/i,
-	
+
 	IntersectedElements: 	[ ],
 	SelectedElements: 		[ ],
-	
+
 	/* Internal flag to control selecting all links or all links matching the greatest size */
 	SelectLargestFontSizeIntersectionLinks:		true,
 
@@ -51,7 +51,7 @@ var SnapLinksSelectionClass = Class.create({
 					this.SelectedElementsType != 'JsLinks') {
 				return [ ];
 			}
-			
+
 			var Distinct = [ ];
 			return this.SelectedElements.filter( function(elem) {
 				if(!elem.href || (this.SnapLinksPlus.Prefs.RemoveDuplicateUrls && Distinct.indexOf(elem.href) != -1))
@@ -64,7 +64,7 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Internal Flag indicating that a selection has been started */
 	DragStarted: false,
-	
+
 	initialize: function(SnapLinksPlus) {
 		this.SnapLinksPlus = SnapLinksPlus;
 		this.PanelContainer = this.SnapLinksPlus.PanelContainer;
@@ -127,7 +127,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
 		this.PanelContainer.addEventListener('keyup', this._OnKeyUp, true);
 	},
-	
+
 	OnMouseMove: function(e) {
 		this.CalculateSnapRects(e.target.ownerDocument);
 
@@ -156,12 +156,11 @@ var SnapLinksSelectionClass = Class.create({
 		} else {
 			this.ExpandSelectionTo(pageX, pageY);
 		}
-		
-		if (this.ElementCount) {
-			this.UpdateElementCount(e);
-		}
+
+		if (this.ElementCount)
+			this.RepositionElementCount(e);
 	},
-	
+
 	OnMouseUp: function(e) {
 		this.RemoveEventHooks();
 	},
@@ -172,22 +171,22 @@ var SnapLinksSelectionClass = Class.create({
 			this.UpdateElement();
 		}
 	},
-	
+
 	OnKeyUp: function(e) {
 		if(e.keyCode == this.Window.KeyboardEvent.DOM_VK_SHIFT ) {
 			this.SelectLargestFontSizeIntersectionLinks = true;
 			this.UpdateElement();
 		}
 	},
-	
+
 	/* Creates the selection rectangle element, returns true if element exists or was created successfully */
 	Create: function() {
 		if(this.DragStarted == true)
 			return true;
-			
+
 		if(this.SelectionRect.width > 4 || this.SelectionRect.height > 4) {
 			var InsertionNode = (this.TopDocument.documentElement) ? this.TopDocument.documentElement : this.TopDocument;
-			
+
 			this.Element = this.TopDocument.createElementNS('http://www.w3.org/1999/xhtml', 'snaplRect');
 			if(InsertionNode && this.Element) {
 				this.Element.style.color = this.SnapLinksPlus.Prefs.SelectionBorderColor;
@@ -197,7 +196,7 @@ var SnapLinksSelectionClass = Class.create({
 				this.Element.style.left = this.SelectionRect.left + 'px';
 				this.Element.style.top = this.SelectionRect.top + 'px';
 				InsertionNode.appendChild(this.Element);
-				
+
 				if(this.SnapLinksPlus.Prefs.ShowSelectedCount &&
 						this.SnapLinksPlus.Prefs.ShowCountWhere == this.SnapLinksPlus.Prefs.ShowCount_Hover) {
 					this.ElementCount = this.TopDocument.createElementNS('http://www.w3.org/1999/xhtml', 'div');
@@ -211,7 +210,7 @@ var SnapLinksSelectionClass = Class.create({
 					} );
 					InsertionNode.appendChild(this.ElementCount);
 				}
- 
+
 				this.DragStarted = this.Element.parentNode != undefined;
 
 				if(this.DragStarted) {
@@ -240,7 +239,7 @@ var SnapLinksSelectionClass = Class.create({
 
 		var offset = { x: Document.defaultView.scrollX, y: Document.defaultView.scrollY };
 		var SelectableElements = [ ];
-		
+
 		var Start = (new Date()).getTime();
 
 		$A(Document.links).forEach( function( link ) {
@@ -372,14 +371,14 @@ var SnapLinksSelectionClass = Class.create({
 		this.SelectionRect.Offset(X, Y);
 		this.UpdateElement();
 	},
-	
+
 	/* Expands the selection to the given X, Y coordinates */
 	ExpandSelectionTo: function(X, Y) {
 		this.SelectionRect.right = Math.max(0, Math.min(X, this.Documents[this.TopDocument.URL].width));
 		this.SelectionRect.bottom = Math.max(0, Math.min(Y, this.Documents[this.TopDocument.URL].height));
 		this.UpdateElement();
 	},
-	
+
 	/* Updates the visible position of the element */
 	UpdateElement: function() {
 		if(this.Create()) {
@@ -389,45 +388,63 @@ var SnapLinksSelectionClass = Class.create({
 				width 	: this.SelectionRect.width - (2 * this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px',
 				height 	: this.SelectionRect.height - (2 * this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px'
 			} );
-			
+
 			this.CalcSelectedElements();
 		}
 	},
 
-	UpdateElementCount: function(e) {
-		var margin = 6;
-		var hSpacing = 3;
-		var vSpacing = 3;
-		
-		var docRect = {
-			width:this.TopDocument.documentElement.clientWidth,
-			height:this.TopDocument.documentElement.clientHeight
-		};
-		var elemRect = this.ElementCount.getBoundingClientRect();
+	RepositionElementCount: function(e) {
+		let margin = 6,
+			hSpacing = 5;
+		var vSpacing = 5;
 
-		var offsetX = 0;
-		var offsetY = 0;
-		
-		if ((e.clientX + hSpacing) <= margin) {
-			offsetX = this.Window.scrollX + margin;
-		} else if ((e.clientX + hSpacing + elemRect.width) >= (docRect.width - margin)) {
-			offsetX = this.Window.scrollX + docRect.width - (elemRect.width + margin);
-		} else {
-			offsetX = e.pageX + hSpacing;
+		if(!this.Documents[e.view.document.URL]){
+			console.error('SL+: Unable to find document info for %s in %o', e.view.document.URL, this.Documents);
+			return;
 		}
-		
-		if ((e.clientY - elemRect.height - vSpacing) <= margin) {
-			offsetY = this.Window.scrollY + margin;
-		} else if ((e.clientY - vSpacing) >= (docRect.height - margin)) {
-			offsetY = this.Window.scrollY + docRect.height - (elemRect.height + margin);
+
+		let di = this.Documents[e.view.document.URL],
+			tde = this.TopDocument.documentElement,
+			elemRect = this.ElementCount.getBoundingClientRect(),
+			offset = {
+				x: di.offset.x,
+				y: di.offset.y,
+			};
+
+		/* Find proper top document x/y coordinates */
+		if(e.view.document == this.TopDocument){
+			offset.x += e.pageX;
+			offset.y += e.pageY;
 		} else {
-			offsetY = e.pageY - elemRect.height - vSpacing;
+			offset.x += e.clientX;
+			offset.y += e.clientY;
 		}
+
+		/* Determine acceptable positions, prefers outside of this.SelectionRect then topLeft */
+		if(offset.x <= this.SelectionRect.left || offset.y <= this.SelectionRect.top) {
+			offset.y - tde.scrollTop - elemRect.height - margin - vSpacing > 0
+				? offset.y -= elemRect.height + vSpacing 	/* Top side is good and preferred, move above cursor */
+				: offset.y += vSpacing;						/* Top side is no good, move below cursor */
+		} else {
+			offset.y + elemRect.height + margin - tde.scrollTop < tde.clientHeight
+				? offset.y += vSpacing						/* Bottom side is good, move below cursor */
+				: offset.y -= elemRect.height + vSpacing;	/* Bottom side is no good, move above cursor */
+		}
+
+		offset.x - tde.scrollLeft - elemRect.width - margin - hSpacing > 0
+			? offset.x -= elemRect.width + hSpacing		/* Left side is good and preferred, move to left of cursor */
+			: offset.x += hSpacing;						/* Left side is no good, move to right of cursor */
+
+		/* Ensure that ElementCount will not extend document */
+		offset.x = Math.min(offset.x, tde.clientWidth - elemRect.width - margin + tde.scrollLeft);	/* No farther right than viewport allows */
+		offset.y = Math.min(offset.y, tde.clientHeight - elemRect.height - margin + tde.scrollTop);	/* No farther down than viewport allows */
+		offset.x = Math.max(offset.x, margin);	/* No less than margin */
+		offset.y = Math.max(offset.y, margin);	/* No less than margin */
 
 		ApplyStyle(this.ElementCount, {
-			top:  offsetY + 'px',
-			left: offsetX + 'px'
-		} );
+			top: offset.y + 'px',
+			left: offset.x + 'px'
+		});
 	},
 
 	/* Calculates which elements intersect with the selection */
@@ -436,7 +453,7 @@ var SnapLinksSelectionClass = Class.create({
 		if(this.Element.style.display != 'none') {
 			var HighLinkFontSize = 0;
 			var HighJsLinkFontSize = 0;
-			
+
 			var TypesInPriorityOrder = new Array('Links', 'JsLinks', 'Checkboxes', 'Buttons', 'RadioButtons', 'Clickable');
 			var TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0, 'RadioButtons': 0, Clickable: 0};
 
@@ -515,17 +532,17 @@ var SnapLinksSelectionClass = Class.create({
 			// Init the greatest values with the first item.
 			var Greatest = TypesInPriorityOrder[0];
 			var GreatestValue = TypeCounts[Greatest];
-			
+
 			// Check if any of the other values if greater.
 			for (var i = 1; i < TypesInPriorityOrder.length; ++i) {
 				var key = TypesInPriorityOrder[i];
-				
+
 				if (TypeCounts[key] > GreatestValue) {
 					Greatest = key;
 					GreatestValue = TypeCounts[key]; 
 				}
 			}
-			
+
 			// Choose the filter function.
 			var filterFunction;
 
@@ -581,7 +598,7 @@ var SnapLinksSelectionClass = Class.create({
 //				} );
 //			}
 
- 			// Apply the style on the selected elements.
+			// Apply the style on the selected elements.
 			var OutlineStyle = this.SnapLinksPlus.Prefs.SelectedElementsBorderWidth + 'px solid ' + this.SnapLinksPlus.Prefs.SelectedElementsBorderColor;
 			this.SelectedElements.forEach( function(elem) {
 				(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
@@ -608,7 +625,7 @@ var SnapLinksSelectionClass = Class.create({
 		}
 		dc('calc-elements', 'Final: SelectedElements = %o', this.SelectedElements);
 	},
-	
+
 	/** Scroll on viewport edge. */
 	scrollOnViewEdge: function (e) {
 		var offsetX = 0;
@@ -621,7 +638,7 @@ var SnapLinksSelectionClass = Class.create({
 		} else if (e.clientX > this.TopDocument.defaultView.innerWidth) {
 			offsetX = e.clientX - this.TopDocument.defaultView.innerWidth;
 			var offsetMaxX = this.Window.scrollMaxX - this.Window.scrollX; 
-			
+
 			if (offsetX > offsetMaxX) {
 				offsetX = offsetMaxX;
 			}
@@ -637,7 +654,7 @@ var SnapLinksSelectionClass = Class.create({
 		} else if (e.clientY > this.TopDocument.defaultView.innerHeight) {
 			offsetY = e.clientY - this.TopDocument.defaultView.innerHeight;
 			var offsetMaxY = this.Window.scrollMaxY - this.Window.scrollY;
-			
+
 			if (offsetY > offsetMaxY) {
 				offsetY = offsetMaxY;
 			}
