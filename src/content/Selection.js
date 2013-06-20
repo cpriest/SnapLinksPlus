@@ -27,6 +27,7 @@ var Cu = Components.utils,
 
 try {
 	Cu.import("chrome://snaplinksplus/content/Utility.js");
+	Cu.import("chrome://snaplinksplus/content/WindowFaker.js");
 } catch(e) {
 	Components.utils.reportError(e + ":\n"+ e.stack);
 }
@@ -457,24 +458,25 @@ var SnapLinksSelectionClass = Class.create({
 			var TypesInPriorityOrder = new Array('Links', 'JsLinks', 'Checkboxes', 'Buttons', 'RadioButtons', 'Clickable');
 			var TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0, 'RadioButtons': 0, Clickable: 0};
 
-			for(var href in this.Documents) {
-				var ti = this.Documents[href];
+			for(var URL in this.Documents) {
+				//noinspection JSUnfilteredForInLoop
+				var ti = this.Documents[URL];
 				var DocRect = new Rect(0, 0, ti.height, ti.width)
 					.Offset(ti.offset.x, ti.offset.y);
-				var SelectRect = this.SelectionRect.GetIntersectRect(DocRect);
+				var IntersectRect = this.SelectionRect.GetIntersectRect(DocRect);
 
 				/* If we have no SelectRect then there is no intersection with ti.Document's coordinates */
-				if(SelectRect !== false) {
+				if(IntersectRect !== false) {
 					/* If we're not in the top document, translate SelectRect to document coordinates */
 					if(ti.Document != this.TopDocument) {
-						SelectRect.Offset(-ti.offset.x, -ti.offset.y);
-						SelectRect.Offset(ti.Document.body.scrollLeft, ti.Document.body.scrollTop);
+						IntersectRect.Offset(-ti.offset.x, -ti.offset.y);
+						IntersectRect.Offset(ti.Document.body.scrollLeft, ti.Document.body.scrollTop);
 					}
 
 					dc('calc-elements', '%o.SelectableElements = %o', ti, ti.SelectableElements);
 					/* Find Links Which Intersect With SelectRect */
 					$A(ti.SelectableElements).forEach(function(elem) {
-						var Intersects = elem.SnapRects.some( SelectRect.IntersectsWith.bind(SelectRect) );
+						var Intersects = elem.SnapRects.some( IntersectRect.IntersectsWith.bind(IntersectRect) );
 
 						if(Intersects) {
 							var computedStyle = this.Window.content.document.defaultView.getComputedStyle(elem, null);

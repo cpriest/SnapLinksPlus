@@ -51,7 +51,8 @@ if(DevMode) {
 	console.warn("Warning, console.clear() is being over-ridden (at this time, it's defined but empty, may have changed.) Defined In:  Console.jsm");
 	console.clear = function() {
 		let bc = Cu.import("resource:///modules/HUDService.jsm", {}).HUDService.consoleUI.browserConsole;
-		bc.jsterm.clearOutput();
+		if(bc && bc.jsterm)
+			bc.jsterm.clearOutput();
 	};
 
 	dc = function() {
@@ -256,7 +257,7 @@ function ApplyStyle(elem, style) {
 function DumpWindowFrameStructure(win) {
 	var path = ['0'];
 	function dump(win) {
-		console.log('%s: %o, %o, %o', path.join('.'), win, win.document, win.document.body);
+		console.log('%s: %s, %o, %o, %o', path.join('.'), win.document.URL, win, win.document, win.document.body);
 		for(var j=0;j<win.frames.length;j++) {
 			path.push(j);
 			dump(win.frames[j]);
@@ -386,11 +387,14 @@ var Rect = Class.create({
 		return this;
 	},
 	GetIntersectRect: function(r) {
-		return new Rect(Math.max(this.top, r.top), Math.max(this.left, r.left),
+		var i = new Rect(Math.max(this.top, r.top), Math.max(this.left, r.left),
 							Math.min(this.bottom, r.bottom), Math.min(this.right, r.right));
+		if(i.IsInverted)
+			return false;
+		return i;
 	},
 	IntersectsWith: function(r) {
-		return !this.GetIntersectRect(r).IsInverted;
+		return this.GetIntersectRect(r) != false;
 	},
 	toString: function() {
 		return ['t:'+this.top, 'l:'+this.left, 'b:'+this.bottom, 'r:'+this.right, 'w:'+this.width, 'h:'+this.height].join(' ');
