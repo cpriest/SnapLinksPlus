@@ -17,6 +17,9 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  @BUG: SelectionRect can lasso elements in sub-document that are scrolled out of view...
+ *  		SelectionRect needs to be trimmed to 'viewport' of frame
  */
 
 var EXPORTED_SYMBOLS = ["SnapLinksSelectionClass"];
@@ -77,6 +80,44 @@ var SnapLinksSelectionClass = Class.create({
 		this._OnKeyUp		= this.OnKeyUp.bind(this);
 	},
 
+	/* Index all documents by URL and calculate offset from Top Document */
+	IndexDocuments: function IndexDocuments(TopDocument) {
+		var Documents = { };
+
+		/* Insert top document */
+		Documents[TopDocument.URL] = {
+			Document: 	TopDocument,
+			height:		Math.max(TopDocument.documentElement.scrollHeight, TopDocument.body.scrollHeight),
+			width:		Math.max(TopDocument.documentElement.scrollWidth, TopDocument.body.scrollWidth),
+			offset: 	{x: 0, y: 0}
+		};
+
+		function IndexFrames(frames) {
+			for(let j=0; j < frames.length;j++) {
+				let frame = frames[j];
+				let elem = frame.frameElement;
+				let offset = { x: 0, y: 0 };
+				do {
+					offset.x += elem.offsetLeft;
+					offset.y += elem.offsetTop;
+					elem = elem.offsetParent;
+				} while(elem != null);
+				offset.x += Documents[frame.parent.document.URL].offset.x;
+				offset.y += Documents[frame.parent.document.URL].offset.y;
+				Documents[frame.document.URL] = {
+					Document: 	frame.document,
+					height:		Math.max(frame.document.documentElement.scrollHeight, frame.document.body.scrollHeight),
+					width:		Math.max(frame.document.documentElement.scrollWidth, frame.document.body.scrollWidth),
+					offset: 	offset
+				};
+				IndexFrames(frame);
+			}
+		}
+		IndexFrames(TopDocument.defaultView.frames);
+
+		return Documents;
+	},
+
 	/* Starting Hook for beginning a selection */
 	OnMouseDown: function(e) {
 		this.Window = e.view.top;
@@ -89,29 +130,7 @@ var SnapLinksSelectionClass = Class.create({
 		/** Initializes the starting mouse position */
 		this.SelectionRect = new Rect(e.pageY, Math.min(e.pageX, Document.documentElement.offsetWidth + Document.defaultView.pageXOffset));
 
-		/** Store all documents and sub-documents as well as their offset positions relative to top document */
-		this.Documents = { };
-		$A(this.TopDocument.body.querySelectorAll('IFRAME')).forEach(function(elem) {
-			var elemDoc = elem.contentDocument,
-				offset = { x: 0, y: 0 };
-			do {
-				offset.x += elem.offsetLeft;
-				offset.y += elem.offsetTop;
-				elem = elem.offsetParent;
-			} while(elem != null);
-			this.Documents[elemDoc.URL] = {
-				Document: 	elemDoc,
-				height:		Math.max(elemDoc.documentElement.scrollHeight, elemDoc.body.scrollHeight),
-				width:		Math.max(elemDoc.documentElement.scrollWidth, elemDoc.body.scrollWidth),
-				offset: 	offset
-			};
-		}, this);
-		this.Documents[this.TopDocument.URL] = {
-			Document: 	this.TopDocument,
-			height:		Math.max(this.TopDocument.documentElement.scrollHeight, this.TopDocument.body.scrollHeight),
-			width:		Math.max(this.TopDocument.documentElement.scrollWidth, this.TopDocument.body.scrollWidth),
-			offset: 	{x: 0, y: 0}
-		};
+		this.Documents = this.IndexDocuments(this.TopDocument);
 
 		/* If we aren't starting in the top document, change rect coordinates to top document origin */
 		if(Document != this.TopDocument) {
