@@ -91,9 +91,14 @@ var SnapLinksSelectionClass = Class.create({
 
 		function IndexFrames(frames) {
 			for(let j=0; j < frames.length;j++) {
-				let frame = frames[j];
-				let elem = frame.frameElement;
-				let offset = { x: 0, y: 0 };
+				let frame = frames[j],
+					elem = frame.frameElement,
+					offset = { x: 0, y: 0 };
+
+				/* Unusual case where a sub-frame has the same URL as the TopDocument, skipping this frame in this case, see this page for issue: https://groups.google.com/forum/#!msg/snaplinksplus/7a18LX7n6uM/5A39Mdlx5RQJ */
+				if(frame.document.URL == TopDocument.URL)
+					continue;
+
 				do {
 					offset.x += elem.offsetLeft;
 					offset.y += elem.offsetTop;
@@ -111,6 +116,7 @@ var SnapLinksSelectionClass = Class.create({
 			}
 		}
 		IndexFrames(TopDocument.defaultView.frames);
+		dc('doc-index', '%o', Documents);
 
 		return Documents;
 	},
@@ -405,10 +411,10 @@ var SnapLinksSelectionClass = Class.create({
 	UpdateElement: function() {
 		if(this.Create()) {
 			ApplyStyle(this.Element, {
-				left 	: this.SelectionRect.left + 'px',
-				top 	: this.SelectionRect.top + 'px',
-				width 	: this.SelectionRect.width - (2 * this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px',
-				height 	: this.SelectionRect.height - (2 * this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px'
+							left 	: this.SelectionRect.left + 'px',
+							top 	: this.SelectionRect.top + 'px',
+							width 	: this.SelectionRect.width - (2 * this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px',
+							height 	: this.SelectionRect.height - (2 * this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px'
 			} );
 
 			this.CalcSelectedElements();
