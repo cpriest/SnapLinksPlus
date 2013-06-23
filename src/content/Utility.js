@@ -37,15 +37,14 @@ var Cu = Components.utils,
 	Cc = Components.classes,
 	Ci = Components.interfaces;
 
-var iPrefs = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefBranch);
-var DevMode = iPrefs.getPrefType('extensions.snaplinks.DevMode') && iPrefs.getBoolPref('extensions.snaplinks.DevMode') || false;
+Cu.import('resource://gre/modules/Services.jsm');
 
 var console = {
 	__noSuchMethod__: function() { }
 };
 var dc = function() { };
 
-if(DevMode) {
+if(Services.prefs.getPrefType('extensions.snaplinks.DevMode') && Services.prefs.getBoolPref('extensions.snaplinks.DevMode') == true) {
 	console = (Cu.import("resource://gre/modules/devtools/Console.jsm", {})).console;
 
 	console.warn("Warning, console.clear() is being over-ridden (at this time, it's defined but empty, may have changed.) Defined In:  Console.jsm");
@@ -56,10 +55,24 @@ if(DevMode) {
 	};
 
 	dc = function() {
-		var args = Array.prototype.slice.call(arguments, 0);
-		var DevChannels = (iPrefs.getPrefType('extensions.snaplinks.DevChannels') && iPrefs.getCharPref('extensions.snaplinks.DevChannels') || '').split(',');
-		var channel = args.shift();
-		if(DevChannels.indexOf(channel) != -1) {
+		let args = Array.prototype.slice.call(arguments, 0),
+			channel = args.shift(),
+			PrefsRoot = 'extensions.snaplinks.debug.channel.';//.'+channel+'.show';
+
+		Services.prefs.getDefaultBranch(PrefsRoot).setBoolPref(channel+'.show', false);
+		if(Services.prefs.getBranch(PrefsRoot).getBoolPref(channel+'.show') != true)
+			return;
+
+		if(typeof args[0] == 'function') {
+			var olf = console.log;
+			console.log = function() {
+				let args = Array.prototype.slice.call(arguments, 0);
+				args[0] = channel+': '+args[0];
+				olf.apply(console, args);
+			};
+			args[0]();
+			console.log = olf;
+		} else {
 			args[0] = channel+': '+args[0];
 			console.log.apply(console, args);
 		}
@@ -279,6 +292,7 @@ var PrefsMapper = Class.create({
 	 *							(Required) Default:		Default Value of Preference
 	 *							(Optional) Name:		Full preference path, defaults to {BasePath}.{PropertyTitle}
 	 */
+
 	initialize: function(BasePath, map) {
 		this.BasePath = BasePath;
 		this.map = map || {};
@@ -295,7 +309,7 @@ var PrefsMapper = Class.create({
 
 			/* Ensure the value or default value is stored */
 			try { this[Property] = this[Property]; }
-				catch(e) { log.warn('Unable to retrieve or set preference: ' + this.map[Property].Path + '\r\n' + e.toString()); }
+				catch(e) { console.warn('Unable to retrieve or set preference: ' + this.map[Property].Path + '\r\n' + e.toString()); }
 		}, this);
 	},
 	

@@ -18,17 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Activity:
- * 	 Clint Priest - 6/3/2011 - Fairly complete refactor and major rewrite
  */
 
- /*
- *	To Fix:
- * 		Scrolling while selection active does not update selection rect properly (look into using clientX + scrollX rather than pageX)
- *
- *
- *
- */
 
 var SnapLinksPlus = { };
 
@@ -53,9 +44,7 @@ window.addEventListener('load', function() {
 	if(SnapLinksPlus.Prefs.DevShowJSConsoleAtStartup) {
 		try {
 			Cu.import("resource:///modules/HUDService.jsm", {}).HUDService.consoleUI.toggleBrowserConsole();
-		} catch(e) {
-			toJavascriptConsole();
-		}
+		} catch(e) { }
 
 		function CreateAnonymousElement(markup) {
 			var AnonymousElement = ((new DOMParser())

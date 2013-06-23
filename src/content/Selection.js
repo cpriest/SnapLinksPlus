@@ -17,9 +17,6 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
- *
- *  @BUG: SelectionRect can lasso elements in sub-document that are scrolled out of view...
- *  		SelectionRect needs to be trimmed to 'viewport' of frame
  */
 
 var EXPORTED_SYMBOLS = ["SnapLinksSelectionClass"];
@@ -131,6 +128,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.SelectionRect = new Rect(e.pageY, Math.min(e.pageX, Document.documentElement.offsetWidth + Document.defaultView.pageXOffset));
 
 		this.Documents = this.IndexDocuments(this.TopDocument);
+		dc('doctree', DumpWindowFrameStructure.bind(DumpWindowFrameStructure, this.Window));
 
 		/* If we aren't starting in the top document, change rect coordinates to top document origin */
 		if(Document != this.TopDocument) {
