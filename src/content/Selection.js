@@ -271,8 +271,7 @@ var SnapLinksSelectionClass = Class.create({
 						!this.SnapLinksPlus.Prefs.HighlightJsLinksForClicking) {
 					return;
 				}
-			}
-			catch (e) {
+			} catch (e) {
 				Components.utils.reportError(e);
 			}
 
@@ -327,17 +326,22 @@ var SnapLinksSelectionClass = Class.create({
 					ForElement.SnapOutlines = [ ForElement, label ];
 				}
 			}
-		}, this );
+		});
 
 		var Labels = (new Date()).getTime();
 
-		$A(Document.body.querySelectorAll('IMG, SPAN, DIV')).forEach( function(elem) {
-			if(elem.SnapLinksClickable || elem.ownerDocument.defaultView.getComputedStyle(elem).cursor == 'pointer') {
-				elem.SnapLinksClickable = true;
-				elem.SnapRects = GetElementRects(elem, offset);
-				SelectableElements.push(elem);
-			}
-		}, this );
+		/* Get list of ineligible elements for 'clickable' */
+		var AnchoredElems = $A(Document.body.querySelectorAll('A[href] IMG, A[href] SPAN, A[href] DIV'));
+
+		$A(Document.body.querySelectorAll('IMG, SPAN, DIV'))
+			.filter( function(elem) { return AnchoredElems.indexOf(elem) == -1; })
+			.forEach( function(elem) {
+				if(elem.SnapLinksClickable || elem.ownerDocument.defaultView.getComputedStyle(elem).cursor == 'pointer') {
+					elem.SnapLinksClickable = true;
+					elem.SnapRects = GetElementRects(elem, offset);
+					SelectableElements.push(elem);
+				}
+			});
 
 		this.Documents[Document.URL].SelectableElements = SelectableElements;
 
@@ -548,7 +552,7 @@ var SnapLinksSelectionClass = Class.create({
 					}, this);
 				}
 			}
-			dc('calc-elements', 'IntersectedElements = %o', this.IntersectedElements);
+			dc('calc-elements', 'IntersectedElements = %o, TypeCounts = %o', this.IntersectedElements, TypeCounts);
 
 			// Init the greatest values with the first item.
 			var Greatest = TypesInPriorityOrder[0];

@@ -56,12 +56,12 @@ if(DevMode) {
 	};
 
 	dc = function() {
-		var args = $A(arguments);
+		var args = Array.prototype.slice.call(arguments, 0);
 		var DevChannels = (iPrefs.getPrefType('extensions.snaplinks.DevChannels') && iPrefs.getCharPref('extensions.snaplinks.DevChannels') || '').split(',');
 		var channel = args.shift();
 		if(DevChannels.indexOf(channel) != -1) {
 			args[0] = channel+': '+args[0];
-			console.log.apply(console.log, args);
+			console.log.apply(console, args);
 		}
 	}
 }
