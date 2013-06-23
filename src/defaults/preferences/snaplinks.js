@@ -53,4 +53,3 @@ pref('extensions.snaplinks.CopyToClipboardSeparator.Id',        1);
 pref('extensions.snaplinks.CopyToClipboardSeparator.Custom',    ',');
 
 pref('extensions.snaplinks.DevMode',    false);
-pref('extensions.snaplinks.DevChannels', '');
