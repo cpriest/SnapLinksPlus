@@ -21,10 +21,11 @@ PREPARE FOR THE NEXT RELEASE
 	- Update extension.subVersion (and extension.version, if needed)
 
 UPLOAD NEW STRINGS TO BABELZILLA
-1. Download "Snap_Links_Plus_all_locales_*.tar.gz" translation bundles to babelzilla directory.
-2. Build a dev build.
+1. Download Snap_Links_Plus_all_locales_skipped.tar.gz translation bundle to babelzilla directory.
+2. Make a dev build.
 3. Upload the latest xpi from dist\babelzilla to Babelzilla.org.
 
 DOWNLOAD TRANSLATED STRINGS FROM BABELZILLA
-1. Download "Snap_Links_Plus_selected_locales_*.tar.gz" translation bundles to babelzilla directory. Select only complete translations.
-2. Update babelzilla\translators.properties, if there are new translators
+1. Download Snap_Links_Plus_selected_locales_replaced.tar.gz translation bundle to babelzilla directory.
+   Note: Select only the translations which are 100 percent complete.
+2. Update babelzilla\translators.properties, if there were new translators.
