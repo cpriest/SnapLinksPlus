@@ -21,11 +21,14 @@ PREPARE FOR THE NEXT RELEASE
 	- Update extension.subVersion (and extension.version, if needed)
 
 UPLOAD NEW STRINGS TO BABELZILLA
+Do this as soon as all the new strings have been added. It usually takes 1-2 weeks before the volunteers
+finish their part. Remind the owners of incomplete translations or look for new translators on the forum.
 1. Download Snap_Links_Plus_all_locales_skipped.tar.gz translation bundle to babelzilla directory.
 2. Make a dev build.
 3. Upload the latest xpi from dist\babelzilla to Babelzilla.org.
 
 DOWNLOAD TRANSLATED STRINGS FROM BABELZILLA
+Do this just before the release, so you will get the latest modifications in.
 1. Download Snap_Links_Plus_selected_locales_replaced.tar.gz translation bundle to babelzilla directory.
    Note: Select only the translations which are 100 percent complete.
 2. Update babelzilla\translators.properties, if there were new translators.
