@@ -131,14 +131,14 @@ var SnapLinksSelectionClass = Class.create({
 		this.TopDocument = e.target.ownerDocument.defaultView.top.document;
 
 		/** Initializes the starting mouse position */
-		this.SelectionRect = new Rect(e.pageY, Math.min(e.pageX, Document.documentElement.offsetWidth + Document.defaultView.pageXOffset));
+		this.SelectionRect = new Rect(e.pageY, e.pageX);
 
 		this.Documents = this.IndexDocuments(this.TopDocument);
 		dc('doctree', DumpWindowFrameStructure.bind(DumpWindowFrameStructure, this.Window));
 
 		/* If we aren't starting in the top document, change rect coordinates to top document origin */
 		if(Document != this.TopDocument) {
-			this.SelectionRect.Offset(-Document.body.scrollLeft, -Document.body.scrollTop);
+			this.SelectionRect.Offset(-Math.max(Document.documentElement.scrollLeft, Document.body.scrollLeft), -Math.max(Document.documentElement.scrollTop, Document.body.scrollTop));
 			this.SelectionRect.Offset(this.Documents[Document.URL].offset.x, this.Documents[Document.URL].offset.y);
 		}
 
@@ -170,8 +170,8 @@ var SnapLinksSelectionClass = Class.create({
 
 		/* If we are in a sub-document, offset our coordinates by the top/left of that sub-document element (IFRAME) */
 		if(e.view.document != this.TopDocument) {
-			pageX += this.Documents[e.view.document.URL].offset.x - e.target.ownerDocument.body.scrollLeft;
-			pageY += this.Documents[e.view.document.URL].offset.y - e.target.ownerDocument.body.scrollTop;
+			pageX += this.Documents[e.view.document.URL].offset.x - Math.max(e.target.ownerDocument.documentElement.scrollLeft, e.target.ownerDocument.body.scrollLeft);
+			pageY += this.Documents[e.view.document.URL].offset.y - Math.max(e.target.ownerDocument.documentElement.scrollTop, e.target.ownerDocument.body.scrollTop);
 		}
 
 		/* Disabled At The Moment */
@@ -497,7 +497,7 @@ var SnapLinksSelectionClass = Class.create({
 					/* If we're not in the top document, translate SelectRect to document coordinates */
 					if(ti.Document != this.TopDocument) {
 						IntersectRect.Offset(-ti.offset.x, -ti.offset.y);
-						IntersectRect.Offset(ti.Document.body.scrollLeft, ti.Document.body.scrollTop);
+						IntersectRect.Offset(Math.max(ti.Document.documentElement.scrollLeft, ti.Document.body.scrollLeft), Math.max(ti.Document.documentElement.scrollTop, ti.Document.body.scrollTop));
 					}
 
 					dc('calc-elements', '%o.SelectableElements = %o', ti, ti.SelectableElements);
