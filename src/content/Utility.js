@@ -288,39 +288,45 @@ var PrefsMapper = Class.create({
 	/**
 	 *	@param BasePath string 	- String representing the prefix for automatic preference names based on property name of map
 	 *	@param map object		- Object map of { PropertyTitle: { Parameters } }
-	 *			Parameters:		(Required) Type: 		bool || int || char
-	 *							(Required) Default:		Default Value of Preference
+	 *			Parameters:		(Required) Default:		Default Value of Preference, pref type is inferred from default value
 	 *							(Optional) Name:		Full preference path, defaults to {BasePath}.{PropertyTitle}
 	 */
 
 	initialize: function(BasePath, map) {
-		this.BasePath = BasePath;
+		this.BasePath = (BasePath + '.').replace(/\.\.$/, '.');
 		this.map = map || {};
-		this.pref = Cc['@mozilla.org/preferences-service;1'].getService(Ci.nsIPrefBranch);
+		this.PrefsBranch = Services.prefs.getDefaultBranch(this.BasePath);
 
 		Object.keys(this.map).forEach( function(Property) {
-			this.map[Property].Type = this.map[Property].Type || 'char';
-			this.map[Property].Path = (this.map[Property].Name && this.map[Property].Name[0] == '.' && this.BasePath + this.map[Property].Name) || (this.BasePath + '.' + Property);
+			this.map[Property].SubPath = ((this.map[Property].Name && this.map[Property].Name[0] == '.' && this.map[Property].Name) || Property).replace(/^\./, '');
+
+			if(typeof this.map[Property].Default == 'undefined') {
+				console.error("SL+ Preference: %s has no default value, skipped", this.BasePath + this.map[Property].SubPath);
+				delete this.map[Property];
+				return;
+			}
 
 			Object.defineProperty(this, Property, {
 				get:	function() { return this.GetPref(Property); },
 				set:	function(x) { this.SetPref(Property, x); }
 			});
 
-			/* Ensure the value or default value is stored */
-			try { this[Property] = this[Property]; }
-				catch(e) { console.warn('Unable to retrieve or set preference: ' + this.map[Property].Path + '\r\n' + e.toString()); }
+			/* PrefsBranch is currently pointing at "non-user defaults" branch, ergo this is setting the defaults */
+			this.SetPref(Property, this.map[Property].Default);
+
 		}, this);
+
+		this.PrefsBranch = Services.prefs.getBranch(this.BasePath);
 	},
 	
 	GetPref: function(Property) {
-		if(this.pref.prefHasUserValue(this.map[Property].Path) == false)
+		if(this.PrefsBranch.prefHasUserValue(this.map[Property].SubPath) == false)
 			return this.map[Property].Default;
 		
-		switch(this.pref.getPrefType(this.map[Property].Path)) {
-			case this.pref.PREF_STRING:	return this.pref.getCharPref(this.map[Property].Path);
-			case this.pref.PREF_INT:	return this.pref.getIntPref(this.map[Property].Path);
-			case this.pref.PREF_BOOL:	return this.pref.getBoolPref(this.map[Property].Path);
+		switch(this.PrefsBranch.getPrefType(this.map[Property].SubPath)) {
+			case this.PrefsBranch.PREF_STRING:		return this.PrefsBranch.getCharPref(this.map[Property].SubPath);
+			case this.PrefsBranch.PREF_INT:			return this.PrefsBranch.getIntPref(this.map[Property].SubPath);
+			case this.PrefsBranch.PREF_BOOL:		return this.PrefsBranch.getBoolPref(this.map[Property].SubPath);
 		}
 		
 		return undefined;
@@ -330,26 +336,26 @@ var PrefsMapper = Class.create({
 		if(Value == undefined)
 			Value = this.map[Property].Default;
 
-		switch(this.map[Property].Type) {
-			case 'bool':	return this.pref.setBoolPref(this.map[Property].Path, Value);
-			case 'int':		return this.pref.setIntPref(this.map[Property].Path, Value);
-			case 'char':	return this.pref.setCharPref(this.map[Property].Path, Value);
+		switch(typeof this.map[Property].Default) {
+			case 'boolean':	return this.PrefsBranch.setBoolPref(this.map[Property].SubPath, Value);
+			case 'number':	return this.PrefsBranch.setIntPref(this.map[Property].SubPath, Value);
+			case 'string':	return this.PrefsBranch.setCharPref(this.map[Property].SubPath, Value);
 		}
 		
 		return undefined;
 	},
-	
-	TranslatePref: function(Property, Map) {
+
+	TranslatePrefValue: function(Property, Map) {
 		var PreviousValue;
 
-		switch(this.pref.getPrefType(this.map[Property].Path)) {
-			case this.pref.PREF_STRING:	PreviousValue = this.pref.getCharPref(this.map[Property].Path);	break;
-			case this.pref.PREF_INT:	PreviousValue = this.pref.getIntPref(this.map[Property].Path);	break;
-			case this.pref.PREF_BOOL:	PreviousValue = this.pref.getBoolPref(this.map[Property].Path);	break;
+		switch(this.PrefsBranch.getPrefType(this.map[Property].SubPath)) {
+			case this.PrefsBranch.PREF_STRING:	PreviousValue = this.PrefsBranch.getCharPref(this.map[Property].SubPath);	break;
+			case this.PrefsBranch.PREF_INT:		PreviousValue = this.PrefsBranch.getIntPref(this.map[Property].SubPath);	break;
+			case this.PrefsBranch.PREF_BOOL:	PreviousValue = this.PrefsBranch.getBoolPref(this.map[Property].SubPath);	break;
 		}
-		this.pref.deleteBranch(this.map[Property].Path);
+		this.PrefsBranch.deleteBranch(this.map[Property].SubPath);
 		this[Property] = Map[PreviousValue];
-		log.warn("Translated Preference (" + this.map[Property].Path + ") from " + PreviousValue + " to " + this[Property]);
+		console.info("Translated Preference (" + this.BasePath + this.map[Property].SubPath + ") from " + PreviousValue + " to " + this[Property]);
 	}
 } );
 

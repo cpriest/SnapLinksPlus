@@ -40,45 +40,45 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 	
 	BasePath:	'extensions.snaplinks',
 	map:	{
-		SelectionButton:					{ Type: 'int', 	Default: 2, 			Name: '.button' },
-		ActivateRequiresShift:				{ Type: 'bool',	Default: false	},
-		ActivateRequiresCtrl:				{ Type: 'bool',	Default: false	},
-		ActivateRequiresAlt:				{ Type: 'bool',	Default: false	},
+		SelectionButton:					{ Default: 2, 			Name: '.button' },
+		ActivateRequiresShift:				{ Default: false	},
+		ActivateRequiresCtrl:				{ Default: false	},
+		ActivateRequiresAlt:				{ Default: false	},
 		
-		SelectionBorderColor:				{ Type: 'char',	Default: '#30AF00', 	Name: '.drawpicker' },
-		SelectionBorderWidth:				{ Type: 'int', 	Default: 3, 			Name: '.drawthick' },
-		SelectedElementsBorderColor:		{ Type: 'char',	Default: '#FF0000', 	Name: '.linkspicker' },
-		SelectedElementsBorderWidth:		{ Type: 'int', 	Default: 1, 			Name: '.linksthick' },
+		SelectionBorderColor:				{ Default: '#30AF00', 	Name: '.drawpicker' },
+		SelectionBorderWidth:				{ Default: 3, 			Name: '.drawthick' },
+		SelectedElementsBorderColor:		{ Default: '#FF0000', 	Name: '.linkspicker' },
+		SelectedElementsBorderWidth:		{ Default: 1, 			Name: '.linksthick' },
 		
-		DefaultAction:						{ Type: 'char',	Default: 'OpenTabs',	Name: '.defaultaction' },	/* @Broken */
-		SwitchToFirstNewTab:				{ Type: 'bool', Default: true },
-		ActionInterval:						{ Type: 'int',	Default: 200 },
+		DefaultAction:						{ Default: 'OpenTabs',	Name: '.defaultaction' },	/* @Broken */
+		SwitchToFirstNewTab:				{ Default: true },
+		ActionInterval:						{ Default: 200 },
 		
-		HighlightCheckboxesForClicking:		{ Type: 'bool',	Default: true },
-		HighlightButtonsForClicking:		{ Type: 'bool',	Default: true },
-		HighlightJsLinksForClicking:		{ Type: 'bool',	Default: true },
-		HideSelectionOnMouseLeave:			{ Type: 'bool',	Default: false	},
-		HighlightRadioButtonsForClicking:	{ Type: 'bool',	Default: true },
-		RemoveDuplicateUrls:				{ Type: 'bool',	Default: true },
-		AlwaysPromptDownloadName:			{ Type: 'bool',	Default: false },
-		ShowSelectedCount:					{ Type: 'bool',	Default: true, 			Name: '.shownumber' },
-		ShowCountWhere:						{ Type: 'int', 	Default: 1,				Name: '.shownumber.where' },
+		HighlightCheckboxesForClicking:		{ Default: true },
+		HighlightButtonsForClicking:		{ Default: true },
+		HighlightJsLinksForClicking:		{ Default: true },
+		HideSelectionOnMouseLeave:			{ Default: false	},
+		HighlightRadioButtonsForClicking:	{ Default: true },
+		RemoveDuplicateUrls:				{ Default: true },
+		AlwaysPromptDownloadName:			{ Default: false },
+		ShowSelectedCount:					{ Default: true, 		Name: '.shownumber' },
+		ShowCountWhere:						{ Default: 1,			Name: '.shownumber.where' },
 
-		CheckboxMixedStateAction:			{ Type: 'int', 	Default: 0,				Name: '.checkbox_mixedstate' },
+		CheckboxMixedStateAction:			{ Default: 0,			Name: '.checkbox_mixedstate' },
 
-		CopyToClipboardSeparatorId:			{ Type: 'int',	Default: 1,				Name: '.CopyToClipboardSeparator.Id' },
-		CopyToClipboardSeparatorCustom:		{ Type: 'char',	Default: ',',			Name: '.CopyToClipboardSeparator.Custom' },
+		CopyToClipboardSeparatorId:			{ Default: 1,			Name: '.CopyToClipboardSeparator.Id' },
+		CopyToClipboardSeparatorCustom:		{ Default: ',',			Name: '.CopyToClipboardSeparator.Custom' },
 
 
-		DevMode:							{ Type: 'bool', Default: false,			Name: '.DevMode' },
-		DevShowJSConsoleAtStartup:			{ Type: 'bool',	Default: false	}
+		DevMode:							{ Default: false},
+		DevShowJSConsoleAtStartup:			{ Default: false	}
 	},
 
 	initialize: function($super) {
 		$super(this.BasePath, this.map);
 
 		/* Translate from older format */
-		if(this.pref.getPrefType(this.map.DefaultAction.Path) == this.pref.PREF_INT)
-			this.TranslatePref('DefaultAction', {	0:'OpenTabs', 1:'OpenWindows', 2:'OpenTabsInNewWindow', 3:'CopyToClipboard', 4:'BookmarkLinks', 5:'DownloadLinks' });
+		if(this.PrefsBranch.getPrefType(this.map.DefaultAction.SubPath) == this.PrefsBranch.PREF_INT)
+			this.TranslatePrefValue('DefaultAction', {	0:'OpenTabs', 1:'OpenWindows', 2:'OpenTabsInNewWindow', 3:'CopyToClipboard', 4:'BookmarkLinks', 5:'DownloadLinks' });
 	}
 });

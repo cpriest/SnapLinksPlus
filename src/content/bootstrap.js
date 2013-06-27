@@ -23,9 +23,13 @@
 
 var SnapLinksPlus = { };
 
+var Cu = Components.utils,
+	Cc = Components.classes,
+	Ci = Components.interfaces;
+
+Cu.import('resource://gre/modules/Services.jsm');
 
 try {
-	var Cu = Components.utils;
 	Cu.import("chrome://snaplinksplus/content/snaplinks.js");
 } catch(e) {
 	Components.utils.reportError(e + ":\n"+ e.stack);
@@ -45,7 +49,11 @@ window.addEventListener('load', function() {
 		try {
 			Cu.import("resource:///modules/HUDService.jsm", {}).HUDService.consoleUI.toggleBrowserConsole();
 		} catch(e) { }
+	}
+}, false);
 
+window.addEventListener('load', function() {
+	if(Services.prefs.getPrefType('extensions.snaplinks.DevMode') && Services.prefs.getBoolPref('extensions.snaplinks.DevMode')) {
 		function CreateAnonymousElement(markup) {
 			var AnonymousElement = ((new DOMParser())
 				.parseFromString('<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">' + markup + '</overlay>', 'text/xml')
