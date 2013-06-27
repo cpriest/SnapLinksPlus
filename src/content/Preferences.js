@@ -40,17 +40,17 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 	
 	BasePath:	'extensions.snaplinks',
 	map:	{
-		SelectionButton:					{ Default: 2, 			Name: '.button' },
+		SelectionButton:					{ Default: 2, 			OldName: '.button' },
 		ActivateRequiresShift:				{ Default: false	},
 		ActivateRequiresCtrl:				{ Default: false	},
 		ActivateRequiresAlt:				{ Default: false	},
 		
-		SelectionBorderColor:				{ Default: '#30AF00', 	Name: '.drawpicker' },
-		SelectionBorderWidth:				{ Default: 3, 			Name: '.drawthick' },
-		SelectedElementsBorderColor:		{ Default: '#FF0000', 	Name: '.linkspicker' },
-		SelectedElementsBorderWidth:		{ Default: 1, 			Name: '.linksthick' },
+		SelectionBorderColor:				{ Default: '#30AF00', 	OldName: '.drawpicker' },
+		SelectionBorderWidth:				{ Default: 3, 			OldName: '.drawthick' },
+		SelectedElementsBorderColor:		{ Default: '#FF0000', 	OldName: '.linkspicker' },
+		SelectedElementsBorderWidth:		{ Default: 1, 			OldName: '.linksthick' },
 		
-		DefaultAction:						{ Default: 'OpenTabs',	Name: '.defaultaction' },	/* @Broken */
+		DefaultAction:						{ Default: 'OpenTabs',	OldName: '.defaultaction' },	/* @Broken */
 		SwitchToFirstNewTab:				{ Default: true },
 		ActionInterval:						{ Default: 200 },
 		
@@ -61,10 +61,10 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 		HighlightRadioButtonsForClicking:	{ Default: true },
 		RemoveDuplicateUrls:				{ Default: true },
 		AlwaysPromptDownloadName:			{ Default: false },
-		ShowSelectedCount:					{ Default: true, 		Name: '.shownumber' },
-		ShowCountWhere:						{ Default: 1,			Name: '.shownumber.where' },
+		ShowSelectedCount:					{ Default: true, 		OldName: '.shownumber' },
+		ShowCountWhere:						{ Default: 1,			OldName: '.shownumber.where' },
 
-		CheckboxMixedStateAction:			{ Default: 0,			Name: '.checkbox_mixedstate' },
+		CheckboxMixedStateAction:			{ Default: 0,			OldName: '.checkbox_mixedstate' },
 
 		CopyToClipboardSeparatorId:			{ Default: 1,			Name: '.CopyToClipboardSeparator.Id' },
 		CopyToClipboardSeparatorCustom:		{ Default: ',',			Name: '.CopyToClipboardSeparator.Custom' },
@@ -79,6 +79,6 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 
 		/* Translate from older format */
 		if(this.PrefsBranch.getPrefType(this.map.DefaultAction.SubPath) == this.PrefsBranch.PREF_INT)
-			this.TranslatePrefValue('DefaultAction', {	0:'OpenTabs', 1:'OpenWindows', 2:'OpenTabsInNewWindow', 3:'CopyToClipboard', 4:'BookmarkLinks', 5:'DownloadLinks' });
+			this.TranslatePropertyPrefValue('DefaultAction', {	0:'OpenTabs', 1:'OpenWindows', 2:'OpenTabsInNewWindow', 3:'CopyToClipboard', 4:'BookmarkLinks', 5:'DownloadLinks' });
 	}
 });
