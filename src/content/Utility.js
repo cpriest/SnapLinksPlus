@@ -310,8 +310,14 @@ var PrefsMapper = Class.create({
 			}
 
 			Object.defineProperty(this, Property, {
-				get:	function() { return this.GetPropertyPref(Property); },
-				set:	function(x) { this.SetPropertyPref(Property, x); }
+				get: function() {
+					//noinspection JSPotentiallyInvalidUsageOfThis
+					return this.GetPropertyPref(Property);
+				},
+				set: function(x) {
+					//noinspection JSPotentiallyInvalidUsageOfThis
+					this.SetPropertyPref(Property, x);
+				}
 			});
 
 			/* Translate preference location if OldName is present */
@@ -344,7 +350,7 @@ var PrefsMapper = Class.create({
 			case this.PrefsBranch.PREF_BOOL:		return this.PrefsBranch.getBoolPref(SubPath);
 		}
 		
-		return undefined;
+		return this.UnwrapBranch(SubPath);
 	},
 	
 	SetPref: function(SubPath, Value) {
@@ -355,8 +361,53 @@ var PrefsMapper = Class.create({
 			case 'boolean':	return this.PrefsBranch.setBoolPref(SubPath, Value);
 			case 'number':	return this.PrefsBranch.setIntPref(SubPath, Value);
 			case 'string':	return this.PrefsBranch.setCharPref(SubPath, Value);
+			case 'object':
+				Object.keys(Value).forEach( function(Key) {
+					this.SetPref(SubPath + '.' + Key, Value[Key]);
+				}, this);
+				break;
 		}
 		return false;
+	},
+
+	/** Returns an array or object of all sub paths of the branch */
+	UnwrapBranch: function(SubPath) {
+		/**
+		 * getChildList() is a strange function, it requires lenOut to be an object and returns
+		 * an object whose only attribute is .value which is the length of the returned array
+		 * However the array's .length is valid, so we basically ignore lenOut
+		 */
+		var lenOut = { };
+		var tChildren = this.PrefsBranch.getChildList(SubPath, lenOut);
+		if(tChildren.length == 0)
+			return undefined;
+
+		/* Paths returned are full paths, we strip our current SubPath and take the first .split() argument
+		* 	which will further call .GetPref() and unroll 2nd/3rd/4th/... levels as necessary */
+
+		/* Get Unique Sub Paths, tChildren[] will be an array of all (full) child paths of SubPath */
+		let UniqueSubPaths = tChildren.reduce(function(UniqueSubPaths, Value) {
+			UniqueSubPaths[Value.replace(SubPath + '.', '').split('.')[0]] = true;
+			return UniqueSubPaths;
+		}, { } );
+
+		var AllKeysAreIntegers = true;
+		var result = { };
+
+		Object.keys(UniqueSubPaths).forEach(function(Key) {
+			if(isNaN(parseInt(Key)))
+				AllKeysAreIntegers = false;
+			result[Key] = this.GetPref(SubPath + '.' + Key);
+		}, this);
+
+		if(!AllKeysAreIntegers)
+			return result;
+
+		/* Convert to array if all UniqueSubPath.keys() were integers */
+		return Object.keys(result)
+			.map(function(Index) {
+				return result[Index];
+			});
 	},
 
 	TranslatePropertyPrefValue: function(Property, Map) {

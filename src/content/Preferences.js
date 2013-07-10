@@ -49,6 +49,12 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 		SelectionBorderWidth:				{ Default: 3, 			OldName: '.drawthick' },
 		SelectedElementsBorderColor:		{ Default: '#FF0000', 	OldName: '.linkspicker' },
 		SelectedElementsBorderWidth:		{ Default: 1, 			OldName: '.linksthick' },
+
+		SelectionStyle:						{ Default: {
+													outline:			'3px dotted #30AF00',
+													backgroundColor:	'rgba(255,0,0,50)'
+												}
+											},
 		
 		DefaultAction:						{ Default: 'OpenTabs',	OldName: '.defaultaction' },	/* @Broken */
 		SwitchToFirstNewTab:				{ Default: true },
