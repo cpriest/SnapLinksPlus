@@ -75,6 +75,8 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 		CopyToClipboardSeparatorId:			{ Default: 1,			Name: '.CopyToClipboardSeparator.Id' },
 		CopyToClipboardSeparatorCustom:		{ Default: ',',			Name: '.CopyToClipboardSeparator.Custom' },
 
+		Events_MouseDown_FireEventOnLinks:	{ Default: false,		Name: '.Events.MouseDown.FireEventsOnLinks' },
+		Events_MouseUp_FireEventOnLinks:	{ Default: false,		Name: '.Events.MouseUp.FireEventsOnLinks' },
 
 		DevMode:							{ Default: false},
 		DevShowJSConsoleAtStartup:			{ Default: false	}

@@ -415,6 +415,8 @@ var SnapLinksClass = Class.create({
 					if (info.SnapIsJsLink) {
 						this.ClickLink(info.elem); // Click JS links.
 					} else {
+						this.FireEventsForElement(info.elem);
+
 						var NewTab = Browser.addTab(info.href, CurrentReferer);
 						TabsCreated++;
 						if(TabsCreated == 1 && this.Prefs.SwitchToFirstNewTab)
@@ -476,12 +478,11 @@ var SnapLinksClass = Class.create({
 			var CollectedElementsInfo = this.CollectElementsInfo(this.Selection.FilteredElements);
 
 			CollectedElementsInfo.forEach( function(info, index) {
-				var callback = this;
-				
 				this.Window.setTimeout(function() {
+					this.FireEventsForElement(info.elem);
 					if(info.href)
-						callback.Window.open(info.href);
-				}, this.Prefs.ActionInterval * index, callback);
+						this.Window.open(info.href);
+				}.bind(this), this.Prefs.ActionInterval * index);
 			}, this );
 		}
 		catch(e) {
@@ -495,6 +496,10 @@ var SnapLinksClass = Class.create({
 	OpenTabsInNewWindow: function() {
 		try {
 			if(this.Selection.FilteredElements.length) {
+				this.Selection.FilteredElements.forEach(function(elem) {
+					this.FireEventsForElement(elem);
+				}.bind(this));
+
 				var urls = this.Selection.FilteredElements.map( function(elem) {
 					return elem.href;
 				}, this ).join('|');
@@ -642,6 +647,23 @@ var SnapLinksClass = Class.create({
 		}
 		catch(e) {
 			Components.utils.reportError(e);
+		}
+	},
+
+	FireEventsForElement: function(elem) {
+		let MouseEvent = this.Window.MouseEvent;
+
+		/* Hidden features that enable users (through about:config) to enable firing of mousedown/mouseup events
+			on links prior to their being opened, see: https://github.com/cpriest/SnapLinksPlus/issues/7 */
+		if(this.Prefs.Events_MouseDown_FireEventOnLinks) {
+			let me = new MouseEvent('mousedown', { view: this.Window, bubbles: false, cancelable: true} );
+			me.preventDefault();
+			elem.dispatchEvent(me);
+		}
+		if(this.Prefs.Events_MouseUp_FireEventOnLinks) {
+			let me = new MouseEvent('mouseup', { view: this.Window, bubbles: false, cancelable: true} );
+			me.preventDefault();
+			elem.dispatchEvent(me);
 		}
 	}
 });
