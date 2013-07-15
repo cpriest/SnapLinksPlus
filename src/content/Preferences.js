@@ -19,14 +19,134 @@
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var EXPORTED_SYMBOLS = ["SnapLinksPrefsClass"];
+var EXPORTED_SYMBOLS = ["SnapLinksPrefsClass",'SLPrefs'];
 
 try {
 	Components.utils.import("chrome://snaplinksplus/content/Utility.js");
+	Components.utils.import("chrome://snaplinksplus/content/WindowFaker.js");
 }
 catch(e) {
 	Components.utils.reportError(e + ":\n"+ e.stack);
 }
+
+var SLPrefs = CreatePreferenceMap('extensions.snaplinks', {
+
+	Activation: {
+		RequiresShift:	false,
+		RequiresCtrl:	false,
+		RequiresAlt:	false,
+	},
+
+	Selection:	{
+		Button: 			2,
+		HideOnMouseLeave:	false,
+		BorderColor:		'#30AF00',
+		BorderWidth:		3,
+//		Style: {
+//			outline: 			'3px dotted #30AF00',
+//			backgroundColor:	'rgba(255,0,0,50)',
+//		},
+//		ShowCount:	0,		/* 0: Don't show, 1: Hover Panel, 2: AddonBar */
+		ShowCount:			true,
+		ShowCountWhere:		1,
+	},
+
+	SelectedElements: {
+		BorderColor: '#FF0000',
+		BorderWidth: 1,
+//		Style: {
+//			outline:	'1px solid #FF0000',
+//		},
+	},
+
+	Elements: {
+		Anchors: {
+			Highlight:				true,
+			RemoveDuplicateUrls:	true,
+		},
+		Checkboxes: {
+			Highlight:				true,
+			MixedStateAction:		0,
+		},
+		Buttons: {
+			Highlight:	true,
+		},
+		JSLinks: {
+			Highlight:	true,
+		},
+		RadioButtons: {
+			Highlight:	true,
+		},
+	},
+
+	Actions: {
+		Default:					'OpenTabs',
+		DelayBetweenActions:		200,
+
+		OpenTabs: {
+			SwitchToFirstNewTab:	true,
+		},
+		CopyToClipboard: {
+			SeparatorId:	1,
+			Separator:		',',
+		},
+		Download: {
+			PromptForName:	false,
+		},
+	},
+
+	Special: {
+		FireEventsOnLinks: {
+			MouseDown:		false,
+			MouseUp:		false,
+		},
+	},
+
+	Dev: {
+		Mode:					false,
+		ShowConsoleAtStartup:	false,
+	},
+});
+
+UpdatePreferences('extensions.snaplinks',  {
+//	'SelectionButton': 						'Selection.Button',
+//	'ActivateRequiresShift': 				'Activation.RequiresShift',
+//	'ActivateRequiresCtrl': 				'Activation.RequiresCtrl',
+//	'ActivateRequiresAlt': 					'Activation.RequiresAlt',
+//
+//	'SelectionBorderColor':					'Selection.BorderColor',
+//	'SelectionBorderWidth':					'Selection.BorderWidth',
+//	'SelectedElementsBorderColor':			'SelectedElements.BorderColor',
+//	'SelectedElementsBorderWidth':			'SelectedElements.BorderWidth',
+//
+//	'DefaultAction':	 {
+//		MoveTo:		'Actions.Default',
+//		Translate:  { 0:'OpenTabs', 1:'OpenWindows', 2:'OpenTabsInNewWindow', 3:'CopyToClipboard', 4:'BookmarkLinks', 5:'DownloadLinks' }
+//	},
+//	'SwitchToFirstNewTab':					'Actions.OpenTabs.SwitchToFirstNewTab',
+//	'ActionInterval':						'Actions.DelayBetweenActions',
+//
+//	'HighlightCheckboxesForClicking':		'Elements.Checkboxes.Highlight',
+//	'HighlightButtonsForClicking':			'Elements.Buttons.Highlight',
+//	'HighlightJsLinksForClicking':			'Elements.JSLinks.Highlight',
+//	'HighlightRadioButtonsForClicking':		'Elements.RadioButtons.Highlight',
+//	'HideSelectionOnMouseLeave':			'Selection.HideOnMouseLeave',
+//	'RemoveDuplicateUrls':					'Elements.Anchors.RemoveDuplicateUrls',
+//	'AlwaysPromptDownloadName':				'Actions.Download.PromptForName',
+//	'ShowSelectedCount':					'Selection.ShowCount',
+//	'ShowCountWhere':						'Selection.ShowCountWhere',
+//
+//	'CheckboxMixedStateAction':				'Elements.Checkboxes.MixedStateAction',
+//
+//	'CopyToClipboardSeparatorId':			'Actions.CopyToClipboard.SeparatorId',
+//	'CopyToClipboardSeparatorCustom':		'Actions.CopyToClipboard.Separator',
+//
+//	'Events.MouseDown.FireEventsOnLinks': 	'Special.FireEventsOnLinks.MouseDown',
+//	'Events.MouseUp.FireEventsOnLinks': 	'Special.FireEventsOnLinks.MouseUp',
+
+	'DevMode':								'Dev.Mode',
+	'DevShowJSConsoleAtStartup':			'Dev.ShowConsoleAtStartup',
+});
 
 var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 	
@@ -39,6 +159,7 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 	CMSA_Toggle		: 2,
 	
 	BasePath:	'extensions.snaplinks',
+
 	map:	{
 		SelectionButton:					{ Default: 2, 			OldName: '.button' },
 		ActivateRequiresShift:				{ Default: false	},
@@ -50,12 +171,6 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 		SelectedElementsBorderColor:		{ Default: '#FF0000', 	OldName: '.linkspicker' },
 		SelectedElementsBorderWidth:		{ Default: 1, 			OldName: '.linksthick' },
 
-		SelectionStyle:						{ Default: {
-													outline:			'3px dotted #30AF00',
-													backgroundColor:	'rgba(255,0,0,50)'
-												}
-											},
-		
 		DefaultAction:						{ Default: 'OpenTabs',	OldName: '.defaultaction' },	/* @Broken */
 		SwitchToFirstNewTab:				{ Default: true },
 		ActionInterval:						{ Default: 200 },
@@ -63,7 +178,7 @@ var SnapLinksPrefsClass = Class.create(PrefsMapper, {
 		HighlightCheckboxesForClicking:		{ Default: true },
 		HighlightButtonsForClicking:		{ Default: true },
 		HighlightJsLinksForClicking:		{ Default: true },
-		HideSelectionOnMouseLeave:			{ Default: false	},
+		HideSelectionOnMouseLeave:			{ Default: false },
 		HighlightRadioButtonsForClicking:	{ Default: true },
 		RemoveDuplicateUrls:				{ Default: true },
 		AlwaysPromptDownloadName:			{ Default: false },

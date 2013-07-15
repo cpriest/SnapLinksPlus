@@ -31,7 +31,9 @@ var EXPORTED_SYMBOLS = ['Class',
                         'escapeHTML',
 						'console',
 						'dc',
-						'DumpWindowFrameStructure'];
+						'DumpWindowFrameStructure',
+						'UpdatePreferences',
+						'CreatePreferenceMap'];
 
 var Cu = Components.utils,
 	Cc = Components.classes,
@@ -44,7 +46,7 @@ var console = {
 };
 var dc = function() { };
 
-if(Services.prefs.getPrefType('extensions.snaplinks.DevMode') && Services.prefs.getBoolPref('extensions.snaplinks.DevMode') == true) {
+if(Services.prefs.getPrefType('extensions.snaplinks.Dev.Mode') && Services.prefs.getBoolPref('extensions.snaplinks.Dev.Mode') == true) {
 	console = (Cu.import("resource://gre/modules/devtools/Console.jsm", {})).console;
 
 	console.warn("Warning, console.clear() is being over-ridden (at this time, it's defined but empty, may have changed.) Defined In:  Console.jsm");
@@ -57,7 +59,7 @@ if(Services.prefs.getPrefType('extensions.snaplinks.DevMode') && Services.prefs.
 	dc = function() {
 		let args = Array.prototype.slice.call(arguments, 0),
 			channel = args.shift(),
-			PrefsRoot = 'extensions.snaplinks.debug.channel.';//.'+channel+'.show';
+			PrefsRoot = 'extensions.snaplinks.Debug.Channel.';//.'+channel+'.show';
 
 		Services.prefs.getDefaultBranch(PrefsRoot).setBoolPref(channel+'.show', false);
 		if(Services.prefs.getBranch(PrefsRoot).getBoolPref(channel+'.show') != true)
@@ -98,7 +100,14 @@ var Util = {
 			for (var property in source)
 				destination[property] = source[property];
 			return destination;
-		}
+		},
+		wrap: function(base, methods) {
+			var o = { };
+			Util.Object.extend(o, methods);
+			o.__proto__ = base;
+			o.wrap = function(base) { return Util.Object.wrap(base, methods); };
+			return o;
+		},
 	},
 
 	Function: {
@@ -281,6 +290,125 @@ function DumpWindowFrameStructure(win) {
 }
 
 /**
+ * Creates our own copy of Services.prefs with added functions and over-rides
+ * of getBranch/getDefaultBranch which return wrapped objects as well.
+ */
+var PrefsServiceExtensions = {
+	/* Type-agnostic GetPref */
+	GetPref: function GetPref(SubPath) {
+		switch(this.getPrefType(SubPath)) {
+			case this.PREF_STRING:	return this.getCharPref(SubPath);
+			case this.PREF_INT:		return this.getIntPref(SubPath);
+			case this.PREF_BOOL:	return this.getBoolPref(SubPath);
+		}
+		return undefined;
+	},
+
+	/* Type-agnostic SetPref */
+	SetPref: function SetPref(SubPath, Value) {
+		if(Value == undefined)
+			return this.clearUserPref(SubPath);
+
+		switch(typeof Value) {
+			case 'boolean':	return this.setBoolPref(SubPath, Value);
+			case 'number':	return this.setIntPref(SubPath, Value);
+			case 'string':	return this.setCharPref(SubPath, Value);
+		}
+		return false;
+	},
+
+	getBranch: function getBranchProxy(root) { return this.wrap(Services.prefs.getBranch(root)); },
+	getDefaultBranch: function getDefaultBranchProxy(root) { return this.wrap(Services.prefs.getDefaultBranch(root)); },
+};
+var Prefs = Util.Object.wrap(Services.prefs, PrefsServiceExtensions);
+
+/**
+ * Returns an object who's properties match the structure of Defaults,
+ * 		each property will have an accessor defined which will get/set the value
+ * 		from within the preferences branch
+ *
+ * @param BasePath	The base branch in the preferences where all properties exist under
+ * @param Defaults	An object map of properties and defaults, all entries in the map are set on the default preferences branch
+ * @returns {*}
+ */
+function CreatePreferenceMap(BasePath, Defaults) {
+	let obj = { };
+	var PrefsBranch = Prefs.getDefaultBranch(BasePath);
+
+	function WalkObject(o, sub) {
+		let obj = { };
+		let props = { };
+
+		for(let [name, value] in Iterator(o)) {
+			let path = [sub, name].join('.');
+			if(typeof value == 'object') {
+				obj[name] = WalkObject(value, path);
+			} else {
+				PrefsBranch.SetPref(path, value);
+				props[name] = {
+					enumerable: true,
+					get: function() { return PrefsBranch.GetPref(path); },
+					set: function(x) { return PrefsBranch.SetPref(path, x); }
+				}
+			}
+		}
+		Object.defineProperties(obj, props);
+		return obj;
+	}
+
+	let obj = WalkObject(Defaults, undefined);
+
+	/* Set PrefsBranch to non-default branch for future access */
+	PrefsBranch = Prefs.getBranch(BasePath);
+
+	return obj;
+}
+
+/**
+ * Updates & Translates user preferences according to the Updates hash
+ *
+ * @param BasePath	The base path in the preferences branch
+ * @param Updates	A hash of SubPath: {Translation}
+ * 						If {Translation} is a string, then it moves any userPref from the old location to the new location (same BasePath)
+ * 						If {Translation} is an object, then properties:
+ * 							.Location	- New location of the user preference
+ * 							.Translate	- Hash of OldValue: NewValue to translate
+ *
+ */
+function UpdatePreferences(BasePath, Updates) {
+	var PrefsBranch = Prefs.getBranch(BasePath);
+
+	function MoveUserPreference(From, To) {
+		From = [BasePath, From].join('.');
+		To = [BasePath, To].join('.');
+		if(Prefs.prefHasUserValue(From)) {
+			Prefs.SetPref(To, Prefs.GetPref(From));
+			Prefs.SetPref(From, undefined);
+		}
+	}
+
+	function TranslateUserPreference(Path, Map) {
+		Path = [BasePath, Path].join('.');
+		if(Prefs.prefHasUserValue(Path)) {
+			let v = Prefs.GetPref(Path);
+			if(v && v in Map)
+				Prefs.SetPref(Path, Map[v]);
+		}
+	}
+
+	for(let [name, value] in Iterator(Updates)) {
+		let Location = value;
+		if(typeof value == 'object') {
+			if('Translate' in value)
+				TranslateUserPreference(name, value.Translate);
+			if('MoveTo' in value)
+				MoveUserPreference(name, value.MoveTo);
+		} else
+			MoveUserPreference(name, value);
+	}
+}
+
+/**
  * Creates getters/setters on this class
  * for each parameter specified in the map.
  */
@@ -295,8 +423,8 @@ var PrefsMapper = Class.create({
 	initialize: function(BasePath, map) {
 		this.BasePath = (BasePath + '.').replace(/\.\.$/, '.');
 		this.map = map || {};
-		var DefaultBranch = Services.prefs.getDefaultBranch(this.BasePath);
-		var NonDefaultBranch = Services.prefs.getBranch(this.BasePath);
+		var DefaultBranch = Prefs.getDefaultBranch(this.BasePath);
+		var NonDefaultBranch = Prefs.getBranch(this.BasePath);
 
 		this.PrefsBranch = DefaultBranch;
 

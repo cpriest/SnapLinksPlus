@@ -36,24 +36,27 @@ try {
 }
 
 window.addEventListener('load', function() {
-	SnapLinksPlus = new SnapLinksClass(window, document);
-
 	try {
+		SnapLinksPlus = new SnapLinksClass(window, document);
+
 		Components.utils.import('chrome://snaplinksplus/content/Debug.js');
 		SnapLinksPlus.Debug = new SnapLinksDebugClass();
 	} catch(e) {
 		 /* Ignored */
+		Components.utils.reportError(e + ":\n"+ e.stack);
 	}
 
-	if(SnapLinksPlus.Prefs.DevShowJSConsoleAtStartup) {
+	if(Services.prefs.getPrefType('extensions.snaplinks.Dev.ShowConsoleAtStartup') && Services.prefs.getBoolPref('extensions.snaplinks.Dev.ShowConsoleAtStartup')) {
 		try {
 			Cu.import("resource:///modules/HUDService.jsm", {}).HUDService.consoleUI.toggleBrowserConsole();
-		} catch(e) { }
+		} catch(e) {
+			Components.utils.reportError(e + ":\n"+ e.stack);
+		}
 	}
 }, false);
 
 window.addEventListener('load', function() {
-	if(Services.prefs.getPrefType('extensions.snaplinks.DevMode') && Services.prefs.getBoolPref('extensions.snaplinks.DevMode')) {
+	if(Services.prefs.getPrefType('extensions.snaplinks.Dev.Mode') && Services.prefs.getBoolPref('extensions.snaplinks.Dev.Mode')) {
 		function CreateAnonymousElement(markup) {
 			var AnonymousElement = ((new DOMParser())
 				.parseFromString('<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">' + markup + '</overlay>', 'text/xml')
