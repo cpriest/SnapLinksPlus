@@ -81,9 +81,9 @@ var SnapLinksClass = Class.create({
 	 */
 	ClipboardSeparator: {
 		get: function() {
-			switch (this.Prefs.CopyToClipboardSeparatorId) {
+			switch (SLPrefs.Actions.CopyToClipboard.SeparatorId) {
 			case this.COPY_TO_CLIPBOARD_SEPARATOR_ID.CUSTOM:
-				return unescape(this.Prefs.CopyToClipboardSeparatorCustom);
+				return unescape(SLPrefs.Actions.CopyToClipboard.Separator);
 				break;
 			case this.COPY_TO_CLIPBOARD_SEPARATOR_ID.NEWLINE:
 				return "\n";
@@ -102,8 +102,8 @@ var SnapLinksClass = Class.create({
 	 */
 	SnapLinksStatus: {
 		set: function(x) {
-			if(this.Prefs.ShowSelectedCount &&
-					this.Prefs.ShowCountWhere == this.Prefs.ShowCount_AddonBar) {
+			if(SLPrefs.Selection.ShowCount &&
+					SLPrefs.Selection.ShowCountWhere == SLE.ShowCount_AddonBar) {
 				var el = this.XulDocument.getElementById('snaplinks-panel') ;
 				el && (el.label = x);
 				el && (el.hidden = (x == ''));
@@ -142,7 +142,6 @@ var SnapLinksClass = Class.create({
 			.addEventListener('popuphidden',this.OnSnapLinksPopupHidden.bind(this),false);
 
 		this.Selection = new SnapLinksSelectionClass(this);
-		this.Prefs = new SnapLinksPrefsClass(this.XulDocument);
 
 		this.SnapLinksStatus = '';
 
@@ -161,13 +160,13 @@ var SnapLinksClass = Class.create({
 	ShouldActivate: function(e) {
 		if(e.view.location.protocol == 'about:')
 			return false;
-		if(e.button != this.Prefs.SelectionButton)
+		if(e.button != SLPrefs.Activation.Button)
 			return false;
-		if(this.Prefs.ActivateRequiresAlt && !e.altKey)
+		if(SLPrefs.Activation.RequiresAlt && !e.altKey)
 			return false;
-		if(this.Prefs.ActivateRequiresShift && !e.shiftKey)
+		if(SLPrefs.Activation.RequiresShift && !e.shiftKey)
 			return false;
-		if(this.Prefs.ActivateRequiresCtrl && !e.ctrlKey)
+		if(SLPrefs.Activation.RequiresCtrl && !e.ctrlKey)
 			return false;
 		return true;
 	},
@@ -200,7 +199,7 @@ var SnapLinksClass = Class.create({
 	},
 
 	OnMouseUp: function(e) {
-		if(e.button != this.Prefs.SelectionButton)
+		if(e.button != SLPrefs.Activation.Button)
 			return;
 
 		if(this.Document) {
@@ -208,7 +207,7 @@ var SnapLinksClass = Class.create({
 
 			if(this.Selection.DragStarted == true) {
 				this.StopNextContextMenuPopup = true;
-				if((e.ctrlKey || this.Prefs.DefaultAction == this.ACTION.ASK_USER) &&
+				if((e.ctrlKey || SLPrefs.Actions.Default == this.ACTION.ASK_USER) &&
 						this.Selection.SelectedElementsType == 'Links' &&
 						this.Selection.FilteredElements.length) {
 					pop = this.XulDocument.getElementById('snaplMenu');
@@ -281,7 +280,7 @@ var SnapLinksClass = Class.create({
 			'Clickable':	[ 'ClickElements'],
 		};
 
-		Action = Action || this.Prefs.DefaultAction;
+		Action = Action || SLPrefs.Actions.Default;
 
 		/* Check to see that the requested action is valid for the given SelectedElementsType */
 		if(ValidActions[this.Selection.SelectedElementsType].indexOf(Action) == -1)
@@ -323,7 +322,7 @@ var SnapLinksClass = Class.create({
 				
 				this.Window.setTimeout(function() {
 					callback.ClickLink(info.elem);
-				}, this.Prefs.ActionInterval * index, callback);
+				}, SLPrefs.Actions.DelayBetweenActions * index, callback);
 			}, this );
 		}
 		catch (e) {
@@ -378,9 +377,9 @@ var SnapLinksClass = Class.create({
 			});
 
 			this.Selection.SelectedElements.forEach( function(elem, index) {
-				if(MixedState == false || this.Prefs.CheckboxMixedStateAction == this.Prefs.CMSA_Toggle)
+				if(MixedState == false || SLPrefs.Elements.Checkboxes.MixedStateAction == SLE.CMSA_Toggle)
 					elem.click();
-				else if(this.Prefs.CheckboxMixedStateAction == this.Prefs.CMSA_Check) {
+				else if(SLPrefs.Elements.Checkboxes.MixedStateAction == SLE.CMSA_Check) {
 					if(elem.checked  == false)
 						elem.click();
 				} else {
@@ -419,11 +418,11 @@ var SnapLinksClass = Class.create({
 
 						var NewTab = Browser.addTab(info.href, CurrentReferer);
 						TabsCreated++;
-						if(TabsCreated == 1 && this.Prefs.SwitchToFirstNewTab)
+						if(TabsCreated == 1 && SLPrefs.Actions.OpenTabs.SwitchToFirstNewTab)
 							Browser.tabContainer.selectedItem = NewTab;
 					}
 				}
-			}.bind(this), this.Prefs.ActionInterval);
+			}.bind(this), SLPrefs.Actions.DelayBetweenActions);
 		}
 		catch(e) {
 			Components.utils.reportError(e + ":\n"+ e.stack);
@@ -482,7 +481,7 @@ var SnapLinksClass = Class.create({
 					this.FireEventsForElement(info.elem);
 					if(info.href)
 						this.Window.open(info.href);
-				}.bind(this), this.Prefs.ActionInterval * index);
+				}.bind(this), SLPrefs.Actions.DelayBetweenActions * index);
 			}, this );
 		}
 		catch(e) {
@@ -629,13 +628,13 @@ var SnapLinksClass = Class.create({
 				var pref = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
 				var useDownloadDir = pref.getBoolPref("browser.download.useDownloadDir");
 
-				if (useDownloadDir && !this.Prefs.AlwaysPromptDownloadName) {
+				if (useDownloadDir && !SLPrefs.Actions.Download.PromptForName) {
 					links.forEach( function( link, index ) {
 						var callback = this;
 						
 						this.Window.setTimeout(function() {
 							saveURL(link.Url, link.FileName, null, true, true, CurrentReferer);
-						}, this.Prefs.ActionInterval * index, callback, link);
+						}, SLPrefs.Actions.DelayBetweenActions * index, callback, link);
 					}, this);
 				} else {
 					links.forEach( function( link, index ) {
@@ -655,12 +654,12 @@ var SnapLinksClass = Class.create({
 
 		/* Hidden features that enable users (through about:config) to enable firing of mousedown/mouseup events
 			on links prior to their being opened, see: https://github.com/cpriest/SnapLinksPlus/issues/7 */
-		if(this.Prefs.Events_MouseDown_FireEventOnLinks) {
+		if(SLPrefs.Special.FireEventsOnLinks.MouseDown) {
 			let me = new MouseEvent('mousedown', { view: this.Window, bubbles: false, cancelable: true} );
 			me.preventDefault();
 			elem.dispatchEvent(me);
 		}
-		if(this.Prefs.Events_MouseUp_FireEventOnLinks) {
+		if(SLPrefs.Special.FireEventsOnLinks.MouseUp) {
 			let me = new MouseEvent('mouseup', { view: this.Window, bubbles: false, cancelable: true} );
 			me.preventDefault();
 			elem.dispatchEvent(me);

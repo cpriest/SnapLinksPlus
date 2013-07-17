@@ -28,42 +28,38 @@ catch(e) {
 
 
 var SnaplinksPrefsDialog = new (Class.create({
-	_dialog: null,
-	
 	InitializeDialog: function(dialog) {
-		this._dialog = dialog;
 		this.UpdateLinePreviews();
 
-		var alwaysPrompt = document.getElementById("snaplinks.checkbox.AlwaysPromptDownloadName");
+		var alwaysPrompt = document.getElementById("SnapLinks.Actions.Download.PromptForName");
 		if (alwaysPrompt) {
 			var pref = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
 			var useDownloadDir = pref.getBoolPref("browser.download.useDownloadDir");
 
 			if (useDownloadDir) {
 				alwaysPrompt.removeAttribute('disabled');
-			}
-			else {
-				alwaysPrompt.setAttribute('disabled', true);
+			} else {
+				alwaysPrompt.setAttribute('disabled', "true");
 			}
 		}
 	},
 	
 	UpdateLinePreviews: function() {
 		/* Initialize Selection Rect Preview */
-		var color = document.getElementById('snaplinks.drawpicker').color;
-		var size = document.getElementById('snaplinks.drawthick').selectedItem.value;
-		var drawPreviewElem = document.getElementById('snaplinks.drawId');
-		drawPreviewElem.style.borderTopWidth = size +'px';
-		drawPreviewElem.style.borderTopColor = color;
-		drawPreviewElem.style.borderTopStyle = 'dashed';
+		var SelectionBorderColor = document.getElementById('SnapLinks.Selection.BorderColor').color;
+		var SelectionBorderSize = document.getElementById('SnapLinks.Selection.BorderWidth').selectedItem.value;
+		var DrawPreviewElem = document.getElementById('SnapLinks.Selection.Preview');
+		DrawPreviewElem.style.borderTopWidth = SelectionBorderSize +'px';
+		DrawPreviewElem.style.borderTopColor = SelectionBorderColor;
+		DrawPreviewElem.style.borderTopStyle = 'dashed';
 
 		/* Initialize Links Preview */
-		var color = document.getElementById('snaplinks.linkspicker').color;
-		var size = document.getElementById('snaplinks.linksthick').selectedItem.value;
-		var linksPreviewElem = document.getElementById('snaplinks.linksId');
-		linksPreviewElem.style.borderTopWidth = size +'px';
-		linksPreviewElem.style.borderTopColor = color;
-		linksPreviewElem.style.borderTopStyle = 'solid';
+		var SelectedBorderColor = document.getElementById('SnapLinks.SelectedElements.BorderColor').color;
+		var SelectedBorderSize = document.getElementById('SnapLinks.SelectedElements.BorderWidth').selectedItem.value;
+		var LinksPreviewElem = document.getElementById('SnapLinks.SelectedElements.Preview');
+		LinksPreviewElem.style.borderTopWidth = SelectedBorderSize +'px';
+		LinksPreviewElem.style.borderTopColor = SelectedBorderColor;
+		LinksPreviewElem.style.borderTopStyle = 'solid';
 	}
 
 } ))();

@@ -28,6 +28,7 @@ var Cu = Components.utils,
 try {
 	Cu.import("chrome://snaplinksplus/content/Utility.js");
 	Cu.import("chrome://snaplinksplus/content/WindowFaker.js");
+	Cu.import('chrome://snaplinksplus/content/Preferences.js');
 } catch(e) {
 	Components.utils.reportError(e + ":\n"+ e.stack);
 }
@@ -55,7 +56,7 @@ var SnapLinksSelectionClass = Class.create({
 
 			var Distinct = [ ];
 			return this.SelectedElements.filter( function(elem) {
-				if(!elem.href || (this.SnapLinksPlus.Prefs.RemoveDuplicateUrls && Distinct.indexOf(elem.href) != -1))
+				if(!elem.href || (SLPrefs.Elements.Anchors.RemoveDuplicateUrls && Distinct.indexOf(elem.href) != -1))
 					return false;
 				Distinct.push(elem.href);
 				return true;
@@ -157,7 +158,7 @@ var SnapLinksSelectionClass = Class.create({
 
 		if(this.Element && e.target.ownerDocument == this.TopDocument) {
 			if(e.clientX < 0 || e.clientY < 0 || e.clientX > this.TopDocument.defaultView.innerWidth || e.clientY > this.TopDocument.defaultView.innerHeight) {
-				if(this.SnapLinksPlus.Prefs.HideSelectionOnMouseLeave)
+				if(SLPrefs.Selection.HideOnMouseLeave)
 					this.Element.style.display = 'none';
 				else {
 					this.Element.style.display = '';
@@ -175,7 +176,7 @@ var SnapLinksSelectionClass = Class.create({
 		}
 
 		/* Disabled At The Moment */
-		if(false && e.altKey && !this.SnapLinksPlus.Prefs.ActivateRequiresAlt) {
+		if(false && e.altKey && !SLPrefs.Activation.RequiresAlt) {
 			this.OffsetSelection(pageX - this.SelectionRect.right, pageY - this.SelectionRect.bottom);
 		} else {
 			this.ExpandSelectionTo(pageX, pageY);
@@ -213,16 +214,16 @@ var SnapLinksSelectionClass = Class.create({
 
 			this.Element = this.TopDocument.createElementNS('http://www.w3.org/1999/xhtml', 'snaplRect');
 			if(InsertionNode && this.Element) {
-				this.Element.style.color = this.SnapLinksPlus.Prefs.SelectionBorderColor;
-				this.Element.style.border = this.SnapLinksPlus.Prefs.SelectionBorderWidth + 'px dotted';
+				this.Element.style.color = SLPrefs.Selection.BorderColor;
+				this.Element.style.border = SLPrefs.Selection.BorderWidth + 'px dotted';
 				this.Element.style.position = 'absolute';
 				this.Element.style.zIndex = '10000';
 				this.Element.style.left = this.SelectionRect.left + 'px';
 				this.Element.style.top = this.SelectionRect.top + 'px';
 				InsertionNode.appendChild(this.Element);
 
-				if(this.SnapLinksPlus.Prefs.ShowSelectedCount &&
-						this.SnapLinksPlus.Prefs.ShowCountWhere == this.SnapLinksPlus.Prefs.ShowCount_Hover) {
+				if(SLPrefs.Selection.ShowCount &&
+						SLPrefs.Selection.ShowCountWhere == SLE.ShowCount_Hover) {
 					this.ElementCount = this.TopDocument.createElementNS('http://www.w3.org/1999/xhtml', 'div');
 					ApplyStyle(this.ElementCount, {
 						position		: 'absolute',
@@ -238,7 +239,7 @@ var SnapLinksSelectionClass = Class.create({
 				this.DragStarted = this.Element.parentNode != undefined;
 
 				if(this.DragStarted) {
-					if(this.SnapLinksPlus.Prefs.ShowSelectedCount) {
+					if(SLPrefs.Selection.ShowCount) {
 						var linksText = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", ['0'], 1);
 						this.SnapLinksPlus.SnapLinksStatus = linksText;
 					}
@@ -272,7 +273,7 @@ var SnapLinksSelectionClass = Class.create({
 
 				// Skip JavaScript links, if the option is disabled.
 				if (link.SnapIsJsLink &&
-						!this.SnapLinksPlus.Prefs.HighlightJsLinksForClicking) {
+						!SLPrefs.Elements.JSLinks.Highlight) {
 					return;
 				}
 			} catch (e) {
@@ -289,13 +290,13 @@ var SnapLinksSelectionClass = Class.create({
 		$A(Document.body.querySelectorAll('INPUT')).forEach( function(input) {
 			var Type = input.getAttribute('type'),
 				ElementRectsNode = input;
-			if(this.SnapLinksPlus.Prefs.HighlightButtonsForClicking && (Type == 'submit' || Type == 'button')) {
+			if(SLPrefs.Elements.Buttons.Highlight && (Type == 'submit' || Type == 'button')) {
 				SelectableElements.push(input);
 			}
-			if(this.SnapLinksPlus.Prefs.HighlightRadioButtonsForClicking && Type == 'radio') {
+			if(SLPrefs.Elements.RadioButtons.Highlight && Type == 'radio') {
 				SelectableElements.push(input);
 			}
-			else if(this.SnapLinksPlus.Prefs.HighlightCheckboxesForClicking && Type == 'checkbox') {
+			else if(SLPrefs.Elements.Checkboxes.Highlight && Type == 'checkbox') {
 				if(input.parentNode.tagName == 'LABEL') {
 					ElementRectsNode = input.parentNode;
 					input.SnapOutlines = [ input.parentNode ];
@@ -413,8 +414,8 @@ var SnapLinksSelectionClass = Class.create({
 			ApplyStyle(this.Element, {
 							left 	: this.SelectionRect.left + 'px',
 							top 	: this.SelectionRect.top + 'px',
-							width 	: this.SelectionRect.width - (2 * this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px',
-							height 	: this.SelectionRect.height - (2 * this.SnapLinksPlus.Prefs.SelectionBorderWidth) + 'px'
+							width 	: this.SelectionRect.width - (2 * SLPrefs.Selection.BorderWidth) + 'px',
+							height 	: this.SelectionRect.height - (2 * SLPrefs.Selection.BorderWidth) + 'px'
 			} );
 
 			this.CalcSelectedElements();
@@ -601,7 +602,7 @@ var SnapLinksSelectionClass = Class.create({
 
 			dc('calc-elements', 'AfterFilter: Greatest=%s, SelectedElements = %o', Greatest, this.SelectedElements);
 
-//			if(Greatest == 'Links' && this.SnapLinksPlus.Prefs.RemoveDuplicateUrls) {
+//			if(Greatest == 'Links' && SLPrefs.Elements.Anchors.RemoveDuplicateUrls) {
 //				/* Detect duplicate links by filtering links which are contained fully within other links - Issue #37
 //				 * 	Note: Identical links are allowed through here. */
 //				var Urls = this.SelectedElements.map(function(elem) { return elem.href; } );
@@ -628,7 +629,7 @@ var SnapLinksSelectionClass = Class.create({
 //			}
 
 			// Apply the style on the selected elements.
-			var OutlineStyle = this.SnapLinksPlus.Prefs.SelectedElementsBorderWidth + 'px solid ' + this.SnapLinksPlus.Prefs.SelectedElementsBorderColor;
+			var OutlineStyle = SLPrefs.SelectedElements.BorderWidth + 'px solid ' + SLPrefs.SelectedElements.BorderColor;
 			this.SelectedElements.forEach( function(elem) {
 				(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
 					elem.style.MozOutline = OutlineStyle;	/* Pre FF13 */

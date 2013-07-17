@@ -22,34 +22,3 @@
  */
 
 pref('extensions.snaplinks@snaplinks.mozdev.org.description',   'chrome://snaplinksplus/locale/snaplinks.properties');  
-
-//pref('extensions.snaplinks.button',                             2);				// Check
-//pref('extensions.snaplinks.ActivateRequiresShift',              false);			// Check
-//pref('extensions.snaplinks.ActivateRequiresCtrl',               false);			// Check
-//pref('extensions.snaplinks.ActivateRequiresAlt',                false);			// Check
-//
-//pref('extensions.snaplinks.drawpicker',                         '#30AF00');		// Check
-//pref('extensions.snaplinks.drawthick',                          3);				// Check
-//pref('extensions.snaplinks.linkspicker',                        '#FF0000');		// Check
-//pref('extensions.snaplinks.linksthick',                         1);				// Check
-//
-//pref('extensions.snaplinks.defaultaction',                      'OpenTabs');	// Check
-//pref('extensions.snaplinks.SwitchToFirstNewTab',        	   	true);			// Check
-//pref('extensions.snaplinks.ActionInterval',                     200);			// Check
-//
-//pref('extensions.snaplinks.HighlightCheckboxesForClicking',     true);			// Check
-//pref('extensions.snaplinks.HighlightButtonsForClicking',        true);			// Check
-//pref('extensions.snaplinks.HighlightRadioButtonsForClicking',   true);			// Check
-//pref('extensions.snaplinks.HighlightJsLinksForClicking',        true);			// Check
-//pref('extensions.snaplinks.HideSelectionOnMouseLeave',          false);			// Check
-//pref('extensions.snaplinks.RemoveDuplicateUrls',                true);			// Check
-//pref('extensions.snaplinks.AlwaysPromptDownloadName',           false);			// Check
-//pref('extensions.snaplinks.shownumber',                         true);			// Check
-//pref('extensions.snaplinks.shownumber.where',                   1);				// Check
-//
-//pref('extensions.snaplinks.checkbox_mixedstate',                0);				// Check
-//
-//pref('extensions.snaplinks.CopyToClipboardSeparator.Id',        1);				// Check
-//pref('extensions.snaplinks.CopyToClipboardSeparator.Custom',    ',');			// Check
-//
-//pref('extensions.snaplinks.DevMode',    false);									// Check
