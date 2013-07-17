@@ -20,15 +20,14 @@
  */
 
 var EXPORTED_SYMBOLS = ['Class',
-                        'PrefsDialogMapper',
-                        'PrefsMapper',
-                        'Util',
-                        '$A',
-                        'ApplyStyle',
-                        'GetElementRects',
-                        'Rect',
-                        'htmlentities',
-                        'escapeHTML',
+						'PrefsDialogMapper',
+						'Util',
+						'$A',
+						'ApplyStyle',
+						'GetElementRects',
+						'Rect',
+						'htmlentities',
+						'escapeHTML',
 						'console',
 						'dc',
 						'DumpWindowFrameStructure',
@@ -407,150 +406,6 @@ function UpdatePreferences(BasePath, Updates) {
 			MoveUserPreference(name, value);
 	}
 }
-
-/**
- * Creates getters/setters on this class
- * for each parameter specified in the map.
- */
-var PrefsMapper = Class.create({
-	/**
-	 *	@param BasePath string 	- String representing the prefix for automatic preference names based on property name of map
-	 *	@param map object		- Object map of { PropertyTitle: { Parameters } }
-	 *			Parameters:		(Required) Default:		Default Value of Preference, pref type is inferred from default value
-	 *							(Optional) Name:		Full preference path, defaults to {BasePath}.{PropertyTitle}
-	 */
-
-	initialize: function(BasePath, map) {
-		this.BasePath = (BasePath + '.').replace(/\.\.$/, '.');
-		this.map = map || {};
-		var DefaultBranch = Prefs.getDefaultBranch(this.BasePath);
-		var NonDefaultBranch = Prefs.getBranch(this.BasePath);
-
-		this.PrefsBranch = DefaultBranch;
-
-		Object.keys(this.map).forEach( function(Property) {
-			this.map[Property].SubPath = ((this.map[Property].Name && this.map[Property].Name[0] == '.' && this.map[Property].Name) || Property).replace(/^\./, '');
-
-			if(typeof this.map[Property].Default == 'undefined') {
-				console.error("SL+ Preference: %s has no default value, skipped", this.BasePath + this.map[Property].SubPath);
-				delete this.map[Property];
-				return;
-			}
-
-			Object.defineProperty(this, Property, {
-				get: function() {
-					//noinspection JSPotentiallyInvalidUsageOfThis
-					return this.GetPropertyPref(Property);
-				},
-				set: function(x) {
-					//noinspection JSPotentiallyInvalidUsageOfThis
-					this.SetPropertyPref(Property, x);
-				}
-			});
-
-			/* Translate preference location if OldName is present */
-			if(this.map[Property].OldName) {
-				let OldName = this.map[Property].OldName.replace(/^./, '');
-				if(NonDefaultBranch.getPrefType(OldName)) {
-					this.PrefsBranch = NonDefaultBranch;
-					this.SetPropertyPref(Property, this.GetPref(OldName));
-					this.SetPref(OldName, undefined);
-					console.info('Translated old preference location from %s to %s', this.BasePath + OldName, this.BasePath + this.map[Property].SubPath);
-					this.PrefsBranch = DefaultBranch;
-				}
-			}
-
-			/* PrefsBranch is currently pointing at "non-user defaults" branch, ergo this is setting the defaults */
-			this.SetPropertyPref(Property, this.map[Property].Default);
-
-		}, this);
-
-		this.PrefsBranch = NonDefaultBranch;
-	},
-
-	GetPropertyPref: function(Property) { return this.GetPref(this.map[Property].SubPath); },
-	SetPropertyPref: function(Property, Value) { return this.SetPref(this.map[Property].SubPath, Value); },
-
-	GetPref: function(SubPath) {
-		switch(this.PrefsBranch.getPrefType(SubPath)) {
-			case this.PrefsBranch.PREF_STRING:		return this.PrefsBranch.getCharPref(SubPath);
-			case this.PrefsBranch.PREF_INT:			return this.PrefsBranch.getIntPref(SubPath);
-			case this.PrefsBranch.PREF_BOOL:		return this.PrefsBranch.getBoolPref(SubPath);
-		}
-		
-		return this.UnwrapBranch(SubPath);
-	},
-	
-	SetPref: function(SubPath, Value) {
-		if(Value == undefined)
-			return this.PrefsBranch.clearUserPref(SubPath);
-
-		switch(typeof Value) {
-			case 'boolean':	return this.PrefsBranch.setBoolPref(SubPath, Value);
-			case 'number':	return this.PrefsBranch.setIntPref(SubPath, Value);
-			case 'string':	return this.PrefsBranch.setCharPref(SubPath, Value);
-			case 'object':
-				Object.keys(Value).forEach( function(Key) {
-					this.SetPref(SubPath + '.' + Key, Value[Key]);
-				}, this);
-				break;
-		}
-		return false;
-	},
-
-	/** Returns an array or object of all sub paths of the branch */
-	UnwrapBranch: function(SubPath) {
-		/**
-		 * getChildList() is a strange function, it requires lenOut to be an object and returns
-		 * an object whose only attribute is .value which is the length of the returned array
-		 * However the array's .length is valid, so we basically ignore lenOut
-		 */
-		var lenOut = { };
-		var tChildren = this.PrefsBranch.getChildList(SubPath, lenOut);
-		if(tChildren.length == 0)
-			return undefined;
-
-		/* Paths returned are full paths, we strip our current SubPath and take the first .split() argument
-		* 	which will further call .GetPref() and unroll 2nd/3rd/4th/... levels as necessary */
-
-		/* Get Unique Sub Paths, tChildren[] will be an array of all (full) child paths of SubPath */
-		let UniqueSubPaths = tChildren.reduce(function(UniqueSubPaths, Value) {
-			UniqueSubPaths[Value.replace(SubPath + '.', '').split('.')[0]] = true;
-			return UniqueSubPaths;
-		}, { } );
-
-		var AllKeysAreIntegers = true;
-		var result = { };
-
-		Object.keys(UniqueSubPaths).forEach(function(Key) {
-			if(isNaN(parseInt(Key)))
-				AllKeysAreIntegers = false;
-			result[Key] = this.GetPref(SubPath + '.' + Key);
-		}, this);
-
-		if(!AllKeysAreIntegers)
-			return result;
-
-		/* Convert to array if all UniqueSubPath.keys() were integers */
-		return Object.keys(result)
-			.map(function(Index) {
-				return result[Index];
-			});
-	},
-
-	TranslatePropertyPrefValue: function(Property, Map) {
-		var PreviousValue;
-
-		switch(this.PrefsBranch.getPrefType(this.map[Property].SubPath)) {
-			case this.PrefsBranch.PREF_STRING:	PreviousValue = this.PrefsBranch.getCharPref(this.map[Property].SubPath);	break;
-			case this.PrefsBranch.PREF_INT:		PreviousValue = this.PrefsBranch.getIntPref(this.map[Property].SubPath);	break;
-			case this.PrefsBranch.PREF_BOOL:	PreviousValue = this.PrefsBranch.getBoolPref(this.map[Property].SubPath);	break;
-		}
-		this.PrefsBranch.deleteBranch(this.map[Property].SubPath);
-		this[Property] = Map[PreviousValue];
-		console.info("Translated Preference (" + this.BasePath + this.map[Property].SubPath + ") from " + PreviousValue + " to " + this[Property]);
-	}
-} );
 
 var Rect = Class.create({
 	initialize:function(top, left, bottom, right) {
