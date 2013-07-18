@@ -159,12 +159,11 @@ var SnapLinksSelectionClass = Class.create({
 		if(this.Element && e.target.ownerDocument == this.TopDocument) {
 			if(e.clientX < 0 || e.clientY < 0 || e.clientX > this.TopDocument.defaultView.innerWidth || e.clientY > this.TopDocument.defaultView.innerHeight) {
 				if(SLPrefs.Selection.HideOnMouseLeave)
-					this.Element.style.display = 'none';
-				else {
-					this.Element.style.display = '';
+					this.HideSelectionRect(true);
+				else
 					this.scrollOnViewEdge(e);
-				}
-			}
+			} else if(this.Element.style.display == 'none')
+				this.HideSelectionRect(false);
 		}
 		var pageX = e.pageX,
 			pageY = e.pageY;
@@ -654,6 +653,18 @@ var SnapLinksSelectionClass = Class.create({
 			}
 		}
 		dc('calc-elements', 'Final: SelectedElements = %o', this.SelectedElements);
+	},
+
+	/** Hides or shows the selection rect and accompanying elements/text */
+	HideSelectionRect: function(Hide) {
+		if(Hide) {
+			this.Element.style.display = 'none';
+			this.ElementCount && (this.ElementCount.style.display = 'none');
+			this.SnapLinksPlus.SnapLinksStatus = '';
+		} else {
+			this.Element.style.display = '';
+			this.ElementCount && (this.ElementCount.style.display = '');
+		}
 	},
 
 	/** Scroll on viewport edge. */
