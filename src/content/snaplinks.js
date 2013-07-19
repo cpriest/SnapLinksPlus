@@ -402,9 +402,11 @@ var SnapLinksClass = Class.create({
 			var CollectedElementsInfo = this.CollectElementsInfo(this.Selection.FilteredElements);
 			var TabsCreated = 0;
 			var Browser = this.Window.getBrowser();
+			var IntervalTimerID;
 
-			var IntervalTimerID = this.Window.setInterval(function() {
+			var DelayedAction = function DelayedAction() {
 				if(CollectedElementsInfo.length == 0) {
+					//noinspection JSPotentiallyInvalidUsageOfThis
 					this.Window.clearInterval(IntervalTimerID);
 					return;
 				}
@@ -422,7 +424,9 @@ var SnapLinksClass = Class.create({
 							Browser.tabContainer.selectedItem = NewTab;
 					}
 				}
-			}.bind(this), SLPrefs.Actions.DelayBetweenActions);
+			};
+			IntervalTimerID = this.Window.setInterval(DelayedAction.bind(this), SLPrefs.Actions.DelayBetweenActions);
+			DelayedAction.call(this);
 		}
 		catch(e) {
 			Components.utils.reportError(e + ":\n"+ e.stack);
