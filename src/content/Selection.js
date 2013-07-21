@@ -41,6 +41,20 @@ var SnapLinksSelectionClass = Class.create({
 	IntersectedElements: 	[ ],
 	SelectedElements: 		[ ],
 
+	/* Dynamic TopDocument */
+	set TopDocument(v) {
+		if(this._TopDocument = v)
+			this.Documents = this.IndexDocuments(this._TopDocument);
+	},
+	get TopDocument() { return this._TopDocument;},
+
+	/* Dynamic Window */
+	set Window(v) {
+		if(this._Window = v)
+			dc('doctree', DumpWindowFrameStructure.bind(DumpWindowFrameStructure, this._Window));
+	},
+	get Window() { return this._Window; },
+
 	/* Internal flag to control selecting all links or all links matching the greatest size */
 	SelectLargestFontSizeIntersectionLinks:		true,
 
@@ -65,7 +79,7 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	/* Internal Flag indicating that a selection has been started */
-	DragStarted: false,
+	get DragStarted() { return this.Element != undefined; },
 
 	initialize: function(SnapLinksPlus) {
 		this.SnapLinksPlus = SnapLinksPlus;
@@ -73,9 +87,10 @@ var SnapLinksSelectionClass = Class.create({
 		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), false);
 		this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
 
-		this._OnMouseMove 	= this.OnMouseMove.bind(this);
-		this._OnKeyDown		= this.OnKeyDown.bind(this);
-		this._OnKeyUp		= this.OnKeyUp.bind(this);
+		this._OnMouseMove 		= this.OnMouseMove.bind(this);
+		this._OnKeyDown			= this.OnKeyDown.bind(this);
+		this._OnKeyUp			= this.OnKeyUp.bind(this);
+		this._OnDocumentLoaded	= this.OnDocumentLoaded.bind(this);
 	},
 
 	/* Index all documents by URL and calculate offset from Top Document */
@@ -134,9 +149,6 @@ var SnapLinksSelectionClass = Class.create({
 		/** Initializes the starting mouse position */
 		this.SelectionRect = new Rect(e.pageY, e.pageX);
 
-		this.Documents = this.IndexDocuments(this.TopDocument);
-		dc('doctree', DumpWindowFrameStructure.bind(DumpWindowFrameStructure, this.Window));
-
 		/* If we aren't starting in the top document, change rect coordinates to top document origin */
 		if(Document != this.TopDocument) {
 			this.SelectionRect.Offset(-Math.max(Document.documentElement.scrollLeft, Document.body.scrollLeft), -Math.max(Document.documentElement.scrollTop, Document.body.scrollTop));
@@ -151,6 +163,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
 		this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
 		this.PanelContainer.addEventListener('keyup', this._OnKeyUp, true);
+		this.PanelContainer.addEventListener('load', this._OnDocumentLoaded, true);
 	},
 
 	OnMouseMove: function(e) {
@@ -203,9 +216,17 @@ var SnapLinksSelectionClass = Class.create({
 		}
 	},
 
+	OnDocumentLoaded: function(e) {
+		if(e.target.URL == this.Window.document.URL) {
+			/* Primary document we're lassoing just reloaded, reset */
+			this.TopDocument = e.target;
+			this.Reset();
+		}
+	},
+
 	/* Creates the selection rectangle element, returns true if element exists or was created successfully */
 	Create: function() {
-		if(this.DragStarted == true)
+		if(this.Element != undefined)
 			return true;
 
 		if(this.SelectionRect.width > 4 || this.SelectionRect.height > 4) {
@@ -221,23 +242,20 @@ var SnapLinksSelectionClass = Class.create({
 				this.Element.style.top = this.SelectionRect.top + 'px';
 				InsertionNode.appendChild(this.Element);
 
-				if(SLPrefs.Selection.ShowCount &&
-						SLPrefs.Selection.ShowCountWhere == SLE.ShowCount_Hover) {
-					this.ElementCount = this.TopDocument.createElementNS('http://www.w3.org/1999/xhtml', 'div');
-					ApplyStyle(this.ElementCount, {
-						position		: 'absolute',
-						padding			: '2px 4px',
-						font			: '12px Verdana',
-						zIndex			: '10000',
-						border			: '1px solid black',
-						backgroundColor	: '#FFFFCC'
-					} );
-					InsertionNode.appendChild(this.ElementCount);
-				}
+				if(this.Element.parentNode) {
+					if(SLPrefs.Selection.ShowCount && SLPrefs.Selection.ShowCountWhere == SLE.ShowCount_Hover) {
+						this.ElementCount = this.TopDocument.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+						ApplyStyle(this.ElementCount, {
+							position		: 'absolute',
+							padding			: '2px 4px',
+							font			: '12px Verdana',
+							zIndex			: '10000',
+							border			: '1px solid black',
+							backgroundColor	: '#FFFFCC'
+						} );
+						InsertionNode.appendChild(this.ElementCount);
+					}
 
-				this.DragStarted = this.Element.parentNode != undefined;
-
-				if(this.DragStarted) {
 					if(SLPrefs.Selection.ShowCount) {
 						var linksText = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", ['0'], 1);
 						this.SnapLinksPlus.SnapLinksStatus = linksText;
@@ -354,8 +372,18 @@ var SnapLinksSelectionClass = Class.create({
 			Links - Start, Inputs - Links, Labels - Inputs, End - Labels, End - Start);
 	},
 
-	/** Clears the selection by removing the element, also clears some other non-refactored but moved code */
+	/** Clears the selection by removing the element, also clears some other non-refactored but moved code, basically completing a drag */
 	Clear: function() {
+		this.Reset();
+
+		this.SelectLargestFontSizeIntersectionLinks = true;
+
+		/* No longer need to reference these */
+		delete this.SelectedFixedFontSize;
+	},
+
+	/** Called by .Clear() and when the document is re-loaded.  Clears out the current 'dead elements' for re-creation */
+	Reset: function() {
 		if (this.Element)
 			this.Element.parentNode.removeChild(this.Element);
 		delete this.Element;
@@ -366,14 +394,8 @@ var SnapLinksSelectionClass = Class.create({
 
 		this.ClearSelectedElements();
 
-		this.DragStarted = false;
-		this.SelectLargestFontSizeIntersectionLinks = true;
-		this.RemoveEventHooks();
-
-		/* No longer need to reference these */
 		delete this.Documents;
 		delete this.CalculateWindowWidth;
-		delete this.SelectedFixedFontSize;
 	},
 	/* Clears the selection style from the currently selected elements */
 	ClearSelectedElements: function() {
@@ -392,6 +414,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.PanelContainer.removeEventListener('keydown', this._OnKeyDown, true);
 		this.PanelContainer.removeEventListener('keyup', this._OnKeyUp, true);
 		this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
+		this.PanelContainer.removeEventListener('load', this._OnDocumentLoaded, true);
 	},
 
 	/** Offsets the selection by the given coordinates */
