@@ -40,7 +40,7 @@ try {
 }
 
 var SnapLinksClass = Class.create({
-	Window: null,
+	ChromeWindow: null,
 	XulDocument: null,
 	PanelContainer: null,
 
@@ -120,8 +120,8 @@ var SnapLinksClass = Class.create({
 		}
 	},
 
-	initialize: function(Window, XulDocument) {
-		this.Window = Window;
+	initialize: function(ChromeWindow, XulDocument) {
+		this.ChromeWindow = ChromeWindow;
 		this.XulDocument = XulDocument;
 		var StringBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
 		this.LocaleBundle = StringBundleService.createBundle("chrome://snaplinksplus/locale/snaplinks.properties");
@@ -131,13 +131,14 @@ var SnapLinksClass = Class.create({
 			//Links:		this.LocaleBundle.GetStringFromName("snaplinks.status.links")
 		};
 
-		this._OnMouseMove 	= this.OnMouseMove.bind(this);
+		this._OnMouseMove	 	= this.OnMouseMove.bind(this);
+		this._OnDocumentLoaded	= this.OnDocumentLoaded.bind(this);
 
 		this.PanelContainer = this.XulDocument.getElementById('content').mPanelContainer;
 		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), false);
 		this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
 		this.PanelContainer.addEventListener('keypress', this.OnKeyPress.bind(this), true);
-		
+
 		this.XulDocument.getElementById('snaplMenu')
 			.addEventListener('popuphidden',this.OnSnapLinksPopupHidden.bind(this),false);
 
@@ -180,16 +181,17 @@ var SnapLinksClass = Class.create({
 			return;
 
 		this.Clear();
-		
+
+		this.InstallEventHooks();
+
 		/* Capture the current working document */
+		this.Window = e.view.top;
 		this.Document = e.target.ownerDocument.defaultView.top.document;
 		this.Document.body.setCapture(false);
-		
-		this.InstallEventHooks();
 
 		/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218, 
 			we prevent the context menu from showing on mouse down here. */
-		if(e.button == 2 /* RMB */ && this.Window.navigator.userAgent.indexOf('Linux') != -1) {
+		if(e.button == 2 /* RMB */ && this.ChromeWindow.navigator.userAgent.indexOf('Linux') != -1) {
 			this.StopNextContextMenuPopup = true;
 		}
 	},
@@ -220,33 +222,43 @@ var SnapLinksClass = Class.create({
 				
 				/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218
 					we force the context menu to open up here*/
-				if(this.Window.navigator.userAgent.indexOf('Linux') != -1) {
-					if (this.Window.gContextMenu) {
+				if(this.ChromeWindow.navigator.userAgent.indexOf('Linux') != -1) {
+					if (this.ChromeWindow.gContextMenu) {
 						var evt = this.XulDocument.createEvent("MouseEvents");
 
-						evt.initMouseEvent('contextmenu', true, true, this.Window, 0, 
+						evt.initMouseEvent('contextmenu', true, true, this.ChromeWindow, 0,
 							e.screenX, e.screenY, e.clientX, e.clientY,
 							false, false, false, false,
 							2, null);
-						this.Window.gContextMenu.target.dispatchEvent(evt);
+						this.ChromeWindow.gContextMenu.target.dispatchEvent(evt);
 					}
 				}
 			}
 		}
 		/* Clear any StopNextContextMenuPopup regardless of it's use on next idle moment */
-		this.Window.setTimeout(function() { this.StopNextContextMenuPopup = false; }.bind(this), 0);
+		this.ChromeWindow.setTimeout(function() { this.StopNextContextMenuPopup = false; }.bind(this), 0);
+	},
+
+	OnDocumentLoaded: function(e) {
+		if(e.target.URL == this.Window.document.URL) {
+			/* Primary document we're lassoing just reloaded, reset */
+			this.Document = e.target;
+//			this.Document.body.setCapture(false);	/* Doesn't work unless it's within a mousedown event, ugh */
+		}
 	},
 
 	InstallEventHooks: function() {
 		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
+		this.PanelContainer.addEventListener('load', this._OnDocumentLoaded, true);
 	},
 
 	RemoveEventHooks: function() {
 		this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
+		this.PanelContainer.removeEventListener('load', this._OnDocumentLoaded, true);
 	},
 
 	OnKeyPress: function(e) {
-		if(e.keyCode == this.Window.KeyboardEvent.DOM_VK_ESCAPE)
+		if(e.keyCode == this.ChromeWindow.KeyboardEvent.DOM_VK_ESCAPE)
 			this.Clear();
 	},
 
@@ -320,7 +332,7 @@ var SnapLinksClass = Class.create({
 			CollectedElementsInfo.forEach( function(info, index) {
 				var callback = this;
 				
-				this.Window.setTimeout(function() {
+				this.ChromeWindow.setTimeout(function() {
 					callback.ClickLink(info.elem);
 				}, SLPrefs.Actions.DelayBetweenActions * index, callback);
 			}, this );
@@ -342,8 +354,8 @@ var SnapLinksClass = Class.create({
 		/* This is needed for JavaScript links on
 		 * Firefox 4.0 and SeaMonkey 2.1.
 		 */
-		var evt = this.Window.document.createEvent("MouseEvents");
-		evt.initMouseEvent("click", true, true, this.Window, 0,
+		var evt = this.ChromeWindow.document.createEvent("MouseEvents");
+		evt.initMouseEvent("click", true, true, this.ChromeWindow, 0,
 				0, 0, 0, 0,
 				false, false, false, false,
 				0, null);
@@ -401,13 +413,13 @@ var SnapLinksClass = Class.create({
 			var CurrentReferer = this.DocumentReferer;
 			var CollectedElementsInfo = this.CollectElementsInfo(this.Selection.FilteredElements);
 			var TabsCreated = 0;
-			var Browser = this.Window.getBrowser();
+			var Browser = this.ChromeWindow.getBrowser();
 			var IntervalTimerID;
 
 			var DelayedAction = function DelayedAction() {
 				if(CollectedElementsInfo.length == 0) {
 					//noinspection JSPotentiallyInvalidUsageOfThis
-					this.Window.clearInterval(IntervalTimerID);
+					this.ChromeWindow.clearInterval(IntervalTimerID);
 					return;
 				}
 				var info = CollectedElementsInfo.shift();
@@ -425,7 +437,7 @@ var SnapLinksClass = Class.create({
 					}
 				}
 			};
-			IntervalTimerID = this.Window.setInterval(DelayedAction.bind(this), SLPrefs.Actions.DelayBetweenActions);
+			IntervalTimerID = this.ChromeWindow.setInterval(DelayedAction.bind(this), SLPrefs.Actions.DelayBetweenActions);
 			DelayedAction.call(this);
 		}
 		catch(e) {
@@ -481,10 +493,10 @@ var SnapLinksClass = Class.create({
 			var CollectedElementsInfo = this.CollectElementsInfo(this.Selection.FilteredElements);
 
 			CollectedElementsInfo.forEach( function(info, index) {
-				this.Window.setTimeout(function() {
+				this.ChromeWindow.setTimeout(function() {
 					this.FireEventsForElement(info.elem);
 					if(info.href)
-						this.Window.open(info.href);
+						this.ChromeWindow.open(info.href);
 				}.bind(this), SLPrefs.Actions.DelayBetweenActions * index);
 			}, this );
 		}
@@ -507,7 +519,7 @@ var SnapLinksClass = Class.create({
 					return elem.href;
 				}, this ).join('|');
 	
-				return this.Window.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
+				return this.ChromeWindow.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
 			}
 		}
 		catch(e) {
@@ -589,7 +601,7 @@ var SnapLinksClass = Class.create({
 							URIList: uriList
 					};
 					
-					PlacesUIUtils.showBookmarkDialog(info, this.Window);
+					PlacesUIUtils.showBookmarkDialog(info, this.ChromeWindow);
 				} else {
 					// Fallback to older showMinimalAddMultiBookmarkUI().
 					PlacesUIUtils.showMinimalAddMultiBookmarkUI(uriList);
@@ -636,7 +648,7 @@ var SnapLinksClass = Class.create({
 					links.forEach( function( link, index ) {
 						var callback = this;
 						
-						this.Window.setTimeout(function() {
+						this.ChromeWindow.setTimeout(function() {
 							saveURL(link.Url, link.FileName, null, true, true, CurrentReferer);
 						}, SLPrefs.Actions.DelayBetweenActions * index, callback, link);
 					}, this);
@@ -654,17 +666,17 @@ var SnapLinksClass = Class.create({
 	},
 
 	FireEventsForElement: function(elem) {
-		let MouseEvent = this.Window.MouseEvent;
+		let MouseEvent = this.ChromeWindow.MouseEvent;
 
 		/* Hidden features that enable users (through about:config) to enable firing of mousedown/mouseup events
 			on links prior to their being opened, see: https://github.com/cpriest/SnapLinksPlus/issues/7 */
 		if(SLPrefs.Special.FireEventsOnLinks.MouseDown) {
-			let me = new MouseEvent('mousedown', { view: this.Window, bubbles: false, cancelable: true} );
+			let me = new MouseEvent('mousedown', { view: this.ChromeWindow, bubbles: false, cancelable: true} );
 			me.preventDefault();
 			elem.dispatchEvent(me);
 		}
 		if(SLPrefs.Special.FireEventsOnLinks.MouseUp) {
-			let me = new MouseEvent('mouseup', { view: this.Window, bubbles: false, cancelable: true} );
+			let me = new MouseEvent('mouseup', { view: this.ChromeWindow, bubbles: false, cancelable: true} );
 			me.preventDefault();
 			elem.dispatchEvent(me);
 		}

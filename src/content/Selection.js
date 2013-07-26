@@ -38,16 +38,6 @@ var SnapLinksSelectionClass = Class.create({
 	SnapLinksPlus: null,
 	jsRegExp: /^javascript:/i,
 
-	IntersectedElements: 	[ ],
-	SelectedElements: 		[ ],
-
-	/* Dynamic TopDocument */
-	set TopDocument(v) {
-		if(this._TopDocument = v)
-			this.Documents = this.IndexDocuments(this._TopDocument);
-	},
-	get TopDocument() { return this._TopDocument;},
-
 	/* Dynamic Window */
 	set Window(v) {
 		if(this._Window = v)
@@ -55,31 +45,133 @@ var SnapLinksSelectionClass = Class.create({
 	},
 	get Window() { return this._Window; },
 
+
+	/* Dynamic TopDocument */
+	get TopDocument() { return this.Window.document;},
+
+
+	/* All document/element based values are stored within the document so that if the document dies,
+		our elements are simply gone as well, this handles the DeadObject issue well */
+	get SLP() {
+		if(!this.TopDocument.SLP)
+			this.TopDocument.SLP = { };
+		return this.TopDocument.SLP;
+	},
+
+
+	/* Dynamic creation/deletion of Element */
+	get Element() {
+		if(!this.SLP.Element) {
+			let InsertionNode = this.TopDocument.documentElement || this.TopDocument;
+
+			let Element = this.TopDocument.createElementNS('http://www.w3.org/1999/xhtml', 'snaplRect');
+			if(InsertionNode && Element) {
+				ApplyStyle(Element, {
+					color   : SLPrefs.Selection.BorderColor,
+					border  : SLPrefs.Selection.BorderWidth + 'px dotted',
+					position: 'absolute',
+					zIndex  : '10000',
+					left    : this.SelectionRect.left + 'px',
+					top     : this.SelectionRect.top + 'px',
+					display : 'none',
+				});
+				InsertionNode.appendChild(Element);
+				this.SLP.Element = Element;
+			}
+		}
+		return this.SLP.Element;
+	},
+	set Element(x) {
+		if(x == undefined)
+			try { this.Element.parentNode.removeChild(this.Element); } catch(e) { }
+		this.SLP.Element = x;
+	},
+
+
+	/* Dynamic creation/deletion of ElementCount */
+	get ElementCount() {
+		if(!this.SLP.ElementCount) {
+			if(SLPrefs.Selection.ShowCount && SLPrefs.Selection.ShowCountWhere == SLE.ShowCount_Hover) {
+				let InsertionNode = this.TopDocument.documentElement || this.TopDocument;
+
+				let ElementCount = this.TopDocument.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+				if(InsertionNode && ElementCount) {
+					ApplyStyle(ElementCount, {
+						position       : 'absolute',
+						padding        : '2px 4px',
+						font           : '12px Verdana',
+						zIndex         : '10000',
+						border         : '1px solid black',
+						backgroundColor: '#FFFFCC',
+						display        : 'none',
+					} );
+					InsertionNode.appendChild(ElementCount);
+
+					this.SLP.ElementCount = ElementCount;
+				}
+			}
+
+			if(SLPrefs.Selection.ShowCount)
+				this.SnapLinksPlus.SnapLinksStatus = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", ['0'], 1);
+		}
+		return this.SLP.ElementCount;
+	},
+	set ElementCount(x) {
+		if(x == undefined)
+			try { this.ElementCount.parentNode.removeChild(this.ElementCount); } catch(e) { }
+		this.SLP.ElementCount = x;
+	},
+
+
+	/* Dynamically re-calculated Indexed Documents */
+	get Documents() {
+		if(!this.SLP.Documents || !this.SLP.Documents[this.TopDocument.URL])
+			this.SLP.Documents = this.IndexDocuments(this.TopDocument);
+		return this.SLP.Documents;
+	},
+	set Documents(x) { this.SLP.Documents = x; },
+
+
+	/* Dynamic creation of elementm, stored in document */
+	get SelectedElements() {
+		if(!this.SLP.SelectedElements)
+			this.SLP.SelectedElements = [ ];
+		return this.SLP.SelectedElements;
+	},
+	set SelectedElements(x) { this.SLP.SelectedElements = x },
+
+
+	/* Dynamic creation of elementm, stored in document */
+	get IntersectedElements() {
+		if(!this.SLP.IntersectedElements)
+			this.SLP.IntersectedElements = [ ];
+		return this.SLP.IntersectedElements;
+	},
+	set IntersectedElements(x) { this.SLP.IntersectedElements = x },
+
 	/* Internal flag to control selecting all links or all links matching the greatest size */
 	SelectLargestFontSizeIntersectionLinks:		true,
 
 	/* Returns an array of elements representing the selected elements
 	 *	taking into account preferences for removing duplicate urls 
 	 */
-	FilteredElements: {
-		get: function() {
-			if(this.SelectedElementsType != 'Links' &&
-					this.SelectedElementsType != 'JsLinks') {
-				return [ ];
-			}
-
-			var Distinct = [ ];
-			return this.SelectedElements.filter( function(elem) {
-				if(!elem.href || (SLPrefs.Elements.Anchors.RemoveDuplicateUrls && Distinct.indexOf(elem.href) != -1))
-					return false;
-				Distinct.push(elem.href);
-				return true;
-			}, this);
+	get FilteredElements() {
+		if(this.SelectedElementsType != 'Links' &&
+				this.SelectedElementsType != 'JsLinks') {
+			return [ ];
 		}
+
+		var Distinct = [ ];
+		return this.SelectedElements.filter( function(elem) {
+			if(!elem.href || (SLPrefs.Elements.Anchors.RemoveDuplicateUrls && Distinct.indexOf(elem.href) != -1))
+				return false;
+			Distinct.push(elem.href);
+			return true;
+		}, this);
 	},
 
 	/* Internal Flag indicating that a selection has been started */
-	get DragStarted() { return this.Element != undefined; },
+	get DragStarted() { return this.Element != undefined && this.Element.style.display != 'none'; },
 
 	initialize: function(SnapLinksPlus) {
 		this.SnapLinksPlus = SnapLinksPlus;
@@ -87,10 +179,14 @@ var SnapLinksSelectionClass = Class.create({
 		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), false);
 		this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
 
-		this._OnMouseMove 		= this.OnMouseMove.bind(this);
-		this._OnKeyDown			= this.OnKeyDown.bind(this);
-		this._OnKeyUp			= this.OnKeyUp.bind(this);
-		this._OnDocumentLoaded	= this.OnDocumentLoaded.bind(this);
+		this._OnMouseMove 			= this.OnMouseMove.bind(this);
+		this._OnKeyDown				= this.OnKeyDown.bind(this);
+		this._OnKeyUp				= this.OnKeyUp.bind(this);
+		this._OnDocumentUnloaded	= this.OnDocumentUnloaded.bind(this);
+		this._OnDocumentLoaded		= this.OnDocumentLoaded.bind(this);
+
+		/* Set mock object for use until first event determines our window */
+		this._Window = { document: { } };
 	},
 
 	/* Index all documents by URL and calculate offset from Top Document */
@@ -144,7 +240,6 @@ var SnapLinksSelectionClass = Class.create({
 			return;
 
 		var Document = e.target.ownerDocument;
-		this.TopDocument = e.target.ownerDocument.defaultView.top.document;
 
 		/** Initializes the starting mouse position */
 		this.SelectionRect = new Rect(e.pageY, e.pageX);
@@ -160,10 +255,21 @@ var SnapLinksSelectionClass = Class.create({
 			this.SelectedFixedFontSize = parseFloat(computedStyle.getPropertyValue("font-size"));
 		}
 
+		this.InstallEventHooks();
+
+		this.PanelContainer.addEventListener('load', this._OnDocumentLoaded, true);
+		this.PanelContainer.addEventListener('unload', this._OnDocumentUnloaded, true);
+	},
+
+	InstallEventHooks: function() {
 		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
 		this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
 		this.PanelContainer.addEventListener('keyup', this._OnKeyUp, true);
-		this.PanelContainer.addEventListener('load', this._OnDocumentLoaded, true);
+	},
+	RemoveEventHooks: function() {
+		this.PanelContainer.removeEventListener('keydown', this._OnKeyDown, true);
+		this.PanelContainer.removeEventListener('keyup', this._OnKeyUp, true);
+		this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
 	},
 
 	OnMouseMove: function(e) {
@@ -199,6 +305,8 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	OnMouseUp: function(e) {
+		this.PanelContainer.removeEventListener('load', this._OnDocumentLoaded, true);
+		this.PanelContainer.removeEventListener('unload', this._OnDocumentUnloaded, true);
 		this.RemoveEventHooks();
 	},
 
@@ -218,54 +326,20 @@ var SnapLinksSelectionClass = Class.create({
 
 	OnDocumentLoaded: function(e) {
 		if(e.target.URL == this.Window.document.URL) {
-			/* Primary document we're lassoing just reloaded, reset */
-			this.TopDocument = e.target;
-			this.Reset();
+			this.CalculateAllDocumentSnapRects();
+			this.UpdateElement();
+			this.InstallEventHooks();
+		}
+	},
+	OnDocumentUnloaded: function(e) {
+		if(e.target.URL == this.Window.document.URL) {
+			this.RemoveEventHooks();
 		}
 	},
 
-	/* Creates the selection rectangle element, returns true if element exists or was created successfully */
-	Create: function() {
-		if(this.Element != undefined)
-			return true;
-
-		if(this.SelectionRect.width > 4 || this.SelectionRect.height > 4) {
-			var InsertionNode = (this.TopDocument.documentElement) ? this.TopDocument.documentElement : this.TopDocument;
-
-			this.Element = this.TopDocument.createElementNS('http://www.w3.org/1999/xhtml', 'snaplRect');
-			if(InsertionNode && this.Element) {
-				this.Element.style.color = SLPrefs.Selection.BorderColor;
-				this.Element.style.border = SLPrefs.Selection.BorderWidth + 'px dotted';
-				this.Element.style.position = 'absolute';
-				this.Element.style.zIndex = '10000';
-				this.Element.style.left = this.SelectionRect.left + 'px';
-				this.Element.style.top = this.SelectionRect.top + 'px';
-				InsertionNode.appendChild(this.Element);
-
-				if(this.Element.parentNode) {
-					if(SLPrefs.Selection.ShowCount && SLPrefs.Selection.ShowCountWhere == SLE.ShowCount_Hover) {
-						this.ElementCount = this.TopDocument.createElementNS('http://www.w3.org/1999/xhtml', 'div');
-						ApplyStyle(this.ElementCount, {
-							position		: 'absolute',
-							padding			: '2px 4px',
-							font			: '12px Verdana',
-							zIndex			: '10000',
-							border			: '1px solid black',
-							backgroundColor	: '#FFFFCC'
-						} );
-						InsertionNode.appendChild(this.ElementCount);
-					}
-
-					if(SLPrefs.Selection.ShowCount) {
-						var linksText = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", ['0'], 1);
-						this.SnapLinksPlus.SnapLinksStatus = linksText;
-					}
-
-					return true;
-				}
-			}
-		}
-		return false;
+	CalculateAllDocumentSnapRects: function() {
+		for(var URL in this.Documents)
+			this.CalculateSnapRects(this.Documents[URL].Document);
 	},
 
 	/** Calculates and caches the rectangles that make up all document lengths */
@@ -374,7 +448,11 @@ var SnapLinksSelectionClass = Class.create({
 
 	/** Clears the selection by removing the element, also clears some other non-refactored but moved code, basically completing a drag */
 	Clear: function() {
-		this.Reset();
+		this.ClearSelectedElements();
+		this.Element = undefined;
+		this.ElementCount = undefined;
+		this.Documents = undefined;
+		delete this.CalculateWindowWidth;
 
 		this.SelectLargestFontSizeIntersectionLinks = true;
 
@@ -382,21 +460,6 @@ var SnapLinksSelectionClass = Class.create({
 		delete this.SelectedFixedFontSize;
 	},
 
-	/** Called by .Clear() and when the document is re-loaded.  Clears out the current 'dead elements' for re-creation */
-	Reset: function() {
-		if (this.Element)
-			this.Element.parentNode.removeChild(this.Element);
-		delete this.Element;
-
-		if(this.ElementCount && this.ElementCount.parentNode)
-			this.ElementCount.parentNode.removeChild(this.ElementCount);
-		delete this.ElementCount;
-
-		this.ClearSelectedElements();
-
-		delete this.Documents;
-		delete this.CalculateWindowWidth;
-	},
 	/* Clears the selection style from the currently selected elements */
 	ClearSelectedElements: function() {
 		this.IntersectedElements = [ ];
@@ -408,13 +471,6 @@ var SnapLinksSelectionClass = Class.create({
 			}, this );
 		}, this );
 		this.SelectedElements = [ ];
-	},
-
-	RemoveEventHooks: function() {
-		this.PanelContainer.removeEventListener('keydown', this._OnKeyDown, true);
-		this.PanelContainer.removeEventListener('keyup', this._OnKeyUp, true);
-		this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
-		this.PanelContainer.removeEventListener('load', this._OnDocumentLoaded, true);
 	},
 
 	/** Offsets the selection by the given coordinates */
@@ -432,16 +488,15 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Updates the visible position of the element */
 	UpdateElement: function() {
-		if(this.Create()) {
-			ApplyStyle(this.Element, {
-							left 	: this.SelectionRect.left + 'px',
-							top 	: this.SelectionRect.top + 'px',
-							width 	: this.SelectionRect.width - (2 * SLPrefs.Selection.BorderWidth) + 'px',
-							height 	: this.SelectionRect.height - (2 * SLPrefs.Selection.BorderWidth) + 'px'
-			} );
+		ApplyStyle(this.Element, {
+						left 	: this.SelectionRect.left + 'px',
+						top 	: this.SelectionRect.top + 'px',
+						width 	: this.SelectionRect.width - (2 * SLPrefs.Selection.BorderWidth) + 'px',
+						height 	: this.SelectionRect.height - (2 * SLPrefs.Selection.BorderWidth) + 'px',
+						display : (this.SelectionRect.width > 4 || this.SelectionRect.height > 4) ? '' : 'none',
+		} );
 
-			this.CalcSelectedElements();
-		}
+		this.CalcSelectedElements();
 	},
 
 	RepositionElementCount: function(e) {
