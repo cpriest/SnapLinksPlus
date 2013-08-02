@@ -32,6 +32,7 @@ var EXPORTED_SYMBOLS = ['Class',
 						'dc',
 						'DumpWindowFrameStructure',
 						'UpdatePreferences',
+						'MaxDocValue',
 						'CreatePreferenceMap'];
 
 var Cu = Components.utils,
@@ -647,3 +648,10 @@ function htmlentities (string, quote_style, charset, double_encode) {
 }
 
 function escapeHTML(str) str.replace(/[&"<>]/g, function (m) ({ "&": "&amp;", '"': "&quot", "<": "&lt;", ">": "&gt;" })[m]);
+
+/* Returns the maximum of the documentElement[prop] or body[prop] if available or 0 if doc is invalid */
+function MaxDocValue(doc, prop) {
+	return doc
+		&& Math.max(doc.documentElement && doc.documentElement[prop] || 0, doc.body && doc.body[prop] || 0)
+		|| 0;
+}

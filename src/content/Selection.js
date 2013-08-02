@@ -196,8 +196,8 @@ var SnapLinksSelectionClass = Class.create({
 		/* Insert top document */
 		Documents[TopDocument.URL] = {
 			Document: 	TopDocument,
-			height:		Math.max(TopDocument.documentElement.scrollHeight, TopDocument.body.scrollHeight),
-			width:		Math.max(TopDocument.documentElement.scrollWidth, TopDocument.body.scrollWidth),
+			height:		MaxDocValue(TopDocument, 'scrollHeight'),
+			width:		MaxDocValue(TopDocument, 'scrollWidth'),
 			offset: 	{x: 0, y: 0}
 		};
 
@@ -220,8 +220,8 @@ var SnapLinksSelectionClass = Class.create({
 				offset.y += Documents[frame.parent.document.URL].offset.y;
 				Documents[frame.document.URL] = {
 					Document: 	frame.document,
-					height:		Math.max(frame.document.documentElement.scrollHeight, frame.document.body.scrollHeight),
-					width:		Math.max(frame.document.documentElement.scrollWidth, frame.document.body.scrollWidth),
+					height:		MaxDocValue(frame.document, 'scrollHeight'),
+					width:		MaxDocValue(frame.document, 'scrollWidth'),
 					offset: 	offset
 				};
 				IndexFrames(frame);
@@ -246,7 +246,7 @@ var SnapLinksSelectionClass = Class.create({
 
 		/* If we aren't starting in the top document, change rect coordinates to top document origin */
 		if(Document != this.TopDocument) {
-			this.SelectionRect.Offset(-Math.max(Document.documentElement.scrollLeft, Document.body.scrollLeft), -Math.max(Document.documentElement.scrollTop, Document.body.scrollTop));
+			this.SelectionRect.Offset(-MaxDocValue(Document, 'scrollLeft'), -MaxDocValue(Document, 'scrollTop'));
 			this.SelectionRect.Offset(this.Documents[Document.URL].offset.x, this.Documents[Document.URL].offset.y);
 		}
 
@@ -289,8 +289,8 @@ var SnapLinksSelectionClass = Class.create({
 
 		/* If we are in a sub-document, offset our coordinates by the top/left of that sub-document element (IFRAME) */
 		if(e.view.document != this.TopDocument) {
-			pageX += this.Documents[e.view.document.URL].offset.x - Math.max(e.target.ownerDocument.documentElement.scrollLeft, e.target.ownerDocument.body.scrollLeft);
-			pageY += this.Documents[e.view.document.URL].offset.y - Math.max(e.target.ownerDocument.documentElement.scrollTop, e.target.ownerDocument.body.scrollTop);
+			pageX += this.Documents[e.view.document.URL].offset.x - MaxDocValue(e.target.ownerDocument, 'scrollLeft');
+			pageY += this.Documents[e.view.document.URL].offset.y - MaxDocValue(e.target.ownerDocument, 'scrollTop');
 		}
 
 		/* Disabled At The Moment */
@@ -575,7 +575,7 @@ var SnapLinksSelectionClass = Class.create({
 					/* If we're not in the top document, translate SelectRect to document coordinates */
 					if(ti.Document != this.TopDocument) {
 						IntersectRect.Offset(-ti.offset.x, -ti.offset.y);
-						IntersectRect.Offset(Math.max(ti.Document.documentElement.scrollLeft, ti.Document.body.scrollLeft), Math.max(ti.Document.documentElement.scrollTop, ti.Document.body.scrollTop));
+						IntersectRect.Offset(MaxDocValue(ti.Document, 'scrollLeft'), MaxDocValue(ti.Document, 'scrollTop'));
 					}
 
 					dc('calc-elements', '%o.SelectableElements = %o', ti, ti.SelectableElements);
@@ -781,5 +781,5 @@ var SnapLinksSelectionClass = Class.create({
 
 		// Scroll.
 		if (offsetX != 0 || offsetY != 0) this.Window.scrollBy(offsetX, offsetY);
-	}
+	},
 } );
