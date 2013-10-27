@@ -65,23 +65,20 @@ var SnapLinksClass = Class.create({
 	/**
 	 * Returns an Mozilla URI pointed at the current documents referrer.
 	 */
-	DocumentReferer: {
-		get: function() {
-			try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
-						.newURI(this.Document.location.href, null, null); }
-			catch(e) {
-				Components.utils.reportError(e + ":\n"+ e.stack);
-			}
-			return null;
+	get DocumentReferer() {
+		try {return Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService)
+					.newURI(this.Document.location.href, null, null); }
+		catch(e) {
+			Components.utils.reportError(e + ":\n"+ e.stack);
 		}
+		return null;
 	},
 
 	/**
 	 * Returns the selected clipboard separator.
 	 */
-	ClipboardSeparator: {
-		get: function() {
-			switch (SLPrefs.Actions.CopyToClipboard.SeparatorId) {
+	get ClipboardSeparator() {
+		switch (SLPrefs.Actions.CopyToClipboard.SeparatorId) {
 			case this.COPY_TO_CLIPBOARD_SEPARATOR_ID.CUSTOM:
 				return unescape(SLPrefs.Actions.CopyToClipboard.Separator);
 				break;
@@ -93,31 +90,27 @@ var SnapLinksClass = Class.create({
 				break;
 			default:
 				return "\n";
-			}
 		}
 	},
 
 	/**
 	 * Setter to change the status text.
 	 */
-	SnapLinksStatus: {
-		set: function(x) {
-			if(SLPrefs.Selection.ShowCount &&
-					SLPrefs.Selection.ShowCountWhere == SLE.ShowCount_AddonBar) {
-				var el = this.XulDocument.getElementById('snaplinks-panel') ;
-				el && (el.label = x);
-				el && (el.hidden = (x == ''));
-			}
+	set SnapLinksStatus(x) {
+		if(SLPrefs.Selection.ShowCount &&
+				SLPrefs.Selection.ShowCountWhere == SLE.ShowCount_AddonBar) {
+			var el = this.XulDocument.getElementById('snaplinks-panel') ;
+			el && (el.label = x);
+			el && (el.hidden = (x == ''));
 		}
 	},
 
 	/**
 	 * Setter to change the status bar text.
 	 */
-	StatusBarLabel: {
-		set: function(x) {
-			this.XulDocument.getElementById('statusbar-display').label = x;
-		}
+	set StatusBarLabel(x) {
+		// @TODO - this element seems to be unavailable some/all of the time
+		this.XulDocument.getElementById('statusbar-display').label = x;
 	},
 
 	initialize: function(ChromeWindow, XulDocument) {
@@ -131,12 +124,12 @@ var SnapLinksClass = Class.create({
 			//Links:		this.LocaleBundle.GetStringFromName("snaplinks.status.links")
 		};
 
-		this._OnMouseMove	 	= this.OnMouseMove.bind(this);
+//		this._OnMouseMove	 	= this.OnMouseMove.bind(this);
 		this._OnDocumentLoaded	= this.OnDocumentLoaded.bind(this);
 
 		this.PanelContainer = this.XulDocument.getElementById('content').mPanelContainer;
-		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), false);
-		this.PanelContainer.addEventListener('mouseup', this.OnMouseUp.bind(this), true);
+		this.XulDocument.addEventListener('mousedown', this.OnMouseDown.bind(this), false);
+		this.XulDocument.addEventListener('mouseup', this.OnMouseUp.bind(this), false);
 		this.PanelContainer.addEventListener('keypress', this.OnKeyPress.bind(this), true);
 
 		this.XulDocument.getElementById('snaplMenu')
@@ -147,12 +140,18 @@ var SnapLinksClass = Class.create({
 		this.SnapLinksStatus = '';
 
 		/* Install context menu popup prevention hook */
-		this.StopNextContextMenuPopup = false;
+		this.StoppingNextContextMenuPopup = false;
 		this.XulDocument.getElementById('contentAreaContextMenu').addEventListener('popupshowing', function (e) {
-			if(this.StopNextContextMenuPopup)
+			if(this.StoppingNextContextMenuPopup)
 				e.preventDefault();
-			this.StopNextContextMenuPopup = false;
+			this.StoppingNextContextMenuPopup = false;
 		}.bind(this), false);
+
+		if(SLPrefs.Dev.Mode) {
+			setTimeout(function() {
+				console.clear();
+			}.bind(this), 1000);
+		}
 	},
 
 	/**
@@ -172,51 +171,49 @@ var SnapLinksClass = Class.create({
 		return true;
 	},
 
-	UpdateStatusLabel: function() {
-		this.StatusBarLabel = this.LocaleStrings.Usage;
-	},
+//	UpdateStatusLabel: function() {
+//		this.StatusBarLabel = this.LocaleStrings.Usage;
+//	},
 
 	OnMouseDown: function(e) {
 		if(!this.ShouldActivate(e))
 			return;
 
-		this.Clear();
+		if(!e.view.toString().match(/\sWindow\]/))
+			return;
 
 		this.InstallEventHooks();
 
 		/* Capture the current working document */
 		this.Window = e.view.top;
 		this.Document = e.target.ownerDocument.defaultView.top.document;
-		this.Document.body.setCapture(false);
 
 		/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218, 
 			we prevent the context menu from showing on mouse down here. */
 		if(e.button == 2 /* RMB */ && this.ChromeWindow.navigator.userAgent.indexOf('Linux') != -1) {
-			this.StopNextContextMenuPopup = true;
+			this.StoppingNextContextMenuPopup = true;
 		}
 	},
 
-	OnMouseMove: function(e) {
+//	OnMouseMove: function(e) {
 //		this.UpdateStatusLabel();
-	},
+//	},
 
 	OnMouseUp: function(e) {
 		if(e.button != SLPrefs.Activation.Button)
 			return;
 
 		if(this.Document) {
-			this.Document.releaseCapture();
-
 			if(this.Selection.DragStarted == true) {
-				this.StopNextContextMenuPopup = true;
-				if((e.ctrlKey || SLPrefs.Actions.Default == this.ACTION.ASK_USER) &&
+				this.StoppingNextContextMenuPopup = true;
+				if( (e.ctrlKey || SLPrefs.Actions.Default == this.ACTION.ASK_USER) &&
 						this.Selection.SelectedElementsType == 'Links' &&
 						this.Selection.FilteredElements.length) {
-					pop = this.XulDocument.getElementById('snaplMenu');
+					let pop = this.XulDocument.getElementById('snaplMenu');
 					pop.openPopupAtScreen(e.screenX, e.screenY, true);
 				} else
 					this.ActivateSelection();
-				e.preventDefault();
+//				e.preventDefault();
 			} else {
 				this.Clear();
 				
@@ -236,24 +233,23 @@ var SnapLinksClass = Class.create({
 			}
 		}
 		/* Clear any StopNextContextMenuPopup regardless of it's use on next idle moment */
-		this.ChromeWindow.setTimeout(function() { this.StopNextContextMenuPopup = false; }.bind(this), 0);
+		this.ChromeWindow.setTimeout(function() { this.StoppingNextContextMenuPopup = false; }.bind(this), 0);
 	},
 
 	OnDocumentLoaded: function(e) {
 		if(e.target.URL == this.Window.document.URL) {
 			/* Primary document we're lassoing just reloaded, reset */
 			this.Document = e.target;
-//			this.Document.body.setCapture(false);	/* Doesn't work unless it's within a mousedown event, ugh */
 		}
 	},
 
 	InstallEventHooks: function() {
-		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
+//		this.PanelContainer.addEventListener('mousemove', this._OnMouseMove, true);
 		this.PanelContainer.addEventListener('load', this._OnDocumentLoaded, true);
 	},
 
 	RemoveEventHooks: function() {
-		this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
+//		this.PanelContainer.removeEventListener('mousemove', this._OnMouseMove, true);
 		this.PanelContainer.removeEventListener('load', this._OnDocumentLoaded, true);
 	},
 

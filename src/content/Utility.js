@@ -33,7 +33,8 @@ var EXPORTED_SYMBOLS = ['Class',
 						'DumpWindowFrameStructure',
 						'UpdatePreferences',
 						'MaxDocValue',
-						'CreatePreferenceMap'];
+						'CreatePreferenceMap',
+						'CreateAnonymousElement'];
 
 var Cu = Components.utils,
 	Cc = Components.classes,
@@ -41,19 +42,20 @@ var Cu = Components.utils,
 
 Cu.import('resource://gre/modules/Services.jsm');
 
-var console = {
-	__noSuchMethod__: function() { }
-};
+let mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Components.interfaces.nsIWindowMediator)
+			.getMostRecentWindow("navigator:browser");
+
+let console = mrbw.console;
+
 var dc = function() { };
 
 if(Services.prefs.getPrefType('extensions.snaplinks.Dev.Mode') && Services.prefs.getBoolPref('extensions.snaplinks.Dev.Mode') == true) {
-	console = (Cu.import("resource://gre/modules/devtools/Console.jsm", {})).console;
-
-	console.warn("Warning, console.clear() is being over-ridden (at this time, it's defined but empty, may have changed.) Defined In:  Console.jsm");
+	console.warn("Warning, console.clear() is being over-ridden/created (at this time, it's defined but empty, may have changed.)");
 	console.clear = function() {
-		let bc = Cu.import("resource:///modules/HUDService.jsm", {}).HUDService.consoleUI.browserConsole;
-		if(bc && bc.jsterm)
-			bc.jsterm.clearOutput();
+		if(mrbw && mrbw.HUDService) {
+			mrbw.HUDService.getBrowserConsole().jsterm.clearOutput();
+		}
 	};
 
 	dc = function() {
@@ -147,7 +149,7 @@ var Util = {
 };
 
 /**
- * Fully functioning prototype class inheritence, also allows for getters/setters including c# style getters/setters */
+ * Fully functioning prototype class inheritance, also allows for getters/setters including c# style getters/setters */
 var Class = (function() {
 	function subclass() {};
 
@@ -408,12 +410,22 @@ function UpdatePreferences(BasePath, Updates) {
 	}
 }
 
+/*
+ * @TODO - Merge my Rect with MDN base rect
+ */
+
 var Rect = Class.create({
 	initialize:function(top, left, bottom, right) {
+		if(typeof top == 'object') {
+			left = top.left;
+			bottom = top.bottom;
+			right = top.right;
+			top = top.top;
+		}
 		this._top = top;
 		this._left = left;
-		this._bottom = bottom || top;
-		this._right = right || left;
+		this._bottom = bottom != undefined ? bottom : top;
+		this._right = right != undefined ? right :  left;
 	},
 	get top()       { return Math.min(this._top, this._bottom);	},
 	set top(top)    { this._top = top; },
@@ -430,9 +442,13 @@ var Rect = Class.create({
 	get width()     { return this.right - this.left; },
 	get height()    { return this.bottom - this.top; },
 
-	get IsInverted() { return this._left > this._right || this._top > this._bottom; },
+	get IsInverted() { return this.IsInvertedX || this.IsInvertedY; },
+	get IsInvertedX() { return this._left > this._right; },
+	get IsInvertedY() { return this._top > this._bottom; },
 
 	get area() { return this.width * this.height; },
+
+	clone: function() { return new Rect(this._top, this._left, this._bottom, this._right); },
 
 	Offset:function(x, y) {
 		this._left += x;
@@ -455,6 +471,8 @@ var Rect = Class.create({
 
 		return this;
 	},
+	intersect: function(r) { return this.GetIntersectRect(r); },
+	intersects: function(r) { return this.IntersectsWith(r); },
 	GetIntersectRect: function(r) {
 		var i = new Rect(Math.max(this.top, r.top), Math.max(this.left, r.left),
 							Math.min(this.bottom, r.bottom), Math.min(this.right, r.right));
@@ -647,7 +665,19 @@ function htmlentities (string, quote_style, charset, double_encode) {
 	 return string;
 }
 
-function escapeHTML(str) str.replace(/[&"<>]/g, function (m) ({ "&": "&amp;", '"': "&quot", "<": "&lt;", ">": "&gt;" })[m]);
+function escapeHTML(str) str.replace(/[&"<>]/g, function (m) ({ "&": "&amp;", '"': "&quot", "<": "&lt;", ">": "&gt;" })[m])
+
+function CreateAnonymousElement(markup) {
+	const DOMParser 		= new Components.Constructor("@mozilla.org/xmlextras/domparser;1", "nsIDOMParser");
+	const SystemPrincipal 	= Cc["@mozilla.org/systemprincipal;1"].createInstance(Ci.nsIPrincipal);
+	let parser = (new DOMParser());		parser.init(SystemPrincipal);
+
+	let AnonymousElement = parser.parseFromString('<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">'+markup+'</overlay>', 'text/xml')
+			.firstChild		/* <overlay />*/
+			.firstChild;	/* markup */
+	AnonymousElement.parentNode.removeChild(AnonymousElement);
+	return AnonymousElement;
+}
 
 /* Returns the maximum of the documentElement[prop] or body[prop] if available or 0 if doc is invalid */
 function MaxDocValue(doc, prop) {

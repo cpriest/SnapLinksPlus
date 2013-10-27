@@ -47,15 +47,10 @@ window.addEventListener('load', function() {
 	}
 
 	if(Services.prefs.getPrefType('extensions.snaplinks.Dev.ShowConsoleAtStartup') && Services.prefs.getBoolPref('extensions.snaplinks.Dev.ShowConsoleAtStartup')) {
-		try {
-			Cu.import("resource:///modules/HUDService.jsm", {}).HUDService.consoleUI.toggleBrowserConsole();
-		} catch(e) {
-			Components.utils.reportError(e + ":\n"+ e.stack);
-		}
+		if(!window.HUDService.getBrowserConsole())
+			window.HUDService.toggleBrowserConsole();
 	}
-}, false);
 
-window.addEventListener('load', function() {
 	if(Services.prefs.getPrefType('extensions.snaplinks.Dev.Mode') && Services.prefs.getBoolPref('extensions.snaplinks.Dev.Mode')) {
 		function CreateAnonymousElement(markup) {
 			var AnonymousElement = ((new DOMParser())
