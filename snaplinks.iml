@@ -10,6 +10,7 @@
       <excludeFolder url="file://$MODULE_DIR$/dist/amo" />
       <excludeFolder url="file://$MODULE_DIR$/dist/babelzilla" />
       <excludeFolder url="file://$MODULE_DIR$/downloads" />
+      <excludeFolder url="file://$MODULE_DIR$/eclipseRunAs" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
