@@ -78,7 +78,7 @@ var SnapLinksSelectionClass = Class.create({
 			if(InsertionNode && Element) {
 				ApplyStyle(Element, {
 					color        : SLPrefs.Selection.BorderColor,
-					border       : SLPrefs.Selection.BorderWidth + 'px dotted',
+					outline      : SLPrefs.Selection.BorderWidth + 'px dotted',
 
 					display      : 'none',
 					position     : 'fixed',
