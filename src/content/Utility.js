@@ -416,53 +416,74 @@ function UpdatePreferences(BasePath, Updates) {
 
 var Rect = Class.create({
 	initialize:function(top, left, bottom, right) {
+		/* __top stores set top, _top stores non-inverted top, likewise for left, bottom, right */
 		if(typeof top == 'object') {
 			left = top.left;
 			bottom = top.bottom;
 			right = top.right;
 			top = top.top;
 		}
-		this._top = top;
-		this._left = left;
-		this._bottom = bottom != undefined ? bottom : top;
-		this._right = right != undefined ? right :  left;
+		this.top = top;
+		this.left = left;
+		this.bottom = bottom != undefined ? bottom : top;
+		this.right = right != undefined ? right :  left;
 	},
-	get top()       { return Math.min(this._top, this._bottom);	},
-	set top(top)    { this._top = top; },
+	get top()       { return this._top;	},
+	set top(top)    {
+		this.__top = top;
+		[this._top, this._bottom] = this.__top < this.__bottom
+			? [this.__top, this.__bottom ]
+			: [this.__bottom, this.__top ];
+	},
 
-	get left()      { return Math.min(this._left, this._right); },
-	set left(left)  { this._left = left; },
+	get left()      { return this._left; },
+	set left(left)  {
+		this.__left = left;
+		[this._left, this._right] = this.__left < this.__right
+			? [this.__left, this.__right ]
+			: [this.__right, this.__left ];
+	},
 
-	get bottom()    { return Math.max(this._top, this._bottom); },
-	set bottom(bottom) { return this._bottom = bottom; },
+	get bottom()    { return this._bottom; },
+	set bottom(bottom) {
+		this.__bottom = bottom;
+		[this._top, this._bottom] = this.__top < this.__bottom
+			? [this.__top, this.__bottom ]
+			: [this.__bottom, this.__top ];
+	},
 
-	get right()     { return Math.max(this._left, this._right); },
-	set right(right) { return this._right = right; },
+	get right()     { return this._right; },
+	set right(right) {
+		this.__right = right;
+		[this._left, this._right] = this.__left < this.__right
+			? [this.__left, this.__right ]
+			: [this.__right, this.__left ];
+	},
 
-	get width()     { return this.right - this.left; },
-	get height()    { return this.bottom - this.top; },
+	get width()     { return this._right - this._left; },
+	get height()    { return this._bottom - this._top; },
 
 	get IsInverted() { return this.IsInvertedX || this.IsInvertedY; },
-	get IsInvertedX() { return this._left > this._right; },
-	get IsInvertedY() { return this._top > this._bottom; },
+	get IsInvertedX() { return this.__left > this.__right; },
+	get IsInvertedY() { return this.__top > this.__bottom; },
 
 	get area() { return this.width * this.height; },
 
 	clone: function() { return new Rect(this._top, this._left, this._bottom, this._right); },
 
 	Offset:function(x, y) {
-		this._left += x;
-		this._right += x;
-		this._top += y;
-		this._bottom += y;
+		this.__left += x;	this._left += x;
+		this.__right += x;	this._right += x;
+		this.__top += y;	this._top += y;
+		this.__bottom += y;	this._bottom += y;
 
 		return this;
 	},
 	Shrink:function(x, y) {
-		this._left += x;
-		this._right -= x;
-		this._top += y;
-		this._bottom -= y;
+		this.__left += x;	this._left += x;
+		this.__right -= x;	this._right -= x;
+		this.__top += y;	this._top += y;
+		this.__bottom -= y;	this._bottom -= y;
 
 		return this;
 	},
@@ -474,17 +495,26 @@ var Rect = Class.create({
 	intersect: function(r) { return this.GetIntersectRect(r); },
 	intersects: function(r) { return this.IntersectsWith(r); },
 	GetIntersectRect: function(r) {
-		var i = new Rect(Math.max(this.top, r.top), Math.max(this.left, r.left),
-							Math.min(this.bottom, r.bottom), Math.min(this.right, r.right));
-		if(i.IsInverted)
-			return false;
-		return i;
+		return new Rect(Math.max(this._top, r._top), Math.max(this._left, r._left),
+							Math.min(this._bottom, r._bottom), Math.min(this._right, r._right));
 	},
 	IntersectsWith: function(r) {
-		return this.GetIntersectRect(r) != false;
+		/* Some/most of this code is duplicated from other parts of this class for performance reasons */
+
+		// If the greatest top is higher than the lowest bottom, they don't intersect
+		let GreatestTop = Math.max(this._top, r._top),
+			LowestBottom = Math.min(this._bottom, r._bottom);
+		if(GreatestTop > LowestBottom)
+			return false;
+
+		// If the greatest left is higher than the lowest right, they don't intersect
+		let GreatestLeft = Math.max(this._left, r._left),
+			LowestRight = Math.min(this._right, r._right);
+		return GreatestLeft <= LowestRight;
+
 	},
 	toString: function() {
-		return ['t:'+this.top, 'l:'+this.left, 'b:'+this.bottom, 'r:'+this.right, 'w:'+this.width, 'h:'+this.height].join(' ');
+		return ['t:'+this._top, 'l:'+this._left, 'b:'+this._bottom, 'r:'+this._right, 'w:'+this.width, 'h:'+this.height].join(' ');
 	}
 });
 

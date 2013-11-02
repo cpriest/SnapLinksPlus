@@ -175,15 +175,6 @@ var SnapLinksSelectionClass = Class.create({
 	},
 	set SelectedElements(x) { this.SLP.SelectedElements = x },
 
-
-	/* Dynamic creation of elementm, stored in document */
-	get IntersectedElements() {
-		if(!this.SLP.IntersectedElements)
-			this.SLP.IntersectedElements = [ ];
-		return this.SLP.IntersectedElements;
-	},
-	set IntersectedElements(x) { this.SLP.IntersectedElements = x },
-
 	/* Internal flag to control selecting all links or all links matching the greatest size */
 	SelectLargestFontSizeIntersectionLinks:		true,
 
@@ -218,8 +209,6 @@ var SnapLinksSelectionClass = Class.create({
 
 		this._OnMouseMove 			= this.OnMouseMove.bind(this);
 		this._OnMouseUp 			= this.OnMouseUp.bind(this);
-		this._OnKeyDown				= this.OnKeyDown.bind(this);
-		this._OnKeyUp				= this.OnKeyUp.bind(this);
 		this._OnDocumentUnloaded	= this.OnDocumentUnloaded.bind(this);
 		this._OnDocumentLoaded		= this.OnDocumentLoaded.bind(this);
 
@@ -301,16 +290,12 @@ var SnapLinksSelectionClass = Class.create({
 		this.ChromeWindow.addEventListener('mouseup', this._OnMouseUp, true);
 		this.PanelContainer.addEventListener('load', this._OnDocumentLoaded, true);
 		this.PanelContainer.addEventListener('unload', this._OnDocumentUnloaded, true);
-		this.PanelContainer.addEventListener('keydown', this._OnKeyDown, true);
-		this.PanelContainer.addEventListener('keyup', this._OnKeyUp, true);
 	},
 	RemoveEventHooks: function() {
 		this.ChromeWindow.removeEventListener('mousemove', this._OnMouseMove, true);
 		this.ChromeWindow.removeEventListener('mouseup', this._OnMouseUp, true);
 		this.PanelContainer.removeEventListener('load', this._OnDocumentLoaded, true);
 		this.PanelContainer.removeEventListener('unload', this._OnDocumentUnloaded, true);
-		this.PanelContainer.removeEventListener('keydown', this._OnKeyDown, true);
-		this.PanelContainer.removeEventListener('keyup', this._OnKeyUp, true);
 	},
 
 	OnMouseMove: function(e) {
@@ -319,6 +304,8 @@ var SnapLinksSelectionClass = Class.create({
 
 		/* If we have an offscreen scroll interval set, clear it */
 		clearTimeout(this.ScrollInterval);
+
+		this.SelectLargestFontSizeIntersectionLinks = !e.shiftKey;
 
 		var pageX = e.pageX,
 			pageY = e.pageY;
@@ -378,20 +365,6 @@ var SnapLinksSelectionClass = Class.create({
 		this.RemoveEventHooks();
 	},
 
-	OnKeyDown: function(e) {
-		if(e.keyCode == this.Window.KeyboardEvent.DOM_VK_SHIFT ) {
-			this.SelectLargestFontSizeIntersectionLinks = false;
-			this.UpdateElement();
-		}
-	},
-
-	OnKeyUp: function(e) {
-		if(e.keyCode == this.Window.KeyboardEvent.DOM_VK_SHIFT ) {
-			this.SelectLargestFontSizeIntersectionLinks = true;
-			this.UpdateElement();
-		}
-	},
-
 	OnDocumentLoaded: function(e) {
 //		console.log('loaded: %s, %s, %o %o', e.target.URL, this.Window.document.URL, e, this.Window);
 		if(e.target.URL == this.Window.document.URL) {
@@ -445,30 +418,31 @@ var SnapLinksSelectionClass = Class.create({
 				Components.utils.reportError(e);
 			}
 
-			link.SnapRects = GetElementRects(link, offset);
 			delete link.SnapFontSize;
+			link.SnapOutlines = [ link ];
+			link.SnapRects = GetElementRects(link, offset);
 			SelectableElements.push(link);
 		}, this);
 
 		var Links = (new Date()).getTime();
 
 		$A(Document.body.querySelectorAll('INPUT')).forEach( function(input) {
-			var Type = input.getAttribute('type'),
+			let Type = input.getAttribute('type'),
 				ElementRectsNode = input;
+
 			if(SLPrefs.Elements.Buttons.Highlight && (Type == 'submit' || Type == 'button')) {
+				input.SnapOutlines = [ input ];
+				input.SnapRects = GetElementRects(ElementRectsNode, offset);
 				SelectableElements.push(input);
-			}
-			if(SLPrefs.Elements.RadioButtons.Highlight && Type == 'radio') {
-				SelectableElements.push(input);
-			}
-			else if(SLPrefs.Elements.Checkboxes.Highlight && Type == 'checkbox') {
+			} else if( (SLPrefs.Elements.RadioButtons.Highlight && Type == 'radio') || (SLPrefs.Elements.Checkboxes.Highlight && Type == 'checkbox') ) {
 				if(input.parentNode.tagName == 'LABEL') {
 					ElementRectsNode = input.parentNode;
 					input.SnapOutlines = [ input.parentNode ];
-				}
+				} else
+					input.SnapOutlines = [ input ];
+				input.SnapRects = GetElementRects(ElementRectsNode, offset);
 				SelectableElements.push(input);
 			}
-			input.SnapRects = GetElementRects(ElementRectsNode, offset);
 		}, this);
 
 		var Inputs = (new Date()).getTime();
@@ -509,6 +483,7 @@ var SnapLinksSelectionClass = Class.create({
 				if(elem.SnapLinksClickable || elem.ownerDocument.defaultView.getComputedStyle(elem).cursor == 'pointer') {
 					elem.SnapLinksClickable = true;
 					elem.SnapRects = GetElementRects(elem, offset);
+					elem.SnapOutlines = [ elem ];
 					SelectableElements.push(elem);
 				}
 			});
@@ -537,14 +512,8 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Clears the selection style from the currently selected elements */
 	ClearSelectedElements: function() {
-		this.IntersectedElements = [ ];
+		this.SetOutline(this.SelectedElements, '');
 
-		this.SelectedElements.forEach( function(elem) {
-			(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
-				elem.style.MozOutline = '';	/* Pre FF13 */
-				elem.style.outline = '';
-			}, this );
-		}, this );
 		this.SelectedElements = [ ];
 	},
 
@@ -623,10 +592,10 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Calculates which elements intersect with the selection */
 	CalcSelectedElements: function() {
-		this.ClearSelectedElements();
 		if(this.Element.style.display != 'none') {
 			var HighLinkFontSize = 0;
 			var HighJsLinkFontSize = 0;
+			let IntersectedElements = [ ];
 
 			var TypesInPriorityOrder = ['Links', 'JsLinks', 'Checkboxes', 'Buttons', 'RadioButtons', 'Clickable'];
 			var TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0, 'RadioButtons': 0, Clickable: 0};
@@ -653,9 +622,10 @@ var SnapLinksSelectionClass = Class.create({
 						IntersectRect.Offset(MaxDocValue(ti.Document, 'scrollLeft'), MaxDocValue(ti.Document, 'scrollTop'));
 					}
 
+					let elem;
 					dc('calc-elements', '%o.SelectableElements = %o', ti, ti.SelectableElements);
 					/* Find Links Which Intersect With SelectRect */
-					$A(ti.SelectableElements).forEach(function(elem) {
+					for(let j=0;j<ti.SelectableElements.length, elem=ti.SelectableElements[j]; j++) {
 						var Intersects = elem.SnapRects.some( IntersectRect.IntersectsWith.bind(IntersectRect) );
 
 						if(Intersects) {
@@ -703,13 +673,13 @@ var SnapLinksSelectionClass = Class.create({
 									TypeCounts.Clickable++;
 								}
 
-								this.IntersectedElements.push(elem);
+								IntersectedElements.push(elem);
 							}
 						}
-					}, this);
+					}
 				}
 			}
-			dc('calc-elements', 'IntersectedElements = %o, TypeCounts = %o', this.IntersectedElements, TypeCounts);
+			dc('calc-elements', 'IntersectedElements = %o, TypeCounts = %o', IntersectedElements, TypeCounts);
 
 			// Init the greatest values with the first item.
 			var Greatest = TypesInPriorityOrder[0];
@@ -730,7 +700,7 @@ var SnapLinksSelectionClass = Class.create({
 
 			switch(Greatest) {
 				case 'Links':
-					filterFunction = function(elem) { return elem.tagName == 'A' && !elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == (this.SelectedFixedFontSize || HighLinkFontSize)) && elem.href != this.TopDocument.URL; };
+					filterFunction = function(elem) { return elem.tagName == 'A' && !elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == (this.SelectedFixedFontSize || HighLinkFontSize)); };
 					break;
 				case 'JsLinks':
 					filterFunction = function(elem) { return elem.tagName == 'A' && elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == (this.SelectedFixedFontSize || HighJsLinkFontSize)); };
@@ -750,9 +720,9 @@ var SnapLinksSelectionClass = Class.create({
 			}
 
 			// Filter the elements.
-			this.SelectedElements = this.IntersectedElements.filter(filterFunction, this);
+			let SelectedElements = IntersectedElements.filter(filterFunction, this);
 
-			dc('calc-elements', 'AfterFilter: Greatest=%s, SelectedElements = %o', Greatest, this.SelectedElements);
+			dc('calc-elements', 'AfterFilter: Greatest=%s, SelectedElements = %o', Greatest, SelectedElements);
 
 //			if(Greatest == 'Links' && SLPrefs.Elements.Anchors.RemoveDuplicateUrls) {
 //				/* Detect duplicate links by filtering links which are contained fully within other links - Issue #37
@@ -780,21 +750,31 @@ var SnapLinksSelectionClass = Class.create({
 //				} );
 //			}
 
-			// Apply the style on the selected elements.
-			var OutlineStyle = SLPrefs.SelectedElements.BorderWidth + 'px solid ' + SLPrefs.SelectedElements.BorderColor;
-			this.SelectedElements.forEach( function(elem) {
-				(elem.SnapOutlines || [ elem ]).forEach( function(elem) {
-					elem.style.MozOutline = OutlineStyle;	/* Pre FF13 */
-					elem.style.outline = OutlineStyle;
-				} );
-			}, this );
+			let PreviousElements = this.SelectedElements,
+				NewElements = [ elem for each ( elem in SelectedElements ) if (PreviousElements.indexOf(elem) == -1) ],
+				ClearElements = [ elem for each ( elem in PreviousElements ) if (SelectedElements.indexOf(elem) == -1) ];
+
+			// Set the outline on NewElements
+			this.SetOutline(NewElements, SLPrefs.SelectedElements.BorderWidth + 'px solid ' + SLPrefs.SelectedElements.BorderColor);
+
+			// Clear the style on ClearElements
+			this.SetOutline(ClearElements, '');
+
 			this.SelectedElementsType = Greatest;
 
-			this.SelectedStatusLabel = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", [this.SelectedElements.length], 1);
+			this.SelectedStatusLabel = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", [SelectedElements.length], 1);
+			this.SelectedElements = SelectedElements;
 		}
 		dc('calc-elements', 'Final: SelectedElements = %o', this.SelectedElements);
 	},
 
+	SetOutline: function(Elements, OutlineStyle) {
+		let	elem, elem2;
+		for(let j=0;j<Elements.length, elem=Elements[j]; j++) {
+			for(let k=0;k<elem.SnapOutlines.length, elem2=elem.SnapOutlines[k];k++)
+				elem2.style.outline = OutlineStyle;
+		}
+	},
 	/** Hides or shows the selection rect and accompanying elements/text */
 	HideSelectionRect: function(Hide) {
 		if(Hide && this.Element.style.display != 'none') {

@@ -110,7 +110,7 @@ var SnapLinksClass = Class.create({
 	 */
 	set StatusBarLabel(x) {
 		// @TODO - this element seems to be unavailable some/all of the time
-		this.XulDocument.getElementById('statusbar-display').label = x;
+//		this.XulDocument.getElementById('statusbar-display').label = x;
 	},
 
 	initialize: function(ChromeWindow, XulDocument) {
