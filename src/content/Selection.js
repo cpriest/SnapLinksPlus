@@ -20,11 +20,6 @@
  */
 
 /* 	@MARK - Things are looking pretty good
-		@TODO - Letting up on right-click doesn't function properly any longer
-		@TODO Change positioning to be based on mozMovementX/Y or SelectionRect is stored in screen coordinates and translated to whatever coordinates we need at the time of use
-			- document.defaultView.mozInnerScreenX/Y seems to be The TopLeft of the sub-document in screen coordinates (even if off screen/monitor)
-			\ This would let us avoid "having" to index documents and get the top/left position of the sub-document because each document has screen coordinates
-		@TODO - Dragging over the console messes with the rect
 																																																																																																															*  */
 
 
@@ -69,23 +64,26 @@ var SnapLinksSelectionClass = Class.create({
 		return this.TopDocument.SLP;
 	},
 
-
 	/* Dynamic creation/deletion of Element */
 	get Element() {
 		if(!this._Element) {
-			let InsertionNode = this.SnapLinksPlus.ChromeWindow.document.getElementById('content');
+			let InsertionNode = this.TabBrowser.selectedBrowser.parentNode;
 			let Element = CreateAnonymousElement('<box></box>');
 			if(InsertionNode && Element) {
 				ApplyStyle(Element, {
-					color        : SLPrefs.Selection.BorderColor,
-					outline      : SLPrefs.Selection.BorderWidth + 'px dotted',
+					color				: SLPrefs.Selection.BorderColor,
+					borderStyle			: 'dotted',
+					borderTopWidth		: SLPrefs.Selection.BorderWidth+'px',
+					borderLeftWidth		: SLPrefs.Selection.BorderWidth+'px',
+					borderBottomWidth	: SLPrefs.Selection.BorderWidth+'px',
+					borderRightWidth	: SLPrefs.Selection.BorderWidth+'px',
 
-					display      : 'none',
-					position     : 'fixed',
-					zIndex       : '999999',
-					pointerEvents: 'none',
+					display				: 'none',
+					position			: 'fixed',
+					zIndex				: '999999',
+					pointerEvents		: 'none',
 				});
-				InsertionNode.insertBefore(Element, InsertionNode.firstChild);
+				InsertionNode.appendChild(Element);
 				this._Element = Element;
 			}
 		}
@@ -160,8 +158,11 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Dynamically re-calculated Indexed Documents */
 	get Documents() {
-		if(!this.SLP.Documents || !this.SLP.Documents[this.TopDocument.URL])
-			this.SLP.Documents = this.IndexDocuments(this.TopDocument);
+		if(!this.SLP.Documents || !this.SLP.Documents[this.TopDocument.URL]) {
+			let Documents = this.SLP.Documents = this.IndexDocuments(this.TopDocument);
+			for(let URL in Documents)
+				this.CalculateSnapRects(Documents[URL].Document);
+		}
 		return this.SLP.Documents;
 	},
 	set Documents(x) { this.SLP.Documents = x; },
@@ -199,13 +200,13 @@ var SnapLinksSelectionClass = Class.create({
 	/* Internal Flag indicating that a selection has been started */
 	get DragStarted() { return this.Element.style.display != 'none'; },
 
-	get XulDocument() { return this.SnapLinksPlus.XulDocument; },
-	get ChromeWindow() { return this.SnapLinksPlus.ChromeWindow; },
-	get PanelContainer() { return this.SnapLinksPlus.PanelContainer; },
-
 	initialize: function(SnapLinksPlus) {
 		this.SnapLinksPlus = SnapLinksPlus;
-		this.PanelContainer.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
+		this.ChromeWindow = SnapLinksPlus.ChromeWindow;
+		this.XulDocument = SnapLinksPlus.XulDocument;
+		this.PanelContainer = SnapLinksPlus.PanelContainer;
+		this.TabBrowser = this.XulDocument.getElementById('content');
+		this.TabBrowser.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
 
 		this._OnMouseMove 			= this.OnMouseMove.bind(this);
 		this._OnMouseUp 			= this.OnMouseUp.bind(this);
@@ -266,16 +267,11 @@ var SnapLinksSelectionClass = Class.create({
 		if(!this.SnapLinksPlus.ShouldActivate(e))
 			return;
 
+		let top = e.view.top;
 		var Document = e.target.ownerDocument;
 
-		/** Initializes the starting mouse position */
-		this.SelectionRect = new Rect(e.pageY, e.pageX);
-
-		/* If we aren't starting in the top document, change rect coordinates to top document origin */
-		if(Document != this.TopDocument) {
-			this.SelectionRect.Offset(-MaxDocValue(Document, 'scrollLeft'), -MaxDocValue(Document, 'scrollTop'));
-			this.SelectionRect.Offset(this.Documents[Document.URL].offset.x, this.Documents[Document.URL].offset.y);
-		}
+		/** Initializes the starting mouse position in the page coordinates of the top document */
+		this.SelectionRect = new Rect(e.screenY - top.mozInnerScreenY + top.scrollY, e.screenX - top.mozInnerScreenX + top.scrollX);
 
 		if(e.target && e.target.tagName == 'A') {
 			var computedStyle = e.target.ownerDocument.defaultView.getComputedStyle(e.target, null);
@@ -288,45 +284,40 @@ var SnapLinksSelectionClass = Class.create({
 	InstallEventHooks: function() {
 		this.ChromeWindow.addEventListener('mousemove', this._OnMouseMove, true);
 		this.ChromeWindow.addEventListener('mouseup', this._OnMouseUp, true);
-		this.PanelContainer.addEventListener('load', this._OnDocumentLoaded, true);
-		this.PanelContainer.addEventListener('unload', this._OnDocumentUnloaded, true);
+		this.ActiveBrowser = this.TabBrowser.selectedBrowser;
+		this.ActiveBrowser.addEventListener('load', this._OnDocumentLoaded, true);
+		this.ActiveBrowser.addEventListener('unload', this._OnDocumentUnloaded, true);
 	},
+
 	RemoveEventHooks: function() {
 		this.ChromeWindow.removeEventListener('mousemove', this._OnMouseMove, true);
 		this.ChromeWindow.removeEventListener('mouseup', this._OnMouseUp, true);
-		this.PanelContainer.removeEventListener('load', this._OnDocumentLoaded, true);
-		this.PanelContainer.removeEventListener('unload', this._OnDocumentUnloaded, true);
+		this.ActiveBrowser.removeEventListener('load', this._OnDocumentLoaded, true);
+		this.ActiveBrowser.removeEventListener('unload', this._OnDocumentUnloaded, true);
+		delete this.ActiveBrowser;
 	},
 
 	OnMouseMove: function(e) {
 //		console.log('page (%d,%d), screen(%d,%d), move(%d, %d), %o, e.target=%o', e.pageX, e.pageY, e.screenX, e.screenY, e.mozMovementX, e.mozMovementY, e, e.target);
-		this.CalculateSnapRects(e.target.ownerDocument);
 
-		/* If we have an offscreen scroll interval set, clear it */
+		/* If we have an off screen scroll interval set, clear it */
 		clearTimeout(this.ScrollInterval);
+
+		let top = this.Window;
 
 		this.SelectLargestFontSizeIntersectionLinks = !e.shiftKey;
 
-		var pageX = e.pageX,
-			pageY = e.pageY;
+		var clientX = e.screenX - top.mozInnerScreenX,
+			clientY = e.screenY - top.mozInnerScreenY;
 
-		/* If we are in a sub-document, offset our coordinates by the top/left of that sub-document element (IFRAME) */
-		if(e.target.ownerDocument != this.TopDocument) {
-			if(e.target.ownerDocument && this.Documents[e.target.ownerDocument.URL]) {
-				pageX += this.Documents[e.target.ownerDocument.URL].offset.x - MaxDocValue(e.target.ownerDocument, 'scrollLeft');
-				pageY += this.Documents[e.target.ownerDocument.URL].offset.y - MaxDocValue(e.target.ownerDocument, 'scrollTop');
-			} else if(e.target == this.Element.ownerDocument || e.target.ownerDocument == this.Element.ownerDocument) {
-				pageX += MaxDocValue(this.TopDocument, 'scrollLeft') - this.Element.parentNode.boxObject.x;
-				pageY += MaxDocValue(this.TopDocument, 'scrollTop') - this.Element.parentNode.boxObject.y;
-			}
-		}
+		var pageX = clientX + top.scrollX,
+			pageY = clientY + top.scrollY;
 
-		var clientX = pageX - MaxDocValue(this.TopDocument, 'scrollLeft'),
-			clientY = pageY - MaxDocValue(this.TopDocument, 'scrollTop');
 
-//		console.log('HideOnMouseLeave: %s, Page: [%d, %d], Client: [%d, %d], winInner: [%d, %d], %o, %o', SLPrefs.Selection.HideOnMouseLeave, pageX, pageY, clientX, clientY, this.TopDocument.defaultView.innerWidth, this.TopDocument.defaultView.innerHeight, e, this.TopDocument);
+//		console.log('Hide: %s, Page: (%d, %d), Client: (%d, %d), topInner: (%d, %d), %o, %o', SLPrefs.Selection.HideOnMouseLeave, pageX, pageY, clientX, clientY, top.innerWidth, top.innerHeight, e, top);
 
-		if(clientX < 0 || clientY < 0 || clientX > this.TopDocument.defaultView.innerWidth || clientY > this.TopDocument.defaultView.innerHeight) {
+		/* Out of top document detection and action */
+		if(clientX < 0 || clientY < 0 || clientX > top.innerWidth || clientY > top.innerHeight) {
 			if(SLPrefs.Selection.HideOnMouseLeave) {
 				this.HideSelectionRect(true);
 				return;
@@ -335,13 +326,13 @@ var SnapLinksSelectionClass = Class.create({
 
 				if(clientX < 0)
 					offsetX = clientX;
-				else if(clientX > this.TopDocument.defaultView.innerWidth)
-					offsetX = clientX - this.TopDocument.defaultView.innerWidth;
+				else if(clientX > top.innerWidth)
+					offsetX = clientX - top.innerWidth;
 
 				if(clientY < 0)
 					offsetY = clientY;
-				else if(clientY > this.TopDocument.defaultView.innerHeight)
-					offsetY = clientY - this.TopDocument.defaultView.innerHeight;
+				else if(clientY > top.innerHeight)
+					offsetY = clientY - top.innerHeight;
 
 				/* Scroll TopDocument Window */
 				this.Window.scrollBy(offsetX, offsetY);
@@ -353,11 +344,11 @@ var SnapLinksSelectionClass = Class.create({
 			this.HideSelectionRect(false);
 
 		/* Disabled At The Moment */
-		if(false && e.altKey && !SLPrefs.Activation.RequiresAlt) {
-			this.OffsetSelection(pageX - this.SelectionRect.right, pageY - this.SelectionRect.bottom);
-		} else {
+//		if(false && e.altKey && !SLPrefs.Activation.RequiresAlt) {
+//			this.OffsetSelection(pageX - this.SelectionRect.right, pageY - this.SelectionRect.bottom);
+//		} else {
 			this.ExpandSelectionTo(pageX, pageY);
-		}
+//		}
 	},
 
 	OnMouseUp: function(e) {
@@ -525,8 +516,10 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Expands the selection to the given X, Y coordinates */
 	ExpandSelectionTo: function(X, Y) {
-		this.SelectionRect.right = Math.max(0, Math.min(X, this.Documents[this.TopDocument.URL].width));
-		this.SelectionRect.bottom = Math.max(0, Math.min(Y, this.Documents[this.TopDocument.URL].height));
+		let top = this.Window;
+
+		this.SelectionRect.right = Math.max(0, Math.min(X, top.innerWidth + top.scrollMaxX));
+		this.SelectionRect.bottom = Math.max(0, Math.min(Y, top.innerHeight + top.scrollMaxY));
 		this.UpdateElement();
 	},
 
@@ -550,10 +543,10 @@ var SnapLinksSelectionClass = Class.create({
 			height 	: ClippedRect.height  + 'px',	/*- (2 * SLPrefs.Selection.BorderWidth)*/
 
 			/* Border width is dependent on not being at the bounding edge unless the document is scrolled entirely in that direction */
-			borderTopWidth		: ( ClippedRect.top 	== BoundingRect.top 	&& this.TopDocumentElement.scrollTop > 0 )	? '0px' : '',
-			borderBottomWidth	: ( ClippedRect.bottom 	== BoundingRect.bottom 	&& this.TopDocumentElement.scrollTop < this.TopDocumentElement.scrollTopMax ) 	? '0px' : '',
-			borderLeftWidth		: ( ClippedRect.left 	== BoundingRect.left 	&& this.TopDocumentElement.scrollLeft > 0 )	? '0px' : '',
-			borderRightWidth	: ( ClippedRect.right 	== BoundingRect.right 	&& this.TopDocumentElement.scrollLeft < this.TopDocumentElement.scrollLeftMax )	? '0px' : '',
+			borderTopWidth		: ( ClippedRect.top 	== BoundingRect.top 	&& this.TopDocumentElement.scrollTop > 0 )	? '0px' : SLPrefs.Selection.BorderWidth+'px',
+			borderBottomWidth	: ( ClippedRect.bottom 	== BoundingRect.bottom 	&& this.TopDocumentElement.scrollTop < this.TopDocumentElement.scrollTopMax ) 	? '0px' : SLPrefs.Selection.BorderWidth+'px',
+			borderLeftWidth		: ( ClippedRect.left 	== BoundingRect.left 	&& this.TopDocumentElement.scrollLeft > 0 )	? '0px' : SLPrefs.Selection.BorderWidth+'px',
+			borderRightWidth	: ( ClippedRect.right 	== BoundingRect.right 	&& this.TopDocumentElement.scrollLeft < this.TopDocumentElement.scrollLeftMax )	? '0px' : SLPrefs.Selection.BorderWidth+'px',
 		});
 
 		this.HideSelectionRect(!(this.SelectionRect.width > 4 || this.SelectionRect.height > 4));

@@ -290,12 +290,14 @@ var SnapLinksClass = Class.create({
 
 		Action = Action || SLPrefs.Actions.Default;
 
-		/* Check to see that the requested action is valid for the given SelectedElementsType */
-		if(ValidActions[this.Selection.SelectedElementsType].indexOf(Action) == -1)
-			Action = ValidActions[this.Selection.SelectedElementsType][0];
+		if(this.Selection.SelectedElementsType) {
+			/* Check to see that the requested action is valid for the given SelectedElementsType */
+			if(ValidActions[this.Selection.SelectedElementsType].indexOf(Action) == -1)
+				Action = ValidActions[this.Selection.SelectedElementsType][0];
 		
-		if(this[Action])
-			this[Action]();
+			if(this[Action])
+				this[Action]();
+		}
 		this.Clear();
 	},
 

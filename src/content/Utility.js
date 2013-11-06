@@ -34,11 +34,13 @@ var EXPORTED_SYMBOLS = ['Class',
 						'UpdatePreferences',
 						'MaxDocValue',
 						'CreatePreferenceMap',
-						'CreateAnonymousElement'];
+						'CreateAnonymousElement',
+						'XULNS'];
 
 var Cu = Components.utils,
 	Cc = Components.classes,
-	Ci = Components.interfaces;
+	Ci = Components.interfaces,
+	XULNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 
 Cu.import('resource://gre/modules/Services.jsm');
 
