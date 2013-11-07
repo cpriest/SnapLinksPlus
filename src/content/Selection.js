@@ -212,6 +212,9 @@ var SnapLinksSelectionClass = Class.create({
 		this._OnMouseUp 			= this.OnMouseUp.bind(this);
 		this._OnDocumentUnloaded	= this.OnDocumentUnloaded.bind(this);
 		this._OnDocumentLoaded		= this.OnDocumentLoaded.bind(this);
+		this._CalcSelectedElements	= this.CalcSelectedElements.bind(this);
+
+		this.LastCalcTime = 0;
 
 		/* Set mock object for use until first event determines our window */
 		this._Window = { document: { } };
@@ -313,7 +316,6 @@ var SnapLinksSelectionClass = Class.create({
 		var pageX = clientX + top.scrollX,
 			pageY = clientY + top.scrollY;
 
-
 //		console.log('Hide: %s, Page: (%d, %d), Client: (%d, %d), topInner: (%d, %d), %o, %o', SLPrefs.Selection.HideOnMouseLeave, pageX, pageY, clientX, clientY, top.innerWidth, top.innerHeight, e, top);
 
 		/* Out of top document detection and action */
@@ -384,6 +386,8 @@ var SnapLinksSelectionClass = Class.create({
 	CalculateSnapRects: function(Document) {
 		if(!Document || !this.Documents[Document.URL])
 			return;
+
+		this.Documents[Document.URL].SelectableElements = [ ];
 
 		/* If the last calculation was done at the same innerWidth, skip calculation */
 		if(this.CalculateWindowWidth == this.Window.innerWidth && this.Documents[Document.URL].SelectableElements != undefined)
@@ -586,6 +590,17 @@ var SnapLinksSelectionClass = Class.create({
 	/* Calculates which elements intersect with the selection */
 	CalcSelectedElements: function() {
 		if(this.Element.style.display != 'none') {
+			let d = 100,
+				Elapsed = Date.now() - this.LastCalcTime;
+
+			if(Elapsed < d) {
+				if(!this.CalcTimer)
+					this.CalcTimer = setTimeout(this._CalcSelectedElements, d - Elapsed);
+				return;
+			}
+			clearTimeout(this.CalcTimer);
+			this.LastCalcTime = Date.now();
+
 			var HighLinkFontSize = 0;
 			var HighJsLinkFontSize = 0;
 			let IntersectedElements = [ ];
