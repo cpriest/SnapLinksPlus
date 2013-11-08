@@ -35,7 +35,9 @@ var EXPORTED_SYMBOLS = ['Class',
 						'MaxDocValue',
 						'CreatePreferenceMap',
 						'CreateAnonymousElement',
-						'XULNS'];
+						'XULNS',
+						'Point',
+						'sprintf'];
 
 var Cu = Components.utils,
 	Cc = Components.classes,
@@ -43,12 +45,16 @@ var Cu = Components.utils,
 	XULNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 
 Cu.import('resource://gre/modules/Services.jsm');
+Cu.import('resource://gre/modules/Geometry.jsm');
+Cu.import('chrome://snaplinksplus/content/sprintf.js');
 
 let mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
 			.getService(Components.interfaces.nsIWindowMediator)
 			.getMostRecentWindow("navigator:browser");
 
 let console = mrbw.console;
+
+//Point.prototype.toString = function() { return sprintf('(%8.2f,%8.2f)', this.x, this.y); };
 
 var dc = function() { };
 
