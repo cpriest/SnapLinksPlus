@@ -54,7 +54,10 @@ let mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
 
 let console = mrbw.console;
 
-//Point.prototype.toString = function() { return sprintf('(%8.2f,%8.2f)', this.x, this.y); };
+Point.prototype.toString = function() {
+	//noinspection JSCheckFunctionSignatures
+	return sprintf('(%8.2f, %8.2f)', this.x, this.y);
+};
 
 var dc = function() { };
 
@@ -289,7 +292,7 @@ function ApplyStyle(elem, style) {
 function DumpWindowFrameStructure(win) {
 	var path = ['0'];
 	function dump(win) {
-		console.log('%s: %s, %o, %o, %o', path.join('.'), win.document.URL, win, win.document, win.document.body);
+		console.log('%s: %s, %o, (%d, %d)', path.join('.'), win.document.URL, win, win.mozInnerScreenX-win.top.mozInnerScreenX, win.mozInnerScreenY-win.top.mozInnerScreenY);
 		for(var j=0;j<win.frames.length;j++) {
 			path.push(j);
 			dump(win.frames[j]);
@@ -479,6 +482,15 @@ var Rect = Class.create({
 
 	clone: function() { return new Rect(this._top, this._left, this._bottom, this._right); },
 
+	scale: function(x, y) {
+		this.__left *= x;	this._left *= x;
+		this.__right *= x;	this._right *= x;
+		this.__top *= y;	this._top *= y;
+		this.__bottom *= y;	this._bottom *= y;
+
+		return this;
+	},
+
 	Offset:function(x, y) {
 		this.__left += x;	this._left += x;
 		this.__right += x;	this._right += x;
@@ -503,6 +515,8 @@ var Rect = Class.create({
 	intersect: function(r) { return this.GetIntersectRect(r); },
 	intersects: function(r) { return this.IntersectsWith(r); },
 	GetIntersectRect: function(r) {
+		if(!this.intersects(r))
+			return false;
 		return new Rect(Math.max(this._top, r._top), Math.max(this._left, r._left),
 							Math.min(this._bottom, r._bottom), Math.min(this._right, r._right));
 	},
@@ -522,7 +536,8 @@ var Rect = Class.create({
 
 	},
 	toString: function() {
-		return ['t:'+this._top, 'l:'+this._left, 'b:'+this._bottom, 'r:'+this._right, 'w:'+this.width, 'h:'+this.height].join(' ');
+		//noinspection JSCheckFunctionSignatures
+		return sprintf('{t:%5d, l:%5d, b:%5d, r:%5d, %5dx%-5d}', this._top, this._left, this._bottom, this._right, this.width, this.height);
 	}
 });
 

@@ -227,54 +227,56 @@ var SnapLinksSelectionClass = Class.create({
 		/* Insert top document */
 		Documents[TopDocument.URL] = {
 			Document: 	TopDocument,
-			height:		MaxDocValue(TopDocument, 'scrollHeight'),
-			width:		MaxDocValue(TopDocument, 'scrollWidth'),
-			offset: 	{x: 0, y: 0}
 		};
 
-		function IndexFrames(frames) {
-			for(let j=0; j < frames.length;j++) {
-				let frame = frames[j],
-					elem = frame.frameElement,
-					offset = { x: 0, y: 0 };
-
+		function IndexFrames(frame) {
+			for(let j=0; j < frame.length; j++) {
 				/* Unusual case where a sub-frame has the same URL as the TopDocument, skipping this frame in this case, see this page for issue: https://groups.google.com/forum/#!msg/snaplinksplus/7a18LX7n6uM/5A39Mdlx5RQJ */
-				if(frame.document.URL == TopDocument.URL)
+				if(frame[j].document.URL == TopDocument.URL)
 					continue;
 
-				do {
-					offset.x += elem.offsetLeft;
-					offset.y += elem.offsetTop;
-					elem = elem.offsetParent;
-				} while(elem != null);
-				offset.x += Documents[frame.parent.document.URL].offset.x;
-				offset.y += Documents[frame.parent.document.URL].offset.y;
-				Documents[frame.document.URL] = {
-					Document: 	frame.document,
-					height:		MaxDocValue(frame.document, 'scrollHeight'),
-					width:		MaxDocValue(frame.document, 'scrollWidth'),
-					offset: 	offset
+				Documents[frame[j].document.URL] = {
+					Document: 	frame[j].document,
 				};
-				IndexFrames(frame);
+				IndexFrames(frame[j]);
 			}
 		}
-		IndexFrames(TopDocument.defaultView.frames);
+		IndexFrames(TopDocument.defaultView);
 		dc('doc-index', '%o', Documents);
 
 		return Documents;
 	},
 
+	InnerScreen: function(e) {
+		e.mozInnerScreenX = e.screenX / this.topPixelScale;
+		e.mozInnerScreenY = e.screenY / this.topPixelScale;
+		return e;
+	},
+
+	ShouldActivate: function(e) {
+		if(!this.SnapLinksPlus.ShouldActivate(e))
+			return false;
+
+		this.Window = e.view.top;
+		this.top = e.view.top;
+		this.topPixelScale = this.top.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils).screenPixelsPerCSSPixel;
+
+		return true;
+	},
+
 	/* Starting Hook for beginning a selection */
 	OnMouseDown: function(e) {
-		this.Window = e.view.top;
-		if(!this.SnapLinksPlus.ShouldActivate(e))
+		if(!this.ShouldActivate(e))
 			return;
 
-		let top = e.view.top;
-		var Document = e.target.ownerDocument;
+		this.e = this.InnerScreen(e);
+
+		let top = this.top,
+			topPageX = e.view.mozInnerScreenX - top.mozInnerScreenX + e.clientX + top.scrollX,
+			topPageY = e.view.mozInnerScreenY - top.mozInnerScreenY + e.clientY + top.scrollY;
 
 		/** Initializes the starting mouse position in the page coordinates of the top document */
-		this.SelectionRect = new Rect(e.screenY - top.mozInnerScreenY + top.scrollY, e.screenX - top.mozInnerScreenX + top.scrollX);
+		this.SelectionRect = new Rect(e.mozInnerScreenY - top.mozInnerScreenY + top.scrollY, e.mozInnerScreenX - top.mozInnerScreenX + top.scrollX);
 
 		if(e.target && e.target.tagName == 'A') {
 			var computedStyle = e.target.ownerDocument.defaultView.getComputedStyle(e.target, null);
@@ -301,40 +303,36 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	OnMouseMove: function(e) {
-//		console.log('page (%d,%d), screen(%d,%d), move(%d, %d), %o, e.target=%o', e.pageX, e.pageY, e.screenX, e.screenY, e.mozMovementX, e.mozMovementY, e, e.target);
+		this.e = this.InnerScreen(e);
 
 		/* If we have an off screen scroll interval set, clear it */
 		clearTimeout(this.ScrollInterval);
 
-		let top = this.Window;
+		let top = this.top,
+			topClientX = e.mozInnerScreenX - top.mozInnerScreenX,
+			topClientY = e.mozInnerScreenY - top.mozInnerScreenY,
+			topPageX = topClientX + top.scrollX,
+			topPageY = topClientY + top.scrollY;
 
 		this.SelectLargestFontSizeIntersectionLinks = !e.shiftKey;
 
-		var clientX = e.screenX - top.mozInnerScreenX,
-			clientY = e.screenY - top.mozInnerScreenY;
-
-		var pageX = clientX + top.scrollX,
-			pageY = clientY + top.scrollY;
-
-//		console.log('Hide: %s, Page: (%d, %d), Client: (%d, %d), topInner: (%d, %d), %o, %o', SLPrefs.Selection.HideOnMouseLeave, pageX, pageY, clientX, clientY, top.innerWidth, top.innerHeight, e, top);
-
 		/* Out of top document detection and action */
-		if(clientX < 0 || clientY < 0 || clientX > top.innerWidth || clientY > top.innerHeight) {
+		if(topClientX < 0 || topClientY < 0 || topClientX > top.innerWidth || topClientY > top.innerHeight) {
 			if(SLPrefs.Selection.HideOnMouseLeave) {
 				this.HideSelectionRect(true);
 				return;
 			} else {
 				let offsetX = 0, offsetY = 0;
 
-				if(clientX < 0)
-					offsetX = clientX;
-				else if(clientX > top.innerWidth)
-					offsetX = clientX - top.innerWidth;
+				if(topClientX < 0)
+					offsetX = topClientX;
+				else if(topClientX > top.innerWidth)
+					offsetX = topClientX - top.innerWidth;
 
-				if(clientY < 0)
-					offsetY = clientY;
-				else if(clientY > top.innerHeight)
-					offsetY = clientY - top.innerHeight;
+				if(topClientY < 0)
+					offsetY = topClientY;
+				else if(topClientY > top.innerHeight)
+					offsetY = topClientY - top.innerHeight;
 
 				/* Scroll TopDocument Window */
 				this.Window.scrollBy(offsetX, offsetY);
@@ -349,7 +347,7 @@ var SnapLinksSelectionClass = Class.create({
 //		if(false && e.altKey && !SLPrefs.Activation.RequiresAlt) {
 //			this.OffsetSelection(pageX - this.SelectionRect.right, pageY - this.SelectionRect.bottom);
 //		} else {
-			this.ExpandSelectionTo(pageX, pageY);
+			this.ExpandSelectionTo(topPageX, topPageY);
 //		}
 	},
 
@@ -386,8 +384,6 @@ var SnapLinksSelectionClass = Class.create({
 	CalculateSnapRects: function(Document) {
 		if(!Document || !this.Documents[Document.URL])
 			return;
-
-		this.Documents[Document.URL].SelectableElements = [ ];
 
 		/* If the last calculation was done at the same innerWidth, skip calculation */
 		if(this.CalculateWindowWidth == this.Window.innerWidth && this.Documents[Document.URL].SelectableElements != undefined)
@@ -520,7 +516,7 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Expands the selection to the given X, Y coordinates */
 	ExpandSelectionTo: function(X, Y) {
-		let top = this.Window;
+		let top = this.top;
 
 		this.SelectionRect.right = Math.max(0, Math.min(X, top.innerWidth + top.scrollMaxX));
 		this.SelectionRect.bottom = Math.max(0, Math.min(Y, top.innerHeight + top.scrollMaxY));
@@ -534,9 +530,10 @@ var SnapLinksSelectionClass = Class.create({
 		/* Maximum values for final top/left/height/width of Element dimensions */
 		let BoundingRect = this.FixedBrowserRect;
 
-		let OffsetSelectionRect = this.SelectionRect.clone()																			/* SelectionRect is in document coordinates */
-									.Offset(-MaxDocValue(this.TopDocument, 'scrollLeft'), -MaxDocValue(this.TopDocument, 'scrollTop')) 	/* Offset to non-scrolled coordinates */
-									.Offset(ParentBoxObject.x, ParentBoxObject.y);														/* Offset by chrome top bar coordinates */
+		let OffsetSelectionRect = this.SelectionRect.clone()							/* SelectionRect is in document coordinates */
+									.Offset(-this.top.scrollX, -this.top.scrollY) 		/* Offset to non-scrolled coordinates */
+									.scale(this.topPixelScale, this.topPixelScale)		/* Convert from document zoom scale to regular pixels */
+									.Offset(ParentBoxObject.x, ParentBoxObject.y);		/* Offset by chrome top bar coordinates */
 
 		let ClippedRect = OffsetSelectionRect.intersect(BoundingRect);
 
@@ -595,55 +592,65 @@ var SnapLinksSelectionClass = Class.create({
 
 			if(Elapsed < d) {
 				if(!this.CalcTimer)
-					this.CalcTimer = setTimeout(this._CalcSelectedElements, d - Elapsed);
+					this.CalcTimer = setTimeout(this._CalcSelectedElements, (d - Elapsed)+1);
 				return;
 			}
-			clearTimeout(this.CalcTimer);
+			clearTimeout(this.CalcTimer);	delete this.CalcTimer;
 			this.LastCalcTime = Date.now();
 
-			var HighLinkFontSize = 0;
-			var HighJsLinkFontSize = 0;
-			let IntersectedElements = [ ];
+			let HighLinkFontSize = HighJsLinkFontSize = 0,
+				IntersectedElements = [ ],
+				top = this.top;
 
-			var TypesInPriorityOrder = ['Links', 'JsLinks', 'Checkboxes', 'Buttons', 'RadioButtons', 'Clickable'];
-			var TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0, 'RadioButtons': 0, Clickable: 0};
+			let TypesInPriorityOrder = ['Links', 'JsLinks', 'Checkboxes', 'Buttons', 'RadioButtons', 'Clickable'],
+				TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0, 'RadioButtons': 0, Clickable: 0};
 
-			for(var URL in this.Documents) {
+			for(let URL in this.Documents) {
 				//noinspection JSUnfilteredForInLoop
-				var ti = this.Documents[URL];
-				var DocRect;
+				let ti = this.Documents[URL], Doc = ti.Document;
+				let IntersectRect, DocRect, elem;
 
 				/* If we are the top document. use documents height/width, otherwise use sub-documents viewport height/width */
-				if(ti.offset.x == 0 && ti.offset.y == 0)
-					DocRect = new Rect(0, 0, ti.height, ti.width);
-				else
-					DocRect = new Rect(0, 0, ti.Document.defaultView.innerHeight, ti.Document.defaultView.innerWidth)
-						.Offset(ti.offset.x, ti.offset.y);
+				DocRect = new Rect(0, 0, Doc.defaultView.innerHeight, Doc.defaultView.innerWidth);
+				if(Doc == top.document) {
+					DocRect.right += Doc.defaultView.scrollMaxX;
+					DocRect.bottom += Doc.defaultView.scrollMaxY;
+				} else {
+					/* Calculate ParentDocRect in top document coordinates */
+					let ParentView = Doc.defaultView.parent,
+						ParentDocRect = new Rect(0, 0, ParentView.innerHeight, ParentView.innerWidth)
+											.Offset(ParentView.mozInnerScreenX - top.mozInnerScreenX + top.scrollX, ParentView.mozInnerScreenY - top.mozInnerScreenY + top.scrollY);
+					DocRect
+						.Offset(Doc.defaultView.mozInnerScreenX - top.mozInnerScreenX + Doc.defaultView.top.scrollX, Doc.defaultView.mozInnerScreenY - top.mozInnerScreenY + top.scrollY);
 
-				var IntersectRect = this.SelectionRect.GetIntersectRect(DocRect);
+					/* Clip sub-document rect by parent document rect */
+					if((DocRect = DocRect.GetIntersectRect(ParentDocRect)) == false)
+						continue;
+				}
 
-				/* If we have no SelectRect then there is no intersection with ti.Document's coordinates */
-				if(IntersectRect !== false) {
-					/* If we're not in the top document, translate SelectRect to document coordinates */
-					if(ti.Document != this.TopDocument) {
-						IntersectRect.Offset(-ti.offset.x, -ti.offset.y);
-						IntersectRect.Offset(MaxDocValue(ti.Document, 'scrollLeft'), MaxDocValue(ti.Document, 'scrollTop'));
-					}
+				/* Clip SelectionRect by DocRect, If we have no SelectRect then there is no intersection with Doc's coordinates */
+				if((IntersectRect = this.SelectionRect.GetIntersectRect(DocRect)) == false)
+					continue;
 
-					let elem;
-					dc('calc-elements', '%o.SelectableElements = %o', ti, ti.SelectableElements);
-					/* Find Links Which Intersect With SelectRect */
-					for(let j=0;j<ti.SelectableElements.length, elem=ti.SelectableElements[j]; j++) {
-						var Intersects = elem.SnapRects.some( IntersectRect.IntersectsWith.bind(IntersectRect) );
+				/* If we're not in the top document, translate SelectRect from top document back to sub-document coordinates */
+				if(Doc != top.document) {
+					IntersectRect.Offset(/* By differences in topleft of sub-doc to top-doc					reduce by scroll amount		add sub-document scroll amount */
+											-(Doc.defaultView.mozInnerScreenX - top.mozInnerScreenX)	+	-top.scrollX 		+		Doc.defaultView.scrollX,
+											-(Doc.defaultView.mozInnerScreenY - top.mozInnerScreenY)	+	-top.scrollY		+		Doc.defaultView.scrollY);
+				}
 
-						if(Intersects) {
-							var computedStyle = this.Window.content.document.defaultView.getComputedStyle(elem, null);
-							var hidden = (computedStyle.getPropertyValue('visibility') == 'hidden' ||
-								computedStyle.getPropertyValue('display') == 'none');
+				dc('calc-elements', '%o.SelectableElements = %o', ti, ti.SelectableElements);
+				/* Find Links Which Intersect With SelectRect */
+				for(let j=0;j<ti.SelectableElements.length, elem=ti.SelectableElements[j]; j++) {
+					for(let k=0;k<elem.SnapRects.length; k++) {
+						if(elem.SnapRects[k].intersects(IntersectRect)) {
+							let computedStyle = this.Window.content.document.defaultView.getComputedStyle(elem, null),
+								hidden = (computedStyle.getPropertyValue('visibility') == 'hidden' ||
+											computedStyle.getPropertyValue('display') == 'none');
 
 							if(!hidden) {
 								if(elem.tagName == 'A' && this.SelectLargestFontSizeIntersectionLinks) {
-									var fontSize = computedStyle.getPropertyValue("font-size");
+									let fontSize = computedStyle.getPropertyValue("font-size");
 
 									if(fontSize.indexOf("px") >= 0)
 										elem.SnapFontSize = parseFloat(fontSize);
@@ -683,6 +690,7 @@ var SnapLinksSelectionClass = Class.create({
 
 								IntersectedElements.push(elem);
 							}
+							break;	/* Breaks from elem.SnapRects[k] */
 						}
 					}
 				}
@@ -690,12 +698,12 @@ var SnapLinksSelectionClass = Class.create({
 			dc('calc-elements', 'IntersectedElements = %o, TypeCounts = %o', IntersectedElements, TypeCounts);
 
 			// Init the greatest values with the first item.
-			var Greatest = TypesInPriorityOrder[0];
-			var GreatestValue = TypeCounts[Greatest];
+			let Greatest = TypesInPriorityOrder[0],
+				GreatestValue = TypeCounts[Greatest];
 
 			// Check if any of the other values if greater.
-			for (var i = 1; i < TypesInPriorityOrder.length; ++i) {
-				var key = TypesInPriorityOrder[i];
+			for (let i = 1; i < TypesInPriorityOrder.length; ++i) {
+				let key = TypesInPriorityOrder[i];
 
 				if (TypeCounts[key] > GreatestValue) {
 					Greatest = key;
@@ -704,7 +712,7 @@ var SnapLinksSelectionClass = Class.create({
 			}
 
 			// Choose the filter function.
-			var filterFunction;
+			let filterFunction;
 
 			switch(Greatest) {
 				case 'Links':
