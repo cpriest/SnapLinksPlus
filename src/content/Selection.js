@@ -19,9 +19,6 @@
  *  along with Snap Links Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* 	@MARK - Things are looking pretty good
-																																																																																																															*  */
-
 
 var EXPORTED_SYMBOLS = ["SnapLinksSelectionClass"];
 
@@ -115,7 +112,7 @@ var SnapLinksSelectionClass = Class.create({
 			}
 
 			if(SLPrefs.Selection.ShowCount)
-				this.SelectedStatusLabel = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", ['0'], 1);
+				this.SelectedCountsLabel = [ 0 ];
 		}
 		return this._ElementCount;
 	},
@@ -125,18 +122,16 @@ var SnapLinksSelectionClass = Class.create({
 		this._ElementCount = x;
 	},
 
-	set SelectedStatusLabel(label) {
+	set SelectedCountsLabel(tValues) {
+		let label = '';
+
+		if(tValues != '')
+			label = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", tValues, 1);
+
 		this.SnapLinksPlus.SnapLinksStatus = label;
 
-		if (this.ElementCount) {
-			// Remove the existing child elements.
-			while (this.ElementCount.firstChild)
-				this.ElementCount.removeChild(this.ElementCount.firstChild);
-
-			// Add the links count.
-			var linksElem = this.Window.document.createTextNode(label);
-			this.ElementCount.appendChild(linksElem);
-		}
+		if (this.ElementCount)
+			this.ElementCount.textContent = label;
 	},
 
 	/* Rect coordinates of "browser pane" in fixed coordinates of ChromeWindow, adjusted for scroll bar */
@@ -226,6 +221,7 @@ var SnapLinksSelectionClass = Class.create({
 		Documents[TopDocument.URL] = {
 			Document: 	TopDocument,
 		};
+		TopDocument.SLPD = { info: 'SnapLinksPlus Document Data' };
 
 		function IndexFrames(frame) {
 			for(let j=0; j < frame.length; j++) {
@@ -236,6 +232,7 @@ var SnapLinksSelectionClass = Class.create({
 				Documents[frame[j].document.URL] = {
 					Document: 	frame[j].document,
 				};
+				frame[j].document.SLPD = { info: 'SnapLinksPlus Document Data' };
 				IndexFrames(frame[j]);
 			}
 		}
@@ -333,7 +330,7 @@ var SnapLinksSelectionClass = Class.create({
 					offsetY = topClientY - top.innerHeight;
 
 				/* Scroll Window */
-				this.Window.scrollBy(offsetX, offsetY);
+				top.scrollBy(offsetX, offsetY);
 
 				/* Scroll Window every N time period, even on no mouse move basically by repeating this same mousemove event */
 				this.ScrollInterval = setInterval(this.OnMouseMove.bind(this, e), 25);
@@ -355,8 +352,8 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	OnDocumentLoaded: function(e) {
-//		console.log('loaded: %s, %s, %o %o', e.target.URL, this.Window.document.URL, e, this.Window);
-		if(e.target.URL == this.Window.document.URL) {
+//		console.log('loaded: %s, %s, %o %o', e.target.URL, this.top.document.URL, e, this.top);
+		if(e.target.URL == this.top.document.URL) {
 //			console.log('loaded top document');
 			setTimeout(function() {
 				this.CalculateAllDocumentSnapRects();
@@ -366,8 +363,8 @@ var SnapLinksSelectionClass = Class.create({
 		}
 	},
 	OnDocumentUnloaded: function(e) {
-//		console.log('unloaded: %s, %s, %o %o', e.target.URL, this.Window.document.URL, e, this.Window);
-		if(e.target.URL == this.Window.document.URL) {
+//		console.log('unloaded: %s, %s, %o %o', e.target.URL, this.top.document.URL, e, this.top);
+		if(e.target.URL == this.top.document.URL) {
 //			console.log('unloaded top document');
 			this.ChromeWindow.removeEventListener('mousemove', this._OnMouseMove, true);
 		}
@@ -384,10 +381,10 @@ var SnapLinksSelectionClass = Class.create({
 			return;
 
 		/* If the last calculation was done at the same innerWidth, skip calculation */
-		if(this.CalculateWindowWidth == this.Window.innerWidth && this.Documents[Document.URL].SelectableElements != undefined)
+		if(Document.SLPD.CalculatedWindowWidth == Document.defaultView.innerWidth && this.Documents[Document.URL].SelectableElements != undefined)
 			return;
 
-		this.CalculateWindowWidth = this.Window.innerWidth;
+		Document.SLPD.CalculatedWindowWidth = Document.defaultView.innerWidth;
 
 		var offset = { x: Document.defaultView.scrollX, y: Document.defaultView.scrollY };
 		var SelectableElements = [ ];
@@ -487,11 +484,10 @@ var SnapLinksSelectionClass = Class.create({
 	/** Clears the selection by removing the element, also clears some other non-refactored but moved code, basically completing a drag */
 	Clear: function() {
 		this.ClearSelectedElements();
-		this.SelectedStatusLabel = '';
+		this.SelectedCountsLabel = '';
 		this.Element = undefined;
 		this.ElementCount = undefined;
 		this.Documents = undefined;
-		delete this.CalculateWindowWidth;
 
 		this.SelectLargestFontSizeIntersectionLinks = true;
 
@@ -643,7 +639,7 @@ var SnapLinksSelectionClass = Class.create({
 				for(let j=0;j<ti.SelectableElements.length, elem=ti.SelectableElements[j]; j++) {
 					for(let k=0;k<elem.SnapRects.length; k++) {
 						if(elem.SnapRects[k].intersects(IntersectRect)) {
-							let computedStyle = this.Window.content.document.defaultView.getComputedStyle(elem, null),
+							let computedStyle = top.getComputedStyle(elem, null),
 								hidden = (computedStyle.getPropertyValue('visibility') == 'hidden' ||
 											computedStyle.getPropertyValue('display') == 'none');
 
@@ -777,7 +773,7 @@ var SnapLinksSelectionClass = Class.create({
 
 			this.SelectedElementsType = Greatest;
 
-			this.SelectedStatusLabel = this.SnapLinksPlus.LocaleBundle.formatStringFromName("snaplinks.status.links", [SelectedElements.length], 1);
+			this.SelectedCountsLabel = [SelectedElements.length];
 			this.SelectedElements = SelectedElements;
 		}
 		dc('calc-elements', 'Final: SelectedElements = %o', this.SelectedElements);
@@ -796,7 +792,7 @@ var SnapLinksSelectionClass = Class.create({
 			this.ClearSelectedElements();
 			this.Element.style.display = 'none';
 			this.ElementCount && (this.ElementCount.style.display = 'none');
-			this.SelectedStatusLabel = '';
+			this.SelectedCountsLabel = '';
 		} else if(!Hide && this.Element.style.display == 'none') {
 			this.Element.style.display = '';
 			this.ElementCount && (this.ElementCount.style.display = '');
