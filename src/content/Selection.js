@@ -53,9 +53,6 @@ var SnapLinksSelectionClass = Class.create({
 	/* Dynamic TopDocument */
 	get TopDocument() { return this.Window.document;},
 
-	/* Dynamic TopDocument.documentElement */
-	get TopDocumentElement() { return (this.TopDocument && this.TopDocument.documentElement) || undefined; },
-
 	/* All document/element based values are stored within the document so that if the document dies,
 		our elements are simply gone as well, this handles the DeadObject issue well */
 	get SLP() {
@@ -144,12 +141,13 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Rect coordinates of "browser pane" in fixed coordinates of ChromeWindow, adjusted for scroll bar */
 	get FixedBrowserRect() {
-		let ParentBoxObject = this.Element.parentNode.boxObject;
+		let pbo = this.Element.parentNode.boxObject,				/* Parent Box Object */
+			sbw = this.TabBrowser.selectedBrowser.contentWindow;	/* Selected Browser Window */
 
 		try {
-			return new Rect( ParentBoxObject.y, ParentBoxObject.x,
-				/* bottom */	ParentBoxObject.y + ParentBoxObject.height - (this.TopDocument && this.TopDocument.documentElement.scrollLeftMax != 0 ? 16 : 0),	/* ScrollBar Adjustment */
-				/* right */		ParentBoxObject.x + ParentBoxObject.width  - (this.TopDocument && this.TopDocument.documentElement.scrollTopMax != 0 ? 16 : 0));	/* ScrollBar Adjustment */
+			return new Rect( pbo.y, pbo.x,
+				/* bottom */	pbo.y + pbo.height - (sbw.scrollMaxX != 0 ? 16 : 0),	/* ScrollBar Adjustment */
+				/* right */		pbo.x + pbo.width  - (sbw.scrollMaxY != 0 ? 16 : 0));	/* ScrollBar Adjustment */
 		} catch(e) {
 			return new Rect(0, 0, 0, 0);
 		}
@@ -334,10 +332,10 @@ var SnapLinksSelectionClass = Class.create({
 				else if(topClientY > top.innerHeight)
 					offsetY = topClientY - top.innerHeight;
 
-				/* Scroll TopDocument Window */
+				/* Scroll Window */
 				this.Window.scrollBy(offsetX, offsetY);
 
-				/* Scroll TopDocument every N time period, even on no mouse move basically by repeating this same mousemove event */
+				/* Scroll Window every N time period, even on no mouse move basically by repeating this same mousemove event */
 				this.ScrollInterval = setInterval(this.OnMouseMove.bind(this, e), 25);
 			}
 		} else if(this.Element.style.display == 'none')
@@ -525,7 +523,8 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Updates the visible position of the element */
 	UpdateElement: function() {
-		let ParentBoxObject = this.Element.parentNode.boxObject;
+		let pbo = this.Element.parentNode.boxObject,				/* Parent Box Object */
+			sbw = this.TabBrowser.selectedBrowser.contentWindow;	/* Selected Browser Window */
 
 		/* Maximum values for final top/left/height/width of Element dimensions */
 		let BoundingRect = this.FixedBrowserRect;
@@ -533,7 +532,7 @@ var SnapLinksSelectionClass = Class.create({
 		let OffsetSelectionRect = this.SelectionRect.clone()							/* SelectionRect is in document coordinates */
 									.Offset(-this.top.scrollX, -this.top.scrollY) 		/* Offset to non-scrolled coordinates */
 									.scale(this.topPixelScale, this.topPixelScale)		/* Convert from document zoom scale to regular pixels */
-									.Offset(ParentBoxObject.x, ParentBoxObject.y);		/* Offset by chrome top bar coordinates */
+									.Offset(pbo.x, pbo.y);		/* Offset by chrome top bar coordinates */
 
 		let ClippedRect = OffsetSelectionRect.intersect(BoundingRect);
 
@@ -544,10 +543,10 @@ var SnapLinksSelectionClass = Class.create({
 			height 	: ClippedRect.height  + 'px',	/*- (2 * SLPrefs.Selection.BorderWidth)*/
 
 			/* Border width is dependent on not being at the bounding edge unless the document is scrolled entirely in that direction */
-			borderTopWidth		: ( ClippedRect.top 	== BoundingRect.top 	&& this.TopDocumentElement.scrollTop > 0 )	? '0px' : SLPrefs.Selection.BorderWidth+'px',
-			borderBottomWidth	: ( ClippedRect.bottom 	== BoundingRect.bottom 	&& this.TopDocumentElement.scrollTop < this.TopDocumentElement.scrollTopMax ) 	? '0px' : SLPrefs.Selection.BorderWidth+'px',
-			borderLeftWidth		: ( ClippedRect.left 	== BoundingRect.left 	&& this.TopDocumentElement.scrollLeft > 0 )	? '0px' : SLPrefs.Selection.BorderWidth+'px',
-			borderRightWidth	: ( ClippedRect.right 	== BoundingRect.right 	&& this.TopDocumentElement.scrollLeft < this.TopDocumentElement.scrollLeftMax )	? '0px' : SLPrefs.Selection.BorderWidth+'px',
+			borderTopWidth		: ( ClippedRect.top 	== BoundingRect.top 	&& sbw.scrollY > 0 )				? '0px' : SLPrefs.Selection.BorderWidth+'px',
+			borderBottomWidth	: ( ClippedRect.bottom 	== BoundingRect.bottom 	&& sbw.scrollY < sbw.scrollMaxY ) 	? '0px' : SLPrefs.Selection.BorderWidth+'px',
+			borderLeftWidth		: ( ClippedRect.left 	== BoundingRect.left 	&& sbw.scrollX > 0 )				? '0px' : SLPrefs.Selection.BorderWidth+'px',
+			borderRightWidth	: ( ClippedRect.right 	== BoundingRect.right 	&& sbw.scrollX < sbw.scrollMaxX )	? '0px' : SLPrefs.Selection.BorderWidth+'px',
 		});
 
 		this.HideSelectionRect(!(this.SelectionRect.width > 4 || this.SelectionRect.height > 4));
