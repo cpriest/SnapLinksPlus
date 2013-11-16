@@ -214,9 +214,7 @@ var SnapLinksSelectionClass = Class.create({
 		var Documents = { };
 
 		/* Insert top document */
-		Documents[TopDocument.URL] = {
-			Document: 	TopDocument,
-		};
+		Documents[TopDocument.URL] = TopDocument;
 		TopDocument.SLPD = { info: 'SnapLinksPlus Document Data' };
 
 		function IndexFrames(frame) {
@@ -225,9 +223,7 @@ var SnapLinksSelectionClass = Class.create({
 				if(frame[j].document.URL == TopDocument.URL)
 					continue;
 
-				Documents[frame[j].document.URL] = {
-					Document: 	frame[j].document,
-				};
+				Documents[frame[j].document.URL] = frame[j].document;
 				frame[j].document.SLPD = { info: 'SnapLinksPlus Document Data' };
 				IndexFrames(frame[j]);
 			}
@@ -235,7 +231,7 @@ var SnapLinksSelectionClass = Class.create({
 		IndexFrames(TopDocument.defaultView);
 
 		for(let URL in Documents)
-			this.CalculateSnapRects(Documents[URL].Document);
+			this.CalculateSnapRects(Documents[URL]);
 
 		dc('doc-index', '%o', Documents);
 		this.Documents = Documents;
@@ -386,7 +382,7 @@ var SnapLinksSelectionClass = Class.create({
 
 	CalculateAllDocumentSnapRects: function() {
 		for(var URL in this.Documents)
-			this.CalculateSnapRects(this.Documents[URL].Document);
+			this.CalculateSnapRects(this.Documents[URL]);
 	},
 
 	/** Calculates and caches the rectangles that make up all document lengths */
@@ -503,7 +499,7 @@ var SnapLinksSelectionClass = Class.create({
 
 		/* Delete our data store SLDP from each document */
 		for(let URL in this.Documents)
-			delete this.Documents[URL].Document.SLPD;
+			delete this.Documents[URL].SLPD;
 		this.Documents = undefined;
 
 		/* Reset attributes */
@@ -620,7 +616,7 @@ var SnapLinksSelectionClass = Class.create({
 
 			for(let URL in this.Documents) {
 				//noinspection JSUnfilteredForInLoop
-				let ti = this.Documents[URL], Doc = ti.Document;
+				let Doc = this.Documents[URL];
 				let IntersectRect, DocRect, elem;
 
 				/* If we are the top document. use documents height/width, otherwise use sub-documents viewport height/width */
