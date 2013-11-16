@@ -20,6 +20,14 @@
  */
 
 
+/*	@MARK - Future Plans
+ * 		- StatusLabel to show more detail (via options) (Filtered, Type Counts)
+ * 		- Filtered elements to have grey outline
+ *		- Tutorial Page (with ability to change prefs in some cases)
+ *
+ *
+ */
+
 var EXPORTED_SYMBOLS = ["SnapLinksSelectionClass"];
 
 var Cu = Components.utils,
@@ -149,19 +157,7 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 
-	/* Dynamically re-calculated Indexed Documents */
-	get Documents() {
-		if(!this.SLP.Documents || !this.SLP.Documents[this.TopDocument.URL]) {
-			let Documents = this.SLP.Documents = this.IndexDocuments(this.TopDocument);
-			for(let URL in Documents)
-				this.CalculateSnapRects(Documents[URL].Document);
-		}
-		return this.SLP.Documents;
-	},
-	set Documents(x) { this.SLP.Documents = x; },
-
-
-	/* Dynamic creation of elementm, stored in document */
+	/* Dynamic creation of elements, stored in document */
 	get SelectedElements() {
 		if(!this.SLP.SelectedElements)
 			this.SLP.SelectedElements = [ ];
@@ -237,10 +233,26 @@ var SnapLinksSelectionClass = Class.create({
 			}
 		}
 		IndexFrames(TopDocument.defaultView);
-		dc('doc-index', '%o', Documents);
 
-		return Documents;
+		for(let URL in Documents)
+			this.CalculateSnapRects(Documents[URL].Document);
+
+		dc('doc-index', '%o', Documents);
+		this.Documents = Documents;
 	},
+
+	/* @MARK
+	 *
+	 *
+	 *
+	 *	onunload = clear this.Documents[URL]
+	 * 	onload = calc loaded document into this.Documents[URL]
+	 *
+	 *  @TODO	Outstanding Minor Issues:
+	 *  @TODO		Mouse scroll while in drag
+	 *  @TODO		Zoom while in drag
+	 *
+	 */
 
 	InnerScreen: function(e) {
 		e.mozInnerScreenX = e.screenX / this.topPixelScale;
@@ -265,6 +277,8 @@ var SnapLinksSelectionClass = Class.create({
 			return;
 
 		this.e = this.InnerScreen(e);
+
+		this.IndexDocuments(this.top.document);
 
 		let top = this.top,
 			topPageX = e.view.mozInnerScreenX - top.mozInnerScreenX + e.clientX + top.scrollX,
@@ -377,11 +391,8 @@ var SnapLinksSelectionClass = Class.create({
 
 	/** Calculates and caches the rectangles that make up all document lengths */
 	CalculateSnapRects: function(Document) {
-		if(!Document || !this.Documents[Document.URL])
-			return;
-
 		/* If the last calculation was done at the same innerWidth, skip calculation */
-		if(Document.SLPD.CalculatedWindowWidth == Document.defaultView.innerWidth && this.Documents[Document.URL].SelectableElements != undefined)
+		if(!Document || Document.SLPD.CalculatedWindowWidth == Document.defaultView.innerWidth)
 			return;
 
 		Document.SLPD.CalculatedWindowWidth = Document.defaultView.innerWidth;
@@ -474,7 +485,7 @@ var SnapLinksSelectionClass = Class.create({
 				}
 			});
 
-		this.Documents[Document.URL].SelectableElements = SelectableElements;
+		Document.SLPD.SelectableElements = SelectableElements;
 
 		var End = (new Date()).getTime();
 		dc('performance', "CalculateSnapRects() -> Links: %sms, Inputs: %sms, Labels: %sms, Clickable: %sms, Total: %sms",
@@ -485,10 +496,17 @@ var SnapLinksSelectionClass = Class.create({
 	Clear: function() {
 		this.ClearSelectedElements();
 		this.SelectedCountsLabel = '';
+
+		/* Delete our outline element and floating count element */
 		this.Element = undefined;
 		this.ElementCount = undefined;
+
+		/* Delete our data store SLDP from each document */
+		for(let URL in this.Documents)
+			delete this.Documents[URL].Document.SLPD;
 		this.Documents = undefined;
 
+		/* Reset attributes */
 		this.SelectLargestFontSizeIntersectionLinks = true;
 
 		/* No longer need to reference these */
@@ -634,9 +652,9 @@ var SnapLinksSelectionClass = Class.create({
 											-(Doc.defaultView.mozInnerScreenY - top.mozInnerScreenY)	+	-top.scrollY		+		Doc.defaultView.scrollY);
 				}
 
-				dc('calc-elements', '%o.SelectableElements = %o', ti, ti.SelectableElements);
+				dc('calc-elements', '%o.SLPD.SelectableElements = %o', Doc, Doc.SLPD.SelectableElements);
 				/* Find Links Which Intersect With SelectRect */
-				for(let j=0;j<ti.SelectableElements.length, elem=ti.SelectableElements[j]; j++) {
+				for(let j=0;j<Doc.SLPD.SelectableElements.length, elem=Doc.SLPD.SelectableElements[j]; j++) {
 					for(let k=0;k<elem.SnapRects.length; k++) {
 						if(elem.SnapRects[k].intersects(IntersectRect)) {
 							let computedStyle = top.getComputedStyle(elem, null),
