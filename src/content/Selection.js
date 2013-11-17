@@ -47,25 +47,6 @@ var SnapLinksSelectionClass = Class.create({
 	SnapLinksPlus: null,
 	jsRegExp: /^javascript:/i,
 
-	/* Dynamic Window */
-	set Window(v) {
-		if(this._Window = v)
-			dc('doctree', DumpWindowFrameStructure.bind(DumpWindowFrameStructure, this._Window));
-	},
-	get Window() { return this._Window; },
-
-
-	/* Dynamic TopDocument */
-	get TopDocument() { return this.Window.document;},
-
-	/* All document/element based values are stored within the document so that if the document dies,
-		our elements are simply gone as well, this handles the DeadObject issue well */
-	get SLP() {
-		if(!this.TopDocument.SLP)
-			this.TopDocument.SLP = { };
-		return this.TopDocument.SLP;
-	},
-
 	/* Dynamic creation/deletion of Element */
 	get Element() {
 		if(!this._Element) {
@@ -249,9 +230,10 @@ var SnapLinksSelectionClass = Class.create({
 		if(!this.SnapLinksPlus.ShouldActivate(e))
 			return false;
 
-		this.Window = e.view.top;
 		this.top = e.view.top;
 		this.topPixelScale = this.top.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils).screenPixelsPerCSSPixel;
+
+		dc('doctree', DumpWindowFrameStructure.bind(DumpWindowFrameStructure, this.top));
 
 		return true;
 	},
