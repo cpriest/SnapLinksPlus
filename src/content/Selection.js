@@ -156,15 +156,6 @@ var SnapLinksSelectionClass = Class.create({
 		}
 	},
 
-
-	/* Dynamic creation of elements, stored in document */
-	get SelectedElements() {
-		if(!this.SLP.SelectedElements)
-			this.SLP.SelectedElements = [ ];
-		return this.SLP.SelectedElements;
-	},
-	set SelectedElements(x) { this.SLP.SelectedElements = x },
-
 	/* Internal flag to control selecting all links or all links matching the greatest size */
 	SelectLargestFontSizeIntersectionLinks:		true,
 
@@ -237,16 +228,14 @@ var SnapLinksSelectionClass = Class.create({
 		this.Documents = Documents;
 	},
 
-	/* @MARK
+	/*
 	 *
-	 *
-	 *
-	 *	onunload = clear this.Documents[URL]
-	 * 	onload = calc loaded document into this.Documents[URL]
-	 *
+	 *	@TODO	onunload = clear this.Documents[URL]
+	 * 	@TODO	onload = calc loaded document into this.Documents[URL]
 	 *  @TODO	Outstanding Minor Issues:
-	 *  @TODO		Mouse scroll while in drag
-	 *  @TODO		Zoom while in drag
+	 *  @TODO	Mouse scroll while in drag
+	 *  @TODO	Zoom while in drag
+	 *  @BUG	When switching tabs, sometimes this.Element is not created, otherwise functionality works.
 	 *
 	 */
 
@@ -511,9 +500,10 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Clears the selection style from the currently selected elements */
 	ClearSelectedElements: function() {
-		this.SetOutline(this.SelectedElements, '');
+		if(this.SelectedElements)
+			this.SetOutline(this.SelectedElements, '');
 
-		this.SelectedElements = [ ];
+		delete this.SelectedElements;
 	},
 
 	/** Offsets the selection by the given coordinates */
@@ -775,15 +765,21 @@ var SnapLinksSelectionClass = Class.create({
 //				} );
 //			}
 
-			let PreviousElements = this.SelectedElements,
-				NewElements = [ elem for each ( elem in SelectedElements ) if (PreviousElements.indexOf(elem) == -1) ],
-				ClearElements = [ elem for each ( elem in PreviousElements ) if (SelectedElements.indexOf(elem) == -1) ];
+			let OutlineStyle = SLPrefs.SelectedElements.BorderWidth + 'px solid ' + SLPrefs.SelectedElements.BorderColor;
 
-			// Set the outline on NewElements
-			this.SetOutline(NewElements, SLPrefs.SelectedElements.BorderWidth + 'px solid ' + SLPrefs.SelectedElements.BorderColor);
+			if(this.SelectedElements) {
+				let PreviousElements = this.SelectedElements,
+					NewElements = [ elem for each ( elem in SelectedElements ) if (PreviousElements.indexOf(elem) == -1) ],
+					ClearElements = [ elem for each ( elem in PreviousElements ) if (SelectedElements.indexOf(elem) == -1) ];
 
-			// Clear the style on ClearElements
-			this.SetOutline(ClearElements, '');
+				// Set the outline on NewElements
+				this.SetOutline(NewElements, OutlineStyle);
+
+				// Clear the style on ClearElements
+				this.SetOutline(ClearElements, '');
+			} else {
+				this.SetOutline(SelectedElements, OutlineStyle);
+			}
 
 			this.SelectedElementsType = Greatest;
 
