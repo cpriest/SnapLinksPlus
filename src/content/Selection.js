@@ -35,6 +35,7 @@ var Cu = Components.utils,
 	Ci = Components.interfaces;
 
 try {
+	Cu.import('resource://gre/modules/Services.jsm');
 	Cu.import("chrome://snaplinksplus/content/Utility.js");
 	Cu.import("chrome://snaplinksplus/content/WindowFaker.js");
 	Cu.import('chrome://snaplinksplus/content/Preferences.js');
@@ -47,9 +48,9 @@ var SnapLinksSelectionClass = Class.create({
 	SnapLinksPlus: null,
 	jsRegExp: /^javascript:/i,
 
-	/* Dynamic creation/deletion of Element */
-	get Element() {
-		if(!this._Element) {
+	/* On Demand Creation of Xul Outline Element */
+	get XulOutlineElem() {
+		if(!this._XulOutlineElement) {
 			let InsertionNode = this.TabBrowser.selectedBrowser.parentNode;
 			let Element = CreateAnonymousElement('<box></box>');
 			if(InsertionNode && Element) {
@@ -67,22 +68,21 @@ var SnapLinksSelectionClass = Class.create({
 					pointerEvents		: 'none',
 				});
 				InsertionNode.appendChild(Element);
-				this._Element = Element;
+				this._XulOutlineElement = Element;
 			}
 		}
-		return this._Element;
+		return this._XulOutlineElement;
 	},
-	set Element(x) {
-		if(x == undefined && this._Element)
-			try { this._Element.parentNode.removeChild(this._Element); } catch(e) { }
-		this._Element = x;
+	set XulOutlineElem(x) {
+		if(x == undefined && this._XulOutlineElement)
+			try { this._XulOutlineElement.parentNode.removeChild(this._XulOutlineElement); } catch(e) { }
+		this._XulOutlineElement = x;
 	},
 
-
-	/* Dynamic creation/deletion of ElementCount */
-	get ElementCount() {
-		if(!this._ElementCount && SLPrefs.Selection.ShowCount && SLPrefs.Selection.ShowCountWhere == SLE.ShowCount_Hover) {
-			let InsertionNode = this.Element.parentNode;
+	/* Dynamic creation/deletion of XulCountElem (Floating Selection Count) */
+	get XulCountElem() {
+		if(!this._XulCountElem && SLPrefs.Selection.ShowCount && SLPrefs.Selection.ShowCountWhere == SLE.ShowCount_Hover) {
+			let InsertionNode = this.XulOutlineElem.parentNode;
 			let ElementCount = CreateAnonymousElement('<box></box>');
 			if(InsertionNode && ElementCount) {
 				ApplyStyle(ElementCount, {
@@ -96,19 +96,19 @@ var SnapLinksSelectionClass = Class.create({
 					zIndex         : '999999',
 					pointerEvents  : 'none',
 				});
-				InsertionNode.insertBefore(ElementCount, this.Element.nextSibling);
-				this._ElementCount = ElementCount;
+				InsertionNode.insertBefore(ElementCount, this.XulOutlineElem.nextSibling);
+				this._XulCountElem = ElementCount;
 			}
 
 			if(SLPrefs.Selection.ShowCount)
 				this.SelectedCountsLabel = [ 0 ];
 		}
-		return this._ElementCount;
+		return this._XulCountElem;
 	},
-	set ElementCount(x) {
-		if(x == undefined && this._ElementCount)
-			try { this._ElementCount.parentNode.removeChild(this._ElementCount); } catch(e) { }
-		this._ElementCount = x;
+	set XulCountElem(x) {
+		if(x == undefined && this._XulCountElem)
+			try { this._XulCountElem.parentNode.removeChild(this._XulCountElem); } catch(e) { }
+		this._XulCountElem = x;
 	},
 
 	set SelectedCountsLabel(tValues) {
@@ -119,13 +119,13 @@ var SnapLinksSelectionClass = Class.create({
 
 		this.SnapLinksPlus.SnapLinksStatus = label;
 
-		if (this.ElementCount)
-			this.ElementCount.textContent = label;
+		if (this.XulCountElem)
+			this.XulCountElem.textContent = label;
 	},
 
 	/* Rect coordinates of "browser pane" in fixed coordinates of ChromeWindow, adjusted for scroll bar */
 	get FixedBrowserRect() {
-		let pbo = this.Element.parentNode.boxObject,				/* Parent Box Object */
+		let pbo = this.XulOutlineElem.parentNode.boxObject,				/* Parent Box Object */
 			sbw = this.TabBrowser.selectedBrowser.contentWindow;	/* Selected Browser Window */
 
 		try {
@@ -159,7 +159,7 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	/* Internal Flag indicating that a selection has been started */
-	get DragStarted() { return this.Element.style.display != 'none'; },
+	get DragStarted() { return this.XulOutlineElem.style.display != 'none'; },
 
 	initialize: function(SnapLinksPlus) {
 		this.SnapLinksPlus = SnapLinksPlus;
@@ -214,15 +214,15 @@ var SnapLinksSelectionClass = Class.create({
 	 *	@TODO	onunload = clear this.Documents[URL]
 	 * 	@TODO	onload = calc loaded document into this.Documents[URL]
 	 *  @TODO	Outstanding Minor Issues:
-	 *  @TODO	Mouse scroll while in drag
-	 *  @TODO	Zoom while in drag
-	 *  @BUG	When switching tabs, sometimes this.Element is not created, otherwise functionality works.
+	 *  @TODO		Mouse scroll while in drag
+	 *  @TODO		Zoom while in drag
+	 *  @BUG	When switching tabs, sometimes this.XulOutlineElem is not created, otherwise functionality works.
 	 *
 	 */
 
 	InnerScreen: function(e) {
-		e.mozInnerScreenX = e.screenX / this.topPixelScale;
-		e.mozInnerScreenY = e.screenY / this.topPixelScale;
+		e.mozInnerScreenX = (e.screenX * this.xulPixelScale) / this.topPixelScale;
+		e.mozInnerScreenY = (e.screenY * this.xulPixelScale) / this.topPixelScale;
 		return e;
 	},
 
@@ -232,6 +232,9 @@ var SnapLinksSelectionClass = Class.create({
 
 		this.top = e.view.top;
 		this.topPixelScale = this.top.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils).screenPixelsPerCSSPixel;
+		this.xulPixelScale = parseFloat(Services.prefs.getCharPref('layout.css.devPixelsPerPx'));
+		if(isNaN(this.xulPixelScale) || this.xulPixelScale <= 0)
+			this.xulPixelScale = 1;
 
 		dc('doctree', DumpWindowFrameStructure.bind(DumpWindowFrameStructure, this.top));
 
@@ -316,7 +319,7 @@ var SnapLinksSelectionClass = Class.create({
 				/* Scroll Window every N time period, even on no mouse move basically by repeating this same mousemove event */
 				this.ScrollInterval = setInterval(this.OnMouseMove.bind(this, e), 25);
 			}
-		} else if(this.Element.style.display == 'none')
+		} else if(this.XulOutlineElem.style.display == 'none')
 			this.HideSelectionRect(false);
 
 		/* Disabled At The Moment */
@@ -465,8 +468,8 @@ var SnapLinksSelectionClass = Class.create({
 		this.SelectedCountsLabel = '';
 
 		/* Delete our outline element and floating count element */
-		this.Element = undefined;
-		this.ElementCount = undefined;
+		this.XulOutlineElem = undefined;
+		this.XulCountElem = undefined;
 
 		/* Delete our data store SLDP from each document */
 		for(let URL in this.Documents)
@@ -505,7 +508,7 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Updates the visible position of the element */
 	UpdateElement: function() {
-		let pbo = this.Element.parentNode.boxObject,				/* Parent Box Object */
+		let pbo = this.XulOutlineElem.parentNode.boxObject,				/* Parent Box Object */
 			sbw = this.TabBrowser.selectedBrowser.contentWindow;	/* Selected Browser Window */
 
 		/* Maximum values for final top/left/height/width of Element dimensions */
@@ -513,12 +516,13 @@ var SnapLinksSelectionClass = Class.create({
 
 		let OffsetSelectionRect = this.SelectionRect.clone()							/* SelectionRect is in document coordinates */
 									.Offset(-this.top.scrollX, -this.top.scrollY) 		/* Offset to non-scrolled coordinates */
-									.scale(this.topPixelScale, this.topPixelScale)		/* Convert from document zoom scale to regular pixels */
+									.scale(this.topPixelScale, this.topPixelScale)	/* Convert from document zoom scale to regular pixels */
+									.scale(1/this.xulPixelScale, 1/this.xulPixelScale)		/* Convert from regular pixels to UI zoom scale */
 									.Offset(pbo.x, pbo.y);		/* Offset by chrome top bar coordinates */
 
 		let ClippedRect = OffsetSelectionRect.intersect(BoundingRect);
 
-		ApplyStyle(this.Element, {
+		ApplyStyle(this.XulOutlineElem, {
 			left 	: ClippedRect.left + 'px',
 			top 	: ClippedRect.top + 'px',
 			width 	: ClippedRect.width + 'px',		/*- (2 * SLPrefs.Selection.BorderWidth)*/
@@ -539,11 +543,11 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	RepositionElementCount: function() {
-		if(this.ElementCount && this.ElementCount.style.display != 'none') {
+		if(this.XulCountElem && this.XulCountElem.style.display != 'none') {
 			let Margin = 6;
 
-			let CountRect = new Rect(this.ElementCount.getBoundingClientRect()),
-				SelectRect = new Rect(this.Element.getBoundingClientRect()),
+			let CountRect = new Rect(this.XulCountElem.getBoundingClientRect()),
+				SelectRect = new Rect(this.XulOutlineElem.getBoundingClientRect()),
 				BrowserRect = this.FixedBrowserRect;
 
 			let x = this.SelectionRect.IsInvertedX ? SelectRect.left - CountRect.width - Margin : SelectRect.right + Margin,
@@ -558,7 +562,10 @@ var SnapLinksSelectionClass = Class.create({
 			else if (CountRect.left < BrowserRect.left)
 				CountRect.Offset((CountRect.width + (Margin * 2)), 0);
 
-			ApplyStyle(this.ElementCount, {
+			if(CountRect.top < BrowserRect.top)
+				CountRect.Offset(0, (CountRect.height + (Margin * 2)));
+
+			ApplyStyle(this.XulCountElem, {
 				top: CountRect.top + 'px',
 				left: CountRect.left + 'px'
 			});
@@ -567,7 +574,7 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Calculates which elements intersect with the selection */
 	CalcSelectedElements: function() {
-		if(this.Element.style.display != 'none') {
+		if(this.XulOutlineElem.style.display != 'none') {
 			let d = 100,
 				Elapsed = Date.now() - this.LastCalcTime;
 
@@ -780,14 +787,14 @@ var SnapLinksSelectionClass = Class.create({
 	},
 	/** Hides or shows the selection rect and accompanying elements/text */
 	HideSelectionRect: function(Hide) {
-		if(Hide && this.Element.style.display != 'none') {
+		if(Hide && this.XulOutlineElem.style.display != 'none') {
 			this.ClearSelectedElements();
-			this.Element.style.display = 'none';
-			this.ElementCount && (this.ElementCount.style.display = 'none');
+			this.XulOutlineElem.style.display = 'none';
+			this.XulCountElem && (this.XulCountElem.style.display = 'none');
 			this.SelectedCountsLabel = '';
-		} else if(!Hide && this.Element.style.display == 'none') {
-			this.Element.style.display = '';
-			this.ElementCount && (this.ElementCount.style.display = '');
+		} else if(!Hide && this.XulOutlineElem.style.display == 'none') {
+			this.XulOutlineElem.style.display = '';
+			this.XulCountElem && (this.XulCountElem.style.display = '');
 		}
 	},
 } );

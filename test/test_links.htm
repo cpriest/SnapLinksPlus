@@ -39,6 +39,8 @@
 		DIV.Issues H1.Open { background-image: url(triangle_down.gif); }
 		DIV.Issues H1 + DIV { margin-left: 6px; padding: 3px 0px 3px 10px; border-left: 1px solid #AAAAAA; display: none; }
 		DIV.Issues H1.Open + DIV { display: block; }
+		DIV#MouseBox { position: fixed; font: 10px Verdana; top: 10px; right: 0px; height: 200px; width: 300px; border: 1px solid black; background-color: white; }
+		DIV#MouseBox TH { text-align: right; padding-right: 5px; }
 	</style>
 </head>
 <body>
@@ -374,23 +376,18 @@
 		});
 
 	</script>
-	<h2>IFRAME</h2>
-	<div id="mouseBox" style="float:left; width:30%; height:300px; border:1px solid black;">
-	</div>
+	<div id="MouseBox"></div>
 	<script defer="defer" type="text/javascript">
 		document.addEventListener('mousemove', function(e) {
-			var mouseBox = document.getElementById('mouseBox');
-			mouseBox.innerHTML = '<table>'+
-				'<tr><th>e.clientX</th><td>'+ e.clientX +'</td></tr>'+
-				'<tr><th>e.clientY</th><td>'+ e.clientY +'</td></tr>'+
-				'<tr><th>e.pageX</th><td>'+ e.pageX +'</td></tr>'+
-				'<tr><th>e.pageY</th><td>'+ e.pageY +'</td></tr>'+
-				'<tr><th>window.scrollX</th><td>'+ window.scrollX +'</td></tr>'+
-				'<tr><th>window.scrollY</th><td>'+ window.scrollY +'</td></tr>'+
-				'<tr><th>window.scrollMaxX</th><td>'+ window.scrollMaxX +'</td></tr>'+
-				'<tr><th>window.scrollMaxY</th><td>'+ window.scrollMaxY +'</td></tr>'+
+			this.innerHTML =
+				'<table>' +
+					'<tr><th>' +	'e.clientX/Y'			+ '</th><td>' + e.clientX 						+ ', ' + e.clientY 						+ '</td></tr>' +
+					'<tr><th>' +	'e.screenX/Y'			+ '</th><td>' + e.screenX						+ ', ' + e.screenY 						+ '</td></tr>' +
+					'<tr><th>' +	'e.pageX/Y'				+ '</th><td>' + e.pageX 						+ ', ' + e.pageY 						+ '</td></tr>' +
+					'<tr><th>' +	'window.scrollX/Y'		+ '</th><td>' + window.scrollX 					+ ', ' + window.scrollY 				+ '</td></tr>' +
+					'<tr><th>' +	'window.scrollMaxX/Y'	+ '</th><td>' + window.scrollMaxX 				+ ', ' + window.scrollMaxY 				+ '</td></tr>' +
 				'</table>';
-		}, true);
+		}.bind(document.getElementById('MouseBox')), true);
 		document.querySelector('DIV.Issues').addEventListener('click', function(e) {
 			if(e.target.nodeType == 1 && e.target.tagName == 'H1') {
 				e.target.className = e.target.className == ""
