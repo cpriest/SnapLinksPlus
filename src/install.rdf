@@ -6,7 +6,7 @@
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>snaplinks@snaplinks.mozdev.org</em:id>
 		<em:name>Snap Links Plus</em:name>
-		<em:version>2.3.4b8</em:version>
+		<em:version>2.3.4b9</em:version>
 		<em:type>2</em:type>
 
 		<em:targetApplication>
@@ -14,7 +14,7 @@
 				<!-- Firefox -->
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 				<em:minVersion>4.0</em:minVersion>
-				<em:maxVersion>21.*</em:maxVersion>
+				<em:maxVersion>28.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 
