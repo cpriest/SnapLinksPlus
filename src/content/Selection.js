@@ -447,7 +447,7 @@ var SnapLinksSelectionClass = Class.create({
 		$A(Document.body.querySelectorAll('IMG, SPAN, DIV'))
 			.filter( function(elem) { return AnchoredElems.indexOf(elem) == -1; })
 			.forEach( function(elem) {
-				if(elem.SnapLinksClickable || elem.ownerDocument.defaultView.getComputedStyle(elem).cursor == 'pointer') {
+				if(elem.SnapLinksClickable || (elem.ownerDocument.defaultView.getComputedStyle(elem) || { }).cursor == 'pointer') {
 					elem.SnapLinksClickable = true;
 					elem.SnapRects = GetElementRects(elem, offset);
 					elem.SnapOutlines = [ elem ];
