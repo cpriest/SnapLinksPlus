@@ -75,7 +75,7 @@ var SnapLinksSelectionClass = Class.create({
 	},
 	set XulOutlineElem(x) {
 		if(x == undefined && this._XulOutlineElement)
-			try { this._XulOutlineElement.parentNode.removeChild(this._XulOutlineElement); } catch(e) { }
+			try { this._XulOutlineElement.parentNode.removeChild(this._XulOutlineElement); } catch(e) { console.log('Exception on XulOutlineElem removal: x=%o, e=%o', x, e); }
 		this._XulOutlineElement = x;
 	},
 
@@ -107,7 +107,7 @@ var SnapLinksSelectionClass = Class.create({
 	},
 	set XulCountElem(x) {
 		if(x == undefined && this._XulCountElem)
-			try { this._XulCountElem.parentNode.removeChild(this._XulCountElem); } catch(e) { }
+			try { this._XulCountElem.parentNode.removeChild(this._XulCountElem); } catch(e) { console.log('Exception on XulCountElem removal: x=%o, e=%o', x, e); }
 		this._XulCountElem = x;
 	},
 
@@ -216,8 +216,7 @@ var SnapLinksSelectionClass = Class.create({
 	 *  @TODO	Outstanding Minor Issues:
 	 *  @TODO		Mouse scroll while in drag
 	 *  @TODO		Zoom while in drag
-	 *  @BUG	When switching tabs, sometimes this.XulOutlineElem is not created, otherwise functionality works.
-	 *
+	 *  @BUG	Right-click on Flash object
 	 */
 
 	InnerScreen: function(e) {
@@ -331,7 +330,8 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	OnMouseUp: function(e) {
-		clearTimeout(this.ScrollInterval);
+		clearTimeout(this.CalcTimer);		delete this.CalcTimer;
+		clearTimeout(this.ScrollInterval);	delete this.ScrollInterval;
 		this.RemoveEventHooks();
 	},
 
@@ -516,9 +516,9 @@ var SnapLinksSelectionClass = Class.create({
 
 		let OffsetSelectionRect = this.SelectionRect.clone()							/* SelectionRect is in document coordinates */
 									.Offset(-this.top.scrollX, -this.top.scrollY) 		/* Offset to non-scrolled coordinates */
-									.scale(this.topPixelScale, this.topPixelScale)	/* Convert from document zoom scale to regular pixels */
-									.scale(1/this.xulPixelScale, 1/this.xulPixelScale)		/* Convert from regular pixels to UI zoom scale */
-									.Offset(pbo.x, pbo.y);		/* Offset by chrome top bar coordinates */
+									.scale(this.topPixelScale, this.topPixelScale)		/* Convert from document zoom scale to regular pixels */
+									.scale(1/this.xulPixelScale, 1/this.xulPixelScale)	/* Convert from regular pixels to UI zoom scale */
+									.Offset(pbo.x, pbo.y);								/* Offset by chrome top bar coordinates */
 
 		let ClippedRect = OffsetSelectionRect.intersect(BoundingRect);
 
