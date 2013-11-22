@@ -162,11 +162,11 @@ var SnapLinksClass = Class.create({
 			return false;
 		if(e.button != SLPrefs.Activation.Button)
 			return false;
-		if(SLPrefs.Activation.RequiresAlt && !e.altKey)
+		if(SLPrefs.Activation.RequiresAlt != e.altKey)
 			return false;
-		if(SLPrefs.Activation.RequiresShift && !e.shiftKey)
+		if(SLPrefs.Activation.RequiresShift != e.shiftKey)
 			return false;
-		if(SLPrefs.Activation.RequiresCtrl && !e.ctrlKey)
+		if(SLPrefs.Activation.RequiresCtrl != e.ctrlKey)
 			return false;
 		return true;
 	},
