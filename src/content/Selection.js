@@ -232,6 +232,8 @@ var SnapLinksSelectionClass = Class.create({
 		this.top = e.view.top;
 		this.topPixelScale = this.top.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils).screenPixelsPerCSSPixel;
 		this.xulPixelScale = parseFloat(Services.prefs.getCharPref('layout.css.devPixelsPerPx'));
+		try { this.sysPixelScale = parseFloat(Components.classes["@mozilla.org/gfx/screenmanager;1"].getService(Components.interfaces.nsIScreenManager).systemDefaultScale); }
+			catch(e) { console.log('SnapLinksPlus: .systemDefaultScale not available, accomodating OS level dpi changes not possible, exception follows.'); Components.utils.reportError(e); this.sysPixelScale = 1; }
 		if(isNaN(this.xulPixelScale) || this.xulPixelScale <= 0)
 			this.xulPixelScale = 1;
 
@@ -362,7 +364,7 @@ var SnapLinksSelectionClass = Class.create({
 	/** Calculates and caches the rectangles that make up all document lengths */
 	CalculateSnapRects: function(Document) {
 		/* If the last calculation was done at the same innerWidth, skip calculation */
-		if(!Document || Document.SLPD.CalculatedWindowWidth == Document.defaultView.innerWidth)
+		if(!Document || (Document.SLPD.CalculatedWindowWidth || 0) == Document.defaultView.innerWidth)
 			return;
 
 		Document.SLPD.CalculatedWindowWidth = Document.defaultView.innerWidth;
@@ -586,7 +588,7 @@ var SnapLinksSelectionClass = Class.create({
 			clearTimeout(this.CalcTimer);	delete this.CalcTimer;
 			this.LastCalcTime = Date.now();
 
-			let HighLinkFontSize = HighJsLinkFontSize = 0,
+			let HighLinkFontSize = 0, HighJsLinkFontSize = 0,
 				IntersectedElements = [ ],
 				top = this.top;
 

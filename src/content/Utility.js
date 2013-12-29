@@ -427,6 +427,7 @@ function UpdatePreferences(BasePath, Updates) {
 
 var Rect = Class.create({
 	initialize:function(top, left, bottom, right) {
+		this.__top = this.__left = this.__right = this.__bottom = 0;
 		/* __top stores set top, _top stores non-inverted top, likewise for left, bottom, right */
 		if(typeof top == 'object') {
 			left = top.left;
@@ -436,8 +437,8 @@ var Rect = Class.create({
 		}
 		this.top = top;
 		this.left = left;
-		this.bottom = bottom != undefined ? bottom : top;
-		this.right = right != undefined ? right :  left;
+		this.bottom = bottom || top;
+		this.right = right || left;
 	},
 	get top()       { return this._top;	},
 	set top(top)    {

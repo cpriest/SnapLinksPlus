@@ -117,6 +117,7 @@ var SLPrefs = CreatePreferenceMap('extensions.snaplinks', {
 	Dev: {
 		Mode:					false,
 		ShowConsoleAtStartup:	false,
+		ClearConsoleDelay:		1000,
 	},
 });
 

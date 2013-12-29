@@ -147,10 +147,10 @@ var SnapLinksClass = Class.create({
 			this.StoppingNextContextMenuPopup = false;
 		}.bind(this), false);
 
-		if(SLPrefs.Dev.Mode) {
+		if(SLPrefs.Dev.Mode && SLPrefs.Dev.ClearConsoleDelay > 0) {
 			setTimeout(function() {
 				console.clear();
-			}.bind(this), 1000);
+			}.bind(this), SLPrefs.Dev.ClearConsoleDelay);
 		}
 	},
 
