@@ -578,10 +578,9 @@ var SnapLinksSelectionClass = Class.create({
 	/* Calculates which elements intersect with the selection */
 	CalcSelectedElements: function() {
 		if(this.XulOutlineElem.style.display != 'none') {
-			let d = 100,
-				Elapsed = Date.now() - this.LastCalcTime;
+			let Elapsed = Date.now() - this.LastCalcTime;
 
-			if(Elapsed < d) {
+			if(Elapsed < SLPrefs.Selection.MinimumCalcDelay) {
 				if(!this.CalcTimer)
 					this.CalcTimer = setTimeout(this._CalcSelectedElements, (d - Elapsed)+1);
 				return;

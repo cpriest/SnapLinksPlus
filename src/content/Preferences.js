@@ -61,6 +61,7 @@ var SLPrefs = CreatePreferenceMap('extensions.snaplinks', {
 //		ShowCount:	0,		/* 0: Don't show, 1: Hover Panel, 2: AddonBar */
 		ShowCount:			true,
 		ShowCountWhere:		1,
+		MinimumCalcDelay:	50,
 	},
 
 	SelectedElements: {
