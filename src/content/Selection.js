@@ -220,8 +220,8 @@ var SnapLinksSelectionClass = Class.create({
 	 */
 
 	InnerScreen: function(e) {
-		e.mozInnerScreenX = (e.screenX * this.xulPixelScale) / this.topPixelScale;
-		e.mozInnerScreenY = (e.screenY * this.xulPixelScale) / this.topPixelScale;
+		e.mozInnerScreenX = e.screenX / this.PixelScale;
+		e.mozInnerScreenY = e.screenY / this.PixelScale;
 		return e;
 	},
 
@@ -232,10 +232,12 @@ var SnapLinksSelectionClass = Class.create({
 		this.top = e.view.top;
 		this.topPixelScale = this.top.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils).screenPixelsPerCSSPixel;
 		this.xulPixelScale = parseFloat(Services.prefs.getCharPref('layout.css.devPixelsPerPx'));
-		try { this.sysPixelScale = parseFloat(Components.classes["@mozilla.org/gfx/screenmanager;1"].getService(Components.interfaces.nsIScreenManager).systemDefaultScale); }
-			catch(e) { console.log('SnapLinksPlus: .systemDefaultScale not available, accomodating OS level dpi changes not possible, exception follows.'); Components.utils.reportError(e); this.sysPixelScale = 1; }
-		if(isNaN(this.xulPixelScale) || this.xulPixelScale <= 0)
+		if(isNaN(this.xulPixelScale) || this.xulPixelScale <= 0) {
 			this.xulPixelScale = 1;
+			try { this.xulPixelScale = parseFloat(Components.classes["@mozilla.org/gfx/screenmanager;1"].getService(Components.interfaces.nsIScreenManager).systemDefaultScale); }
+				catch(e) { console.log('SnapLinksPlus: nsIScreenManager.systemDefaultScale not available, accomodating OS level dpi changes not possible, exception follows.'); Components.utils.reportError(e); this.xulPixelScale = 1; }
+		}
+		this.PixelScale = this.topPixelScale / this.xulPixelScale;
 
 		dc('doctree', DumpWindowFrameStructure.bind(DumpWindowFrameStructure, this.top));
 
@@ -518,8 +520,7 @@ var SnapLinksSelectionClass = Class.create({
 
 		let OffsetSelectionRect = this.SelectionRect.clone()							/* SelectionRect is in document coordinates */
 									.Offset(-this.top.scrollX, -this.top.scrollY) 		/* Offset to non-scrolled coordinates */
-									.scale(this.topPixelScale, this.topPixelScale)		/* Convert from document zoom scale to regular pixels */
-									.scale(1/this.xulPixelScale, 1/this.xulPixelScale)	/* Convert from regular pixels to UI zoom scale */
+									.scale(this.PixelScale, 	this.PixelScale)		/* Convert from document zoom scale to UI scale */
 									.Offset(pbo.x, pbo.y);								/* Offset by chrome top bar coordinates */
 
 		let ClippedRect = OffsetSelectionRect.intersect(BoundingRect);
