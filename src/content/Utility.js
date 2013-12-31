@@ -56,7 +56,7 @@ let console = mrbw.console;
 
 Point.prototype.toString = function() {
 	//noinspection JSCheckFunctionSignatures
-	return sprintf('(%8.2f, %8.2f)', this.x, this.y);
+	return sprintf('( %8.1f, %8.1f )', this.x, this.y);
 };
 
 var dc = function() { };

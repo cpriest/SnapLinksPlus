@@ -220,9 +220,16 @@ var SnapLinksSelectionClass = Class.create({
 	 */
 
 	InnerScreen: function(e) {
-		e.mozInnerScreenX = e.screenX / this.PixelScale;
-		e.mozInnerScreenY = e.screenY / this.PixelScale;
-		return e;
+		if(e && e.screenX)
+			this.MouseScreenPos = new Point(e.screenX / this.PixelScale, e.screenY / this.PixelScale);
+
+		let top = this.top,
+			topClientX = this.MouseScreenPos.x - top.mozInnerScreenX,
+			topClientY = this.MouseScreenPos.y - top.mozInnerScreenY,
+			topPageX = topClientX + top.scrollX,
+			topPageY = topClientY + top.scrollY;
+
+		return [top, topClientX, topClientY, topPageX, topPageY];
 	},
 
 	ShouldActivate: function(e) {
@@ -249,16 +256,12 @@ var SnapLinksSelectionClass = Class.create({
 		if(!this.ShouldActivate(e))
 			return;
 
-		this.e = this.InnerScreen(e);
+		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen(e);
 
 		this.IndexDocuments(this.top.document);
 
-		let top = this.top,
-			topPageX = e.view.mozInnerScreenX - top.mozInnerScreenX + e.clientX + top.scrollX,
-			topPageY = e.view.mozInnerScreenY - top.mozInnerScreenY + e.clientY + top.scrollY;
-
 		/** Initializes the starting mouse position in the page coordinates of the top document */
-		this.SelectionRect = new Rect(e.mozInnerScreenY - top.mozInnerScreenY + top.scrollY, e.mozInnerScreenX - top.mozInnerScreenX + top.scrollX);
+		this.SelectionRect = new Rect(topPageY, topPageX);
 
 		if(e.target && e.target.tagName == 'A') {
 			var computedStyle = e.target.ownerDocument.defaultView.getComputedStyle(e.target, null);
@@ -285,16 +288,10 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	OnMouseMove: function(e) {
-		this.e = this.InnerScreen(e);
+		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen(e);
 
 		/* If we have an off screen scroll interval set, clear it */
 		clearTimeout(this.ScrollInterval);
-
-		let top = this.top,
-			topClientX = e.mozInnerScreenX - top.mozInnerScreenX,
-			topClientY = e.mozInnerScreenY - top.mozInnerScreenY,
-			topPageX = topClientX + top.scrollX,
-			topPageY = topClientY + top.scrollY;
 
 		this.SelectLargestFontSizeIntersectionLinks = !e.shiftKey;
 
@@ -513,7 +510,7 @@ var SnapLinksSelectionClass = Class.create({
 	/* Updates the visible position of the element */
 	UpdateElement: function() {
 		let pbo = this.XulOutlineElem.parentNode.boxObject,				/* Parent Box Object */
-			sbw = this.TabBrowser.selectedBrowser.contentWindow;	/* Selected Browser Window */
+			sbw = this.TabBrowser.selectedBrowser.contentWindow;		/* Selected Browser Window */
 
 		/* Maximum values for final top/left/height/width of Element dimensions */
 		let BoundingRect = this.FixedBrowserRect;
@@ -578,11 +575,12 @@ var SnapLinksSelectionClass = Class.create({
 	/* Calculates which elements intersect with the selection */
 	CalcSelectedElements: function() {
 		if(this.XulOutlineElem.style.display != 'none') {
-			let Elapsed = Date.now() - this.LastCalcTime;
+			let CalcDelay = SLPrefs.Selection.MinimumCalcDelay,
+				Elapsed = Date.now() - this.LastCalcTime;
 
-			if(Elapsed < SLPrefs.Selection.MinimumCalcDelay) {
+			if(Elapsed < CalcDelay) {
 				if(!this.CalcTimer)
-					this.CalcTimer = setTimeout(this._CalcSelectedElements, (d - Elapsed)+1);
+					this.CalcTimer = setTimeout(this._CalcSelectedElements, (CalcDelay - Elapsed)+1);
 				return;
 			}
 			clearTimeout(this.CalcTimer);	delete this.CalcTimer;
