@@ -115,26 +115,32 @@ var SnapLinksDebugClass = Class.create({
 		var offset = { x: this.Document.defaultView.scrollX, y: this.Document.defaultView.scrollY };
 		
 		GetElementRects(link, offset).forEach( function(rect) {
-			var elem = link.ownerDocument.createElement('div');
-			ApplyStyle(elem, {
-				position	: 'absolute',
-				zIndex		: 1,
-				top			: rect.top + 'px',
-				left		: rect.left + 'px',
-				width		: (rect.right - rect.left) + 'px',
-				height		: (rect.bottom - rect.top) + 'px',
-				cursor		: 'pointer'
-			}, this );
-			ApplyStyle(elem, this.Flags.Links.ClientRectStyle);
-			
-			/* Pass through any clicks to this div to the original link */
-			elem.addEventListener('click', function(e) {
-				var evt = this.Window.document.createEvent('MouseEvents');
-				evt.initMouseEvent('click', true, true, this.Window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-				link.dispatchEvent(evt); 
-			}, true);
-			link.ownerDocument.body.appendChild(elem);
+			let elem = this.CreateHighlightRect(link.ownerDocument, rect, this.Flags.Links.ClientRectStyle);
+
 			link.SnapDebugNodes.push(elem);
 		}, this );
-	}
+	},
+	CreateHighlightRect: function(doc, r, s) {
+		var elem = doc.createElement('div');
+		ApplyStyle(elem, {
+			position	: 'absolute',
+			zIndex		: 1,
+			top			: r.top + 'px',
+			left		: r.left + 'px',
+			width		: (r.right - r.left) + 'px',
+			height		: (r.bottom - r.top) + 'px',
+			cursor		: 'pointer',
+		}, this );
+		if(s)
+			ApplyStyle(elem, s);
+
+		/* Pass through any clicks to this div to the original link */
+		elem.addEventListener('click', function(e) {
+			var evt = this.Window.document.createEvent('MouseEvents');
+			evt.initMouseEvent('click', true, true, this.Window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+			link.dispatchEvent(evt);
+		}, true);
+		doc.body.appendChild(elem);
+		return elem;
+	},
 });
