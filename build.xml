@@ -182,8 +182,15 @@
 			<param name="dir.name" value="src"/>
 			<param name="dirset.id" value="src.locale.dirs"/>
 		</antcall>
+
+		<!-- antcall target="strip-debug-blocks"> </antcall -->
 	</target>
 
+	<target name="strip-debug-blocks">
+		<replaceregexp match="(?m)^.+?&lt;debug&gt;(?s).+?&lt;/debug&gt;.+?$." replace="" byline="false">
+    		<fileset dir="${build.dir}/src" includes="**/*.js"/>
+		</replaceregexp>
+	</target>
 
 	<target name="patch-for-babelzilla" depends="copy-src-to-build,unpack-locale-bundle-to-babelzilla-src">
 		<copy file="${src.dir}/install.rdf" todir="${build.dir}/babelzilla" overwrite="true" />
