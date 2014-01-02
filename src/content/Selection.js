@@ -593,6 +593,12 @@ var SnapLinksSelectionClass = Class.create({
 			let TypesInPriorityOrder = ['Links', 'JsLinks', 'Checkboxes', 'Buttons', 'RadioButtons', 'Clickable'],
 				TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0, 'RadioButtons': 0, Clickable: 0};
 
+			/**	@debug DebugRects
+			  *	file:///c:/code/xul/snaplinks/test/iframe_content.htm
+			  *	file:///c:/code/xul/snaplinks/test/iframe_iframe_content.htm
+			  */
+//			let DebugRectsDocumentURL = 'file:///c:/code/xul/snaplinks/test/iframe_content.htm';
+
 			for(let URL in this.Documents) {
 				//noinspection JSUnfilteredForInLoop
 				let Doc = this.Documents[URL];
@@ -605,20 +611,42 @@ var SnapLinksSelectionClass = Class.create({
 					DocRect.bottom += Doc.defaultView.scrollMaxY;
 				} else {
 					/* Calculate ParentDocRect in top document coordinates */
-					let ParentView = Doc.defaultView.parent,
-						ParentDocRect = new Rect(0, 0, ParentView.innerHeight, ParentView.innerWidth)
-											.Offset(ParentView.mozInnerScreenX - top.mozInnerScreenX + top.scrollX, ParentView.mozInnerScreenY - top.mozInnerScreenY + top.scrollY);
-					DocRect
-						.Offset(Doc.defaultView.mozInnerScreenX - top.mozInnerScreenX + Doc.defaultView.top.scrollX, Doc.defaultView.mozInnerScreenY - top.mozInnerScreenY + top.scrollY);
+					let ParentWindow = Doc.defaultView.parent,
+						ParentDocRect = new Rect(0, 0, ParentWindow.innerHeight, ParentWindow.innerWidth);
+
+					if(ParentWindow == top) {
+						ParentDocRect.right += ParentWindow.scrollMaxX;
+						ParentDocRect.bottom += ParentWindow.scrollMaxY;
+					} else {
+						ParentDocRect.Offset(ParentWindow.mozInnerScreenX - top.mozInnerScreenX + top.scrollX, ParentWindow.mozInnerScreenY - top.mozInnerScreenY + top.scrollY);
+					}
+
+					DocRect.Offset(Doc.defaultView.mozInnerScreenX - top.mozInnerScreenX + top.scrollX, Doc.defaultView.mozInnerScreenY - top.mozInnerScreenY + top.scrollY);
+
+					/** @debug DebugRects */
+//					if(URL == DebugRectsDocumentURL) {
+//						!Doc.SLPD.DebugRects_Red && (Doc.SLPD.DebugRects_Red = this.SnapLinksPlus.Debug.CreateHighlightRect(top.document, ParentDocRect, { border: '1px solid red', backgroundColor: 'red', opacity: '.3'   } ));
+//						!Doc.SLPD.DebugRects_Yel && (Doc.SLPD.DebugRects_Yel = this.SnapLinksPlus.Debug.CreateHighlightRect(top.document, DocRect, { border: '1px solid yellow', backgroundColor: 'yellow', opacity: '.3'   } ));
+//					}
 
 					/* Clip sub-document rect by parent document rect */
 					if((DocRect = DocRect.GetIntersectRect(ParentDocRect)) == false)
 						continue;
+
+					/** @debug DebugRects */
+//					if(URL == DebugRectsDocumentURL)
+//						!Doc.SLPD.DebugRects_Blu && (Doc.SLPD.DebugRects_Blu = this.SnapLinksPlus.Debug.CreateHighlightRect(top.document, DocRect, { border: '1px solid blue', backgroundColor: 'blue', opacity: '.3'   } ));
 				}
 
 				/* Clip SelectionRect by DocRect, If we have no SelectRect then there is no intersection with Doc's coordinates */
 				if((IntersectRect = this.SelectionRect.GetIntersectRect(DocRect)) == false)
 					continue;
+
+				/** @debug DebugRects */
+//				if(URL == DebugRectsDocumentURL) {
+//					Doc.SLPD.DebugRects_Green && Doc.SLPD.DebugRects_Green.parentNode.removeChild(Doc.SLPD.DebugRects_Green);
+//					Doc.SLPD.DebugRects_Green = this.SnapLinksPlus.Debug.CreateHighlightRect(top.document, IntersectRect, { border: '1px solid green', backgroundColor: 'green', opacity: '.3' } );
+//				}
 
 				/* If we're not in the top document, translate SelectRect from top document back to sub-document coordinates */
 				if(Doc != top.document) {
