@@ -34,7 +34,9 @@
 		DIV.Issues H1.Open { background-image: url(triangle_down.gif); }
 		DIV.Issues H1 + DIV { margin-left: 6px; padding: 3px 0px 3px 10px; border-left: 1px solid #AAAAAA; display: none; }
 		DIV.Issues H1.Open + DIV { display: block; }
-		DIV#MouseBox { position: fixed; font: 10px Verdana; top: 10px; right: 0px; height: 200px; width: 300px; border: 1px solid black; background-color: white; }
+		DIV#MouseBox { position: fixed; cursor: pointer; font: 10px Verdana; top: 10px; right: 0px; min-width: 200px; border: 1px solid black; padding: 10px; background-color: white; }
+		DIV#MouseBox:hover { opacity: 1.0; }
+		DIV#MouseBox.Closed { padding: 0px 2px; min-width: 0px; opacity: 0.5; background: blue; color: white; font: 14px Verdana; border: 1px solid #AAAAAA; }
 		DIV#MouseBox TH { text-align: right; padding-right: 5px; }
 	</style>
 </head>
@@ -347,7 +349,7 @@
 		</table>
 	<hr/>
 	<h2>Javascript Elements with click handlers (targeted for .click() because they have cursor: pointer</h2>
-	<table id="JS_Click_Events_Tester" style="border-spacing: 6;">
+	<table id="JS_Click_Events_Tester" style="border-spacing: 6px;">
 		<tr><th></th>			<TH>IMG</TH>	<TH>SPAN</TH>	<TH>DIV</TH></tr>
 		<tr>						<th>"onclick"</th>				<td><img src="http://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/22px-Flag_of_the_United_States.svg.png" onclick="this.classList.toggle('highlighted')"></td>
 																	<td><span onclick="this.classList.toggle('highlighted')">span</span></td>
@@ -360,7 +362,7 @@
 																	<td><div>div</div></td></tr>
 	</table>
 	<script language="javascript">
-        let elem;
+		var elem;
 		elem = document.getElementById('onclick-via-js');
 		Array.prototype.forEach.call(elem.querySelectorAll('td > *'), function(elem) {
 			elem.onclick = function() this.classList.toggle('highlighted');
@@ -372,18 +374,34 @@
 		});
 
 	</script>
-	<div id="MouseBox"></div>
+	<div id="MouseBox" class="Closed"></div>
 	<script defer="defer" type="text/javascript">
-		document.addEventListener('mousemove', function(e) {
-			this.innerHTML =
-				'<table>' +
-					'<tr><th>' +	'e.clientX/Y'			+ '</th><td>' + e.clientX 						+ ', ' + e.clientY 						+ '</td></tr>' +
-					'<tr><th>' +	'e.screenX/Y'			+ '</th><td>' + e.screenX						+ ', ' + e.screenY 						+ '</td></tr>' +
-					'<tr><th>' +	'e.pageX/Y'				+ '</th><td>' + e.pageX 						+ ', ' + e.pageY 						+ '</td></tr>' +
-					'<tr><th>' +	'window.scrollX/Y'		+ '</th><td>' + window.scrollX 					+ ', ' + window.scrollY 				+ '</td></tr>' +
-					'<tr><th>' +	'window.scrollMaxX/Y'	+ '</th><td>' + window.scrollMaxX 				+ ', ' + window.scrollMaxY 				+ '</td></tr>' +
-				'</table>';
-		}.bind(document.getElementById('MouseBox')), true);
+		var MouseBox = document.getElementById('MouseBox');
+		MouseBox.UpdateContent = function(e) {
+			if(e) {
+				this.Detail =
+					'<table>' +
+						'<tr><th>' +	'e.clientX/Y'			+ '</th><td>' + e.clientX 						+ ', ' + e.clientY 						+ '</td></tr>' +
+						'<tr><th>' +	'e.screenX/Y'			+ '</th><td>' + e.screenX						+ ', ' + e.screenY 						+ '</td></tr>' +
+						'<tr><th>' +	'e.pageX/Y'				+ '</th><td>' + e.pageX 						+ ', ' + e.pageY 						+ '</td></tr>' +
+						'<tr><th>' +	'window.scrollX/Y'		+ '</th><td>' + window.scrollX 					+ ', ' + window.scrollY 				+ '</td></tr>' +
+						'<tr><th>' +	'window.scrollMaxX/Y'	+ '</th><td>' + window.scrollMaxX 				+ ', ' + window.scrollMaxY 				+ '</td></tr>' +
+					'</table>';
+			}
+			if(this.className.contains('Closed')) {
+				this.innerHTML = '&#9194;';
+			} else {
+				this.innerHTML = this.Detail;
+			}
+		};
+		document.addEventListener('mousemove', MouseBox.UpdateContent.bind(MouseBox), true);
+		MouseBox.addEventListener('click', function(e) {
+			this.className = this.className == 'Closed'
+				? ''
+				: 'Closed';
+			this.UpdateContent();
+		}.bind(MouseBox));
+		MouseBox.UpdateContent();
 		document.querySelector('DIV.Issues').addEventListener('click', function(e) {
 			if(e.target.nodeType == 1 && e.target.tagName == 'H1') {
 				e.target.className = e.target.className == ""
