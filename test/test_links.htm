@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Expires" content="Fri, Jan 01 1900 00:00:00 GMT">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Cache-Control" content="no-cache">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta http-equiv="Lang" content="en">
 <meta name="author" content="">
-<meta http-equiv="Reply-to" content="@.com">
 <meta name="generator" content="PhpED 5.8">
 <meta name="description" content="">
 <meta name="keywords" content="">
@@ -352,7 +347,7 @@
 		</table>
 	<hr/>
 	<h2>Javascript Elements with click handlers (targeted for .click() because they have cursor: pointer</h2>
-	<table id="JS_Click_Events_Tester" cellspacing="6">
+	<table id="JS_Click_Events_Tester" style="border-spacing: 6;">
 		<tr><th></th>			<TH>IMG</TH>	<TH>SPAN</TH>	<TH>DIV</TH></tr>
 		<tr>						<th>"onclick"</th>				<td><img src="http://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/22px-Flag_of_the_United_States.svg.png" onclick="this.classList.toggle('highlighted')"></td>
 																	<td><span onclick="this.classList.toggle('highlighted')">span</span></td>
@@ -365,12 +360,13 @@
 																	<td><div>div</div></td></tr>
 	</table>
 	<script language="javascript">
-		var elem = document.getElementById('onclick-via-js');
+        let elem;
+		elem = document.getElementById('onclick-via-js');
 		Array.prototype.forEach.call(elem.querySelectorAll('td > *'), function(elem) {
 			elem.onclick = function() this.classList.toggle('highlighted');
 		});
 
-		var elem = document.getElementById('click_via_addEvent');
+		elem = document.getElementById('click_via_addEvent');
 		Array.prototype.forEach.call(elem.querySelectorAll('td > *'), function(elem) {
 			elem.addEventListener('click', function() this.classList.toggle('highlighted'));
 		});
