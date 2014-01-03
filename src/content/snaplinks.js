@@ -168,6 +168,8 @@ var SnapLinksClass = Class.create({
 			return false;
 		if(SLPrefs.Activation.RequiresCtrl != e.ctrlKey)
 			return false;
+		if(e.target.tagName == 'EMBED')
+			return false;
 		return true;
 	},
 
