@@ -169,6 +169,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.TabBrowser = this.XulDocument.getElementById('content');
 		this.TabBrowser.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
 
+		this._OnDocScroll			= this.OnDocScroll.bind(this);
 		this._OnMouseMove 			= this.OnMouseMove.bind(this);
 		this._OnMouseUp 			= this.OnMouseUp.bind(this);
 		this._OnDocumentUnloaded	= this.OnDocumentUnloaded.bind(this);
@@ -214,7 +215,6 @@ var SnapLinksSelectionClass = Class.create({
 	 *	@TODO	onunload = clear this.Documents[URL]
 	 * 	@TODO	onload = calc loaded document into this.Documents[URL]
 	 *  @TODO	Outstanding Minor Issues:
-	 *  @TODO		Mouse scroll while in drag
 	 *  @TODO		Zoom while in drag
 	 *  @BUG	Right-click on Flash object
 	 */
@@ -277,6 +277,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.ActiveBrowser = this.TabBrowser.selectedBrowser;
 		this.ActiveBrowser.addEventListener('load', this._OnDocumentLoaded, true);
 		this.ActiveBrowser.addEventListener('unload', this._OnDocumentUnloaded, true);
+		this.ActiveBrowser.addEventListener('scroll', this._OnDocScroll, true);
 	},
 
 	RemoveEventHooks: function() {
@@ -284,6 +285,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.ChromeWindow.removeEventListener('mouseup', this._OnMouseUp, true);
 		this.ActiveBrowser.removeEventListener('load', this._OnDocumentLoaded, true);
 		this.ActiveBrowser.removeEventListener('unload', this._OnDocumentUnloaded, true);
+		this.ActiveBrowser.removeEventListener('scroll', this._OnDocScroll, true);
 		delete this.ActiveBrowser;
 	},
 
@@ -334,6 +336,12 @@ var SnapLinksSelectionClass = Class.create({
 		clearTimeout(this.CalcTimer);		delete this.CalcTimer;
 		clearTimeout(this.ScrollInterval);	delete this.ScrollInterval;
 		this.RemoveEventHooks();
+	},
+
+	OnDocScroll: function(e) {
+		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
+
+		this.ExpandSelectionTo(topPageX, topPageY);
 	},
 
 	OnDocumentLoaded: function(e) {
