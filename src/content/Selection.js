@@ -170,6 +170,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.TabBrowser.addEventListener('mousedown', this.OnMouseDown.bind(this), true);
 
 		this._OnDocScroll			= this.OnDocScroll.bind(this);
+		this._OnResize				= this.OnResize.bind(this);
 		this._OnMouseMove 			= this.OnMouseMove.bind(this);
 		this._OnMouseUp 			= this.OnMouseUp.bind(this);
 		this._OnDocumentUnloaded	= this.OnDocumentUnloaded.bind(this);
@@ -215,7 +216,6 @@ var SnapLinksSelectionClass = Class.create({
 	 *	@TODO	onunload = clear this.Documents[URL]
 	 * 	@TODO	onload = calc loaded document into this.Documents[URL]
 	 *  @TODO	Outstanding Minor Issues:
-	 *  @TODO		Zoom while in drag
 	 *  @BUG	Right-click on Flash object
 	 */
 
@@ -237,6 +237,14 @@ var SnapLinksSelectionClass = Class.create({
 			return false;
 
 		this.top = e.view.top;
+		this.CalcPixelScale();
+
+		dc('doctree', DumpWindowFrameStructure.bind(DumpWindowFrameStructure, this.top));
+
+		return true;
+	},
+
+	CalcPixelScale: function() {
 		this.topPixelScale = this.top.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils).screenPixelsPerCSSPixel;
 		this.xulPixelScale = parseFloat(Services.prefs.getCharPref('layout.css.devPixelsPerPx'));
 		if(isNaN(this.xulPixelScale) || this.xulPixelScale <= 0) {
@@ -245,10 +253,6 @@ var SnapLinksSelectionClass = Class.create({
 				catch(e) { console.log('SnapLinksPlus: nsIScreenManager.systemDefaultScale not available, accomodating OS level dpi changes not possible, exception follows.'); Components.utils.reportError(e); this.xulPixelScale = 1; }
 		}
 		this.PixelScale = this.topPixelScale / this.xulPixelScale;
-
-		dc('doctree', DumpWindowFrameStructure.bind(DumpWindowFrameStructure, this.top));
-
-		return true;
 	},
 
 	/* Starting Hook for beginning a selection */
@@ -278,6 +282,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.ActiveBrowser.addEventListener('load', this._OnDocumentLoaded, true);
 		this.ActiveBrowser.addEventListener('unload', this._OnDocumentUnloaded, true);
 		this.ActiveBrowser.addEventListener('scroll', this._OnDocScroll, true);
+		this.ActiveBrowser.addEventListener('resize', this._OnResize, true);
 	},
 
 	RemoveEventHooks: function() {
@@ -286,6 +291,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.ActiveBrowser.removeEventListener('load', this._OnDocumentLoaded, true);
 		this.ActiveBrowser.removeEventListener('unload', this._OnDocumentUnloaded, true);
 		this.ActiveBrowser.removeEventListener('scroll', this._OnDocScroll, true);
+		this.ActiveBrowser.removeEventListener('resize', this._OnResize, true);
 		delete this.ActiveBrowser;
 	},
 
@@ -339,6 +345,18 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	OnDocScroll: function(e) {
+		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
+
+		this.ExpandSelectionTo(topPageX, topPageY);
+	},
+
+	OnResize: function(e) {
+		/* We aren't getting an update mouse position, but scaling has possibly changed.
+		 		Adjust stored mouse position to potential new scale */
+		let OldPixelScale = this.PixelScale;
+		this.CalcPixelScale();
+		this.MouseScreenPos.scale(OldPixelScale / this.PixelScale);
+
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
 
 		this.ExpandSelectionTo(topPageX, topPageY);
