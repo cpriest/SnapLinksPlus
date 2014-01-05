@@ -37,7 +37,8 @@ var EXPORTED_SYMBOLS = ['Class',
 						'CreateAnonymousElement',
 						'XULNS',
 						'Point',
-						'sprintf'];
+						'sprintf',
+						'usn'];
 
 var Cu = Components.utils,
 	Cc = Components.classes,
@@ -683,7 +684,7 @@ function htmlentities (string, quote_style, charset, double_encode) {
 	// +   improved by: nobbler
 	// +    tweaked by: Jack
 	// +   bugfixed by: Onno Marsman    // +    revised by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-	// +    bugfixed by: Brett Zamir (http://brett-zamir.me)
+	// +   bugfixed by: Brett Zamir (http://brett-zamir.me)
 	// +      input by: Ratheous
 	// +   improved by: Rafał Kukawski (http://blog.kukawski.pl)
 	// +   improved by: Dj (http://phpjs.org/functions/htmlentities:425#comment_134018)    // -    depends on: get_html_translation_table
@@ -738,4 +739,16 @@ function MaxDocValue(doc, prop) {
 	return doc
 		&& Math.max(doc.documentElement && doc.documentElement[prop] || 0, doc.body && doc.body[prop] || 0)
 		|| 0;
+}
+
+/* Keeps track of previously called strings and returns deterministic ids (per run) */
+function usn(s) {
+	if(!this.s) {
+		this.num = 1;
+		this.s = { };
+	}
+	if(!this.s[s]) {
+		this.s[s] = { num: this.num++, s: s };
+	}
+	return this.s[s].num;
 }

@@ -189,7 +189,6 @@ var SnapLinksSelectionClass = Class.create({
 
 		/* Insert top document */
 		Documents[TopDocument.URL] = TopDocument;
-		TopDocument.SLPD = { info: 'SnapLinksPlus Document Data' };
 
 		function IndexFrames(frame) {
 			for(let j=0; j < frame.length; j++) {
@@ -198,7 +197,6 @@ var SnapLinksSelectionClass = Class.create({
 					continue;
 
 				Documents[frame[j].document.URL] = frame[j].document;
-				frame[j].document.SLPD = { info: 'SnapLinksPlus Document Data' };
 				IndexFrames(frame[j]);
 			}
 		}
@@ -212,12 +210,12 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	/*
-	 *
-	 *	@TODO	onunload = clear this.Documents[URL]
-	 * 	@TODO	onload = calc loaded document into this.Documents[URL]
 	 *  @TODO	Outstanding Minor Issues:
+	 *  @TODO		- new contact being dynamically loaded on yahoo.com during drag is not being recognized.
+	 *  @TODO		- Can we use DOMContentReady?? rather than onload for earlier re-select
+	 *  @TODO		- re-visit pressing/holding shift during drag w/o mouse movement (keydown/press?)
 	 *  @BUG	Right-click on Flash object
-	 */
+	 **/
 
 	InnerScreen: function(e) {
 		if(e && e.screenX)
@@ -347,6 +345,7 @@ var SnapLinksSelectionClass = Class.create({
 	OnDocScroll: function(e) {
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
 
+//		console.log('ondocscroll');
 		this.ExpandSelectionTo(topPageX, topPageY);
 	},
 
@@ -359,25 +358,27 @@ var SnapLinksSelectionClass = Class.create({
 
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
 
+//		console.log('onresize');
 		this.ExpandSelectionTo(topPageX, topPageY);
 	},
 
 	OnDocumentLoaded: function(e) {
-//		console.log('loaded: %s, %s, %o %o', e.target.URL, this.top.document.URL, e, this.top);
-		if(e.target.URL == this.top.document.URL) {
-//			console.log('loaded top document');
-			setTimeout(function() {
-				this.CalculateAllDocumentSnapRects();
-				this.UpdateElement();
-				this.ChromeWindow.addEventListener('mousemove', this._OnMouseMove, true);
-			}.bind(this), 0);
-		}
+//		console.log('loaded: Url #%s, %o', usn(e.target.URL), e);
+		this.CalculateSnapRects(e.target);
+		this.Documents[e.target.URL] = e.target;
+		this.CalcSelectedElements();
 	},
 	OnDocumentUnloaded: function(e) {
-//		console.log('unloaded: %s, %s, %o %o', e.target.URL, this.top.document.URL, e, this.top);
 		if(e.target.URL == this.top.document.URL) {
 //			console.log('unloaded top document');
-			this.ChromeWindow.removeEventListener('mousemove', this._OnMouseMove, true);
+			this.Documents = [ ];
+			this.SelectedElements = [ ];
+			return;
+		}
+//		console.log('unloaded: Url #%s, %o', usn(e.target.URL), e);
+		if(this.Documents && this.Documents[e.target.URL]) {
+			this.ClearSelectedElements(e.target);
+			delete this.Documents[e.target.URL];
 		}
 	},
 
@@ -387,19 +388,22 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	/** Calculates and caches the rectangles that make up all document lengths */
-	CalculateSnapRects: function(Document) {
+	CalculateSnapRects: function(Doc) {
+		if(!Doc.SLPD)
+			Doc.SLPD = { info: 'SnapLinksPlus Document Data' };
+
 		/* If the last calculation was done at the same innerWidth, skip calculation */
-		if(!Document || (Document.SLPD.CalculatedWindowWidth || 0) == Document.defaultView.innerWidth)
+		if((Doc.SLPD.CalculatedWindowWidth || -1) == Doc.defaultView.innerWidth)
 			return;
 
-		Document.SLPD.CalculatedWindowWidth = Document.defaultView.innerWidth;
+		Doc.SLPD.CalculatedWindowWidth = Doc.defaultView.innerWidth;
 
-		var offset = { x: Document.defaultView.scrollX, y: Document.defaultView.scrollY };
+		var offset = { x: Doc.defaultView.scrollX, y: Doc.defaultView.scrollY };
 		var SelectableElements = [ ];
 
 		var Start = (new Date()).getTime();
 
-		$A(Document.links).forEach( function( link ) {
+		$A(Doc.links).forEach( function( link ) {
 			try {
 				link.SnapIsJsLink = this.jsRegExp.test(link.href); // Is a JavaScript link?
 
@@ -420,7 +424,7 @@ var SnapLinksSelectionClass = Class.create({
 
 		var Links = (new Date()).getTime();
 
-		$A(Document.body.querySelectorAll('INPUT')).forEach( function(input) {
+		$A(Doc.body.querySelectorAll('INPUT')).forEach( function(input) {
 			let Type = input.getAttribute('type'),
 				ElementRectsNode = input;
 
@@ -441,17 +445,17 @@ var SnapLinksSelectionClass = Class.create({
 
 		var Inputs = (new Date()).getTime();
 
-		$A(Document.body.querySelectorAll('LABEL')).forEach( function(label) {
+		$A(Doc.body.querySelectorAll('LABEL')).forEach( function(label) {
 			var forId = label.getAttribute('for');
 			if (forId != null && forId != '') {
 				var ForElement;
 
 				try {
-					ForElement = Document.body.querySelector('INPUT[type=checkbox]#'+forId);
+					ForElement = Doc.body.querySelector('INPUT[type=checkbox]#'+forId);
 				} catch(e) {
 					// If querySelector() fails, the ID is propably illegal.
 					// We can still find the elemement by using getElementById().
-					var idElem = Document.getElementById(forId);
+					var idElem = Doc.getElementById(forId);
 					if (idElem &&
 							idElem.tagName == 'INPUT' &&
 							idElem.type.toLowerCase() == 'checkbox'	) {
@@ -469,9 +473,9 @@ var SnapLinksSelectionClass = Class.create({
 		var Labels = (new Date()).getTime();
 
 		/* Get list of ineligible elements for 'clickable' */
-		var AnchoredElems = $A(Document.body.querySelectorAll('A[href] IMG, A[href] SPAN, A[href] DIV'));
+		var AnchoredElems = $A(Doc.body.querySelectorAll('A[href] IMG, A[href] SPAN, A[href] DIV'));
 
-		$A(Document.body.querySelectorAll('IMG, SPAN, DIV'))
+		$A(Doc.body.querySelectorAll('IMG, SPAN, DIV'))
 			.filter( function(elem) { return AnchoredElems.indexOf(elem) == -1; })
 			.forEach( function(elem) {
 				if(elem.SnapLinksClickable || (elem.ownerDocument.defaultView.getComputedStyle(elem) || { }).cursor == 'pointer') {
@@ -482,7 +486,8 @@ var SnapLinksSelectionClass = Class.create({
 				}
 			});
 
-		Document.SLPD.SelectableElements = SelectableElements;
+//		console.log('calc rects setting for Url #%s to se=%o, se.length=%d, SLPD=%o, Doc=%o', usn(Doc.URL), SelectableElements, SelectableElements.length, Doc.SLPD, Doc);
+		Doc.SLPD.SelectableElements = SelectableElements;
 
 		var End = (new Date()).getTime();
 		dc('performance', "CalculateSnapRects() -> Links: %sms, Inputs: %sms, Labels: %sms, Clickable: %sms, Total: %sms",
@@ -510,12 +515,20 @@ var SnapLinksSelectionClass = Class.create({
 		delete this.SelectedFixedFontSize;
 	},
 
-	/* Clears the selection style from the currently selected elements */
-	ClearSelectedElements: function() {
-		if(this.SelectedElements)
-			this.SetOutline(this.SelectedElements, '');
-
-		delete this.SelectedElements;
+	/* Clears the selection style from the currently selected elements or from elements belonging to Doc */
+	ClearSelectedElements: function(Doc) {
+		if(this.SelectedElements) {
+			let Elements = this.SelectedElements;
+			if(Doc) {
+				[ Elements, this.SelectedElements ] = this.SelectedElements.reduce(function(acc, elem) {
+					acc[(elem.ownerDocument.URL != Doc.URL) << 0].push(elem);
+					return acc;
+				}, [ [ ], [ ] ]);
+			} else {
+				delete this.SelectedElements;
+			}
+			this.SetOutline(Elements, '');
+		}
 	},
 
 	/** Offsets the selection by the given coordinates */
@@ -682,6 +695,10 @@ var SnapLinksSelectionClass = Class.create({
 				}
 
 				dc('calc-elements', '%o.SLPD.SelectableElements = %o', Doc, Doc.SLPD.SelectableElements);
+//				!Doc.SLPD && console.log('SLPD missing for Url #%s, Doc=%o', usn(URL), Doc);
+//				!Doc.SLPD.SelectableElements && console.log('SLPD.SelectableElements missing for Url #%s, Doc=%o, Doc.SLPD=%o', usn(URL), Doc, Doc.SLPD);
+//				!Doc.SLPD.SelectableElements.length == undefined && console.log('SLPD.SelectableElements.length missing for Url #%s, Doc=%o, Doc.SLPD=%o', usn(URL), Doc, Doc.SLPD);
+
 				/* Find Links Which Intersect With SelectRect */
 				for(let j=0;j<Doc.SLPD.SelectableElements.length, elem=Doc.SLPD.SelectableElements[j]; j++) {
 					for(let k=0;k<elem.SnapRects.length; k++) {
