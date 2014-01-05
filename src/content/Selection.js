@@ -212,7 +212,6 @@ var SnapLinksSelectionClass = Class.create({
 	/*
 	 *  @TODO	Outstanding Minor Issues:
 	 *  @TODO		- new contact being dynamically loaded on yahoo.com during drag is not being recognized.
-	 *  @TODO		- Can we use DOMContentReady?? rather than onload for earlier re-select
 	 *  @TODO		- re-visit pressing/holding shift during drag w/o mouse movement (keydown/press?)
 	 *  @BUG	Right-click on Flash object
 	 **/
@@ -278,6 +277,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.ChromeWindow.addEventListener('mouseup', this._OnMouseUp, true);
 		this.ActiveBrowser = this.TabBrowser.selectedBrowser;
 		this.ActiveBrowser.addEventListener('load', this._OnDocumentLoaded, true);
+		this.ActiveBrowser.addEventListener('DOMContentLoaded', this._OnDocumentLoaded, true);
 		this.ActiveBrowser.addEventListener('unload', this._OnDocumentUnloaded, true);
 		this.ActiveBrowser.addEventListener('scroll', this._OnDocScroll, true);
 		this.ActiveBrowser.addEventListener('resize', this._OnResize, true);
@@ -287,6 +287,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.ChromeWindow.removeEventListener('mousemove', this._OnMouseMove, true);
 		this.ChromeWindow.removeEventListener('mouseup', this._OnMouseUp, true);
 		this.ActiveBrowser.removeEventListener('load', this._OnDocumentLoaded, true);
+		this.ActiveBrowser.removeEventListener('DOMContentLoaded', this._OnDocumentLoaded, true);
 		this.ActiveBrowser.removeEventListener('unload', this._OnDocumentUnloaded, true);
 		this.ActiveBrowser.removeEventListener('scroll', this._OnDocScroll, true);
 		this.ActiveBrowser.removeEventListener('resize', this._OnResize, true);
