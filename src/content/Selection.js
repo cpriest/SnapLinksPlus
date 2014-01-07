@@ -343,6 +343,8 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	OnMouseUp: function(e) {
+		if(e.button != SLPrefs.Activation.Button)
+			return false;
 		clearTimeout(this.CalcTimer);		delete this.CalcTimer;
 		clearTimeout(this.ScrollInterval);	delete this.ScrollInterval;
 		this.RemoveEventHooks();
