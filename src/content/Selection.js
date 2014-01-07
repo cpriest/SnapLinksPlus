@@ -255,6 +255,10 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Starting Hook for beginning a selection */
 	OnMouseDown: function(e) {
+		if(SLPrefs.Dev.Mode && e.ctrlKey && e.shiftKey && e.button == 0) {
+			console.clear();	e.stopPropagation();	e.preventDefault();
+			return;
+		}
 		if(!this.ShouldActivate(e))
 			return;
 
