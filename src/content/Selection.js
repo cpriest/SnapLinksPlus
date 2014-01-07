@@ -364,6 +364,9 @@ var SnapLinksSelectionClass = Class.create({
 		this.CalcPixelScale();
 		this.MouseScreenPos.scale(OldPixelScale / this.PixelScale);
 
+		for(let URL in this.Documents)
+			this.CalculateSnapRects(this.Documents[URL]);
+
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
 
 //		console.log('onresize');
