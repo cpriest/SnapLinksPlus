@@ -28,6 +28,17 @@
  *
  */
 
+	/*
+	 *  @TODO	Outstanding Minor Issues:
+	 *  @TODO		- new content being dynamically loaded on yahoo.com during drag is not being recognized.
+	 *  @TODO		- re-visit pressing/holding shift during drag w/o mouse movement (keydown/press?)
+	 *  @TODO		- Outline of some elements 'hidden' -- outline/border/box-shadow all subject to parent overflow: hidden,
+	 *  				Possible solutions include:
+	 *  					box-shadow: 0px 0px 1px 0px red (inner shadow, tighter and not as preferable)
+	 *  					New outline element per selection (probably would be very slow, maybe less so with an 'outline element cache for created but no longer used')
+	 *  @BUG	Right-click on Flash object
+	 **/
+
 var EXPORTED_SYMBOLS = ["SnapLinksSelectionClass"];
 
 var Cu = Components.utils,
@@ -178,9 +189,6 @@ var SnapLinksSelectionClass = Class.create({
 		this.CalcSelectedElements	= CapCallFrequency(this.CalcSelectedElements.bind(this), SLPrefs.Selection.MinimumCalcDelay);
 
 		this.LastCalcTime = 0;
-
-		/* Set mock object for use until first event determines our window */
-		this._Window = { document: { } };
 	},
 
 	/* Index all documents by URL and calculate offset from Top Document */
@@ -208,13 +216,6 @@ var SnapLinksSelectionClass = Class.create({
 		dc('doc-index', '%o', Documents);
 		this.Documents = Documents;
 	},
-
-	/*
-	 *  @TODO	Outstanding Minor Issues:
-	 *  @TODO		- new contact being dynamically loaded on yahoo.com during drag is not being recognized.
-	 *  @TODO		- re-visit pressing/holding shift during drag w/o mouse movement (keydown/press?)
-	 *  @BUG	Right-click on Flash object
-	 **/
 
 	InnerScreen: function(e) {
 		if(e && e.screenX)
