@@ -175,7 +175,7 @@ var SnapLinksSelectionClass = Class.create({
 		this._OnMouseUp 			= this.OnMouseUp.bind(this);
 		this._OnDocumentUnloaded	= this.OnDocumentUnloaded.bind(this);
 		this._OnDocumentLoaded		= this.OnDocumentLoaded.bind(this);
-		this._CalcSelectedElements	= this.CalcSelectedElements.bind(this);
+		this.CalcSelectedElements	= CapCallFrequency(this.CalcSelectedElements.bind(this), SLPrefs.Selection.MinimumCalcDelay);
 
 		this.LastCalcTime = 0;
 
@@ -615,17 +615,6 @@ var SnapLinksSelectionClass = Class.create({
 	/* Calculates which elements intersect with the selection */
 	CalcSelectedElements: function() {
 		if(this.XulOutlineElem.style.display != 'none') {
-			let CalcDelay = SLPrefs.Selection.MinimumCalcDelay,
-				Elapsed = Date.now() - this.LastCalcTime;
-
-			if(Elapsed < CalcDelay) {
-				if(!this.CalcTimer)
-					this.CalcTimer = setTimeout(this._CalcSelectedElements, (CalcDelay - Elapsed)+1);
-				return;
-			}
-			clearTimeout(this.CalcTimer);	delete this.CalcTimer;
-			this.LastCalcTime = Date.now();
-
 			let HighLinkFontSize = 0, HighJsLinkFontSize = 0,
 				IntersectedElements = [ ],
 				top = this.top;
@@ -848,6 +837,7 @@ var SnapLinksSelectionClass = Class.create({
 			this.SelectedElements = SelectedElements;
 		}
 		dc('calc-elements', 'Final: SelectedElements = %o', this.SelectedElements);
+		return SLPrefs.Selection.MinimumCalcDelay;	/* Updates Frequeny from CapCallFrequency */
 	},
 
 	SetOutline: function(Elements, OutlineStyle) {

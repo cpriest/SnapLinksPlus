@@ -38,7 +38,8 @@ var EXPORTED_SYMBOLS = ['Class',
 						'XULNS',
 						'Point',
 						'sprintf',
-						'usn'];
+						'usn',
+						'CapCallFrequency'];
 
 var Cu = Components.utils,
 	Cc = Components.classes,
@@ -48,6 +49,7 @@ var Cu = Components.utils,
 Cu.import('resource://gre/modules/Services.jsm');
 Cu.import('resource://gre/modules/Geometry.jsm');
 Cu.import('chrome://snaplinksplus/content/sprintf.js');
+Cu.import('chrome://snaplinksplus/content/WindowFaker.js');
 
 let mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
 			.getService(Components.interfaces.nsIWindowMediator)
@@ -751,4 +753,28 @@ function usn(s) {
 		this.s[s] = { num: this.num++, s: s };
 	}
 	return this.s[s].num;
+}
+
+/** Limits Function Calls with a Frequency Cap */
+function CapCallFrequency(func, Frequency) {
+	var LastCalcTime = Date.now() - Frequency + 1,
+		CalcTimer;
+
+	return function() {
+		function CallBufferedFunction() {
+			clearTimeout(CalcTimer);	CalcTimer = 0;
+			LastCalcTime = Date.now();
+			Frequency = (func() << 0) || Frequency;
+		}
+
+		let Elapsed = Date.now() - LastCalcTime;
+
+		if(Elapsed < Frequency) {
+			if(!CalcTimer)
+				CalcTimer = setTimeout(CallBufferedFunction, (Frequency - Elapsed)+1);
+			return false;
+		}
+		CallBufferedFunction();
+		return true;
+	};
 }
