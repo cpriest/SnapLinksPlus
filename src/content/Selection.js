@@ -30,7 +30,6 @@
 
 	/*
 	 *  @TODO	Outstanding Minor Issues:
-	 *  @TODO		- new content being dynamically loaded on yahoo.com during drag is not being recognized.
 	 *  @TODO		- re-visit pressing/holding shift during drag w/o mouse movement (keydown/press?)
 	 *  @TODO		- Outline of some elements 'hidden' -- outline/border/box-shadow all subject to parent overflow: hidden,
 	 *  				Possible solutions include:
@@ -213,7 +212,7 @@ var SnapLinksSelectionClass = Class.create({
 		IndexFrames(TopDocument.defaultView);
 
 		for(let URL in Documents)
-			this.CalculateSnapRects(Documents[URL]);
+			this.CalculateSelectableElements(Documents[URL]);
 
 		dc('doc-index', '%o', Documents);
 		this.Documents = Documents;
@@ -355,7 +354,6 @@ var SnapLinksSelectionClass = Class.create({
 	OnDocScroll: function(e) {
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
 
-//		console.log('ondocscroll');
 		this.ExpandSelectionTo(topPageX, topPageY);
 	},
 
@@ -367,28 +365,24 @@ var SnapLinksSelectionClass = Class.create({
 		this.MouseScreenPos.scale(OldPixelScale / this.PixelScale);
 
 		for(let URL in this.Documents)
-			this.CalculateSnapRects(this.Documents[URL]);
+			this.CalculateSelectableElements(this.Documents[URL]);
 
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
 
-//		console.log('onresize');
 		this.ExpandSelectionTo(topPageX, topPageY);
 	},
 
 	OnDocumentLoaded: function(e) {
-//		console.log('loaded: Url #%s, %o', usn(e.target.URL), e);
-		this.CalculateSnapRects(e.target);
+		this.CalculateSelectableElements(e.target);
 		this.Documents[e.target.URL] = e.target;
 		this.CalcSelectedElements();
 	},
 	OnDocumentUnloaded: function(e) {
 		if(e.target.URL == this.top.document.URL) {
-//			console.log('unloaded top document');
 			this.Documents = [ ];
 			this.SelectedElements = [ ];
 			return;
 		}
-//		console.log('unloaded: Url #%s, %o', usn(e.target.URL), e);
 		if(this.Documents && this.Documents[e.target.URL]) {
 			this.ClearSelectedElements(e.target);
 			delete this.Documents[e.target.URL];
@@ -410,18 +404,13 @@ var SnapLinksSelectionClass = Class.create({
 			this.Documents[URL].SLPD.CalculateSelectable();
 	},
 
-	CalculateAllDocumentSnapRects: function() {
-		for(var URL in this.Documents)
-			this.CalculateSnapRects(this.Documents[URL]);
-	},
-
 	/** Calculates and caches the rectangles that make up all document lengths */
-	CalculateSnapRects: function(Doc) {
+	CalculateSelectableElements: function(Doc) {
 		if(!Doc.SLPD) {
 			Doc.SLPD = {
 				info				: 'SnapLinksPlus Document Data',
 				MutationObserver	: new this.top.MutationObserver(this._OnElementMutation),
-				CalculateSelectable	: new CapCallFrequency(this.CalculateSnapRects.bind(this, Doc), SLPrefs.Calc.SelectableFrequencyCap),
+				CalculateSelectable	: new CapCallFrequency(this.CalculateSelectableElements.bind(this, Doc), SLPrefs.Calc.SelectableFrequencyCap),
 			};
 			Doc.SLPD.MutationObserver.observe(Doc, {
 				childList: true, subtree: true,
@@ -518,11 +507,10 @@ var SnapLinksSelectionClass = Class.create({
 				}
 			});
 
-//		console.log('calc rects setting for Url #%s to se=%o, se.length=%d, SLPD=%o, Doc=%o', usn(Doc.URL), SelectableElements, SelectableElements.length, Doc.SLPD, Doc);
 		Doc.SLPD.SelectableElements = SelectableElements;
 
 		var End = (new Date()).getTime();
-		dc('performance', "CalculateSnapRects() -> Links: %sms, Inputs: %sms, Labels: %sms, Clickable: %sms, Total: %sms",
+		dc('performance', "CalculateSelectableElements() -> Links: %sms, Inputs: %sms, Labels: %sms, Clickable: %sms, Total: %sms",
 			Links - Start, Inputs - Links, Labels - Inputs, End - Labels, End - Start);
 	},
 
@@ -556,6 +544,7 @@ var SnapLinksSelectionClass = Class.create({
 		if(this.SelectedElements) {
 			let Elements = this.SelectedElements;
 			if(Doc) {
+				/* Sort all elements into Elements (for this doc) and all the rest */
 				[ Elements, this.SelectedElements ] = this.SelectedElements.reduce(function(acc, elem) {
 					acc[(elem.ownerDocument.URL != Doc.URL) << 0].push(elem);
 					return acc;
