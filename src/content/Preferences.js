@@ -50,6 +50,11 @@ var SLPrefs = CreatePreferenceMap('extensions.snaplinks', {
 		RequiresAlt:	false,
 	},
 
+	Calc: {
+		SelectableFrequencyCap:		50,
+		SelectedFrequencyCap: 		50,
+	},
+
 	Selection:	{
 		HideOnMouseLeave:	false,
 		BorderColor:		'#30AF00',
@@ -61,7 +66,6 @@ var SLPrefs = CreatePreferenceMap('extensions.snaplinks', {
 //		ShowCount:	0,		/* 0: Don't show, 1: Hover Panel, 2: AddonBar */
 		ShowCount:			true,
 		ShowCountWhere:		1,
-		MinimumCalcDelay:	50,
 	},
 
 	SelectedElements: {

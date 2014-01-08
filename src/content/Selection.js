@@ -186,7 +186,9 @@ var SnapLinksSelectionClass = Class.create({
 		this._OnMouseUp 			= this.OnMouseUp.bind(this);
 		this._OnDocumentUnloaded	= this.OnDocumentUnloaded.bind(this);
 		this._OnDocumentLoaded		= this.OnDocumentLoaded.bind(this);
-		this.CalcSelectedElements	= CapCallFrequency(this.CalcSelectedElements.bind(this), SLPrefs.Selection.MinimumCalcDelay);
+		this._OnElementMutation		= this.OnElementMutation.bind(this);
+
+		this.CalcSelectedElements	= CapCallFrequency(this.CalcSelectedElements.bind(this), SLPrefs.Calc.SelectedFrequencyCap);
 
 		this.LastCalcTime = 0;
 	},
@@ -393,6 +395,21 @@ var SnapLinksSelectionClass = Class.create({
 		}
 	},
 
+	OnElementMutation: function(mutations) {
+
+		let MutatedDocURLs = mutations.reduce(function(acc, mu) {
+			for(let nodes of [ mu.addedNodes, mu.removedNodes ]) {
+				if(nodes) {
+					for(let elem of nodes)
+						acc[elem.ownerDocument.URL] = true;
+				}
+			}
+			return acc;
+		}, { });
+		for(let URL in MutatedDocURLs)
+			this.Documents[URL].SLPD.CalculateSelectable();
+	},
+
 	CalculateAllDocumentSnapRects: function() {
 		for(var URL in this.Documents)
 			this.CalculateSnapRects(this.Documents[URL]);
@@ -400,12 +417,16 @@ var SnapLinksSelectionClass = Class.create({
 
 	/** Calculates and caches the rectangles that make up all document lengths */
 	CalculateSnapRects: function(Doc) {
-		if(!Doc.SLPD)
-			Doc.SLPD = { info: 'SnapLinksPlus Document Data' };
-
-		/* If the last calculation was done at the same innerWidth, skip calculation */
-		if((Doc.SLPD.CalculatedWindowWidth || -1) == Doc.defaultView.innerWidth)
-			return;
+		if(!Doc.SLPD) {
+			Doc.SLPD = {
+				info				: 'SnapLinksPlus Document Data',
+				MutationObserver	: new this.top.MutationObserver(this._OnElementMutation),
+				CalculateSelectable	: new CapCallFrequency(this.CalculateSnapRects.bind(this, Doc), SLPrefs.Calc.SelectableFrequencyCap),
+			};
+			Doc.SLPD.MutationObserver.observe(Doc, {
+				childList: true, subtree: true,
+			});
+		}
 
 		Doc.SLPD.CalculatedWindowWidth = Doc.defaultView.innerWidth;
 
@@ -515,9 +536,13 @@ var SnapLinksSelectionClass = Class.create({
 		this.XulCountElem = undefined;
 
 		/* Delete our data store SLDP from each document */
-		for(let URL in this.Documents)
+		for(let URL in this.Documents) {
+			this.Documents[URL].SLPD.MutationObserver.disconnect();
+			delete this.Documents[URL].SLPD.MutationObserver;
+			delete this.Documents[URL].SLPD.CalculateSelectable;
 			delete this.Documents[URL].SLPD;
-		this.Documents = undefined;
+		}
+		delete this.Documents;
 
 		/* Reset attributes */
 		this.SelectLargestFontSizeIntersectionLinks = true;
