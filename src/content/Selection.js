@@ -254,6 +254,10 @@ var SnapLinksSelectionClass = Class.create({
 		this.PixelScale = this.topPixelScale / this.xulPixelScale;
 	},
 
+//|																																																																																																																																	*/
+//|	  Event Handlers																																																																																																																												*/
+//|																																																																																																																																	*/
+
 	/* Starting Hook for beginning a selection */
 	OnMouseDown: function(e) {
 		if(SLPrefs.Dev.Mode && e.ctrlKey && e.shiftKey && e.button == 0) {
@@ -404,6 +408,25 @@ var SnapLinksSelectionClass = Class.create({
 			this.Documents[URL].SLPD.CalculateSelectable();
 	},
 
+	/** Offsets the selection by the given coordinates */
+	OffsetSelection: function(X, Y) {
+		this.SelectionRect.Offset(X, Y);
+		this.UpdateElement();
+	},
+
+	/* Expands the selection to the given X, Y coordinates */
+	ExpandSelectionTo: function(X, Y) {
+		let top = this.top;
+
+		this.SelectionRect.right = Math.max(0, Math.min(X, top.innerWidth + top.scrollMaxX));
+		this.SelectionRect.bottom = Math.max(0, Math.min(Y, top.innerHeight + top.scrollMaxY));
+		this.UpdateElement();
+	},
+
+//|																																																																																																																																	*/
+//|	  Calculation Functions																																																																																																																												*/
+//|																																																																																																																																	*/
+
 	/** Calculates and caches the rectangles that make up all document lengths */
 	CalculateSelectableElements: function(Doc) {
 		if(!Doc.SLPD) {
@@ -512,128 +535,6 @@ var SnapLinksSelectionClass = Class.create({
 		var End = (new Date()).getTime();
 		dc('performance', "CalculateSelectableElements() -> Links: %sms, Inputs: %sms, Labels: %sms, Clickable: %sms, Total: %sms",
 			Links - Start, Inputs - Links, Labels - Inputs, End - Labels, End - Start);
-	},
-
-	/** Clears the selection by removing the element, also clears some other non-refactored but moved code, basically completing a drag */
-	Clear: function() {
-		this.ClearSelectedElements();
-		this.SelectedCountsLabel = '';
-
-		/* Delete our outline element and floating count element */
-		this.XulOutlineElem = undefined;
-		this.XulCountElem = undefined;
-
-		/* Delete our data store SLDP from each document */
-		for(let URL in this.Documents) {
-			this.Documents[URL].SLPD.MutationObserver.disconnect();
-			delete this.Documents[URL].SLPD.MutationObserver;
-			delete this.Documents[URL].SLPD.CalculateSelectable;
-			delete this.Documents[URL].SLPD;
-		}
-		delete this.Documents;
-
-		/* Reset attributes */
-		this.SelectLargestFontSizeIntersectionLinks = true;
-
-		/* No longer need to reference these */
-		delete this.SelectedFixedFontSize;
-	},
-
-	/* Clears the selection style from the currently selected elements or from elements belonging to Doc */
-	ClearSelectedElements: function(Doc) {
-		if(this.SelectedElements) {
-			let Elements = this.SelectedElements;
-			if(Doc) {
-				/* Sort all elements into Elements (for this doc) and all the rest */
-				[ Elements, this.SelectedElements ] = this.SelectedElements.reduce(function(acc, elem) {
-					acc[(elem.ownerDocument.URL != Doc.URL) << 0].push(elem);
-					return acc;
-				}, [ [ ], [ ] ]);
-			} else {
-				delete this.SelectedElements;
-			}
-			this.SetOutline(Elements, '');
-		}
-	},
-
-	/** Offsets the selection by the given coordinates */
-	OffsetSelection: function(X, Y) {
-		this.SelectionRect.Offset(X, Y);
-		this.UpdateElement();
-	},
-
-	/* Expands the selection to the given X, Y coordinates */
-	ExpandSelectionTo: function(X, Y) {
-		let top = this.top;
-
-		this.SelectionRect.right = Math.max(0, Math.min(X, top.innerWidth + top.scrollMaxX));
-		this.SelectionRect.bottom = Math.max(0, Math.min(Y, top.innerHeight + top.scrollMaxY));
-		this.UpdateElement();
-	},
-
-	/* Updates the visible position of the element */
-	UpdateElement: function() {
-		let pbo = this.XulOutlineElem.parentNode.boxObject,				/* Parent Box Object */
-			sbw = this.TabBrowser.selectedBrowser.contentWindow;		/* Selected Browser Window */
-
-		/* Maximum values for final top/left/height/width of Element dimensions */
-		let BoundingRect = this.FixedBrowserRect;
-
-		let OffsetSelectionRect = this.SelectionRect.clone()							/* SelectionRect is in document coordinates */
-									.Offset(-this.top.scrollX, -this.top.scrollY) 		/* Offset to non-scrolled coordinates */
-									.scale(this.PixelScale, 	this.PixelScale)		/* Convert from document zoom scale to UI scale */
-									.Offset(pbo.x, pbo.y);								/* Offset by chrome top bar coordinates */
-
-		let ClippedRect = OffsetSelectionRect.intersect(BoundingRect);
-
-		ApplyStyle(this.XulOutlineElem, {
-			left 	: ClippedRect.left + 'px',
-			top 	: ClippedRect.top + 'px',
-			width 	: ClippedRect.width + 'px',		/*- (2 * SLPrefs.Selection.BorderWidth)*/
-			height 	: ClippedRect.height  + 'px',	/*- (2 * SLPrefs.Selection.BorderWidth)*/
-
-			/* Border width is dependent on not being at the bounding edge unless the document is scrolled entirely in that direction */
-			borderTopWidth		: ( ClippedRect.top 	== BoundingRect.top 	&& sbw.scrollY > 0 )				? '0px' : SLPrefs.Selection.BorderWidth+'px',
-			borderBottomWidth	: ( ClippedRect.bottom 	== BoundingRect.bottom 	&& sbw.scrollY < sbw.scrollMaxY ) 	? '0px' : SLPrefs.Selection.BorderWidth+'px',
-			borderLeftWidth		: ( ClippedRect.left 	== BoundingRect.left 	&& sbw.scrollX > 0 )				? '0px' : SLPrefs.Selection.BorderWidth+'px',
-			borderRightWidth	: ( ClippedRect.right 	== BoundingRect.right 	&& sbw.scrollX < sbw.scrollMaxX )	? '0px' : SLPrefs.Selection.BorderWidth+'px',
-		});
-
-		this.HideSelectionRect(!(this.SelectionRect.width > 4 || this.SelectionRect.height > 4));
-
-		this.RepositionElementCount();
-
-		this.CalcSelectedElements();
-	},
-
-	RepositionElementCount: function() {
-		if(this.XulCountElem && this.XulCountElem.style.display != 'none') {
-			let Margin = 6;
-
-			let CountRect = new Rect(this.XulCountElem.getBoundingClientRect()),
-				SelectRect = new Rect(this.XulOutlineElem.getBoundingClientRect()),
-				BrowserRect = this.FixedBrowserRect;
-
-			let x = this.SelectionRect.IsInvertedX ? SelectRect.left - CountRect.width - Margin : SelectRect.right + Margin,
-				y = (this.SelectionRect.IsInvertedY ? SelectRect.top : SelectRect.bottom) - CountRect.height - Margin;
-
-			CountRect.Offset(-CountRect.left, -CountRect.top);		/* Move to 0,0 coordinates */
-			CountRect.Offset(x, y);									/* Move to Left or Right and Above Cursor,
-
-			/* Prefer outside of rect, but flip inside if outside the BrowserRect left|right */
-			if(CountRect.right > BrowserRect.right)
-				CountRect.Offset(-(CountRect.width + (Margin * 2)), 0);
-			else if (CountRect.left < BrowserRect.left)
-				CountRect.Offset((CountRect.width + (Margin * 2)), 0);
-
-			if(CountRect.top < BrowserRect.top)
-				CountRect.Offset(0, (CountRect.height + (Margin * 2)));
-
-			ApplyStyle(this.XulCountElem, {
-				top: CountRect.top + 'px',
-				left: CountRect.left + 'px'
-			});
-		}
 	},
 
 	/* Calculates which elements intersect with the selection */
@@ -863,6 +764,125 @@ var SnapLinksSelectionClass = Class.create({
 		dc('calc-elements', 'Final: SelectedElements = %o', this.SelectedElements);
 		return SLPrefs.Selection.MinimumCalcDelay;	/* Updates Frequeny from CapCallFrequency */
 	},
+
+//|																																																																																																																																	*/
+//|	  Cleanup Functions																																																																																																																												*/
+//|																																																																																																																																	*/
+
+	/** Clears the selection by removing the element, also clears some other non-refactored but moved code, basically completing a drag */
+	Clear: function() {
+		this.ClearSelectedElements();
+		this.SelectedCountsLabel = '';
+
+		/* Delete our outline element and floating count element */
+		this.XulOutlineElem = undefined;
+		this.XulCountElem = undefined;
+
+		/* Delete our data store SLDP from each document */
+		for(let URL in this.Documents) {
+			this.Documents[URL].SLPD.MutationObserver.disconnect();
+			delete this.Documents[URL].SLPD.MutationObserver;
+			delete this.Documents[URL].SLPD.CalculateSelectable;
+			delete this.Documents[URL].SLPD;
+		}
+		delete this.Documents;
+
+		/* Reset attributes */
+		this.SelectLargestFontSizeIntersectionLinks = true;
+
+		/* No longer need to reference these */
+		delete this.SelectedFixedFontSize;
+	},
+
+	/* Clears the selection style from the currently selected elements or from elements belonging to Doc */
+	ClearSelectedElements: function(Doc) {
+		if(this.SelectedElements) {
+			let Elements = this.SelectedElements;
+			if(Doc) {
+				/* Sort all elements into Elements (for this doc) and all the rest */
+				[ Elements, this.SelectedElements ] = this.SelectedElements.reduce(function(acc, elem) {
+					acc[(elem.ownerDocument.URL != Doc.URL) << 0].push(elem);
+					return acc;
+				}, [ [ ], [ ] ]);
+			} else {
+				delete this.SelectedElements;
+			}
+			this.SetOutline(Elements, '');
+		}
+	},
+
+//|																																																																																																																																	*/
+//|	  Floating Status Indicator Functions																																																																																																																												*/
+//|																																																																																																																																	*/
+
+	/* Updates the visible position of the element */
+	UpdateElement: function() {
+		let pbo = this.XulOutlineElem.parentNode.boxObject,				/* Parent Box Object */
+			sbw = this.TabBrowser.selectedBrowser.contentWindow;		/* Selected Browser Window */
+
+		/* Maximum values for final top/left/height/width of Element dimensions */
+		let BoundingRect = this.FixedBrowserRect;
+
+		let OffsetSelectionRect = this.SelectionRect.clone()							/* SelectionRect is in document coordinates */
+									.Offset(-this.top.scrollX, -this.top.scrollY) 		/* Offset to non-scrolled coordinates */
+									.scale(this.PixelScale, 	this.PixelScale)		/* Convert from document zoom scale to UI scale */
+									.Offset(pbo.x, pbo.y);								/* Offset by chrome top bar coordinates */
+
+		let ClippedRect = OffsetSelectionRect.intersect(BoundingRect);
+
+		ApplyStyle(this.XulOutlineElem, {
+			left 	: ClippedRect.left + 'px',
+			top 	: ClippedRect.top + 'px',
+			width 	: ClippedRect.width + 'px',
+			height 	: ClippedRect.height  + 'px',
+
+			/* Border width is dependent on not being at the bounding edge unless the document is scrolled entirely in that direction */
+			borderTopWidth		: ( ClippedRect.top 	== BoundingRect.top 	&& sbw.scrollY > 0 )				? '0px' : SLPrefs.Selection.BorderWidth+'px',
+			borderBottomWidth	: ( ClippedRect.bottom 	== BoundingRect.bottom 	&& sbw.scrollY < sbw.scrollMaxY ) 	? '0px' : SLPrefs.Selection.BorderWidth+'px',
+			borderLeftWidth		: ( ClippedRect.left 	== BoundingRect.left 	&& sbw.scrollX > 0 )				? '0px' : SLPrefs.Selection.BorderWidth+'px',
+			borderRightWidth	: ( ClippedRect.right 	== BoundingRect.right 	&& sbw.scrollX < sbw.scrollMaxX )	? '0px' : SLPrefs.Selection.BorderWidth+'px',
+		});
+
+		this.HideSelectionRect(!(this.SelectionRect.width > 4 || this.SelectionRect.height > 4));
+
+		this.RepositionElementCount();
+
+		this.CalcSelectedElements();
+	},
+
+	RepositionElementCount: function() {
+		if(this.XulCountElem && this.XulCountElem.style.display != 'none') {
+			let Margin = 6;
+
+			let CountRect = new Rect(this.XulCountElem.getBoundingClientRect()),
+				SelectRect = new Rect(this.XulOutlineElem.getBoundingClientRect()),
+				BrowserRect = this.FixedBrowserRect;
+
+			let x = this.SelectionRect.IsInvertedX ? SelectRect.left - CountRect.width - Margin : SelectRect.right + Margin,
+				y = (this.SelectionRect.IsInvertedY ? SelectRect.top : SelectRect.bottom) - CountRect.height - Margin;
+
+			CountRect.Offset(-CountRect.left, -CountRect.top);		/* Move to 0,0 coordinates */
+			CountRect.Offset(x, y);									/* Move to Left or Right and Above Cursor,
+
+			/* Prefer outside of rect, but flip inside if outside the BrowserRect left|right */
+			if(CountRect.right > BrowserRect.right)
+				CountRect.Offset(-(CountRect.width + (Margin * 2)), 0);
+			else if (CountRect.left < BrowserRect.left)
+				CountRect.Offset((CountRect.width + (Margin * 2)), 0);
+
+			if(CountRect.top < BrowserRect.top)
+				CountRect.Offset(0, (CountRect.height + (Margin * 2)));
+
+			ApplyStyle(this.XulCountElem, {
+				top: CountRect.top + 'px',
+				left: CountRect.left + 'px'
+			});
+		}
+	},
+
+//|																																																																																																																																	*/
+//|	  Miscellaneous																																																																																																																												*/
+//|																																																																																																																																	*/
 
 	SetOutline: function(Elements, OutlineStyle) {
 		let	elem, elem2;
