@@ -39,12 +39,14 @@ var EXPORTED_SYMBOLS = ['Class',
 						'Point',
 						'sprintf',
 						'usn',
-						'CapCallFrequency'];
+						'CapCallFrequency',
+						'KeyEvent'];
 
 var Cu = Components.utils,
 	Cc = Components.classes,
 	Ci = Components.interfaces,
-	XULNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
+	XULNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
+	KeyEvent = Ci.nsIDOMKeyEvent;
 
 Cu.import('resource://gre/modules/Services.jsm');
 Cu.import('resource://gre/modules/Geometry.jsm');
