@@ -414,12 +414,18 @@ var SnapLinksClass = Class.create({
 			var CollectedElementsInfo = this.CollectElementsInfo(this.Selection.FilteredElements);
 			var TabsCreated = 0;
 			var Browser = this.ChromeWindow.getBrowser();
-			var IntervalTimerID;
+			var IntervalTimerID,
+				OriginalTab = Browser.selectedTab;
+
+			if('TreeStyleTabService' in this.ChromeWindow)
+				this.ChromeWindow.TreeStyleTabService.readyToOpenChildTab(Browser.selectedTab, true);
 
 			var DelayedAction = function DelayedAction() {
 				if(CollectedElementsInfo.length == 0) {
 					//noinspection JSPotentiallyInvalidUsageOfThis
 					this.ChromeWindow.clearInterval(IntervalTimerID);
+					if('TreeStyleTabService' in this.ChromeWindow)
+						this.ChromeWindow.TreeStyleTabService.stopToOpenChildTab(OriginalTab);
 					return;
 				}
 				var info = CollectedElementsInfo.shift();
