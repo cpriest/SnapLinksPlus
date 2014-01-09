@@ -24,13 +24,10 @@
  * 		- StatusLabel to show more detail (via options) (Filtered, Type Counts)
  * 		- Filtered elements to have grey outline
  *		- Tutorial Page (with ability to change prefs in some cases)
- *
- *
  */
 
 	/*
 	 *  @TODO	Outstanding Minor Issues:
-	 *  @TODO		- re-visit pressing/holding shift during drag w/o mouse movement (keydown/press?)
 	 *  @TODO		- Outline of some elements 'hidden' -- outline/border/box-shadow all subject to parent overflow: hidden,
 	 *  				Possible solutions include:
 	 *  					box-shadow: 0px 0px 1px 0px red (inner shadow, tighter and not as preferable)
@@ -186,6 +183,8 @@ var SnapLinksSelectionClass = Class.create({
 		this._OnDocumentUnloaded	= this.OnDocumentUnloaded.bind(this);
 		this._OnDocumentLoaded		= this.OnDocumentLoaded.bind(this);
 		this._OnElementMutation		= this.OnElementMutation.bind(this);
+		this._OnKeyDown				= this.OnKeyDown.bind(this);
+		this._OnKeyUp				= this.OnKeyUp.bind(this);
 
 		this.CalcSelectedElements	= CapCallFrequency(this.CalcSelectedElements.bind(this), SLPrefs.Calc.SelectedFrequencyCap);
 
@@ -291,6 +290,8 @@ var SnapLinksSelectionClass = Class.create({
 		this.ActiveBrowser.addEventListener('unload', this._OnDocumentUnloaded, true);
 		this.ActiveBrowser.addEventListener('scroll', this._OnDocScroll, true);
 		this.ActiveBrowser.addEventListener('resize', this._OnResize, true);
+		this.ActiveBrowser.addEventListener('keydown', this._OnKeyDown, true);
+		this.ActiveBrowser.addEventListener('keyup', this._OnKeyUp, true);
 	},
 
 	RemoveEventHooks: function() {
@@ -301,6 +302,8 @@ var SnapLinksSelectionClass = Class.create({
 		this.ActiveBrowser.removeEventListener('unload', this._OnDocumentUnloaded, true);
 		this.ActiveBrowser.removeEventListener('scroll', this._OnDocScroll, true);
 		this.ActiveBrowser.removeEventListener('resize', this._OnResize, true);
+		this.ActiveBrowser.removeEventListener('keydown', this._OnKeyDown, true);
+		this.ActiveBrowser.removeEventListener('keyup', this._OnKeyUp, true);
 		delete this.ActiveBrowser;
 	},
 
@@ -309,8 +312,6 @@ var SnapLinksSelectionClass = Class.create({
 
 		/* If we have an off screen scroll interval set, clear it */
 		clearTimeout(this.ScrollInterval);
-
-		this.SelectLargestFontSizeIntersectionLinks = !e.shiftKey;
 
 		/* Out of top document detection and action */
 		if(topClientX < 0 || topClientY < 0 || topClientX > top.innerWidth || topClientY > top.innerHeight) {
@@ -406,6 +407,28 @@ var SnapLinksSelectionClass = Class.create({
 		}, { });
 		for(let URL in MutatedDocURLs)
 			this.Documents[URL].SLPD.CalculateSelectable();
+	},
+
+	OnKeyDown: function(e) {
+		switch(e.keyCode) {
+			case KeyEvent.DOM_VK_SHIFT:
+				if(!this.ShiftDown) {
+					this.ShiftDown = true;
+					this.CalcSelectedElements();
+				}
+				break;
+		}
+	},
+
+	OnKeyUp: function(e) {
+		switch(e.keyCode) {
+			case KeyEvent.DOM_VK_SHIFT:
+				if(this.ShiftDown) {
+					this.ShiftDown = false;
+					this.CalcSelectedElements();
+				}
+				break;
+		}
 	},
 
 	/** Offsets the selection by the given coordinates */
@@ -539,6 +562,8 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Calculates which elements intersect with the selection */
 	CalcSelectedElements: function() {
+		var SelectLargestFontSizeIntersectionLinks = !this.ShiftDown;
+
 		if(this.XulOutlineElem.style.display != 'none') {
 			let HighLinkFontSize = 0, HighJsLinkFontSize = 0,
 				IntersectedElements = [ ],
@@ -623,7 +648,7 @@ var SnapLinksSelectionClass = Class.create({
 											computedStyle.getPropertyValue('display') == 'none');
 
 							if(!hidden) {
-								if(elem.tagName == 'A' && this.SelectLargestFontSizeIntersectionLinks) {
+								if(elem.tagName == 'A' && SelectLargestFontSizeIntersectionLinks) {
 									let fontSize = computedStyle.getPropertyValue("font-size");
 
 									if(fontSize.indexOf("px") >= 0)
@@ -690,10 +715,10 @@ var SnapLinksSelectionClass = Class.create({
 
 			switch(Greatest) {
 				case 'Links':
-					filterFunction = function(elem) { return elem.tagName == 'A' && !elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == (this.SelectedFixedFontSize || HighLinkFontSize)); };
+					filterFunction = function(elem) { return elem.tagName == 'A' && !elem.SnapIsJsLink && (!SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == (this.SelectedFixedFontSize || HighLinkFontSize)); };
 					break;
 				case 'JsLinks':
-					filterFunction = function(elem) { return elem.tagName == 'A' && elem.SnapIsJsLink && (!this.SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == (this.SelectedFixedFontSize || HighJsLinkFontSize)); };
+					filterFunction = function(elem) { return elem.tagName == 'A' && elem.SnapIsJsLink && (!SelectLargestFontSizeIntersectionLinks || elem.SnapFontSize == (this.SelectedFixedFontSize || HighJsLinkFontSize)); };
 					break;
 				case 'Checkboxes':
 					filterFunction = function(elem) { return elem.tagName == 'INPUT' && elem.getAttribute('type') == 'checkbox'; };
@@ -786,9 +811,7 @@ var SnapLinksSelectionClass = Class.create({
 			delete this.Documents[URL].SLPD;
 		}
 		delete this.Documents;
-
-		/* Reset attributes */
-		this.SelectLargestFontSizeIntersectionLinks = true;
+		this.ShiftDown = false;
 
 		/* No longer need to reference these */
 		delete this.SelectedFixedFontSize;
