@@ -350,7 +350,8 @@ var SnapLinksSelectionClass = Class.create({
 
 	OnMouseUp: function(e) {
 		if(e.button != SLPrefs.Activation.Button)
-			return false;
+			return;
+
 		clearTimeout(this.CalcTimer);		delete this.CalcTimer;
 		clearTimeout(this.ScrollInterval);	delete this.ScrollInterval;
 		this.RemoveEventHooks();
@@ -520,8 +521,8 @@ var SnapLinksSelectionClass = Class.create({
 				try {
 					ForElement = Doc.body.querySelector('INPUT[type=checkbox]#'+forId);
 				} catch(e) {
-					// If querySelector() fails, the ID is propably illegal.
-					// We can still find the elemement by using getElementById().
+					// If querySelector() fails, the ID is probably illegal.
+					// We can still find the element by using getElementById().
 					var idElem = Doc.getElementById(forId);
 					if (idElem &&
 							idElem.tagName == 'INPUT' &&
@@ -769,8 +770,8 @@ var SnapLinksSelectionClass = Class.create({
 
 			if(this.SelectedElements) {
 				let PreviousElements = this.SelectedElements,
-					NewElements = [ elem for each ( elem in SelectedElements ) if (PreviousElements.indexOf(elem) == -1) ],
-					ClearElements = [ elem for each ( elem in PreviousElements ) if (SelectedElements.indexOf(elem) == -1) ];
+					NewElements = [ elem for each ( var elem in SelectedElements ) if (PreviousElements.indexOf(elem) == -1) ],
+					ClearElements = [ elem for each ( var elem in PreviousElements ) if (SelectedElements.indexOf(elem) == -1) ];
 
 				// Set the outline on NewElements
 				this.SetOutline(NewElements, OutlineStyle);
@@ -787,7 +788,7 @@ var SnapLinksSelectionClass = Class.create({
 			this.SelectedElements = SelectedElements;
 		}
 		dc('calc-elements', 'Final: SelectedElements = %o', this.SelectedElements);
-		return SLPrefs.Selection.MinimumCalcDelay;	/* Updates Frequeny from CapCallFrequency */
+		return SLPrefs.Selection.MinimumCalcDelay;	/* Updates Frequency from CapCallFrequency */
 	},
 
 //|																																																																																																																																	*/
@@ -803,7 +804,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.XulOutlineElem = undefined;
 		this.XulCountElem = undefined;
 
-		/* Delete our data store SLDP from each document */
+		/* Delete our data store SLPD from each document */
 		for(let URL in this.Documents) {
 			this.Documents[URL].SLPD.MutationObserver.disconnect();
 			delete this.Documents[URL].SLPD.MutationObserver;
