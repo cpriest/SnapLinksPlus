@@ -141,7 +141,7 @@
 	<target name="clean-dist">
 		<mkdir dir="${dist.dir}" />
 		<delete includeemptydirs="true">
-			<fileset dir="${dist.dir}" includes="**/*" excludes=".cvsignore" />
+			<fileset dir="${dist.dir}" includes="**/*" excludes=".cvsignore,*.xpi" />
 		</delete>
 	</target>
 
