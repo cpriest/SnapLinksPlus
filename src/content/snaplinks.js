@@ -36,7 +36,7 @@ try {
 	Cu.import('chrome://snaplinksplus/content/Selection.js');
 	Cu.import('chrome://snaplinksplus/content/Preferences.js');
 } catch(e) {
-	Components.utils.reportError(e + ":\n"+ e.stack);
+	Components.utils.reportError(e);
 }
 
 var SnapLinksClass = Class.create({

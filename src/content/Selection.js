@@ -770,8 +770,8 @@ var SnapLinksSelectionClass = Class.create({
 
 			if(this.SelectedElements) {
 				let PreviousElements = this.SelectedElements,
-					NewElements = [ elem for each ( var elem in SelectedElements ) if (PreviousElements.indexOf(elem) == -1) ],
-					ClearElements = [ elem for each ( var elem in PreviousElements ) if (SelectedElements.indexOf(elem) == -1) ];
+					NewElements = [ elem for each ( elem in SelectedElements ) if (PreviousElements.indexOf(elem) == -1) ],
+					ClearElements = [ elem for each ( elem in PreviousElements ) if (SelectedElements.indexOf(elem) == -1) ];
 
 				// Set the outline on NewElements
 				this.SetOutline(NewElements, OutlineStyle);
