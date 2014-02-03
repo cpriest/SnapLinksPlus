@@ -247,7 +247,7 @@ var SnapLinksSelectionClass = Class.create({
 		this.xulPixelScale = parseFloat(Services.prefs.getCharPref('layout.css.devPixelsPerPx'));
 		if(isNaN(this.xulPixelScale) || this.xulPixelScale <= 0) {
 			this.xulPixelScale = 1;
-			try { this.xulPixelScale = parseFloat(Components.classes["@mozilla.org/gfx/screenmanager;1"].getService(Components.interfaces.nsIScreenManager).systemDefaultScale); }
+			try { this.xulPixelScale = parseFloat(Components.classes["@mozilla.org/gfx/screenmanager;1"].getService(Components.interfaces.nsIScreenManager).systemDefaultScale); console.log('ScreenManager.systemDefaultScale = %d', this.xulPixelScale); }
 				catch(e) { console.log('SnapLinksPlus: nsIScreenManager.systemDefaultScale not available, accomodating OS level dpi changes not possible, exception follows.'); Components.utils.reportError(e); this.xulPixelScale = 1; }
 		}
 		this.PixelScale = this.topPixelScale / this.xulPixelScale;
