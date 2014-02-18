@@ -33,6 +33,7 @@
 	 *  					box-shadow: 0px 0px 1px 0px red (inner shadow, tighter and not as preferable)
 	 *  					New outline element per selection (probably would be very slow, maybe less so with an 'outline element cache for created but no longer used')
 	 *  @BUG	Right-click on Flash object
+	 *  @BUG	Hitting escape while in drag isn't working right.
 	 **/
 
 var EXPORTED_SYMBOLS = ["SnapLinksSelectionClass"];
@@ -73,7 +74,18 @@ var SnapLinksSelectionClass = Class.create({
 					position			: 'fixed',
 					zIndex				: '999999',
 					pointerEvents		: 'none',
+					overflow			: 'hidden',
 				});
+				if(SLPrefs.Debug.Rects) {
+					innerElem = CreateAnonymousElement('<box style="opacity: .1; background-color: red; position: relative;"></box>');
+					ApplyStyle(innerElem, {
+						top   : '-100px',
+						left  : '-100px',
+						width : '9000px',
+						height: '9000px',
+					});
+					Element.appendChild(innerElem);
+				}
 				InsertionNode.appendChild(Element);
 				this._XulOutlineElement = Element;
 			}
@@ -243,14 +255,30 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	CalcPixelScale: function() {
+		this.DebugInfo = { };
 		this.topPixelScale = this.top.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils).screenPixelsPerCSSPixel;
 		this.xulPixelScale = parseFloat(Services.prefs.getCharPref('layout.css.devPixelsPerPx'));
+		this.DebugInfo.devPixelsPerPx = this.xulPixelScale;
+		this.DebugInfo.xulPixelSrc = 'devPixelsPerPx';
+		this.DebugInfo['ChromeWindow.devicePixelRatio'] = this.ChromeWindow.devicePixelRatio;
+		this.DebugInfo['window.devicePixelRatio'] = this.top.devicePixelRatio;
 		if(isNaN(this.xulPixelScale) || this.xulPixelScale <= 0) {
 			this.xulPixelScale = 1;
-			try { this.xulPixelScale = parseFloat(Components.classes["@mozilla.org/gfx/screenmanager;1"].getService(Components.interfaces.nsIScreenManager).systemDefaultScale); console.log('ScreenManager.systemDefaultScale = %d', this.xulPixelScale); }
-				catch(e) { console.log('SnapLinksPlus: nsIScreenManager.systemDefaultScale not available, accomodating OS level dpi changes not possible, exception follows.'); Components.utils.reportError(e); this.xulPixelScale = 1; }
+			try {
+				this.xulPixelScale = parseFloat(Components.classes["@mozilla.org/gfx/screenmanager;1"].getService(Components.interfaces.nsIScreenManager).systemDefaultScale);
+				this.DebugInfo.xulPixelSrc = 'ScreenMgr';
+			} catch(e) {
+				this.DebugInfo.xulPixelSrc = 'fallback';
+				console.log('SnapLinksPlus: nsIScreenManager.systemDefaultScale not available, accomodating OS level dpi changes not possible, exception follows.');
+				Components.utils.reportError(e);
+				this.xulPixelScale = 1;
+			}
 		}
 		this.PixelScale = this.topPixelScale / this.xulPixelScale;
+
+		this.DebugInfo.topPixelScale = this.topPixelScale;
+		this.DebugInfo.xulPixelScale = this.xulPixelScale;
+		this.DebugInfo.PixelScale = this.PixelScale;
 	},
 
 //|																																																																																																																																	*/
@@ -265,6 +293,9 @@ var SnapLinksSelectionClass = Class.create({
 		}
 		if(!this.ShouldActivate(e))
 			return;
+
+		/** Added here because of SLPrefs.Debug.KeepRects feature */
+		this.XulOutlineElem = undefined;
 
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen(e);
 
@@ -464,8 +495,6 @@ var SnapLinksSelectionClass = Class.create({
 			});
 		}
 
-		Doc.SLPD.CalculatedWindowWidth = Doc.defaultView.innerWidth;
-
 		var offset = { x: Doc.defaultView.scrollX, y: Doc.defaultView.scrollY };
 		var SelectableElements = [ ];
 
@@ -568,7 +597,8 @@ var SnapLinksSelectionClass = Class.create({
 		if(this.XulOutlineElem.style.display != 'none') {
 			let HighLinkFontSize = 0, HighJsLinkFontSize = 0,
 				IntersectedElements = [ ],
-				top = this.top;
+				top = this.top,
+				DebugRects = SLPrefs.Debug.Rects;
 
 			let TypesInPriorityOrder = ['Links', 'JsLinks', 'Checkboxes', 'Buttons', 'RadioButtons', 'Clickable'],
 				TypeCounts = {'Links': 0, 'JsLinks': 0, 'Checkboxes': 0, 'Buttons': 0, 'RadioButtons': 0, Clickable: 0};
@@ -619,9 +649,20 @@ var SnapLinksSelectionClass = Class.create({
 				}
 
 				/* Clip SelectionRect by DocRect, If we have no SelectRect then there is no intersection with Doc's coordinates */
-				if((IntersectRect = this.SelectionRect.GetIntersectRect(DocRect)) == false)
+				if((IntersectRect = this.SelectionRect.GetIntersectRect(DocRect)) == false) {
+					if(DebugRects && Doc.DebugRect) {
+						Doc.DebugRect.destroy();
+						delete Doc.DebugRect;
+					}
 					continue;
+				}
 
+				if(DebugRects) {
+					if(Doc.DebugRect)
+						Doc.DebugRect.SetRect(IntersectRect);
+					else
+						Doc.DebugRect = this.SnapLinksPlus.Debug.CreateHighlightRect(top.document, IntersectRect, { border: '1px solid green'}, { backgroundColor: 'green', opacity: '.1' } );
+				}
 				/** @debug DebugRects */
 //				if(URL == DebugRectsDocumentURL) {
 //					Doc.SLPD.DebugRects_Green && Doc.SLPD.DebugRects_Green.parentNode.removeChild(Doc.SLPD.DebugRects_Green);
@@ -786,6 +827,23 @@ var SnapLinksSelectionClass = Class.create({
 
 			this.SelectedCountsLabel = [SelectedElements.length];
 			this.SelectedElements = SelectedElements;
+			if(DebugRects) {
+				if(!top.DebugRectInfo) {
+					top.DebugRectInfo = CreateAnonymousElement('<div style="z-index: 999999; position: fixed; right: 0px; top: 0px; border: 2px solid black; background-color: #dbdbdb; padding: 3px; font: 12px Verdana;"></div>', false); //this.SnapLinksPlus.Debug.CreateHighlightRect(top.document, null, { border: '2px solid black', backgroundColor: '#AAAAAA',  }, { backgroundColor: 'green', opacity: '.1' } );
+					top.document.body.appendChild(top.DebugRectInfo);
+					top.DebugRectInfo.SetInfo = function(i) {
+						let x, a = ['<pre style="margin: 0px;">' ];
+						let max = 0;
+						for(x in i)
+							max = Math.max(max, x.length);
+						for(x in i)
+							a.push(sprintf('<b>%'+max+'s:</b> %s', x, i[x]));
+						a.push('</pre>');
+						this.innerHTML = a.join('\r\n');
+					}
+				}
+				top.DebugRectInfo.SetInfo(this.DebugInfo);
+			}
 		}
 		dc('calc-elements', 'Final: SelectedElements = %o', this.SelectedElements);
 		return SLPrefs.Selection.MinimumCalcDelay;	/* Updates Frequency from CapCallFrequency */
@@ -800,16 +858,24 @@ var SnapLinksSelectionClass = Class.create({
 		this.ClearSelectedElements();
 		this.SelectedCountsLabel = '';
 
+		let DebugKeepRects = SLPrefs.Debug.Rects && SLPrefs.Debug.KeepRects;
+
 		/* Delete our outline element and floating count element */
-		this.XulOutlineElem = undefined;
+		if(!DebugKeepRects)
+			this.XulOutlineElem = undefined;
 		this.XulCountElem = undefined;
 
 		/* Delete our data store SLPD from each document */
 		for(let URL in this.Documents) {
-			this.Documents[URL].SLPD.MutationObserver.disconnect();
-			delete this.Documents[URL].SLPD.MutationObserver;
-			delete this.Documents[URL].SLPD.CalculateSelectable;
-			delete this.Documents[URL].SLPD;
+			let doc = this.Documents[URL];
+			if(!DebugKeepRects && doc.DebugRect) {
+				doc.DebugRect.destroy();
+				delete doc.DebugRect;
+			}
+			doc.SLPD.MutationObserver.disconnect();
+			delete doc.SLPD.MutationObserver;
+			delete doc.SLPD.CalculateSelectable;
+			delete doc.SLPD;
 		}
 		delete this.Documents;
 		this.ShiftDown = false;
@@ -841,7 +907,8 @@ var SnapLinksSelectionClass = Class.create({
 
 	/* Updates the visible position of the element */
 	UpdateElement: function() {
-		let pbo = this.XulOutlineElem.parentNode.boxObject,				/* Parent Box Object */
+		let xoe = this.XulOutlineElem,
+			pbo = xoe.parentNode.boxObject,				/* Parent Box Object */
 			sbw = this.TabBrowser.selectedBrowser.contentWindow;		/* Selected Browser Window */
 
 		/* Maximum values for final top/left/height/width of Element dimensions */
@@ -853,18 +920,20 @@ var SnapLinksSelectionClass = Class.create({
 									.Offset(pbo.x, pbo.y);								/* Offset by chrome top bar coordinates */
 
 		let ClippedRect = OffsetSelectionRect.intersect(BoundingRect);
+		let BorderWidth = SLPrefs.Selection.BorderWidth;
 
-		ApplyStyle(this.XulOutlineElem, {
+		ClippedRect.Expand(BorderWidth, BorderWidth);
+		ApplyStyle(xoe, {
 			left 	: ClippedRect.left + 'px',
 			top 	: ClippedRect.top + 'px',
 			width 	: ClippedRect.width + 'px',
 			height 	: ClippedRect.height  + 'px',
 
 			/* Border width is dependent on not being at the bounding edge unless the document is scrolled entirely in that direction */
-			borderTopWidth		: ( ClippedRect.top 	== BoundingRect.top 	&& sbw.scrollY > 0 )				? '0px' : SLPrefs.Selection.BorderWidth+'px',
-			borderBottomWidth	: ( ClippedRect.bottom 	== BoundingRect.bottom 	&& sbw.scrollY < sbw.scrollMaxY ) 	? '0px' : SLPrefs.Selection.BorderWidth+'px',
-			borderLeftWidth		: ( ClippedRect.left 	== BoundingRect.left 	&& sbw.scrollX > 0 )				? '0px' : SLPrefs.Selection.BorderWidth+'px',
-			borderRightWidth	: ( ClippedRect.right 	== BoundingRect.right 	&& sbw.scrollX < sbw.scrollMaxX )	? '0px' : SLPrefs.Selection.BorderWidth+'px',
+			borderTopWidth		: ( ClippedRect.top 	== BoundingRect.top 	&& sbw.scrollY > 0 )				? '0px' : BorderWidth+'px',
+			borderBottomWidth	: ( ClippedRect.bottom 	== BoundingRect.bottom 	&& sbw.scrollY < sbw.scrollMaxY ) 	? '0px' : BorderWidth+'px',
+			borderLeftWidth		: ( ClippedRect.left 	== BoundingRect.left 	&& sbw.scrollX > 0 )				? '0px' : BorderWidth+'px',
+			borderRightWidth	: ( ClippedRect.right 	== BoundingRect.right 	&& sbw.scrollX < sbw.scrollMaxX )	? '0px' : BorderWidth+'px',
 		});
 
 		this.HideSelectionRect(!(this.SelectionRect.width > 4 || this.SelectionRect.height > 4));

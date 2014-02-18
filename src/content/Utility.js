@@ -726,14 +726,22 @@ function htmlentities (string, quote_style, charset, double_encode) {
 
 function escapeHTML(str) str.replace(/[&"<>]/g, function (m) ({ "&": "&amp;", '"': "&quot", "<": "&lt;", ">": "&gt;" })[m])
 
-function CreateAnonymousElement(markup) {
+function CreateAnonymousElement(markup, xul) {
 	const DOMParser 		= new Components.Constructor("@mozilla.org/xmlextras/domparser;1", "nsIDOMParser");
 	const SystemPrincipal 	= Cc["@mozilla.org/systemprincipal;1"].createInstance(Ci.nsIPrincipal);
 	let parser = (new DOMParser());		parser.init(SystemPrincipal);
+	let AnonymousElement;
 
-	let AnonymousElement = parser.parseFromString('<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">'+markup+'</overlay>', 'text/xml')
-			.firstChild		/* <overlay />*/
-			.firstChild;	/* markup */
+	if(xul || xul == undefined) {
+		AnonymousElement = parser.parseFromString('<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">'+markup+'</overlay>', 'text/xml')
+				.firstChild		/* overlay*/
+				.firstChild;	/* markup */
+	} else {
+		AnonymousElement = parser.parseFromString(markup, 'text/html')
+				.body			/* body*/
+				.firstChild;	/* markup */
+	}
+
 	AnonymousElement.parentNode.removeChild(AnonymousElement);
 	return AnonymousElement;
 }

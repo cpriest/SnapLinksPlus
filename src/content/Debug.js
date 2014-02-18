@@ -120,26 +120,44 @@ var SnapLinksDebugClass = Class.create({
 			link.SnapDebugNodes.push(elem);
 		}, this );
 	},
-	CreateHighlightRect: function(doc, r, s) {
-		var elem = doc.createElement('div');
+	CreateHighlightRect: function(doc, r, os, is) {
+		var elem = doc.createElement('div'), innerElem;
 		ApplyStyle(elem, {
 			position	: 'absolute',
-			zIndex		: 1,
-			top			: r.top + 'px',
-			left		: r.left + 'px',
-			width		: (r.right - r.left) + 'px',
-			height		: (r.bottom - r.top) + 'px',
-			cursor		: 'pointer',
+			zIndex		: 999999,
+//			cursor		: 'pointer',
 		}, this );
-		if(s)
-			ApplyStyle(elem, s);
+		if(os)
+			ApplyStyle(elem, os);
+		if(is) {
+			innerElem = doc.createElement('div');
+			elem.appendChild(innerElem);
+			ApplyStyle(innerElem, { width: '100%', height: '100%' });
+			ApplyStyle(innerElem, is);
+		}
 
-		/* Pass through any clicks to this div to the original link */
-		elem.addEventListener('click', function(e) {
-			var evt = this.Window.document.createEvent('MouseEvents');
-			evt.initMouseEvent('click', true, true, this.Window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-			link.dispatchEvent(evt);
-		}, true);
+//		/* Pass through any clicks to this div to the original link */
+//		elem.addEventListener('click', function(e) {
+//			var evt = this.Window.document.createEvent('MouseEvents');
+//			evt.initMouseEvent('click', true, true, this.Window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+//			link.dispatchEvent(evt);
+//		}, true);
+		/* Add SetRect to the element */
+		elem.SetRect = function SetRect(r) {
+			ApplyStyle(this, {
+				top			: r.top + 'px',
+				left		: r.left + 'px',
+				width		: (r.right - r.left) + 'px',
+				height		: (r.bottom - r.top) + 'px',
+			});
+		};
+		elem.destroy = function destroy() {
+			if(this.parentNode)
+				this.parentNode.removeChild(this);
+		};
+
+		if(r)
+			elem.SetRect(r);
 		doc.body.appendChild(elem);
 		return elem;
 	},
