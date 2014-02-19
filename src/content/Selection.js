@@ -274,7 +274,8 @@ var SnapLinksSelectionClass = Class.create({
 				this.xulPixelScale = 1;
 			}
 		}
-		this.PixelScale = this.topPixelScale / this.xulPixelScale;
+//		this.PixelScale = this.topPixelScale / this.xulPixelScale;
+		this.PixelScale = this.top.devicePixelRatio / this.ChromeWindow.devicePixelRatio;
 
 		this.DebugInfo.topPixelScale = this.topPixelScale;
 		this.DebugInfo.xulPixelScale = this.xulPixelScale;
