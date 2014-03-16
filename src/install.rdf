@@ -6,7 +6,7 @@
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>snaplinks@snaplinks.mozdev.org</em:id>
 		<em:name>Snap Links Plus</em:name>
-		<em:version>2.4.0b2</em:version>
+		<em:version>2.4.1b3</em:version>
 		<em:type>2</em:type>
 
 		<em:targetApplication>

@@ -165,7 +165,8 @@ var Util = {
 };
 
 /**
- * Fully functioning prototype class inheritance, also allows for getters/setters including c# style getters/setters */
+ * Fully functioning prototype class inheritance, also allows for getters/setters including c# style getters/setters
+ **/
 var Class = (function() {
 	function subclass() {};
 
