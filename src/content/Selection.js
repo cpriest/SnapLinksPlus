@@ -300,8 +300,6 @@ var SnapLinksSelectionClass = Class.create({
 
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen(e);
 
-		this.IndexDocuments(this.top.document);
-
 		/** Initializes the starting mouse position in the page coordinates of the top document */
 		this.SelectionRect = new Rect(topPageY, topPageX);
 
@@ -417,7 +415,7 @@ var SnapLinksSelectionClass = Class.create({
 	},
 	OnDocumentUnloaded: function(e) {
 		if(e.target.URL == this.top.document.URL) {
-			this.Documents = [ ];
+			delete this.Documents;
 			this.SelectedElements = [ ];
 			return;
 		}
@@ -596,6 +594,11 @@ var SnapLinksSelectionClass = Class.create({
 		var SelectLargestFontSizeIntersectionLinks = !this.ShiftDown;
 
 		if(this.XulOutlineElem.style.display != 'none') {
+
+			// We delay indexing the documents and calculating selectable elements until the last possible moment, Closes #38
+			if(this.Documents == undefined)
+				this.IndexDocuments(this.top.document);
+
 			let HighLinkFontSize = 0, HighJsLinkFontSize = 0,
 				IntersectedElements = [ ],
 				top = this.top,
