@@ -160,7 +160,7 @@ var SnapLinksSelectionClass = Class.create({
 	SelectLargestFontSizeIntersectionLinks:		true,
 
 	/* Returns an array of elements representing the selected elements
-	 *	taking into account preferences for removing duplicate urls 
+	 *	taking into account preferences for removing duplicate urls
 	 */
 	get FilteredElements() {
 		if(this.SelectedElementsType != 'Links' &&
@@ -923,7 +923,6 @@ var SnapLinksSelectionClass = Class.create({
 		let ClippedRect = OffsetSelectionRect.intersect(BoundingRect);
 		let BorderWidth = SLPrefs.Selection.BorderWidth;
 
-		ClippedRect.Expand(BorderWidth, BorderWidth);
 		ApplyStyle(xoe, {
 			left 	: ClippedRect.left + 'px',
 			top 	: ClippedRect.top + 'px',
