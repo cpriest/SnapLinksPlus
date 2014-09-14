@@ -95,6 +95,13 @@
 			<iframe name="iframe" id="iframe" style="width: 100%; height: 600px;" src="iframe_issue49.htm"></iframe>
 		</div>
 
+		<h1><a href="https://github.com/cpriest/SnapLinksPlus/issues/38">Issue 38</a> Right-clicking can cause a delay on some sites</h1>
+		<div>
+			This is because as soon as the right-click-down event fires the document calculations are made, which take very little time but it is noticeable on pages with many elements. This could be delayed until the drag begins or possibly to a non-ui worker thread.<br>
+			<a target="_blank" href="http://imdb.com/search/title?at=0&count=100">IMDB Search (100)</a><br>
+			<a target="_blank" href="http://imdb.com/search/title?at=0&count=1000">IMDB Search (1000)</a><br>
+		</div>
+
 		<h1 class="Open">General Testing Sites</h1>
 		<div>
 			<ul>

@@ -40,38 +40,58 @@ var EXPORTED_SYMBOLS = ['Class',
 						'sprintf',
 						'usn',
 						'CapCallFrequency',
-						'KeyEvent'];
+						'KeyEvent',
+						'Unloader',
+						'PromiseLoadFile',
+						'PromiseLoadDocument',
+						'devtools',
+						'BootstrapMgr'];
 
-var Cu = Components.utils,
-	Cc = Components.classes,
-	Ci = Components.interfaces,
-	XULNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
+let { Constructor: CC, classes: Cc, interfaces: Ci, utils: Cu } = Components;
+
+Cu.import("resource://gre/modules/devtools/Loader.jsm");
+Cu.import("resource://gre/modules/devtools/Console.jsm");
+
+let XULNS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
 	KeyEvent = Ci.nsIDOMKeyEvent;
 
 Cu.import('resource://gre/modules/Services.jsm');
+Cu.import("resource://gre/modules/devtools/Console.jsm");
 Cu.import('resource://gre/modules/Geometry.jsm');
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import('chrome://snaplinksplus/content/sprintf.js');
 Cu.import('chrome://snaplinksplus/content/WindowFaker.js');
 
-let mrbw = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-			.getService(Components.interfaces.nsIWindowMediator)
-			.getMostRecentWindow("navigator:browser");
-
-let console = mrbw.console;
-
-Point.prototype.toString = function() {
+Point.prototype.toString = function () {
 	//noinspection JSCheckFunctionSignatures
 	return sprintf('( %8.1f, %8.1f )', this.x, this.y);
 };
 
-var dc = function() { };
+var dc = function () { };
+
+/**
+ * Loads files via Cu.import and tracks files loaded so they can be
+ *    unloaded during shutdown()
+ */
+var Unloader = {
+	LoadedFiles: new Set(),
+
+	load  : function load(URL) {
+		Cu.import(URL);
+		this.LoadedFiles.add(URL);
+	},
+	unload: function unload() {
+		for (let URL of this.LoadedFiles.values())
+			Cu.unload(URL);
+	}
+};
 
 if(Services.prefs.getPrefType('extensions.snaplinks.Dev.Mode') && Services.prefs.getBoolPref('extensions.snaplinks.Dev.Mode') == true) {
 	console.warn("Warning, console.clear() is being over-ridden/created (at this time, it's defined but empty, may have changed.)");
 	console.clear = function() {
-		if(mrbw && mrbw.HUDService) {
-			mrbw.HUDService.getBrowserConsole().jsterm.clearOutput();
-		}
+		try {
+			devtools.require("devtools/webconsole/hudservice").getBrowserConsole().jsterm.clearOutput();
+		} catch (e) { }
 	};
 
 	dc = function() {
@@ -179,6 +199,7 @@ var Class = (function() {
 		function klass() {
 			this.initialize.apply(this, arguments);
 		}
+
 		klass.superclass = parent;
 		klass.subclasses = [];
 
@@ -224,7 +245,7 @@ var Class = (function() {
 					if(value.get)
 						this.prototype.__defineGetter__(property, value.get);
 				} else {
-					if (ancestor && Util.Object.isFunction(value) &&	Util.Function.ArgumentNames(value)[0] == "$super") {
+					if (ancestor && Util.Object.isFunction(value) && Util.Function.ArgumentNames(value)[0] == "$super") {
 						var method = value;
 						value = Util.Function.Wrap(
 							(function(m) {
@@ -288,7 +309,7 @@ function ApplyStyle(elem, style) {
 	Object.keys(style).forEach( function(name) {
 		OriginalStyle[name] = elem.style[name];
 		elem.style[name] = style[name];
-	}, this );
+	}, this);
 	return OriginalStyle;
 }
 
@@ -297,6 +318,7 @@ function ApplyStyle(elem, style) {
  */
 function DumpWindowFrameStructure(win) {
 	var path = ['0'];
+
 	function dump(win) {
 		console.log('%s: %s, %o, (%d, %d)', path.join('.'), win.document.URL, win, win.mozInnerScreenX-win.top.mozInnerScreenX, win.mozInnerScreenY-win.top.mozInnerScreenY);
 		for(var j=0;j<win.frames.length;j++) {
@@ -305,6 +327,7 @@ function DumpWindowFrameStructure(win) {
 			path.pop();
 		}
 	}
+
 	dump(win);
 }
 
@@ -666,21 +689,22 @@ function get_html_translation_table (table, quote_style) {
 	if (useQuoteStyle !== 'ENT_NOQUOTES') {
 		entities['34'] = '&quot;';
 	}
-	if (useQuoteStyle === 'ENT_QUOTES') {        entities['39'] = '&#39;';
+	if (useQuoteStyle === 'ENT_QUOTES') {
+		entities['39'] = '&#39;';
 	}
 	entities['60'] = '&lt;';
 	entities['62'] = '&gt;';
 
 	// ascii decimals to real symbols
 	for (decimal in entities) {
-		if (entities.hasOwnProperty(decimal)) {
-			hash_map[String.fromCharCode(decimal)] = entities[decimal];        }
+		if (entities.hasOwnProperty(decimal))
+			hash_map[String.fromCharCode(decimal)] = entities[decimal];
 	}
 
 	return hash_map;
 }
 
-function htmlentities (string, quote_style, charset, double_encode) {
+function htmlentities(string, quote_style, charset, double_encode) {
 	// Convert all applicable characters to HTML entities
 	//
 	// version: 1109.2015
@@ -706,26 +730,30 @@ function htmlentities (string, quote_style, charset, double_encode) {
 	}
 
 	if (quote_style && quote_style === 'ENT_QUOTES') {
-		hash_map["'"] = '&#039;';    }
+		hash_map["'"] = '&#039;';
+	}
 
 	if (!!double_encode || double_encode == null) {
 		for (symbol in hash_map) {
-			if (hash_map.hasOwnProperty(symbol)) {                string = string.split(symbol).join(hash_map[symbol]);
-			}
+			if (hash_map.hasOwnProperty(symbol))
+				string = string.split(symbol).join(hash_map[symbol]);
 		}
 	} else {
-		string = string.replace(/([\s\S]*?)(&(?:#\d+|#x[\da-f]+|[a-zA-Z][\da-z]*);|$)/g, function (ignore, text, entity) {            for (symbol in hash_map) {
-				if (hash_map.hasOwnProperty(symbol)) {
+		string = string.replace(/([\s\S]*?)(&(?:#\d+|#x[\da-f]+|[a-zA-Z][\da-z]*);|$)/g, function (ignore, text, entity) {
+			for (symbol in hash_map) {
+				if (hash_map.hasOwnProperty(symbol))
 					text = text.split(symbol).join(hash_map[symbol]);
-				}
 			}
 			return text + entity;
 		});
 	}
-	 return string;
+	return string;
 }
 
-function escapeHTML(str) str.replace(/[&"<>]/g, function (m) ({ "&": "&amp;", '"': "&quot", "<": "&lt;", ">": "&gt;" })[m])
+function escapeHTML(str) { str.replace(/[&"<>]/g, function(m) {
+		return { "&": "&amp;", '"': "&quot", "<": "&lt;", ">": "&gt;" }[m];
+	});
+}
 
 function CreateAnonymousElement(markup, xul) {
 	const DOMParser 		= new Components.Constructor("@mozilla.org/xmlextras/domparser;1", "nsIDOMParser");
@@ -789,3 +817,67 @@ function CapCallFrequency(func, Frequency) {
 		return true;
 	};
 }
+
+function PromiseLoadFile(url) {
+	return new Promise((resolve, reject) => {
+		let request = new (CC("@mozilla.org/xmlextras/xmlhttprequest;1", "nsIXMLHttpRequest"));
+		request.onload = (e) => {
+			resolve([request.responseText, request.channel.contentType]);
+		};
+		request.onabort = request.onerror = ( e ) => {
+			reject(e);
+		};
+		request.open('GET', url);
+		request.send();
+	});
+}
+
+function PromiseLoadDocument(url, callback) {
+	return PromiseLoadFile(url)
+		.then( ([responseText, contentType]) => {
+			let parser = new (CC("@mozilla.org/xmlextras/domparser;1", "nsIDOMParser"));
+			parser.init(new (CC(["@mozilla.org/systemprincipal;1"], "nsIPrincipal")), Services.io.newURI(url, null, null));
+			return parser.parseFromString(responseText, contentType);
+		});
+}
+
+var BootstrapMgr = Class.create({
+	initialize         : function () {
+		this.OverlayedDocs = new Map();
+	},
+	OverlayDocumentOnto: function (URL, doc) {
+		function appendChildren(from, to) {
+			let res = [ ];
+			while(from.children.length) {
+				to.appendChild(from.children[0]);
+				res.push(to.lastChild);
+			}
+			return res;
+		}
+		PromiseLoadDocument(URL).then( overlay => {
+			try {
+				let OverlayedNodes = this.OverlayedDocs.get(doc) || [ ];
+
+				for(let el of overlay.documentElement.children) {
+					let existingRoot = null;
+					if(el.id && (existingRoot = doc.querySelector(el.tagName + '#' + el.id)))
+						OverlayedNodes.push(...appendChildren(el, existingRoot));
+					else
+						OverlayedNodes.push(doc.documentElement.appendChild(el) && el);
+				}
+				this.OverlayedDocs.set(doc, OverlayedNodes);
+			} catch(e) {
+				console.error(e);
+			}
+		})
+		.catch( (e) => console.error );
+	},
+	RemoveOverlayNodes: function RemoveveOverlayNodes(doc) {
+		(this.OverlayedDocs.get(doc) || [ ])
+			.every( (el) => {
+				el.remove();
+				return true;
+			});
+		this.OverlayedDocs.delete(doc);
+	}
+});

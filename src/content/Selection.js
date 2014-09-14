@@ -38,9 +38,7 @@
 
 var EXPORTED_SYMBOLS = ["SnapLinksSelectionClass"];
 
-var Cu = Components.utils,
-	Cc = Components.classes,
-	Ci = Components.interfaces;
+let { Constructor: CC, classes: Cc, interfaces: Ci, utils: Cu } = Components;
 
 try {
 	Cu.import('resource://gre/modules/Services.jsm');
