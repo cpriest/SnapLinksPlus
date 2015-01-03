@@ -725,7 +725,9 @@ function htmlentities (string, quote_style, charset, double_encode) {
 	 return string;
 }
 
-function escapeHTML(str) str.replace(/[&"<>]/g, function (m) ({ "&": "&amp;", '"': "&quot", "<": "&lt;", ">": "&gt;" })[m])
+function escapeHTML(str) {
+	return str.replace(/[&"<>]/g, (m) => ({"&": "&amp;", '"': "&quot", "<": "&lt;", ">": "&gt;"})[m]);
+}
 
 function CreateAnonymousElement(markup, xul) {
 	const DOMParser 		= new Components.Constructor("@mozilla.org/xmlextras/domparser;1", "nsIDOMParser");

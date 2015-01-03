@@ -55,7 +55,7 @@ var SnapLinksClass = Class.create({
 
 		CLICK_ELEMENTS		: 'ClickElements'
 	},
-	
+
 	COPY_TO_CLIPBOARD_SEPARATOR_ID: {
 		CUSTOM: 0,
 		NEWLINE: 1,
@@ -156,6 +156,7 @@ var SnapLinksClass = Class.create({
 
 	/**
 	 * Evaluates a given event looking to see if the button and modifier keys are present.
+	 * @return {boolean}
 	 */
 	ShouldActivate: function(e) {
 		if(e.view.location.protocol == 'about:')
@@ -168,9 +169,8 @@ var SnapLinksClass = Class.create({
 			return false;
 		if(SLPrefs.Activation.RequiresCtrl != e.ctrlKey)
 			return false;
-		if(e.target.tagName == 'EMBED')
-			return false;
-		return true;
+		return e.target.tagName != 'EMBED';
+
 	},
 
 //	UpdateStatusLabel: function() {
@@ -190,7 +190,7 @@ var SnapLinksClass = Class.create({
 		this.Window = e.view.top;
 		this.Document = e.target.ownerDocument.defaultView.top.document;
 
-		/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218, 
+		/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218,
 			we prevent the context menu from showing on mouse down here. */
 		if(e.button == 2 /* RMB */ && this.ChromeWindow.navigator.userAgent.indexOf('Linux') != -1) {
 			this.StoppingNextContextMenuPopup = true;
@@ -218,7 +218,7 @@ var SnapLinksClass = Class.create({
 //				e.preventDefault();
 			} else {
 				this.Clear();
-				
+
 				/* On Linux the context menu occurs on mouse down, see bug: https://bugzilla.mozilla.org/show_bug.cgi?id=667218
 					we force the context menu to open up here*/
 				if(this.ChromeWindow.navigator.userAgent.indexOf('Linux') != -1) {
@@ -296,7 +296,7 @@ var SnapLinksClass = Class.create({
 			/* Check to see that the requested action is valid for the given SelectedElementsType */
 			if(ValidActions[this.Selection.SelectedElementsType].indexOf(Action) == -1)
 				Action = ValidActions[this.Selection.SelectedElementsType][0];
-		
+
 			if(this[Action])
 				this[Action]();
 		}
@@ -331,7 +331,7 @@ var SnapLinksClass = Class.create({
 
 			CollectedElementsInfo.forEach( function(info, index) {
 				var callback = this;
-				
+
 				this.ChromeWindow.setTimeout(function() {
 					callback.ClickLink(info.elem);
 				}, SLPrefs.Actions.DelayBetweenActions * index, callback);
@@ -350,7 +350,7 @@ var SnapLinksClass = Class.create({
 			elem.click();
 			return;
 		}
-		
+
 		/* This is needed for JavaScript links on
 		 * Firefox 4.0 and SeaMonkey 2.1.
 		 */
@@ -458,14 +458,14 @@ var SnapLinksClass = Class.create({
 			// Duplicate the current page on a new tab.
 			var docHref = this.Document.location.href;
 			var newTab = getBrowser().addTab(docHref, this.DocumentReferer);
-			
+
 			// Run our code when the new tab is ready.
 			var newTabBrowser = gBrowser.getBrowserForTab(newTab);
 			newTabBrowser.addEventListener("load", function () {
 				// Get the body element.
 				var body = newTabBrowser.contentDocument.body;
 				var dupeElem;
-				
+
 				// If the link element has an ID, lets use it.
 				if (elem.id) {
 					dupeElem = body.getElementById(elem.id);
@@ -524,14 +524,14 @@ var SnapLinksClass = Class.create({
 				var urls = this.Selection.FilteredElements.map( function(elem) {
 					return elem.href;
 				}, this ).join('|');
-	
+
 				return this.ChromeWindow.openDialog("chrome://browser/content/", "_blank", "all,chrome,dialog=no", urls);
 			}
 		}
 		catch(e) {
 			Components.utils.reportError(e);
 		}
-		
+
 		return null;
 	},
 
@@ -542,38 +542,38 @@ var SnapLinksClass = Class.create({
 		try {
 			var textSeparator = this.ClipboardSeparator;
 			var htmlSeparator = textSeparator.replace(/\n/g, "<br>\n");
-			
+
 			var Representations = this.Selection.FilteredElements.reduce( function(acc, elem) {
 				var text = htmlentities(elem.textContent.replace(/^\s+|\s+$/g, '').replace(/\s{2,}/g, ' '));
-	
+
 				acc.html.push( '<a href="' + escapeHTML(elem.href) + '">' + text + '</a>' );
 				acc.text.push( escapeHTML(elem.href) );
 				return acc;
 			}, { html: [ ], text: [ ] } );
-	
+
 			// Create the transferable
 			var objData = Components.classes["@mozilla.org/widget/transferable;1"]
 							.createInstance(Components.interfaces.nsITransferable);
-	
+
 			if(objData) {
 				var TextContent = Components.classes["@mozilla.org/supports-string;1"]
 									.createInstance(Components.interfaces.nsISupportsString);
 				if(TextContent) {
 					TextContent.data = Representations.text.join(textSeparator);
-	
+
 					objData.addDataFlavor('text/unicode');
 					objData.setTransferData('text/unicode', TextContent, TextContent.data.length * 2);	/* Double byte data (len*2) */
 				}
-	
+
 				var HtmlContent = Components.classes["@mozilla.org/supports-string;1"]
 									.createInstance(Components.interfaces.nsISupportsString);
 				if(HtmlContent) {
 					HtmlContent.data = Representations.html.join(htmlSeparator);
-	
+
 					objData.addDataFlavor('text/html');
 					objData.setTransferData('text/html', HtmlContent, HtmlContent.data.length * 2);	/* Double byte data (len*2) */
 				}
-	
+
 				var objClipboard = Components.classes["@mozilla.org/widget/clipboard;1"]
 									.getService(Components.interfaces.nsIClipboard);
 				if (objClipboard)
@@ -596,7 +596,7 @@ var SnapLinksClass = Class.create({
 				var uriList = this.Selection.FilteredElements.map( function(elem) {
 					return ioService.newURI(elem.href, null, null);
 				}, this );
-				
+
 				// Use showBookmarkDialog() when it is available.
 				if (PlacesUIUtils.showBookmarkDialog) {
 					/* See documentation at the top of bookmarkProperties.js (Mozilla). */
@@ -606,7 +606,7 @@ var SnapLinksClass = Class.create({
 							hiddenRows: ["description"],
 							URIList: uriList
 					};
-					
+
 					PlacesUIUtils.showBookmarkDialog(info, this.ChromeWindow);
 				} else {
 					// Fallback to older showMinimalAddMultiBookmarkUI().
@@ -626,10 +626,10 @@ var SnapLinksClass = Class.create({
 		try {
 			if(this.Selection.FilteredElements.length) {
 				var TitlesUsed = { };
-	
+
 				var links = this.Selection.FilteredElements.map( function(elem) {
 					var Title = elem.textContent.replace(/\s{2,}/g, ' ').replace(/ /g,'_').replace(/[^a-zA-Z0-9_]+/g, '').substring(0, 75);
-	
+
 					/* Ensure Uniqueness of Filename */
 					for(var j=0;j<99;j++) {
 						var TitleCheck = Title;
@@ -641,19 +641,19 @@ var SnapLinksClass = Class.create({
 						}
 					}
 					TitlesUsed[Title] = true;
-	
+
 					return { FileName: Title, Url: elem.href };
 				}, this );
-				
+
 				var CurrentReferer = this.DocumentReferer;
-				
+
 				var pref = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
 				var useDownloadDir = pref.getBoolPref("browser.download.useDownloadDir");
 
 				if (useDownloadDir && !SLPrefs.Actions.Download.PromptForName) {
 					links.forEach( function( link, index ) {
 						var callback = this;
-						
+
 						this.ChromeWindow.setTimeout(function() {
 							saveURL(link.Url, link.FileName, null, true, true, CurrentReferer);
 						}, SLPrefs.Actions.DelayBetweenActions * index, callback, link);

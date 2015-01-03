@@ -841,7 +841,7 @@ var SnapLinksSelectionClass = Class.create({
 						for(x in i)
 							max = Math.max(max, x.length);
 						for(x in i)
-							a.push(sprintf('<b>%'+max+'s:</b> %s', x, i[x]));
+							a.push(sprintf('<strong>%'+max+'s:</strong> %s', x, i[x]));
 						a.push('</pre>');
 						this.innerHTML = a.join('\r\n');
 					}

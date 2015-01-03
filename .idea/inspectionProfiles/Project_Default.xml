@@ -2,36 +2,49 @@
   <profile version="1.0" is_locked="false">
     <option name="myName" value="Project Default" />
     <option name="myLocal" value="false" />
-    <inspection_tool class="CheckValidXmlInScriptTagBody" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="CheckEmptyScriptTag" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CssMissingSemicolon" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="CssRedundantUnit" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="CssUnitlessNumber" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="CssUnusedSymbol" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="FallthroughInSwitchStatementJS" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="HtmlFormInputWithoutLabel" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="3">
-            <item index="0" class="java.lang.String" itemvalue="snaplinksinspect" />
-            <item index="1" class="java.lang.String" itemvalue="debug" />
-            <item index="2" class="java.lang.String" itemvalue="which" />
+          <list size="1">
+            <item index="0" class="java.lang.String" itemvalue="secure" />
           </list>
         </value>
       </option>
       <option name="myCustomValuesEnabled" value="true" />
     </inspection_tool>
-    <inspection_tool class="JSConstructorReturnsPrimitive" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="JSHint" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="JSLastCommaInObjectLiteral" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="JSLint" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="JSPotentiallyInvalidConstructorUsage" enabled="false" level="WARNING" enabled_by_default="false">
-      <option name="myConsiderUppercaseFunctionsToBeConstructors" value="false" />
+    <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="12">
+            <item index="0" class="java.lang.String" itemvalue="nobr" />
+            <item index="1" class="java.lang.String" itemvalue="noembed" />
+            <item index="2" class="java.lang.String" itemvalue="comment" />
+            <item index="3" class="java.lang.String" itemvalue="noscript" />
+            <item index="4" class="java.lang.String" itemvalue="embed" />
+            <item index="5" class="java.lang.String" itemvalue="script" />
+            <item index="6" class="java.lang.String" itemvalue="prefpane" />
+            <item index="7" class="java.lang.String" itemvalue="vbox" />
+            <item index="8" class="java.lang.String" itemvalue="key" />
+            <item index="9" class="java.lang.String" itemvalue="command" />
+            <item index="10" class="java.lang.String" itemvalue="box" />
+            <item index="11" class="java.lang.String" itemvalue="overlay" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
     </inspection_tool>
-    <inspection_tool class="JSUnfilteredForInLoop" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="JSUnnecessarySemicolon" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="JSUnresolvedFunction" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
-    <inspection_tool class="JSUnresolvedVariable" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
-    <inspection_tool class="JSUnusedAssignment" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="JSUnusedGlobalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="JSUnusedLocalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="HtmlUnknownTarget" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="JSConstructorReturnsPrimitive" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PhpIncludeInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PhpMissingDocCommentInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="CHECK_FIELD" value="true" />
+      <option name="CHECK_CLASS_CONSTANT" value="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnusedParameterInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
   </profile>
 </component>
