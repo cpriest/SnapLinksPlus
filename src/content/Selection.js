@@ -298,6 +298,7 @@ var SnapLinksSelectionClass = Class.create({
 		/** Added here because of SLPrefs.Debug.KeepRects feature */
 		this.XulOutlineElem = undefined;
 
+		//noinspection JSUnusedLocalSymbols
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen(e);
 
 		/** Initializes the starting mouse position in the page coordinates of the top document */
@@ -388,6 +389,7 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	OnDocScroll: function(e) {
+		//noinspection JSUnusedLocalSymbols
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
 
 		this.ExpandSelectionTo(topPageX, topPageY);
@@ -403,6 +405,7 @@ var SnapLinksSelectionClass = Class.create({
 		for(let URL in this.Documents)
 			this.CalculateSelectableElements(this.Documents[URL]);
 
+		//noinspection JSUnusedLocalSymbols
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
 
 		this.ExpandSelectionTo(topPageX, topPageY);

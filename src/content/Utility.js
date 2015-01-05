@@ -351,7 +351,6 @@ var Prefs = Util.Object.wrap(Services.prefs, PrefsServiceExtensions);
  * @returns {*}
  */
 function CreatePreferenceMap(BasePath, Defaults) {
-	let obj = { };
 	var PrefsBranch = Prefs.getDefaultBranch(BasePath);
 
 	function WalkObject(o, sub) {
@@ -395,8 +394,6 @@ function CreatePreferenceMap(BasePath, Defaults) {
  *
  */
 function UpdatePreferences(BasePath, Updates) {
-	var PrefsBranch = Prefs.getBranch(BasePath);
-
 	function MoveUserPreference(From, To) {
 		From = [BasePath, From].join('.');
 		To = [BasePath, To].join('.');
