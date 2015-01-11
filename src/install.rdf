@@ -6,7 +6,7 @@
 	<Description about="urn:mozilla:install-manifest">
 		<em:id>snaplinks@snaplinks.mozdev.org</em:id>
 		<em:name>Snap Links Plus</em:name>
-		<em:version>2.4.1b3</em:version>
+		<em:version>2.4.2</em:version>
 		<em:type>2</em:type>
 
 		<em:targetApplication>
@@ -14,7 +14,7 @@
 				<!-- Firefox -->
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 				<em:minVersion>4.0</em:minVersion>
-				<em:maxVersion>28.*</em:maxVersion>
+				<em:maxVersion>36.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 
@@ -24,6 +24,14 @@
 				<em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
 				<em:minVersion>2.1</em:minVersion>
 				<em:maxVersion>2.15a1</em:maxVersion>
+			</Description>
+		</em:targetApplication>
+
+		<em:targetApplication><!-- Pale Moon -->
+			<Description>
+				<em:id>{8de7fcbb-c55c-4fbe-bfc5-fc555c87dbc4}</em:id>
+				<em:minVersion>25.0</em:minVersion>
+				<em:maxVersion>25.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 
