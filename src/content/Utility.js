@@ -374,7 +374,6 @@ var Prefs = Util.Object.wrap(Services.prefs, PrefsServiceExtensions);
  * @returns {*}
  */
 function CreatePreferenceMap(BasePath, Defaults) {
-	let obj = { };
 	var PrefsBranch = Prefs.getDefaultBranch(BasePath);
 
 	function WalkObject(o, sub) {
@@ -418,8 +417,6 @@ function CreatePreferenceMap(BasePath, Defaults) {
  *
  */
 function UpdatePreferences(BasePath, Updates) {
-	var PrefsBranch = Prefs.getBranch(BasePath);
-
 	function MoveUserPreference(From, To) {
 		From = [BasePath, From].join('.');
 		To = [BasePath, To].join('.');
@@ -750,9 +747,8 @@ function htmlentities(string, quote_style, charset, double_encode) {
 	return string;
 }
 
-function escapeHTML(str) { str.replace(/[&"<>]/g, function(m) {
-		return { "&": "&amp;", '"': "&quot", "<": "&lt;", ">": "&gt;" }[m];
-	});
+function escapeHTML(str) {
+	return str.replace(/[&"<>]/g, (m) => ({"&": "&amp;", '"': "&quot", "<": "&lt;", ">": "&gt;"})[m]);
 }
 
 function CreateAnonymousElement(markup, xul) {

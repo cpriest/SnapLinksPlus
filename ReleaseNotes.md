@@ -1,0 +1,3 @@
+- 2.4.1
+	- Fixed selection rectangle exceeding web browser pane boundaries
+ 	- Improved response time of regular right-click by delaying indexing until it's actually needed

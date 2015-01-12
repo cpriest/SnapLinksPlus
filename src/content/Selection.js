@@ -158,7 +158,7 @@ var SnapLinksSelectionClass = Class.create({
 	SelectLargestFontSizeIntersectionLinks:		true,
 
 	/* Returns an array of elements representing the selected elements
-	 *	taking into account preferences for removing duplicate urls 
+	 *	taking into account preferences for removing duplicate urls
 	 */
 	get FilteredElements() {
 		if(this.SelectedElementsType != 'Links' &&
@@ -296,9 +296,8 @@ var SnapLinksSelectionClass = Class.create({
 		/** Added here because of SLPrefs.Debug.KeepRects feature */
 		this.XulOutlineElem = undefined;
 
+		//noinspection JSUnusedLocalSymbols
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen(e);
-
-		this.IndexDocuments(this.top.document);
 
 		/** Initializes the starting mouse position in the page coordinates of the top document */
 		this.SelectionRect = new Rect(topPageY, topPageX);
@@ -388,6 +387,7 @@ var SnapLinksSelectionClass = Class.create({
 	},
 
 	OnDocScroll: function(e) {
+		//noinspection JSUnusedLocalSymbols
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
 
 		this.ExpandSelectionTo(topPageX, topPageY);
@@ -403,6 +403,7 @@ var SnapLinksSelectionClass = Class.create({
 		for(let URL in this.Documents)
 			this.CalculateSelectableElements(this.Documents[URL]);
 
+		//noinspection JSUnusedLocalSymbols
 		let [top, topClientX, topClientY, topPageX, topPageY] = this.InnerScreen();
 
 		this.ExpandSelectionTo(topPageX, topPageY);
@@ -415,7 +416,7 @@ var SnapLinksSelectionClass = Class.create({
 	},
 	OnDocumentUnloaded: function(e) {
 		if(e.target.URL == this.top.document.URL) {
-			this.Documents = [ ];
+			delete this.Documents;
 			this.SelectedElements = [ ];
 			return;
 		}
@@ -594,6 +595,11 @@ var SnapLinksSelectionClass = Class.create({
 		var SelectLargestFontSizeIntersectionLinks = !this.ShiftDown;
 
 		if(this.XulOutlineElem.style.display != 'none') {
+
+			// We delay indexing the documents and calculating selectable elements until the last possible moment, Closes #38
+			if(this.Documents == undefined)
+				this.IndexDocuments(this.top.document);
+
 			let HighLinkFontSize = 0, HighJsLinkFontSize = 0,
 				IntersectedElements = [ ],
 				top = this.top,
@@ -836,7 +842,7 @@ var SnapLinksSelectionClass = Class.create({
 						for(x in i)
 							max = Math.max(max, x.length);
 						for(x in i)
-							a.push(sprintf('<b>%'+max+'s:</b> %s', x, i[x]));
+							a.push(sprintf('<strong>%'+max+'s:</strong> %s', x, i[x]));
 						a.push('</pre>');
 						this.innerHTML = a.join('\r\n');
 					}
@@ -921,7 +927,6 @@ var SnapLinksSelectionClass = Class.create({
 		let ClippedRect = OffsetSelectionRect.intersect(BoundingRect);
 		let BorderWidth = SLPrefs.Selection.BorderWidth;
 
-		ClippedRect.Expand(BorderWidth, BorderWidth);
 		ApplyStyle(xoe, {
 			left 	: ClippedRect.left + 'px',
 			top 	: ClippedRect.top + 'px',

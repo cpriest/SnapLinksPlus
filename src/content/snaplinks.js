@@ -155,6 +155,7 @@ var SnapLinksClass = Class.create({
 
 	/**
 	 * Evaluates a given event looking to see if the button and modifier keys are present.
+	 * @return {boolean}
 	 */
 	ShouldActivate: function(e) {
 		if(e.view.location.protocol == 'about:')
@@ -167,10 +168,8 @@ var SnapLinksClass = Class.create({
 			return false;
 		if(SLPrefs.Activation.RequiresCtrl != e.ctrlKey)
 			return false;
-		// noinspection RedundantIfStatementJS
-		if(e.target.tagName == 'EMBED')
-			return false;
-		return true;
+		return e.target.tagName != 'EMBED';
+
 	},
 
 //	UpdateStatusLabel: function() {
