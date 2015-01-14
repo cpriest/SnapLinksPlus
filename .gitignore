@@ -2,6 +2,6 @@ babelzilla/
 build
 dist/amo
 dist/babelzilla
-.idea/
 src/snaplinks@snaplinks.mozdev.org
 /LocalNotes.txt
+/.idea/shelf
