@@ -9,25 +9,23 @@
 		<em:version>2.4.2</em:version>
 		<em:type>2</em:type>
 
-		<em:targetApplication>
+		<em:targetApplication>  <!-- Firefox -->
 			<Description>
-				<!-- Firefox -->
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 				<em:minVersion>4.0</em:minVersion>
 				<em:maxVersion>36.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 
-		<em:targetApplication>
+		<em:targetApplication>  <!-- SeaMonkey -->
 			<Description>
-				<!-- SeaMonkey -->
 				<em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
 				<em:minVersion>2.1</em:minVersion>
-				<em:maxVersion>2.15a1</em:maxVersion>
+				<em:maxVersion>2.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 
-		<em:targetApplication><!-- Pale Moon -->
+		<em:targetApplication>  <!-- Pale Moon -->
 			<Description>
 				<em:id>{8de7fcbb-c55c-4fbe-bfc5-fc555c87dbc4}</em:id>
 				<em:minVersion>25.0</em:minVersion>
@@ -37,18 +35,19 @@
 
 		<em:description>Opens multiple links contained in a selected area in new tabs.</em:description>
 
-		<em:creator>Pedro Fonseca (savred)</em:creator>
+		<em:creator>Clint Priest</em:creator>
 
-		<em:developer>Jeff Sugar (Atreus)</em:developer>
-		<em:developer>Mumbly Juergens</em:developer>
 		<em:developer>Tommi Rautava</em:developer>
-		<em:developer>Clint Priest</em:developer>
+
+		<em:contributor>Pedro Fonseca (savred)</em:contributor>
+		<em:contributor>Jeff Sugar (Atreus)</em:contributor>
+		<em:contributor>Mumbly Juergens</em:contributor>
 
 		<em:translator>BabelZilla.org</em:translator>
 
 		<em:iconURL>chrome://snaplinksplus/content/icon32.png</em:iconURL>
 		<em:icon64URL>chrome://snaplinksplus/content/icon64.png</em:icon64URL>
-		<em:homepageURL>http://snaplinks.mozdev.org/</em:homepageURL>
+		<em:homepageURL>https://github.com/cpriest/SnapLinksPlus/wiki</em:homepageURL>
 <!--		<em:updateURL>https://snaplinksplus.googlecode.com/hg/update.rdf</em:updateURL>	-->
 		<em:optionsURL>chrome://snaplinksplus/content/options.xul</em:optionsURL>
 	</Description>
