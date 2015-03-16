@@ -169,7 +169,9 @@ var SnapLinksClass = Class.create({
 			return false;
 		if(SLPrefs.Activation.RequiresCtrl != e.ctrlKey)
 			return false;
-		return e.target.tagName != 'EMBED';
+		if(e.target.tagName == 'EMBED' || e.target.tagName == 'OBJECT')
+			return false;
+		return true;
 
 	},
 
