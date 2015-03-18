@@ -32,7 +32,6 @@
 	 *  				Possible solutions include:
 	 *  					box-shadow: 0px 0px 1px 0px red (inner shadow, tighter and not as preferable)
 	 *  					New outline element per selection (probably would be very slow, maybe less so with an 'outline element cache for created but no longer used')
-	 *  @BUG	Right-click on Flash object
 	 *  @BUG	Hitting escape while in drag isn't working right.
 	 **/
 
