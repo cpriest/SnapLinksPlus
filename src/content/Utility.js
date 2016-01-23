@@ -74,6 +74,8 @@ var dc = function () { };
  *    unloaded during shutdown()
  */
 var Unloader = {
+
+
 	LoadedFiles: new Set(),
 
 	load  : function load(URL) {
@@ -759,12 +761,12 @@ function CreateAnonymousElement(markup, xul) {
 
 	if(xul || xul == undefined) {
 		AnonymousElement = parser.parseFromString('<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">'+markup+'</overlay>', 'text/xml')
-				.firstChild		/* overlay*/
-				.firstChild;	/* markup */
+				.firstElementChild	/* overlay*/
+				.firstElementChild;	/* markup */
 	} else {
 		AnonymousElement = parser.parseFromString(markup, 'text/html')
-				.body			/* body*/
-				.firstChild;	/* markup */
+				.body				/* body*/
+				.firstElementChild;	/* markup */
 	}
 
 	AnonymousElement.parentNode.removeChild(AnonymousElement);
