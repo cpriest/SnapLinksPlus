@@ -7,12 +7,72 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f5596319-fd00-48d7-81c8-d155ad02ba53" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" afterPath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/deployment.xml" afterPath="$PROJECT_DIR$/.idea/deployment.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/snaplinks.iml" afterPath="$PROJECT_DIR$/.idea/snaplinks.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/snaplinks.iml" afterPath="$PROJECT_DIR$/snaplinks.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/content/Utility.js" afterPath="$PROJECT_DIR$/src/content/Utility.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.buildNumbers/build.number.0.0" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.buildNumbers/build.number.1.0" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.buildNumbers/build.number.1.1" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.buildNumbers/build.number.2.0" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.buildNumbers/build.number.2.0.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.buildNumbers/build.number.2.1.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.buildNumbers/build.number.2.2.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.buildNumbers/build.number.2.3.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.buildNumbers/build.number.2.4.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.externalToolBuilders/snaplinksplus-build-dev.launch" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.externalToolBuilders/snaplinksplus-build-dist.launch" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.project" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.settings/.jsdtscope" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.settings/org.eclipse.wst.jsdt.ui.superType.container" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.settings/org.eclipse.wst.jsdt.ui.superType.name" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/babelzilla/Snap_Links_Plus_all_locales_skipped.tar.gz" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/babelzilla/Snap_Links_Plus_selected_locales_replaced.tar.gz" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/babelzilla/translators.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/babelzilla/unused/Snap_Links_Plus_all_locales_blank.tar.gz" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/babelzilla/unused/Snap_Links_Plus_all_locales_replaced.tar.gz" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/babelzilla/unused/Snap_Links_Plus_selected_locales_blank.tar.gz" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/babelzilla/unused/Snap_Links_Plus_selected_locales_skipped.tar.gz" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/build.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/eclipseRunAs/snaplinks dev build.launch" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/eclipseRunAs/snaplinks dist build.launch" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/eclipseRunAs/snaplinks publish build.launch" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/famfamfam_flag_icons.zip" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/release.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/snaplinks.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/bootstrap.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/chrome.manifest" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/Debug.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/Dev/DevMode.xul" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/ISOlat1.dtd" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/Preferences.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/Selection.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/Utility.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/WindowFaker.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/icon32.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/icon64.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/options.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/options.xul" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/overlay.xul" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/snaplinks.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/snaplinks.xul" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/sprintf.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content/trans.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/install.rdf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/license.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/locale/en-US/options.dtd" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/locale/en-US/snaplinks.dtd" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/locale/en-US/snaplinks.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/skin/action.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/skin/advanced.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/skin/options.css" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/skin/selection.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/update.rdf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/utility/QtCore4.dll" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/utility/convertTextEncoding.exe" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/utility/libgcc_s_dw2-1.dll" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/utility/libstdc++-6.dll" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/utility/mingwm10.dll" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DevNotes.md" afterPath="$PROJECT_DIR$/DevNotes.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ReleaseNotes.md" afterPath="$PROJECT_DIR$/ReleaseNotes.md" />
     </list>
     <ignored path="snaplinks.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -95,7 +155,86 @@
     <favorites_list name="snaplinks" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file leaf-file-name="README.downloads" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dist/README.downloads">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DevNotes.md" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/DevNotes.md">
+          <provider editor-type-id="Gfm">
+            <state />
+          </provider>
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="0">
+                <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+                <folding />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="140">
+              <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider editor-type-id="Gfm">
+            <state />
+          </provider>
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="160">
+                <caret line="8" column="25" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
+                <folding />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README-DEV.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README-DEV.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="680">
+              <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ReleaseNotes.md" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ReleaseNotes.md">
+          <provider editor-type-id="Gfm">
+            <state />
+          </provider>
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="20">
+                <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+                <folding />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -115,7 +254,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="v2.4.3" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RESET_MODE" value="HARD" />
@@ -152,6 +291,8 @@
         <option value="$PROJECT_DIR$/src/chrome.manifest" />
         <option value="$PROJECT_DIR$/src/install.rdf" />
         <option value="$PROJECT_DIR$/src/content/Utility.js" />
+        <option value="$PROJECT_DIR$/ReleaseNotes.md" />
+        <option value="$PROJECT_DIR$/DevNotes.md" />
       </list>
     </option>
   </component>
@@ -298,38 +439,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="snaplinks" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="snaplinks" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="snaplinks" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="snaplinks" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="snaplinks" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="content" />
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
           </PATH>
@@ -638,12 +747,12 @@
     <layout>
       <window_info id="GfmBrowser" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13831478" sideWeight="0.49964765" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13831478" sideWeight="0.49964765" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31007752" sideWeight="0.57239515" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Script Monkey" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293371" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2197183" sideWeight="0.37917328" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.38380283" sideWeight="0.4618442" order="11" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.38380283" sideWeight="0.4618442" order="11" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40944326" sideWeight="0.37917328" order="16" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.168124" sideWeight="0.5003524" order="3" side_tool="true" content_ui="tabs" />
@@ -880,13 +989,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DevNotes.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/content/snaplinks.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -937,20 +1039,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/release.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.buildNumbers/build.number.2.4.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -998,6 +1086,101 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dist/README.downloads">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.project">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider editor-type-id="Gfm">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="160">
+            <caret line="8" column="25" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/snaplinks.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ReleaseNotes.md">
+      <provider editor-type-id="Gfm">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="20">
+            <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/release.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README-DEV.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="680">
+          <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DevNotes.md">
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+        </state>
+      </provider>
+      <provider editor-type-id="Gfm">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="0">
+            <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
