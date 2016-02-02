@@ -1,0 +1,27 @@
+{
+	"description": "Select multiple links, checkboxes and other elements and do something with them such as open them in new tabs or check/uncheck them.",
+	"manifest_version": 2,
+	"name": "Snap Links",
+	"version": "3.0a0",
+	"homepage_url": "https://github.com/cpriest/SnapLinksPlus",
+	"icons": {
+	},
+	"applications": {
+		"gecko": {
+			"id": "snaplinks@dev.rxv.me",
+			"strict_min_version": "45.0.0"
+		}
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"<all_urls>"
+			],
+			"js": [
+				"src/content-scripts/test-compiled.js",
+				"src/content-scripts/Utility-compiled.js",
+				"src/content-scripts/SnapLinks-compiled.js"
+			]
+		}
+	]
+}

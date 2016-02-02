@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="Generated files" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/src/content-scripts/test-compiled.js" />
+        <item url="file://$PROJECT_DIR$/src/content-scripts/Utility-compiled.js" />
+        <item url="file://$PROJECT_DIR$/src/content-scripts/SnapLinks-compiled.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/src/content-scripts/test-compiled.js" />
+      <root url="file://$PROJECT_DIR$/src/content-scripts/Utility-compiled.js" />
+      <root url="file://$PROJECT_DIR$/src/content-scripts/SnapLinks-compiled.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>
