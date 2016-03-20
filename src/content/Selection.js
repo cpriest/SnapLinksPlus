@@ -32,7 +32,6 @@
 	 *  				Possible solutions include:
 	 *  					box-shadow: 0px 0px 1px 0px red (inner shadow, tighter and not as preferable)
 	 *  					New outline element per selection (probably would be very slow, maybe less so with an 'outline element cache for created but no longer used')
-	 *  @BUG	Right-click on Flash object
 	 *  @BUG	Hitting escape while in drag isn't working right.
 	 **/
 
@@ -818,8 +817,8 @@ var SnapLinksSelectionClass = Class.create({
 
 			if(this.SelectedElements) {
 				let PreviousElements = this.SelectedElements,
-					NewElements = [ elem for each ( elem in SelectedElements ) if (PreviousElements.indexOf(elem) == -1) ],
-					ClearElements = [ elem for each ( elem in PreviousElements ) if (SelectedElements.indexOf(elem) == -1) ];
+					NewElements = SelectedElements.filter(elem => PreviousElements.indexOf(elem) == -1),
+					ClearElements = PreviousElements.filter(elem => SelectedElements.indexOf(elem) == -1);
 
 				// Set the outline on NewElements
 				this.SetOutline(NewElements, OutlineStyle);
