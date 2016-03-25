@@ -18,7 +18,7 @@
 				"<all_urls>"
 			],
 			"js": [
-				"src/content-scripts/test-compiled.js",
+				//				"src/content-scripts/Playground-compiled.js",
 				"src/content-scripts/Utility-compiled.js",
 				"src/content-scripts/SnapLinks-compiled.js"
 			]

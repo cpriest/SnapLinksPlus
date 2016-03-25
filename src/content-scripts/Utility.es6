@@ -28,7 +28,7 @@ function CreateElement(html) {
 }
 
 /**
- * Outputs a string of the given properties, like propName: propValue
+ * Returns a string of the given properties, like propName: propValue
  *
  * @param obj
  * @param props

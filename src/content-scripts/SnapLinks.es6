@@ -28,6 +28,12 @@ const LMB = 1,	// Left Mouse Button
 
 const data = {
 	scrollRate: 8,
+	selection : {
+		activate: {
+			minX: 5,
+			minY: 5,
+		}
+	}
 };
 
 class Rect {
@@ -50,8 +56,8 @@ class Rect {
 	}
 
 	expand(x, y) {
-		[ this.top, this.bottom ] = [ this.top - x, this.bottom + x ];
-		[ this.left, this.right ] = [ this.left - y, this.right + y ];
+		[ this.top, this.bottom ] = [ this.top - y, this.bottom + y ];
+		[ this.left, this.right ] = [ this.left - x, this.right + x ];
 		return this.calculateProperties();
 	}
 
@@ -81,25 +87,36 @@ class SelectionRect {
 	setBottomRight(bottom, right) {
 		let dr = (new DocRect(document))
 			.expand(-2, -2);
+		/* Based on current fixed style */
 		this.dims
 			.setBottomRight(bottom, right)
 			.clipTo(dr);
 
 		[ this.uiElem.style.top, this.uiElem.style.left ]     = [ this.dims.top + 'px', this.dims.left + 'px' ];
 		[ this.uiElem.style.height, this.uiElem.style.width ] = [ this.dims.height + 'px', this.dims.width + 'px' ];
+
+		this.uiElem.style.display = this.IsLargeEnoughToActivate()
+			? ''
+			: 'none';
 	}
 
 	remove() {
-		this.uiElem.parentNode.removeChild(this.uiElem);
+		this.uiElem.remove();
 		delete this.uiElem;
+	}
+
+	IsLargeEnoughToActivate() {
+		return this.dims.width > data.selection.activate.minX && this.dims.height > data.selection.activate.minY;
 	}
 }
 
 new (class EventHandler {
 	constructor() {
 		this.RegisterActivationEvents();
-		this._onMouseUp   = this.onMouseUp.bind(this);
-		this._onMouseMove = this.onMouseMove.bind(this);
+		this._onMouseUp          = this.onMouseUp.bind(this);
+		this._onMouseMove        = this.onMouseMove.bind(this);
+		this._onContextMenu      = this.onContextMenu.bind(this);
+		this.StopNextContextMenu = false;
 	}
 
 	RegisterActivationEvents() {
@@ -110,37 +127,49 @@ new (class EventHandler {
 		/* Static use of no-modifiers down and right mouse button down */
 		e.mods = (e.ctrlKey) + (e.altKey << 1) + (e.shiftKey << 2);
 
-		if(e.buttons == RMB) {
+		if(e.buttons == RMB && e.mods == 0) {
 			this.CurrentSelection = new SelectionRect(e.pageY, e.pageX);
+			this.LastMouseEvent   = e;
 			window.addEventListener('mouseup', this._onMouseUp, true);
 			window.addEventListener('mousemove', this._onMouseMove, true);
-			this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
+			window.addEventListener('contextmenu', this._onContextMenu, true);
+			this.mmTimer          = setInterval(this.onMouseMoveInterval.bind(this), 30);
+			this.EligibleElements = {};
 		}
 	}
 
 	onMouseMove(e) {
-		this.LastMoveEvent = e;
+		this.LastMouseEvent = e;
 	}
 
 	onMouseMoveInterval() {
-		let e       = this.LastMoveEvent,
+		let e       = this.LastMouseEvent,
 			docElem = document.documentElement;
 
-		if(!e)
-			return;
+		if(e) {
+			this.IntervalScrollOffset = {
+				x: e.clientX < 0
+					? e.clientX
+					: e.clientX > docElem.clientWidth
+					   ? e.clientX - docElem.clientWidth
+					   : 0,
+				y: e.clientY < 0
+					? e.clientY
+					: e.clientY > docElem.clientHeight
+					   ? e.clientY - docElem.clientHeight
+					   : 0,
+			};
 
-		this.CurrentSelection.setBottomRight(e.pageY, e.pageX);
+			this.MousePos = { clientX: e.clientX, clientY: e.clientY };
+			delete this.LastMouseEvent;
+		}
 
-		if(e.clientX < 0)
-			docElem.scrollLeft += docElem.clientWidth / data.scrollRate;
-		else if(e.clientX > docElem.clientHeight)
-			docElem.scrollLeft -= docElem.clientWidth / data.scrollRate;
-		if(e.clientY < 0)
-			docElem.scrollTop -= docElem.clientHeight / data.scrollRate;
-		else if(e.clientY > docElem.clientHeight)
-			docElem.scrollTop += docElem.clientHeight / data.scrollRate;
+		docElem.scrollLeft += this.IntervalScrollOffset.x;
+		docElem.scrollTop += this.IntervalScrollOffset.y;
 
-		delete this.LastMoveEvent;
+		/* Set our bottom right to scroll + max(clientX/Y, clientWidth/Height) */
+		this.CurrentSelection.setBottomRight(docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight),
+			docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth));
 	}
 
 	onMouseUp(e) {
@@ -150,7 +179,16 @@ new (class EventHandler {
 		delete this.mmTimer;
 
 		window.removeEventListener('mousemove', this._onMouseMove, true);
+		this.StopNextContextMenu = this.CurrentSelection.IsLargeEnoughToActivate();
 		this.CurrentSelection.remove();
 		delete this.CurrentSelection;
+	}
+
+	onContextMenu(e) {
+		window.removeEventListener('oncontextmenu', this._onContextMenu, true);
+		if(this.StopNextContextMenu) {
+			this.StopNextContextMenu = false;
+			e.preventDefault();
+		}
 	}
 });
