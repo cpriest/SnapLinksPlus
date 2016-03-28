@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="coding" pattern="file:src//*||file:test//*||file:LocalNotes.txt" />
+</component>
