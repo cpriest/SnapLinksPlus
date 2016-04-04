@@ -314,7 +314,7 @@
 	</target>
 
 
-	<target name="dist" depends="clean,init-dist,xpi-babelzilla,xpi,xpi-amo">
+	<target name="build-dist" depends="clean,init-dist,xpi-babelzilla,xpi,xpi-amo">
 		<checksum file="${dist.dir}/${extension.xpi}" algorithm="${extension.checksumAlgorithm}" property="extension.dist.xpi.checksum" />
 
 		<tstamp prefix="stop">
