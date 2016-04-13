@@ -30,9 +30,17 @@ class ElementHighlighter {
 	}
 
 	Highlight(tElems) {
-		for(var elem of tElems) {
+		let tPrevElems  = this.HighlightedElements,
+			Unhighlight = tPrevElems.filter(
+				(elem) => { return !tElems.includes(elem); }
+			),
+			Highlight   = tElems.filter(
+				(elem) => { return !tPrevElems.includes(elem); }
+			);
+		for(let elem of Unhighlight)
+			elem.style.outline = '';
+		for(let elem of Highlight)
 			elem.style.outline = '1px solid red';
-		}
 		this.HighlightedElements = tElems;
 	}
 
