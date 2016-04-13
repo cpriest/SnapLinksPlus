@@ -27,8 +27,9 @@ const LMB = 1,	// Left Mouse Button
 
 
 const data = {
-	scrollRate: 8,
-	selection : {
+	IndexBuckets: 10,
+	scrollRate  : 8,
+	selection   : {
 		activate: {
 			minX: 5,
 			minY: 5,
@@ -61,6 +62,21 @@ class Rect {
 		return this.calculateProperties();
 	}
 
+	intersects(r) {
+		/* Some/most of this code is duplicated from other parts of this class for performance reasons */
+
+		// If the greatest top is higher than the lowest bottom, they don't intersect
+		let GreatestTop  = Math.max(this.top, r.top),
+			LowestBottom = Math.min(this.bottom, r.bottom);
+		if(GreatestTop > LowestBottom)
+			return false;
+
+		// If the greatest left is higher than the lowest right, they don't intersect
+		let GreatestLeft = Math.max(this.left, r.left),
+			LowestRight  = Math.min(this.right, r.right);
+		return GreatestLeft <= LowestRight;
+	}
+
 	clipTo(r) {
 		[ this.top, this.left ]     = [ Math.max(this.top, r.top), Math.max(this.left, r.left) ];
 		[ this.bottom, this.right ] = [ Math.min(this.bottom, r.bottom), Math.min(this.right, r.right) ];
@@ -73,7 +89,7 @@ class Rect {
 class DocRect extends Rect {
 	constructor(doc) {
 		let docElem = document.documentElement;
-		super(0, 0, docElem.offsetHeight, docElem.offsetWidth);
+		super(0, 0, docElem.scrollHeight, docElem.scrollWidth);
 	}
 }
 
@@ -130,11 +146,11 @@ new (class EventHandler {
 		if(e.buttons == RMB && e.mods == 0) {
 			this.CurrentSelection = new SelectionRect(e.pageY, e.pageX);
 			this.LastMouseEvent   = e;
+			document.documentElement.setCapture(true);
 			window.addEventListener('mouseup', this._onMouseUp, true);
 			window.addEventListener('mousemove', this._onMouseMove, true);
 			window.addEventListener('contextmenu', this._onContextMenu, true);
-			this.mmTimer          = setInterval(this.onMouseMoveInterval.bind(this), 30);
-			this.EligibleElements = {};
+			this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
 		}
 	}
 
@@ -170,6 +186,15 @@ new (class EventHandler {
 		/* Set our bottom right to scroll + max(clientX/Y, clientWidth/Height) */
 		this.CurrentSelection.setBottomRight(docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight),
 			docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth));
+
+		if(this.ElementIndexer) {
+			this.ElementHighlighter.Highlight(
+				this.ElementIndexer.Search(this.CurrentSelection.dims)
+			);
+		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
+			this.ElementIndexer     = new ElementIndexer();
+			this.ElementHighlighter = new ElementHighlighter();
+		}
 	}
 
 	onMouseUp(e) {
@@ -182,6 +207,12 @@ new (class EventHandler {
 		this.StopNextContextMenu = this.CurrentSelection.IsLargeEnoughToActivate();
 		this.CurrentSelection.remove();
 		delete this.CurrentSelection;
+		delete this.ElementIndexer;
+
+		this.ElementHighlighter.Unhighlight();
+		delete this.ElementHighlighter;
+
+		document.releaseCapture();
 	}
 
 	onContextMenu(e) {

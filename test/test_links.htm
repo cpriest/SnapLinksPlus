@@ -368,17 +368,22 @@
 																	<td><span>span</span></td>
 																	<td><div>div</div></td></tr>
 	</table>
+	<a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small;">Bottom of Document Link (Wikipedia Bronze)</a>
 	<script language="javascript">
 		var elem;
 		elem = document.getElementById('onclick-via-js');
 		Array.prototype.forEach.call(elem.querySelectorAll('td > *'), function(elem) {
 			elem.onclick = () => this.classList.toggle('highlighted');
-		});
+		});;
+		;
+		;
 
 		elem = document.getElementById('click_via_addEvent');
 		Array.prototype.forEach.call(elem.querySelectorAll('td > *'), function(elem) {
 			elem.addEventListener('click', () =>  this.classList.toggle('highlighted'));
-		});
+		});;
+		;
+		;
 
 	</script>
 	<div id="MouseBox" class="Closed"></div>

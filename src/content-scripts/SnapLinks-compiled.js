@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2016 Clint Priest
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF 
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
  * DEALINGS IN THE SOFTWARE.
  */
 
@@ -36,6 +36,7 @@ RMB = 2,
 MMB = 4; // Middle Mouse Button
 
 var data = {
+	IndexBuckets: 10,
 	scrollRate: 8,
 	selection: {
 		activate: {
@@ -93,6 +94,21 @@ var Rect = (function () {
 			return this.calculateProperties();
 		}
 	}, {
+		key: 'intersects',
+		value: function intersects(r) {
+			/* Some/most of this code is duplicated from other parts of this class for performance reasons */
+
+			// If the greatest top is higher than the lowest bottom, they don't intersect
+			var GreatestTop = Math.max(this.top, r.top),
+			    LowestBottom = Math.min(this.bottom, r.bottom);
+			if (GreatestTop > LowestBottom) return false;
+
+			// If the greatest left is higher than the lowest right, they don't intersect
+			var GreatestLeft = Math.max(this.left, r.left),
+			    LowestRight = Math.min(this.right, r.right);
+			return GreatestLeft <= LowestRight;
+		}
+	}, {
 		key: 'clipTo',
 		value: function clipTo(r) {
 			var _ref7 = [Math.max(this.top, r.top), Math.max(this.left, r.left)];
@@ -121,7 +137,7 @@ var DocRect = (function (_Rect) {
 		_classCallCheck(this, DocRect);
 
 		var docElem = document.documentElement;
-		_get(Object.getPrototypeOf(DocRect.prototype), 'constructor', this).call(this, 0, 0, docElem.offsetHeight, docElem.offsetWidth);
+		_get(Object.getPrototypeOf(DocRect.prototype), 'constructor', this).call(this, 0, 0, docElem.scrollHeight, docElem.scrollWidth);
 	}
 
 	return DocRect;
@@ -193,11 +209,11 @@ new ((function () {
 			if (e.buttons == RMB && e.mods == 0) {
 				this.CurrentSelection = new SelectionRect(e.pageY, e.pageX);
 				this.LastMouseEvent = e;
+				document.documentElement.setCapture(true);
 				window.addEventListener('mouseup', this._onMouseUp, true);
 				window.addEventListener('mousemove', this._onMouseMove, true);
 				window.addEventListener('contextmenu', this._onContextMenu, true);
 				this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
-				this.EligibleElements = {};
 			}
 		}
 	}, {
@@ -226,6 +242,13 @@ new ((function () {
 
 			/* Set our bottom right to scroll + max(clientX/Y, clientWidth/Height) */
 			this.CurrentSelection.setBottomRight(docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight), docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth));
+
+			if (this.ElementIndexer) {
+				this.ElementHighlighter.Highlight(this.ElementIndexer.Search(this.CurrentSelection.dims));
+			} else if (this.CurrentSelection.IsLargeEnoughToActivate()) {
+				this.ElementIndexer = new ElementIndexer();
+				this.ElementHighlighter = new ElementHighlighter();
+			}
 		}
 	}, {
 		key: 'onMouseUp',
@@ -239,6 +262,12 @@ new ((function () {
 			this.StopNextContextMenu = this.CurrentSelection.IsLargeEnoughToActivate();
 			this.CurrentSelection.remove();
 			delete this.CurrentSelection;
+			delete this.ElementIndexer;
+
+			this.ElementHighlighter.Unhighlight();
+			delete this.ElementHighlighter;
+
+			document.releaseCapture();
 		}
 	}, {
 		key: 'onContextMenu',
