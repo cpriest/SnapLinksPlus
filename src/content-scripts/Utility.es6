@@ -42,3 +42,55 @@ function dir(obj, props) {
 		out.push(prop + ': ' + obj[ prop ]);
 	return out.join(', ');
 }
+
+/**
+ * Class which provides for timing and metrics / elapsed time with output
+ *    controlled via delayed template literal
+ */
+class RateReporter {
+	/**
+	 *
+	 * @param msg         Template literal which should be passed as a string, when reporting
+	 *                    the following variables are available to the template:
+	 *                        Count:            The count variable passed in to report()
+	 *                        PerSecond:        The Count / Second rate
+	 *                        Elapsed:        The time that has elapsed
+	 * @param options
+	 */
+	constructor(msg, options) {
+		this.msg     = msg;
+		this.options = options;
+		this.started = Date.now();
+	}
+
+	/**
+	 * Report the results of the timing
+	 * @param Count
+	 */
+	report(Count) {
+		let ElapsedMS = (Date.now() - this.started),
+			ElapsedS  = ElapsedMS / 1000,
+			Elapsed;
+
+		// Function to resolve template literal
+		let z = new Function('Count', 'PerSecond', 'Elapsed', 'return `' + this.msg + '`');
+
+		// Show ms if less than 1 second, otherwise seconds rounded to two places
+		Elapsed = ElapsedMS < 1000
+			? ElapsedMS + 'ms'
+			: (Math.round(ElapsedS * 100) / 100) + 's';
+
+		console.log(z(Count, (Math.round(Count / ElapsedS * 100) / 100) + '/s', Elapsed));
+	}
+}
+
+/**
+ * Converts an iterable element to an array.
+ */
+function $A(iterable) {
+	if(!iterable) return [];
+	if('toArray' in Object(iterable)) return iterable.toArray();
+	var length = iterable.length || 0, results = new Array(length);
+	while(length--) results[ length ] = iterable[ length ];
+	return results;
+}
