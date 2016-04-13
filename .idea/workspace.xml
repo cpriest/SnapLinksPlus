@@ -6,12 +6,8 @@
     <option name="CUSTOM_SCOPE_NAME" value="coding" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f5596319-fd00-48d7-81c8-d155ad02ba53" name="Default" comment="BUGFIX: Mouse was not being captured properly for auto-scrolling during selection, also wrong property was being used for clipping of rects.&#10;ADDED: &#10; ElementIndexer&#10;  - It puts all selectable elements into a configurable number of buckets (10 at present) for quick-culling of sections of the page for matching&#10;  - Searches through non-culled buckets getting clientRects() of bucket elements and finds those whose rects intersect the SelectionRect&#10; ElementHighlighter&#10;  - Beginnings of selection highlighting&#10;  RateReporter  - Quick Class for measuring performance of code sections&#10;">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Generated_files.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Generated_files.xml" />
+    <list default="true" id="f5596319-fd00-48d7-81c8-d155ad02ba53" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/content-scripts/ElementHighlighter-compiled.js" afterPath="$PROJECT_DIR$/src/content-scripts/ElementHighlighter-compiled.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/content-scripts/ElementHighlighter-compiled.js.map" afterPath="$PROJECT_DIR$/src/content-scripts/ElementHighlighter-compiled.js.map" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/content-scripts/ElementHighlighter.es6" afterPath="$PROJECT_DIR$/src/content-scripts/ElementHighlighter.es6" />
     </list>
     <ignored path="snaplinks.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -96,11 +92,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ElementHighlighter.es6" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ElementHighlighter.es6" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementHighlighter.es6">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="800">
-              <caret line="40" column="36" selection-start-line="40" selection-start-column="36" selection-end-line="40" selection-end-column="36" />
+            <state relative-caret-position="560">
+              <caret line="28" column="38" selection-start-line="28" selection-start-column="38" selection-end-line="28" selection-end-column="38" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ElementIndexer.es6" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer.es6">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="600">
+              <caret line="80" column="56" selection-start-line="80" selection-start-column="56" selection-end-line="80" selection-end-column="56" />
               <folding />
             </state>
           </provider>
@@ -187,12 +193,12 @@
         <option value="$PROJECT_DIR$/src/content-scripts/TestWorker.es6" />
         <option value="$PROJECT_DIR$/src/content-scripts/Playground.es6" />
         <option value="$PROJECT_DIR$/src/content-scripts/Utility.es6" />
-        <option value="$PROJECT_DIR$/src/content-scripts/ElementIndexer.es6" />
         <option value="$PROJECT_DIR$/src/content-scripts/SnapLinks.es6" />
         <option value="$PROJECT_DIR$/manifest.json" />
         <option value="$PROJECT_DIR$/test/test_links.htm" />
         <option value="$PROJECT_DIR$/.idea/workspace.xml" />
         <option value="$PROJECT_DIR$/src/content-scripts/ElementHighlighter.es6" />
+        <option value="$PROJECT_DIR$/src/content-scripts/ElementIndexer.es6" />
       </list>
     </option>
   </component>
@@ -749,7 +755,7 @@
       <workItem from="1460283643262" duration="4735000" />
       <workItem from="1460427644618" duration="8519000" />
       <workItem from="1460557908297" duration="1255000" />
-      <workItem from="1460584182585" duration="1019000" />
+      <workItem from="1460584182585" duration="1220000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed the build number, the new beta is now 2.4.1b3.&#10;">
       <created>1394972910743</created>
@@ -816,7 +822,7 @@
     </servers>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="240632000" />
+    <option name="totallyTimeSpent" value="240833000" />
   </component>
   <component name="TodoView" selected-index="0">
     <todo-panel id="selected-file">
@@ -840,12 +846,12 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1555" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="GfmBrowser" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31007752" sideWeight="0.57239515" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32957748" sideWeight="0.5038168" order="9" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18521127" sideWeight="0.5177665" order="11" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18521127" sideWeight="0.5177665" order="11" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18521127" sideWeight="0.4822335" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40944326" sideWeight="0.37917328" order="16" side_tool="true" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -920,9 +926,6 @@
     <option featureType="com.intellij.configurationType" implementationName="PhpLocalRunConfigurationType" />
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.properties" />
   </component>
-  <component name="UpdateCopyrightCheckinHandler">
-    <option name="UPDATE_COPYRIGHT" value="true" />
-  </component>
   <component name="Vcs.Log.Settings">
     <option name="SHOW_BRANCHES_PANEL" value="true" />
   </component>
@@ -941,7 +944,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="false" />
     <option name="SHOW_PATCH_IN_EXPLORER" value="false" />
     <MESSAGE value="Fixed the build number, the new beta is now 2.4.1b3.&#10;" />
@@ -967,10 +969,9 @@
     <MESSAGE value="Full SelectionRect capabilities, interval scrolling.&#10;&quot;Preferences&quot; is currently a static data object structure, mostly as placeholders for when a preferences system is built.&#10;" />
     <MESSAGE value="temp shelf... auto-scrolling is no longer working" />
     <MESSAGE value="BUGFIX: Mouse was not being captured properly for auto-scrolling during selection, also wrong property was being used for clipping of rects.&#10;ADDED: &#10; ElementIndexer&#10;  - It puts all selectable elements into a configurable number of buckets (10 at present) for quick-culling of sections of the page for matching&#10;  - Searches through non-culled buckets getting clientRects() of bucket elements and finds those whose rects intersect the SelectionRect&#10; ElementHighlighter&#10;  - Beginnings of selection highlighting&#10;  RateReporter  - Quick Class for measuring performance of code sections&#10;" />
-    <option name="LAST_COMMIT_MESSAGE" value="BUGFIX: Mouse was not being captured properly for auto-scrolling during selection, also wrong property was being used for clipping of rects.&#10;ADDED: &#10; ElementIndexer&#10;  - It puts all selectable elements into a configurable number of buckets (10 at present) for quick-culling of sections of the page for matching&#10;  - Searches through non-culled buckets getting clientRects() of bucket elements and finds those whose rects intersect the SelectionRect&#10; ElementHighlighter&#10;  - Beginnings of selection highlighting&#10;  RateReporter  - Quick Class for measuring performance of code sections&#10;" />
-    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
-    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
-    <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
+    <MESSAGE value="Elements no longer selected are now unhighlighted." />
+    <MESSAGE value="Only A[href] elements are now highlighted." />
+    <option name="LAST_COMMIT_MESSAGE" value="Only A[href] elements are now highlighted." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1149,12 +1150,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer.es6" />
     <entry file="file://$PROJECT_DIR$/install.rdf" />
     <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementHighlighter.es6">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="800">
-          <caret line="40" column="36" selection-start-line="40" selection-start-column="36" selection-end-line="40" selection-end-column="36" />
+        <state relative-caret-position="560">
+          <caret line="28" column="38" selection-start-line="28" selection-start-column="38" selection-end-line="28" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer.es6">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="600">
+          <caret line="80" column="56" selection-start-line="80" selection-start-column="56" selection-end-line="80" selection-end-column="56" />
           <folding />
         </state>
       </provider>

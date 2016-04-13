@@ -3,10 +3,12 @@
     <properties>
       <sourceFilesUrls>
         <item url="file://$PROJECT_DIR$/src/content-scripts/ElementHighlighter-compiled.js" />
+        <item url="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer-compiled.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
       <root url="file://$PROJECT_DIR$/src/content-scripts/ElementHighlighter-compiled.js" />
+      <root url="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer-compiled.js" />
     </CLASSES>
     <SOURCES />
   </library>

@@ -27,7 +27,7 @@ class RectMapper {
 	 *
 	 * @param elem    HtmlElement    The element being requested
 	 * @param offset  object        The {x,y} offset the document is currently scrolled to (passed for performance reasons)
-	 * @returns {V}
+	 * @returns {Rect}
 	 */
 	get(elem, offset) {
 		let Rects = this.ElemRects.get(elem);
@@ -65,7 +65,7 @@ class RectMapper {
  */
 class ElementIndexer {
 	constructor() {
-		this.Anchors      = document.querySelectorAll('A');
+		this.Anchors      = document.querySelectorAll('A[href]');
 		this.ElementRects = new RectMapper();
 
 		this.UpdateIndex();
