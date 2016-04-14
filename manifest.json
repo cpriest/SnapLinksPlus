@@ -12,12 +12,19 @@
 			"strict_min_version": "45.0.0"
 		}
 	},
+	"background": {
+		"scripts": [
+			"src/globals-compiled.js",
+			"src/background-scripts/background-compiled.js"
+		]
+	},
 	"content_scripts": [
 		{
 			"matches": [
 				"<all_urls>"
 			],
 			"js": [
+				"src/globals-compiled.js",
 				"src/content-scripts/Utility-compiled.js",
 				"src/content-scripts/SnapLinks-compiled.js",
 				"src/content-scripts/ElementIndexer-compiled.js",

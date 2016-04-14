@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2016 Clint Priest
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF 
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
 
@@ -23,28 +23,6 @@ var _createClass = (function () { function defineProperties(target, props) { for
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-var CTRL = 1,
-    ALT = 2,
-    SHIFT = 4;
-
-//  (MouseEvent.buttons bitfield)
-var LMB = 1,
-    // Left Mouse Button
-RMB = 2,
-    // Right Mouse Button
-MMB = 4; // Middle Mouse Button
-
-var data = {
-	IndexBuckets: 10,
-	scrollRate: 8,
-	selection: {
-		activate: {
-			minX: 5,
-			minY: 5
-		}
-	}
-};
 
 var Rect = (function () {
 	function Rect(top, left, bottom, right) {
@@ -192,7 +170,6 @@ new ((function () {
 		this._onMouseUp = this.onMouseUp.bind(this);
 		this._onMouseMove = this.onMouseMove.bind(this);
 		this._onContextMenu = this.onContextMenu.bind(this);
-		this.StopNextContextMenu = false;
 	}
 
 	_createClass(EventHandler, [{
@@ -206,14 +183,23 @@ new ((function () {
 			/* Static use of no-modifiers down and right mouse button down */
 			e.mods = e.ctrlKey + (e.altKey << 1) + (e.shiftKey << 2);
 
-			if (e.buttons == RMB && e.mods == 0) {
-				this.CurrentSelection = new SelectionRect(e.pageY, e.pageX);
-				this.LastMouseEvent = e;
-				document.documentElement.setCapture(true);
-				window.addEventListener('mouseup', this._onMouseUp, true);
-				window.addEventListener('mousemove', this._onMouseMove, true);
-				window.addEventListener('contextmenu', this._onContextMenu, true);
-				this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
+			if (e.buttons == RMB) {
+				switch (e.mods) {
+					// @Development
+					case CTRL + ALT:
+						this.StopNextContextMenu();
+						chrome.runtime.sendMessage({ Action: RELOAD_EXTENSION });
+						break;
+
+					case NONE:
+						this.CurrentSelection = new SelectionRect(e.pageY, e.pageX);
+						this.LastMouseEvent = e;
+						document.documentElement.setCapture(true);
+						window.addEventListener('mouseup', this._onMouseUp, true);
+						window.addEventListener('mousemove', this._onMouseMove, true);
+						this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
+						break;
+				}
 			}
 		}
 	}, {
@@ -244,7 +230,7 @@ new ((function () {
 			this.CurrentSelection.setBottomRight(docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight), docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth));
 
 			if (this.ElementIndexer) {
-				this.ElementHighlighter.Highlight(this.ElementIndexer.Search(this.CurrentSelection.dims));
+				this.ElementHighlighter.Highlight(this.SelectedElements = this.ElementIndexer.Search(this.CurrentSelection.dims));
 			} else if (this.CurrentSelection.IsLargeEnoughToActivate()) {
 				this.ElementIndexer = new ElementIndexer();
 				this.ElementHighlighter = new ElementHighlighter();
@@ -259,10 +245,13 @@ new ((function () {
 			delete this.mmTimer;
 
 			window.removeEventListener('mousemove', this._onMouseMove, true);
-			this.StopNextContextMenu = this.CurrentSelection.IsLargeEnoughToActivate();
+			this.CurrentSelection.IsLargeEnoughToActivate() && this.StopNextContextMenu();
 			this.CurrentSelection.remove();
 			delete this.CurrentSelection;
 			delete this.ElementIndexer;
+
+			this.ActUpon(this.SelectedElements, e);
+			delete this.SelectedElements;
 
 			this.ElementHighlighter.Unhighlight();
 			delete this.ElementHighlighter;
@@ -270,13 +259,26 @@ new ((function () {
 			document.releaseCapture();
 		}
 	}, {
+		key: 'StopNextContextMenu',
+		value: function StopNextContextMenu() {
+			window.addEventListener('contextmenu', this._onContextMenu, true);
+		}
+	}, {
 		key: 'onContextMenu',
 		value: function onContextMenu(e) {
 			window.removeEventListener('oncontextmenu', this._onContextMenu, true);
-			if (this.StopNextContextMenu) {
-				this.StopNextContextMenu = false;
-				e.preventDefault();
-			}
+			e.preventDefault();
+		}
+	}, {
+		key: 'ActUpon',
+		value: function ActUpon(tElems) {
+			// For now we are simply going to create new tabs for the selected elements
+			chrome.runtime.sendMessage({
+				Action: OPEN_URLS_IN_TABS,
+				tUrls: tElems.map(function (elem) {
+					return elem.href;
+				})
+			});
 		}
 	}]);
 

@@ -16,27 +16,6 @@
 
 "use strict";
 
-const CTRL  = 1,
-	  ALT   = 2,
-	  SHIFT = 4;
-
-//  (MouseEvent.buttons bitfield)
-const LMB = 1,	// Left Mouse Button
-	  RMB = 2,	// Right Mouse Button
-	  MMB = 4;	// Middle Mouse Button
-
-
-const data = {
-	IndexBuckets: 10,
-	scrollRate  : 8,
-	selection   : {
-		activate: {
-			minX: 5,
-			minY: 5,
-		}
-	}
-};
-
 class Rect {
 	constructor(top, left, bottom, right) {
 		[ this.originTop, this.originLeft ]              = [ top, left ];
@@ -132,7 +111,6 @@ new (class EventHandler {
 		this._onMouseUp          = this.onMouseUp.bind(this);
 		this._onMouseMove        = this.onMouseMove.bind(this);
 		this._onContextMenu      = this.onContextMenu.bind(this);
-		this.StopNextContextMenu = false;
 	}
 
 	RegisterActivationEvents() {
@@ -143,14 +121,23 @@ new (class EventHandler {
 		/* Static use of no-modifiers down and right mouse button down */
 		e.mods = (e.ctrlKey) + (e.altKey << 1) + (e.shiftKey << 2);
 
-		if(e.buttons == RMB && e.mods == 0) {
-			this.CurrentSelection = new SelectionRect(e.pageY, e.pageX);
-			this.LastMouseEvent   = e;
-			document.documentElement.setCapture(true);
-			window.addEventListener('mouseup', this._onMouseUp, true);
-			window.addEventListener('mousemove', this._onMouseMove, true);
-			window.addEventListener('contextmenu', this._onContextMenu, true);
-			this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
+		if(e.buttons == RMB) {
+			switch(e.mods) {
+				// @Development
+				case CTRL + ALT:
+					this.StopNextContextMenu();
+					chrome.runtime.sendMessage({ Action: RELOAD_EXTENSION });
+					break;
+
+				case NONE:
+					this.CurrentSelection = new SelectionRect(e.pageY, e.pageX);
+					this.LastMouseEvent   = e;
+					document.documentElement.setCapture(true);
+					window.addEventListener('mouseup', this._onMouseUp, true);
+					window.addEventListener('mousemove', this._onMouseMove, true);
+					this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
+					break;
+			}
 		}
 	}
 
@@ -189,7 +176,7 @@ new (class EventHandler {
 
 		if(this.ElementIndexer) {
 			this.ElementHighlighter.Highlight(
-				this.ElementIndexer.Search(this.CurrentSelection.dims)
+				this.SelectedElements = this.ElementIndexer.Search(this.CurrentSelection.dims)
 			);
 		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
 			this.ElementIndexer     = new ElementIndexer();
@@ -204,10 +191,13 @@ new (class EventHandler {
 		delete this.mmTimer;
 
 		window.removeEventListener('mousemove', this._onMouseMove, true);
-		this.StopNextContextMenu = this.CurrentSelection.IsLargeEnoughToActivate();
+		this.CurrentSelection.IsLargeEnoughToActivate() && this.StopNextContextMenu();
 		this.CurrentSelection.remove();
 		delete this.CurrentSelection;
 		delete this.ElementIndexer;
+
+		this.ActUpon(this.SelectedElements, e);
+		delete this.SelectedElements;
 
 		this.ElementHighlighter.Unhighlight();
 		delete this.ElementHighlighter;
@@ -215,11 +205,20 @@ new (class EventHandler {
 		document.releaseCapture();
 	}
 
+	StopNextContextMenu() {
+		window.addEventListener('contextmenu', this._onContextMenu, true);
+	}
+
 	onContextMenu(e) {
 		window.removeEventListener('oncontextmenu', this._onContextMenu, true);
-		if(this.StopNextContextMenu) {
-			this.StopNextContextMenu = false;
-			e.preventDefault();
-		}
+		e.preventDefault();
+	}
+
+	ActUpon(tElems) {
+		// For now we are simply going to create new tabs for the selected elements
+		chrome.runtime.sendMessage({
+			Action: OPEN_URLS_IN_TABS,
+			tUrls: 	tElems.map((elem) => elem.href),
+		});
 	}
 });

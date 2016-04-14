@@ -3,12 +3,18 @@
     <properties>
       <sourceFilesUrls>
         <item url="file://$PROJECT_DIR$/src/content-scripts/ElementHighlighter-compiled.js" />
+        <item url="file://$PROJECT_DIR$/src/background-scripts/background-compiled.js" />
+        <item url="file://$PROJECT_DIR$/src/content-scripts/SnapLinks-compiled.js" />
         <item url="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer-compiled.js" />
+        <item url="file://$PROJECT_DIR$/src/globals-compiled.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
       <root url="file://$PROJECT_DIR$/src/content-scripts/ElementHighlighter-compiled.js" />
+      <root url="file://$PROJECT_DIR$/src/background-scripts/background-compiled.js" />
+      <root url="file://$PROJECT_DIR$/src/content-scripts/SnapLinks-compiled.js" />
       <root url="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer-compiled.js" />
+      <root url="file://$PROJECT_DIR$/src/globals-compiled.js" />
     </CLASSES>
     <SOURCES />
   </library>
