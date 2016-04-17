@@ -6,69 +6,8 @@
     <option name="CUSTOM_SCOPE_NAME" value="coding" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f5596319-fd00-48d7-81c8-d155ad02ba53" name="Default" comment="First working V3 of SnapLinks, right-click-drag around links will open those links in new tabs.">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snap_links-0.0.4-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snap_links-0.0.5-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-0.0.6-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-0.0.7-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-0.0.8-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.1-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.10-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.11-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.12-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.13-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.2-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.2.0pre21-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.3-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.3.0pre37-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.4-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.4.1-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.5-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.6-fx.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.7-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.8-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.0.9-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-1.1b1.0pre29-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-2.0b1-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-2.0b1.0pre10-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-2.0b1.0pre11-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-2.0b1.0pre12-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-2.0b1.0pre13-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-2.0b1.0pre8-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-2.0b1.0pre9-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-2.0b2-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-2.0b3-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinks-2.0b3.0pre11-fx+sm.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.2.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.2b15.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.2b16.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.3.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.3b19.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.3b20.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.3b21.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.3b22.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b1.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b10.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b11.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b12.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b2.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b3.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b4.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b5.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b6.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b7.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b8.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.3.4b9.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.4.0.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.4.0b1.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.4.0b2.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.4.1b3.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.4.2.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.4.3b1.xpi" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/snaplinksplus-2.4.3b2.xpi" afterPath="" />
+    <list default="true" id="f5596319-fd00-48d7-81c8-d155ad02ba53" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ReleaseNotes.md" afterPath="$PROJECT_DIR$/ReleaseNotes.md" />
     </list>
     <ignored path="snaplinks.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -152,7 +91,18 @@
     <favorites_list name="snaplinks" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="build.xml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/phing/build.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="660">
+              <caret line="33" column="58" selection-start-line="33" selection-start-column="58" selection-end-line="33" selection-end-column="58" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -211,7 +161,6 @@
         <option value="$PROJECT_DIR$/composer.bat" />
         <option value="$PROJECT_DIR$/build.xml" />
         <option value="$PROJECT_DIR$/update.rdf" />
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/release.properties" />
         <option value="$PROJECT_DIR$/.buildNumbers/build.number.2.4.txt" />
         <option value="$PROJECT_DIR$/src/chrome.manifest" />
@@ -241,6 +190,10 @@
         <option value="$PROJECT_DIR$/src/content-scripts/SnapLinks.es6" />
         <option value="$PROJECT_DIR$/src/background-scripts/background.es6" />
         <option value="$PROJECT_DIR$/ReleaseNotes.md" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/build/manifest.json" />
+        <option value="$PROJECT_DIR$/phing/build.properties" />
+        <option value="$PROJECT_DIR$/phing/build.xml" />
       </list>
     </option>
   </component>
@@ -253,7 +206,7 @@
   <component name="PhpServers">
     <servers />
   </component>
-  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" interpreter_name="PHP 5.5">
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" interpreter_name="PHP 5.6">
     <include_path>
       <path value="$PROJECT_DIR$/vendor/pear/archive_tar" />
       <path value="$PROJECT_DIR$/vendor/pear/console_getopt" />
@@ -422,6 +375,62 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
+      <pane id="Scope">
+        <subPane subId="Problems" />
+        <subPane subId="coding">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="snaplinks">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="snaplinks">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="test">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="snaplinks">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="src">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+        <subPane subId="Production" />
+        <subPane subId="Changed Files" />
+        <subPane subId="Project Files" />
+        <subPane subId="Default">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+        <subPane subId="Tests" />
+      </pane>
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -500,7 +509,43 @@
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="content-scripts" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Playground.es6" />
+              <option name="myItemType" value="com.intellij.plugins.watcher.projectView.NestingTreeNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="background-scripts" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="phing" />
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
           </PATH>
@@ -518,64 +563,62 @@
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="build" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="build" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="build" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="content-scripts" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="Scope">
-        <subPane subId="Problems" />
-        <subPane subId="coding">
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="snaplinks">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="snaplinks">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="test">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="snaplinks">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="src">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-        <subPane subId="Production" />
-        <subPane subId="Changed Files" />
-        <subPane subId="Project Files" />
-        <subPane subId="Default">
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-        <subPane subId="Tests" />
-      </pane>
-      <pane id="Scratches" />
       <pane id="PackagesPane">
         <subPane />
       </pane>
@@ -656,7 +699,7 @@
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="recentsLimit" value="5" />
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file://C:/code/XUL/snaplinks/src/content/Preferences.js&#10;Utilit&#9;FILE&#9;file://C:/code/XUL/snaplinks/src/content/Utility.js" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../XUL/SnapLinksV2" />
+    <property name="last_opened_file_path" value="C:/sync/lib/phing" />
     <property name="com.intellij.ide.scratch.ScratchpadManager" value="JavaScript 1.7" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="129" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
@@ -678,7 +721,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="Settings.MultiMarkdown.Application" />
+    <property name="settings.editor.selected.configurable" value="settings.phing" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="js-jscs-nodeInterpreter" value="c:\sync\portable\nodejs\node.exe" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
@@ -706,17 +749,64 @@
       <envs />
       <method />
     </configuration>
+    <configuration default="true" type="ChromiumRemoteDebugType" factoryName="Chromium Remote">
+      <method />
+    </configuration>
+    <configuration default="true" type="CompoundRunConfigurationType" factoryName="Compound Run Configuration">
+      <method />
+    </configuration>
+    <configuration default="true" type="FirefoxRemoteDebugType" factoryName="Firefox Remote">
+      <method />
+    </configuration>
     <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
       <method />
     </configuration>
     <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" working-dir="">
       <method />
     </configuration>
+    <configuration default="true" type="NodeJSRemoteDebug" factoryName="Node.js Remote Debug">
+      <node-js-remote-debug />
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeWebKit" factoryName="NW.js">
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeunitConfigurationType" factoryName="Nodeunit">
+      <setting name="nodePath" value="project" />
+      <envs />
+      <setting name="nodeunitModuleDir" value="" />
+      <setting name="workingDirectory" value="" />
+      <setting name="testType" value="JS_FILE" />
+      <setting name="jsFile" value="" />
+      <method />
+    </configuration>
     <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
       <TestRunner />
       <method />
     </configuration>
+    <configuration default="true" type="PhpBuiltInWebServerConfigurationType" factoryName="PHP Built-in Web Server">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpHttpRequestRunConfigurationType" factoryName="PHP HTTP Request">
+      <method />
+    </configuration>
     <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpRemoteDebugRunConfigurationType" factoryName="PHP Remote Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application">
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.grunt" factoryName="Grunt.js">
+      <node-interpreter value="project" />
+      <envs />
+      <force value="false" />
+      <verbose value="false" />
       <method />
     </configuration>
     <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
@@ -848,7 +938,8 @@
       <workItem from="1460636642931" duration="660000" />
       <workItem from="1460726352609" duration="36000" />
       <workItem from="1460844171211" duration="913000" />
-      <workItem from="1460859797021" duration="1040000" />
+      <workItem from="1460859797021" duration="5006000" />
+      <workItem from="1460864823960" duration="333000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed the build number, the new beta is now 2.4.1b3.&#10;">
       <created>1394972910743</created>
@@ -915,7 +1006,7 @@
     </servers>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="248411000" />
+    <option name="totallyTimeSpent" value="252710000" />
   </component>
   <component name="TodoView" selected-index="0">
     <todo-panel id="selected-file">
@@ -942,15 +1033,18 @@
     <editor active="false" />
     <layout>
       <window_info id="GfmBrowser" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12957075" sideWeight="0.693662" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31007752" sideWeight="0.57239515" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Script Monkey" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293371" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32957748" sideWeight="0.5038168" order="10" side_tool="true" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12957075" sideWeight="0.30633804" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30492958" sideWeight="0.509434" order="16" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30492958" sideWeight="0.49056605" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12957075" sideWeight="0.30985916" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40944326" sideWeight="0.37917328" order="17" side_tool="true" content_ui="tabs" />
+      <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13314785" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12957075" sideWeight="0.69014084" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Script Monkey" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293371" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4338028" sideWeight="0.49960256" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.168124" sideWeight="0.5003524" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="SVN Repositories" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32957748" sideWeight="0.49824739" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -962,7 +1056,6 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Properties" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32770744" sideWeight="0.5" order="19" side_tool="false" content_ui="tabs" />
-      <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.13314785" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Tail" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
@@ -970,7 +1063,6 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40944326" sideWeight="0.6208267" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30492958" sideWeight="0.5273003" order="16" side_tool="false" content_ui="tabs" />
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18774861" sideWeight="0.8615495" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1609698" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" x="92" y="92" width="2376" height="1354" />
@@ -982,7 +1074,6 @@
       <window_info id="Thumbnails" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.59478503" sideWeight="0.5" order="21" side_tool="false" content_ui="tabs" />
       <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980973" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4338028" sideWeight="0.49960256" order="2" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -1039,8 +1130,6 @@
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="false" />
     <option name="SHOW_PATCH_IN_EXPLORER" value="false" />
-    <MESSAGE value="Closes #42" />
-    <MESSAGE value="Delayed indexing documents and calculating selectable elements until just before it's needed." />
     <MESSAGE value="Beginnings of being restartless, main functionality is not enabled.&#10;&#10;Disable/Enable works, elements are added and removed following state.&#10;" />
     <MESSAGE value="Last Master Branch State (Restartless, switching to 2.4.2 to get fixed for FF Beta)&#10;" />
     <MESSAGE value="Fixes PhpStorm from code analysis" />
@@ -1064,7 +1153,9 @@
     <MESSAGE value="Elements no longer selected are now unhighlighted." />
     <MESSAGE value="Only A[href] elements are now highlighted." />
     <MESSAGE value="First working V3 of SnapLinks, right-click-drag around links will open those links in new tabs." />
-    <option name="LAST_COMMIT_MESSAGE" value="First working V3 of SnapLinks, right-click-drag around links will open those links in new tabs." />
+    <MESSAGE value="Updated release notes w/ pending beta 1 release, removed old distributions from dist for branch.&#10;" />
+    <MESSAGE value="Created phing/build.xml with initial 3.0b1 build target for submission to AMO.&#10;Tested .xpi build with FF Dev Edition, works like a charm." />
+    <option name="LAST_COMMIT_MESSAGE" value="Created phing/build.xml with initial 3.0b1 build target for submission to AMO.&#10;Tested .xpi build with FF Dev Edition, works like a charm." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1085,17 +1176,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/test/iframe_iframe_content.htm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/locale/en-US/snaplinks.dtd" />
-    <entry file="file://$PROJECT_DIR$/src/content/options.xul" />
-    <entry file="file://$PROJECT_DIR$/src/skin/options.css" />
-    <entry file="file://$PROJECT_DIR$/src/content/snaplinks.xul" />
     <entry file="file://$PROJECT_DIR$/src/content/snaplinks.js" />
     <entry file="file://$PROJECT_DIR$/src/content/options.js" />
     <entry file="file://$PROJECT_DIR$/src/content/Debug.js" />
@@ -1128,13 +1208,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md" />
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dist/README.downloads">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1254,8 +1327,13 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ReleaseNotes.md">
-      <provider editor-type-id="MultiMarkdownFxPreviewEditor">
-        <state />
+      <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="220">
+            <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+          </first_editor>
+          <second_editor />
+        </state>
       </provider>
       <provider editor-type-id="Gfm">
         <state />
@@ -1263,17 +1341,10 @@
       <provider editor-type-id="text-editor">
         <state relative-caret-position="20">
           <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
-      <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="220">
-            <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
+      <provider editor-type-id="MultiMarkdownFxPreviewEditor">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/content-scripts/SnapLinks.es6">
@@ -1290,6 +1361,50 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="840">
           <caret line="42" column="0" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/src/content-scripts/ElementHighlighter-compiled.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/src/content-scripts/ElementHighlighter-compiled.js.map">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/manifest.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="13" column="6" selection-start-line="13" selection-start-column="6" selection-end-line="13" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phing/build.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="20">
+          <caret line="1" column="15" selection-start-line="1" selection-start-column="15" selection-end-line="1" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phing/build.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="660">
+          <caret line="33" column="58" selection-start-line="33" selection-start-column="58" selection-end-line="33" selection-end-column="58" />
           <folding />
         </state>
       </provider>

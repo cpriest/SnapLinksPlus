@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="SnapLinks" default="dist" basedir="../">
+
+	<property file="phing/build.properties"/>
+	<property name="dist-dir" value="./dist"/>
+
+	<property name="moz-ext" value=".xpi"/>
+	<property name="chrome-ext" value=".crx"/>
+
+	<!--<property name="package" value="${phing.project.name}" override="true"/>-->
+	<property name="builddir" value="./build" override="true"/>
+	<!--<property name="srcdir" value="${project.basedir}" override="true"/>-->
+
+
+	<fileset dir="." id="AllFiles">
+		<include name="manifest.json"/>
+		<include name="**/*-compiled.js"/>
+		<include name="**/*-compiled.js.map"/>
+		<exclude name="**/*Test*"/>
+		<exclude name="**/*Playground*"/>
+	</fileset>
+
+	<!-- 	PREPARE 					-->
+	<target name="prepare">
+		<delete dir="${builddir}" />
+
+		<echo msg="Creating build directory." />
+		<mkdir dir="${builddir}"/>
+	</target>
+
+	<!-- 	BUILD 					-->
+	<target name="build" depends="prepare">
+		<echo msg="Copying files to build directory..." />
+		<!--<copy file="manifest.json" tofile="build/manifest.json"/>-->
+		<copy todir="${builddir}">
+			<fileset refid="AllFiles"/>
+		</copy>
+	</target>
+
+	<target name="dist-beta" depends="build">
+		<property name="version" value="${version.major}.${version.minor}b${version.build}"/>
+		<phingcall target="create-dist"/>
+	</target>
+
+	<target name="dist" depends="build">
+		<property name="version" value="${version.major}.${version.minor}"/>
+		<phingcall target="create-dist"/>
+	</target>
+
+	<target name="create-dist">
+		<property name="basename" value="SnapLinks-${version}" />
+
+		<property name="moz-filepath" value="${dist-dir}/${basename}${moz-ext}"/>
+		<echo msg="Creating Mozilla Archive: ${moz-filepath}..."/>
+		<zip destfile="${moz-filepath}" basedir="${builddir}"/>
+		<echo msg="Done."/>
+	</target>
+
+</project>
