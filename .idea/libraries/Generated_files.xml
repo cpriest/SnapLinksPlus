@@ -2,19 +2,25 @@
   <library name="Generated files" type="javaScript">
     <properties>
       <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/src/content-scripts/Utility-compiled.js" />
+        <item url="file://$PROJECT_DIR$/src/content-scripts/Playground-compiled.js" />
         <item url="file://$PROJECT_DIR$/src/content-scripts/ElementHighlighter-compiled.js" />
         <item url="file://$PROJECT_DIR$/src/background-scripts/background-compiled.js" />
         <item url="file://$PROJECT_DIR$/src/content-scripts/SnapLinks-compiled.js" />
         <item url="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer-compiled.js" />
         <item url="file://$PROJECT_DIR$/src/globals-compiled.js" />
+        <item url="file://$PROJECT_DIR$/src/content-scripts/TestWorker-compiled.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
+      <root url="file://$PROJECT_DIR$/src/content-scripts/Utility-compiled.js" />
+      <root url="file://$PROJECT_DIR$/src/content-scripts/Playground-compiled.js" />
       <root url="file://$PROJECT_DIR$/src/content-scripts/ElementHighlighter-compiled.js" />
       <root url="file://$PROJECT_DIR$/src/background-scripts/background-compiled.js" />
       <root url="file://$PROJECT_DIR$/src/content-scripts/SnapLinks-compiled.js" />
       <root url="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer-compiled.js" />
       <root url="file://$PROJECT_DIR$/src/globals-compiled.js" />
+      <root url="file://$PROJECT_DIR$/src/content-scripts/TestWorker-compiled.js" />
     </CLASSES>
     <SOURCES />
   </library>

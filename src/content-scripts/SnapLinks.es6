@@ -132,7 +132,10 @@ new (class EventHandler {
 				case NONE:
 					this.CurrentSelection = new SelectionRect(e.pageY, e.pageX);
 					this.LastMouseEvent   = e;
-					document.documentElement.setCapture(true);
+
+					// Chrome doesn't support/need set/releaseCapture
+					document.documentElement.setCapture &&
+						document.documentElement.setCapture(true);
 					window.addEventListener('mouseup', this._onMouseUp, true);
 					window.addEventListener('mousemove', this._onMouseMove, true);
 					this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
@@ -202,7 +205,9 @@ new (class EventHandler {
 		this.ElementHighlighter.Unhighlight();
 		delete this.ElementHighlighter;
 
-		document.releaseCapture();
+		// Chrome doesn't support/need set/releaseCapture
+		document.releaseCapture &&
+			document.releaseCapture();
 	}
 
 	StopNextContextMenu() {
