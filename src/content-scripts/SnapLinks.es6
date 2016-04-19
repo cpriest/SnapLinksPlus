@@ -114,7 +114,7 @@ new (class EventHandler {
 	}
 
 	RegisterActivationEvents() {
-		window.addEventListener('mousedown', this.onMouseDown.bind(this), true);
+		document.addEventListener('mousedown', this.onMouseDown.bind(this), true);
 	}
 
 	onMouseDown(e) {
@@ -136,8 +136,8 @@ new (class EventHandler {
 					// Chrome doesn't support/need set/releaseCapture
 					document.documentElement.setCapture &&
 						document.documentElement.setCapture(true);
-					window.addEventListener('mouseup', this._onMouseUp, true);
-					window.addEventListener('mousemove', this._onMouseMove, true);
+					document.addEventListener('mouseup', this._onMouseUp, true);
+					document.addEventListener('mousemove', this._onMouseMove, true);
 					this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
 					break;
 			}
@@ -188,12 +188,12 @@ new (class EventHandler {
 	}
 
 	onMouseUp(e) {
-		window.removeEventListener('mouseup', this._onMouseUp, true);
+		document.removeEventListener('mouseup', this._onMouseUp, true);
 
 		clearInterval(this.mmTimer);
 		delete this.mmTimer;
 
-		window.removeEventListener('mousemove', this._onMouseMove, true);
+		document.removeEventListener('mousemove', this._onMouseMove, true);
 		this.CurrentSelection.IsLargeEnoughToActivate() && this.StopNextContextMenu();
 		this.CurrentSelection.remove();
 		delete this.CurrentSelection;

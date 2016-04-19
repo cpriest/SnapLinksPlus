@@ -400,7 +400,7 @@
 						'<tr><th>' +	'window.scrollMaxX/Y'	+ '</th><td>' + window.scrollMaxX 				+ ', ' + window.scrollMaxY 				+ '</td></tr>' +
 					'</table>';
 			}
-			if(this.className.contains('Closed')) {
+			if(this.className.includes('Closed')) {
 				this.innerHTML = '&#9194;';
 			} else {
 				this.innerHTML = this.Detail;

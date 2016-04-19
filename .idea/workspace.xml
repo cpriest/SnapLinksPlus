@@ -7,20 +7,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f5596319-fd00-48d7-81c8-d155ad02ba53" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/background-scripts/background-compiled.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content-scripts/ElementHighlighter-compiled.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content-scripts/Playground-compiled.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content-scripts/SnapLinks-compiled.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/content-scripts/SnapLinks-compiled.js.map" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/globals-compiled.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/SnapLinks-3.0b1.xpi" afterPath="$PROJECT_DIR$/dist/SnapLinks-3.0b1.xpi" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Generated_files.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Generated_files.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/watcherTasks.xml" afterPath="$PROJECT_DIR$/.idea/watcherTasks.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/manifest.json" afterPath="$PROJECT_DIR$/manifest.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/phing/build.xml" afterPath="$PROJECT_DIR$/phing/build.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/content-scripts/SnapLinks.es6" afterPath="$PROJECT_DIR$/src/content-scripts/SnapLinks.es6" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test_links.htm" afterPath="$PROJECT_DIR$/test/test_links.htm" />
     </list>
     <ignored path="snaplinks.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -105,54 +94,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="manifest.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/manifest.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="SnapLinks.es6" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/content-scripts/SnapLinks.es6">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="560">
-              <caret line="103" column="14" selection-start-line="103" selection-start-column="14" selection-end-line="103" selection-end-column="14" />
+            <state relative-caret-position="540">
+              <caret line="147" column="32" selection-start-line="147" selection-start-column="32" selection-end-line="147" selection-end-column="32" />
               <folding>
-                <marker date="1461035696656" expanded="true" signature="3170:3244" placeholder="..." />
+                <marker date="1461108625715" expanded="true" signature="3170:3244" placeholder="..." />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ElementHighlighter.es6" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementHighlighter.es6">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="14" column="3" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="3" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ElementIndexer.es6" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer.es6">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="500">
-              <caret line="75" column="22" selection-start-line="75" selection-start-column="22" selection-end-line="75" selection-end-column="22" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ElementIndexer-compiled.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer-compiled.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1540">
-              <caret line="13" column="28" selection-start-line="13" selection-start-column="28" selection-end-line="13" selection-end-column="28" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -233,7 +182,6 @@
         <option value="$PROJECT_DIR$/snaplinks@dev.rxv.me" />
         <option value="$PROJECT_DIR$/src/content-scripts/ElementSelection-compiled.js" />
         <option value="$PROJECT_DIR$/src/content-scripts/ElementSelection.es6" />
-        <option value="$PROJECT_DIR$/test/test_links.htm" />
         <option value="$PROJECT_DIR$/.idea/workspace.xml" />
         <option value="$PROJECT_DIR$/src/background-scripts/background.es6" />
         <option value="$PROJECT_DIR$/ReleaseNotes.md" />
@@ -249,6 +197,7 @@
         <option value="$PROJECT_DIR$/src/content-scripts/ElementIndexer-compiled.js" />
         <option value="$PROJECT_DIR$/src/content-scripts/ElementIndexer.es6" />
         <option value="$PROJECT_DIR$/manifest.json" />
+        <option value="$PROJECT_DIR$/test/test_links.htm" />
         <option value="$PROJECT_DIR$/src/content-scripts/SnapLinks.es6" />
       </list>
     </option>
@@ -446,6 +395,20 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="SnapLinks3" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
               <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
             </PATH_ELEMENT>
           </PATH>
@@ -921,7 +884,7 @@
       <workItem from="1460864823960" duration="1699000" />
       <workItem from="1460942035656" duration="153000" />
       <workItem from="1460983318851" duration="120000" />
-      <workItem from="1460999278639" duration="6976000" />
+      <workItem from="1460999278639" duration="13393000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed the build number, the new beta is now 2.4.1b3.&#10;">
       <created>1394972910743</created>
@@ -988,7 +951,7 @@
     </servers>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="261325000" />
+    <option name="totallyTimeSpent" value="267742000" />
   </component>
   <component name="TodoView" selected-index="0">
     <todo-panel id="selected-file">
@@ -1018,12 +981,13 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31007752" sideWeight="0.57239515" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3046875" sideWeight="0.509434" order="16" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30492958" sideWeight="0.49056605" order="10" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30203864" sideWeight="0.69084823" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16094421" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" x="92" y="92" width="2376" height="1354" />
+      <window_info id="Version Control" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18025751" sideWeight="0.69084823" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18521127" sideWeight="0.4822335" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40944326" sideWeight="0.37917328" order="17" side_tool="true" content_ui="tabs" />
       <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.13304721" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30203864" sideWeight="0.3091518" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18025751" sideWeight="0.3091518" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Script Monkey" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293371" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298887" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4338028" sideWeight="0.49960256" order="2" side_tool="false" content_ui="tabs" />
@@ -1048,7 +1012,6 @@
       <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18774861" sideWeight="0.8615495" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1609698" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" x="92" y="92" width="2376" height="1354" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34366196" sideWeight="0.62608695" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Command Line Tools Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31496063" sideWeight="0.5" order="18" side_tool="false" content_ui="tabs" />
       <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980973" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1112,7 +1075,6 @@
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="false" />
     <option name="SHOW_PATCH_IN_EXPLORER" value="false" />
-    <MESSAGE value="Beginnings of being restartless, main functionality is not enabled.&#10;&#10;Disable/Enable works, elements are added and removed following state.&#10;" />
     <MESSAGE value="Last Master Branch State (Restartless, switching to 2.4.2 to get fixed for FF Beta)&#10;" />
     <MESSAGE value="Fixes PhpStorm from code analysis" />
     <MESSAGE value="Fix for let hoising change, FF 35 compatibility fix." />
@@ -1137,7 +1099,8 @@
     <MESSAGE value="First working V3 of SnapLinks, right-click-drag around links will open those links in new tabs." />
     <MESSAGE value="Updated release notes w/ pending beta 1 release, removed old distributions from dist for branch.&#10;" />
     <MESSAGE value="Created phing/build.xml with initial 3.0b1 build target for submission to AMO.&#10;Tested .xpi build with FF Dev Edition, works like a charm." />
-    <option name="LAST_COMMIT_MESSAGE" value="Created phing/build.xml with initial 3.0b1 build target for submission to AMO.&#10;Tested .xpi build with FF Dev Edition, works like a charm." />
+    <MESSAGE value="Turns out Chrome and FF versions I'm targeting are &gt; 90% ES6 compliant.  Deleting the -compiled and turned off babel compilation.&#10;Also, in testing with chrome I found it doesn't support setCapture/releaseCapture, so those are no longer invoked there." />
+    <option name="LAST_COMMIT_MESSAGE" value="Turns out Chrome and FF versions I'm targeting are &gt; 90% ES6 compliant.  Deleting the -compiled and turned off babel compilation.&#10;Also, in testing with chrome I found it doesn't support setCapture/releaseCapture, so those are no longer invoked there." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1246,13 +1209,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="520">
           <caret line="26" column="54" selection-start-line="26" selection-start-column="54" selection-end-line="26" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/test_links.htm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="830">
-          <caret line="409" column="56" selection-start-line="409" selection-start-column="56" selection-end-line="409" selection-end-column="56" />
         </state>
       </provider>
     </entry>
@@ -1369,10 +1325,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementHighlighter.es6">
+    <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer-compiled.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="14" column="3" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="3" />
+        <state relative-caret-position="-1540">
+          <caret line="13" column="28" selection-start-line="13" selection-start-column="28" selection-end-line="13" selection-end-column="28" />
           <folding />
         </state>
       </provider>
@@ -1385,10 +1341,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementIndexer-compiled.js">
+    <entry file="file://$PROJECT_DIR$/src/content-scripts/ElementHighlighter.es6">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1540">
-          <caret line="13" column="28" selection-start-line="13" selection-start-column="28" selection-end-line="13" selection-end-column="28" />
+        <state relative-caret-position="280">
+          <caret line="14" column="3" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="3" />
           <folding />
         </state>
       </provider>
@@ -1401,12 +1357,28 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/test/test_links.htm">
+      <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownHtmlPreviewEditor]">
+        <state split_layout="FIRST">
+          <first_editor relative-caret-position="214">
+            <caret line="400" column="31" selection-start-line="400" selection-start-column="31" selection-end-line="400" selection-end-column="31" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="830">
+          <caret line="409" column="56" selection-start-line="409" selection-start-column="56" selection-end-line="409" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/content-scripts/SnapLinks.es6">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="560">
-          <caret line="103" column="14" selection-start-line="103" selection-start-column="14" selection-end-line="103" selection-end-column="14" />
+        <state relative-caret-position="540">
+          <caret line="147" column="32" selection-start-line="147" selection-start-column="32" selection-end-line="147" selection-end-column="32" />
           <folding>
-            <marker date="1461035696656" expanded="true" signature="3170:3244" placeholder="..." />
+            <marker date="1461108625715" expanded="true" signature="3170:3244" placeholder="..." />
           </folding>
         </state>
       </provider>
