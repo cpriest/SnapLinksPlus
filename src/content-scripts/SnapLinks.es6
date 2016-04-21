@@ -1,3 +1,5 @@
+"use strict";
+
 /*
  * Copyright (c) 2016 Clint Priest
  *
@@ -13,8 +15,6 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-
-"use strict";
 
 class Rect {
 	constructor(top, left, bottom, right) {
@@ -108,9 +108,9 @@ class SelectionRect {
 new (class EventHandler {
 	constructor() {
 		this.RegisterActivationEvents();
-		this._onMouseUp          = this.onMouseUp.bind(this);
-		this._onMouseMove        = this.onMouseMove.bind(this);
-		this._onContextMenu      = this.onContextMenu.bind(this);
+		this._onMouseUp     = this.onMouseUp.bind(this);
+		this._onMouseMove   = this.onMouseMove.bind(this);
+		this._onContextMenu = this.onContextMenu.bind(this);
 	}
 
 	RegisterActivationEvents() {
@@ -183,7 +183,8 @@ new (class EventHandler {
 			);
 		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
 			this.ElementIndexer     = new ElementIndexer();
-			this.ElementHighlighter = new ElementHighlighter();
+			this.SvgOverlay			= new SvgOverlay();
+			this.ElementHighlighter = new ElementHighlighter(this.SvgOverlay, data.HighlightStyles.ActOnElements);
 		}
 	}
 
@@ -194,16 +195,18 @@ new (class EventHandler {
 		delete this.mmTimer;
 
 		document.removeEventListener('mousemove', this._onMouseMove, true);
-		this.CurrentSelection.IsLargeEnoughToActivate() && this.StopNextContextMenu();
+		this.CurrentSelection.IsLargeEnoughToActivate()
+			&& this.StopNextContextMenu();
 		this.CurrentSelection.remove();
 		delete this.CurrentSelection;
+
 		delete this.ElementIndexer;
 
 		this.ActUpon(this.SelectedElements, e);
 		delete this.SelectedElements;
 
-		this.ElementHighlighter.Unhighlight();
-		delete this.ElementHighlighter;
+		this.ElementHighlighter.destruct(); delete this.ElementHighlighter;
+		this.SvgOverlay.destruct(); delete this.SvgOverlay;
 
 		// Chrome doesn't support/need set/releaseCapture
 		document.releaseCapture &&
@@ -223,7 +226,7 @@ new (class EventHandler {
 		// For now we are simply going to create new tabs for the selected elements
 		chrome.runtime.sendMessage({
 			Action: OPEN_URLS_IN_TABS,
-			tUrls: 	tElems.map((elem) => elem.href),
+			tUrls : tElems.map((elem) => elem.href),
 		});
 	}
 });

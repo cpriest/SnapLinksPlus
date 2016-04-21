@@ -14,12 +14,13 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+let ElemDocRects;
 
 "use strict";
 
 class RectMapper {
 	constructor() {
-		this.ElemRects = new WeakMap();
+		this.clear();
 	}
 
 	/**
@@ -56,7 +57,12 @@ class RectMapper {
 				rect.bottom + offset.y, rect.right + offset.x);
 		});
 	}
+	clear() {
+		this.ElemRects = new WeakMap();
+	}
 }
+
+ElemDocRects = new RectMapper();
 
 /**
  * This class is responsible for:
@@ -66,7 +72,6 @@ class RectMapper {
 class ElementIndexer {
 	constructor() {
 		this.Anchors      = document.querySelectorAll('A[href]');
-		this.ElementRects = new RectMapper();
 
 		this.UpdateIndex();
 	}
@@ -92,7 +97,7 @@ class ElementIndexer {
 			if(this.BoundaryIndex[ idx ])
 				this.BoundaryIndex[ idx ].push(elem);
 //			@PerfTest
-//			this.ElementRects.get(elem, offset);
+//			ElemDocRects.get(elem, offset);
 		}
 //		@PerfTest
 //		rr.report(this.Anchors.length);
@@ -114,7 +119,7 @@ class ElementIndexer {
 
 		for(var j = FirstBucket; j <= LastBucket; j++) {
 			for(var elem of this.BoundaryIndex[ j ]) {
-				for(var r of this.ElementRects.get(elem, offset)) {
+				for(var r of ElemDocRects.get(elem, offset)) {
 					if(SelectionRect.intersects(r)) {
 						tMatches.push(elem);
 						break;	// for(var r...

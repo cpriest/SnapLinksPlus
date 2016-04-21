@@ -16,14 +16,19 @@
 
 "use strict";
 
+/**
+ * Handy shortcut for creating an element or element tree
+ * @param html	string	Raw HTML to be used for creating the nodes
+ * @returns {Element}
+ */
 function CreateElement(html) {
 	let DocFrag = document.createDocumentFragment();
 	let result;
 
 	DocFrag.appendChild(document.createElement('div'));
 	DocFrag.firstChild.innerHTML = html;
-	result                       = DocFrag.firstChild.firstChild;
-	result.parentNode.removeChild(result);
+	result                       = DocFrag.firstElementChild.firstElementChild;
+	result.remove();
 	return result;
 }
 

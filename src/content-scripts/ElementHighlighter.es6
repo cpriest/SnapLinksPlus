@@ -25,30 +25,78 @@
  *    Current plan for 'quickly' filtering selectable elements is to index by element.getClientBoundingRect().top divided into N buckets
  */
 class ElementHighlighter {
-	constructor() {
+	/**
+	 * Initializes the ElementHighlighter
+	 *
+	 * @param Overlay	SvgOverlay	The overlay element to use
+	 * @param style		string		The style to be applied to the SVGRect elements
+	 */
+	constructor(Overlay, style) {
+		this.Overlay = Overlay;
+		this.style = style;
+
+		this.HighlightElemMap = new WeakMap();
 		this.HighlightedElements = [];
 	}
 
+	/**
+	 * Called to highlight document elements using the SvgOverlay layer
+	 * @param tElems Element[]	An array of elements which represent the current set of elements to be highlighted
+	 */
 	Highlight(tElems) {
 		let tPrevElems  = this.HighlightedElements,
-			Unhighlight = tPrevElems.filter(
+			tUnhighlight = tPrevElems.filter(
 				(elem) => { return !tElems.includes(elem); }
 			),
-			Highlight   = tElems.filter(
+			tHighlight   = tElems.filter(
 				(elem) => { return !tPrevElems.includes(elem); }
-			);
-		for(let elem of Unhighlight)
-			elem.style.outline = '';
-		for(let elem of Highlight)
-			elem.style.outline = '1px solid red';
+			),
+			offset = { x: document.documentElement.scrollLeft, y: document.documentElement.scrollTop };
+
+		/* Remove highlighting of elements no longer in tElems */
+		for(let elem of tUnhighlight)
+			this.Overlay.ReleaseRects(this.HighlightElemMap.get(elem));
+
+		/* Add highlights for elements new to tElems */
+		for(let elem of tHighlight) {
+
+			let tSvgRects = [ ];
+			for(let r of ElemDocRects.get(elem)) {
+				let svgRect = this.Overlay.GetRect(),
+					attr = {
+						x     : r.left,
+						y     : r.top,
+						width : r.width,
+						height: r.height,
+						style : this.style,
+					};
+
+				for(var name in attr)
+					svgRect.setAttribute(name, attr[name]);
+
+				tSvgRects.push(svgRect);
+			}
+			this.HighlightElemMap.set(elem, tSvgRects);
+		}
 		this.HighlightedElements = tElems;
 	}
 
+	/**
+	 * Remove all highlights from the overlay and clear our internals
+	 */
 	Unhighlight() {
-		for(var elem of this.HighlightedElements) {
-			elem.style.outline = '';
-		}
+		for(var elem of this.HighlightedElements)
+			this.Overlay.ReleaseRects(this.HighlightElemMap.get(elem));
+		this.HighlightElemMap = new WeakMap();
 		this.HighlightedElements = [];
+	}
+
+	/**
+	 * Called manually when this object is destroyed to clean up
+	 */
+	destruct() {
+		this.Unhighlight();
+		delete this.HighlightElemMap;
 	}
 }
 

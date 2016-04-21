@@ -16,6 +16,8 @@
 
 "use strict";
 
+let docElem = document.documentElement;
+
 const NONE  = 0,
 	  CTRL  = 1,
 	  ALT   = 2,
@@ -38,6 +40,9 @@ const data = {
 			minX: 5,
 			minY: 5,
 		}
+	},
+	HighlightStyles: {
+		ActOnElements: 'fill: rgba(255,0,0,.1); stroke: red; stroke-width: .75px;',
 	}
 };
 
