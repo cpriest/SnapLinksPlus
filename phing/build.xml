@@ -16,20 +16,9 @@
   ~ DEALINGS IN THE SOFTWARE.
   -->
 
-<project name="SnapLinks" default="dist" basedir="../">
+<project name="SnapLinks" default="build-again" basedir="../">
 
-	<property file="phing/build.properties"/>
-	<property name="dist-dir" value="./dist"/>
-
-	<property name="moz-ext" value=".xpi"/>
-	<property name="chrome-ext" value=".crx"/>
-
-	<!--<property name="package" value="${phing.project.name}" override="true"/>-->
-	<property name="builddir" value="./build" override="true"/>
-	<!--<property name="srcdir" value="${project.basedir}" override="true"/>-->
-
-
-	<fileset dir="." id="AllFiles">
+	<fileset dir="." id="AllFiles_Compiled">
 		<include name="manifest.json"/>
 		<include name="**/*-compiled.js"/>
 		<include name="**/*-compiled.js.map"/>
@@ -37,7 +26,18 @@
 		<exclude name="**/*Playground*"/>
 	</fileset>
 
+	<fileset dir="." id="AllFiles">
+		<include name="**/*.png"/>
+		<include name="**/*.es6"/>
+		<exclude name="**/*Test*"/>
+		<exclude name="res/Screenshot*.*"/>
+		<exclude name="**/*Playground*"/>
+	</fileset>
+
+
 	<!-- 	PREPARE 					-->
+
+
 	<target name="prepare">
 		<delete dir="${builddir}" />
 
@@ -45,31 +45,93 @@
 		<mkdir dir="${builddir}"/>
 	</target>
 
+	<target name="init">
+		<property file="phing/build.properties"/>
+		<property name="dist-dir" value="./dist"/>
+
+		<property name="moz-ext" value=".xpi"/>
+		<property name="chrome-ext" value=".crx"/>
+
+		<!--<property name="package" value="${phing.project.name}" override="true"/>-->
+		<property name="builddir" value="./build" override="true"/>
+		<!--<property name="srcdir" value="${project.basedir}" override="true"/>-->
+
+	</target>
+
+
 	<!-- 	BUILD 					-->
+
+
 	<target name="build" depends="prepare">
+
+		<property name="version" value="${version.major}.${version.minor}.${version.patch}.${version.build}"/>
+		<if>
+			<equals arg1="${version.type}" arg2="beta"/>
+			<then>
+				<property name="version_name" value="${version.major}.${version.minor}.${version.patch}b${version.build}"/>
+			</then>
+			<else>
+				<property name="version_name" value="${version}"/>
+			</else>
+		</if>
+
 		<echo msg="Copying files to build directory..." />
-		<!--<copy file="manifest.json" tofile="build/manifest.json"/>-->
+		<copy file="manifest.json" tofile="build/manifest.json">
+			<filterchain>
+				<expandproperties/>
+			</filterchain>
+		</copy>
 		<copy todir="${builddir}">
 			<fileset refid="AllFiles"/>
 		</copy>
 	</target>
 
-	<target name="dist-beta" depends="build">
-		<property name="version" value="${version.major}.${version.minor}b${version.build}"/>
+	<target name="build-increment">
+		<php expression="${version.build}+1" returnProperty="version.build"/>
+		<phingcall target="create-dist"/>
+		<echoproperties regex="/^(version)\..+$/" destfile="phing/build.properties"/>
+	</target>
+
+
+	<!--	EXECUTION TARGETS -->
+
+
+	<target name="build-again" depends="init">
 		<phingcall target="create-dist"/>
 	</target>
 
-	<target name="dist" depends="build">
-		<property name="version" value="${version.major}.${version.minor}"/>
-		<phingcall target="create-dist"/>
+	<target name="build-release" depends="init">
+		<property name="version.type" value="release" override="true"/>
+		<phingcall target="build-increment"/>
 	</target>
 
-	<target name="create-dist">
-		<property name="basename" value="SnapLinks-${version}" />
+	<target name="build-beta" depends="init">
+		<property name="version.type" value="beta" override="true"/>
+		<phingcall target="build-increment"/>
+	</target>
 
-		<property name="moz-filepath" value="${dist-dir}/${basename}${moz-ext}"/>
+
+	<!--	PACKAGE				-->
+
+	<target name="create-dist" depends="build">
+		<property name="basename" value="SnapLinks-${version_name}" />
+
+		<mkdir dir="${dist-dir}/chrome"/>
+		<mkdir dir="${dist-dir}/moz"/>
+
+		<property name="moz-filepath" value="${dist-dir}/moz/${basename}${moz-ext}"/>
 		<echo msg="Creating Mozilla Archive: ${moz-filepath}..."/>
 		<zip destfile="${moz-filepath}" basedir="${builddir}"/>
+		<echo msg="Done."/>
+
+		<property name="chrome-filepath" value="${dist-dir}/chrome/${basename}${chrome-ext}"/>
+		<echo msg="Creating Chrome Archive: ${chrome-filepath}..."/>
+		<zip destfile="${chrome-filepath}" basedir="${builddir}"/>
+		<echo msg="Done."/>
+
+		<property name="chrome-zip-filepath" value="${dist-dir}/chrome/${basename}.zip"/>
+		<echo msg="Creating Chrome Zip Archive: ${chrome-zip-filepath}..."/>
+		<zip destfile="${chrome-zip-filepath}" basedir="${builddir}"/>
 		<echo msg="Done."/>
 	</target>
 

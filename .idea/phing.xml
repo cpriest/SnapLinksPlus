@@ -5,11 +5,13 @@
       <buildFile options="" path="file://$PROJECT_DIR$/phing/build.xml">
         <targetsToHide>
           <target value="prepare" />
+          <target value="init" />
           <target value="build" />
+          <target value="build-increment" />
           <target value="create-dist" />
         </targetsToHide>
       </buildFile>
     </buildFilePaths>
-    <phingPath>C:/sync/lib/phing/phing-latest.phar</phingPath>
+    <phingPath>C:/sync/lib/phing/phing-latest_2.phar</phingPath>
   </component>
 </project>
