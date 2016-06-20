@@ -116,22 +116,9 @@
 	<target name="create-dist" depends="build">
 		<property name="basename" value="SnapLinks-${version_name}" />
 
-		<mkdir dir="${dist-dir}/chrome"/>
-		<mkdir dir="${dist-dir}/moz"/>
-
-		<property name="moz-filepath" value="${dist-dir}/moz/${basename}${moz-ext}"/>
-		<echo msg="Creating Mozilla Archive: ${moz-filepath}..."/>
-		<zip destfile="${moz-filepath}" basedir="${builddir}"/>
-		<echo msg="Done."/>
-
-		<property name="chrome-filepath" value="${dist-dir}/chrome/${basename}${chrome-ext}"/>
-		<echo msg="Creating Chrome Archive: ${chrome-filepath}..."/>
-		<zip destfile="${chrome-filepath}" basedir="${builddir}"/>
-		<echo msg="Done."/>
-
-		<property name="chrome-zip-filepath" value="${dist-dir}/chrome/${basename}.zip"/>
-		<echo msg="Creating Chrome Zip Archive: ${chrome-zip-filepath}..."/>
-		<zip destfile="${chrome-zip-filepath}" basedir="${builddir}"/>
+		<property name="filepath" value="${dist-dir}/${basename}.zip"/>
+		<echo msg="Creating Zip Archive: ${filepath}..."/>
+		<zip destfile="${filepath}" basedir="${builddir}"/>
 		<echo msg="Done."/>
 	</target>
 

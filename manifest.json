@@ -17,7 +17,7 @@
 
 	"applications":           {
 		"gecko": {
-			"id":                 "snaplinks@dev.rxv.me",
+			"id":                 "snaplinks@snaplinks.mozdev.org",
 			"strict_min_version": "45.0.0"
 		}
 	},
