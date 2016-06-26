@@ -76,7 +76,7 @@
 		</if>
 
 		<echo msg="Copying files to build directory..." />
-		<copy file="manifest.json" tofile="build/manifest.json">
+		<copy file="phing/manifest-in.json" tofile="build/manifest.json">
 			<filterchain>
 				<expandproperties/>
 			</filterchain>
@@ -84,6 +84,7 @@
 		<copy todir="${builddir}">
 			<fileset refid="AllFiles"/>
 		</copy>
+		<copy file="build/manifest.json" tofile="manifest.json" />
 	</target>
 
 	<target name="build-increment">
