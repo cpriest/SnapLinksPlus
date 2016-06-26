@@ -1,3 +1,13 @@
+v3.0.0b3
+========
+- Pressing escape will now cancel an already started drag operation
+
+v3.0.0b2
+========
+- Mostly a build system setup, compatibility with Chrome & submission
+  to AMO/Chrome Mostly a build system setup, compatibility with Chrome
+  & submission to AMO/Chrome
+
 v3.0b1
 ======
  - Initial beta version 1 of 3.0 - Tracer bullet to the target

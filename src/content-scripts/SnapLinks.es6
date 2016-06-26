@@ -18,14 +18,14 @@
 
 class Rect {
 	constructor(top, left, bottom, right) {
-		[ this.originTop, this.originLeft ]              = [ top, left ];
-		[ this.top, this.left, this.bottom, this.right ] = [ top, left, bottom, right ];
+		[this.originTop, this.originLeft]              = [top, left];
+		[this.top, this.left, this.bottom, this.right] = [top, left, bottom, right];
 		this.calculateProperties();
 	}
 
 	setBottomRight(bottom, right) {
-		[ this.top, this.left ]     = [ Math.min(this.originTop, bottom), Math.min(this.originLeft, right) ];
-		[ this.bottom, this.right ] = [ Math.max(this.originTop, bottom), Math.max(this.originLeft, right) ];
+		[this.top, this.left]     = [Math.min(this.originTop, bottom), Math.min(this.originLeft, right)];
+		[this.bottom, this.right] = [Math.max(this.originTop, bottom), Math.max(this.originLeft, right)];
 		return this.calculateProperties();
 	}
 
@@ -36,8 +36,8 @@ class Rect {
 	}
 
 	expand(x, y) {
-		[ this.top, this.bottom ] = [ this.top - y, this.bottom + y ];
-		[ this.left, this.right ] = [ this.left - x, this.right + x ];
+		[this.top, this.bottom] = [this.top - y, this.bottom + y];
+		[this.left, this.right] = [this.left - x, this.right + x];
 		return this.calculateProperties();
 	}
 
@@ -57,8 +57,8 @@ class Rect {
 	}
 
 	clipTo(r) {
-		[ this.top, this.left ]     = [ Math.max(this.top, r.top), Math.max(this.left, r.left) ];
-		[ this.bottom, this.right ] = [ Math.min(this.bottom, r.bottom), Math.min(this.right, r.right) ];
+		[this.top, this.left]     = [Math.max(this.top, r.top), Math.max(this.left, r.left)];
+		[this.bottom, this.right] = [Math.min(this.bottom, r.bottom), Math.min(this.right, r.right)];
 		return this.calculateProperties();
 	}
 
@@ -87,8 +87,8 @@ class SelectionRect {
 			.setBottomRight(bottom, right)
 			.clipTo(dr);
 
-		[ this.uiElem.style.top, this.uiElem.style.left ]     = [ this.dims.top + 'px', this.dims.left + 'px' ];
-		[ this.uiElem.style.height, this.uiElem.style.width ] = [ this.dims.height + 'px', this.dims.width + 'px' ];
+		[this.uiElem.style.top, this.uiElem.style.left]     = [this.dims.top + 'px', this.dims.left + 'px'];
+		[this.uiElem.style.height, this.uiElem.style.width] = [this.dims.height + 'px', this.dims.width + 'px'];
 
 		this.uiElem.style.display = this.IsLargeEnoughToActivate()
 			? ''
@@ -111,6 +111,7 @@ new (class EventHandler {
 		this._onMouseUp     = this.onMouseUp.bind(this);
 		this._onMouseMove   = this.onMouseMove.bind(this);
 		this._onContextMenu = this.onContextMenu.bind(this);
+		this._onKeyDown     = this.onKeyDown.bind(this);
 	}
 
 	RegisterActivationEvents() {
@@ -130,22 +131,51 @@ new (class EventHandler {
 					break;
 
 				case NONE:
-					this.CurrentSelection = new SelectionRect(e.pageY, e.pageX);
-					this.LastMouseEvent   = e;
-
-					// Chrome doesn't support/need set/releaseCapture
-					document.documentElement.setCapture &&
-						document.documentElement.setCapture(true);
-					document.addEventListener('mouseup', this._onMouseUp, true);
-					document.addEventListener('mousemove', this._onMouseMove, true);
-					this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
+					this.BeginDrag(e);
 					break;
 			}
 		}
 	}
 
-	onMouseMove(e) {
-		this.LastMouseEvent = e;
+	onMouseMove(e) { this.LastMouseEvent = e; }
+
+	onMouseUp(e) {
+		if(this.CurrentSelection.IsLargeEnoughToActivate())
+			this.StopNextContextMenu();
+
+		this.EndDrag(e);
+
+		if(this.SelectedElements) {
+			this.ActUpon(this.SelectedElements, e);
+			delete this.SelectedElements;
+		}
+	}
+
+	onKeyDown(e) {
+		switch(e.key) {
+			case 'Escape':
+				this.EndDrag(e);
+				break;
+		}
+	}
+
+	onContextMenu(e) {
+		window.removeEventListener('oncontextmenu', this._onContextMenu, true);
+		e.preventDefault();
+	}
+
+	BeginDrag(e) {
+		this.CurrentSelection = new SelectionRect(e.pageY, e.pageX);
+		this.LastMouseEvent   = e;
+
+		// Chrome doesn't support/need set/releaseCapture
+		if(document.documentElement.setCapture)
+			document.documentElement.setCapture(true);
+
+		document.addEventListener('mouseup', this._onMouseUp, true);
+		document.addEventListener('mousemove', this._onMouseMove, true);
+		document.addEventListener('keydown', this._onKeyDown, true);
+		this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
 	}
 
 	onMouseMoveInterval() {
@@ -175,7 +205,7 @@ new (class EventHandler {
 
 		/* Set our bottom right to scroll + max(clientX/Y, clientWidth/Height) */
 		this.CurrentSelection.setBottomRight(docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight),
-			docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth));
+											 docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth));
 
 		if(this.ElementIndexer) {
 			this.ElementHighlighter.Highlight(
@@ -183,33 +213,41 @@ new (class EventHandler {
 			);
 		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
 			this.ElementIndexer     = new ElementIndexer();
-			this.SvgOverlay			= new SvgOverlay();
+			this.SvgOverlay         = new SvgOverlay();
 			this.ElementHighlighter = new ElementHighlighter(this.SvgOverlay, data.HighlightStyles.ActOnElements);
 		}
 	}
 
-	onMouseUp(e) {
+	EndDrag(e) {
 		document.removeEventListener('mouseup', this._onMouseUp, true);
-
-		clearInterval(this.mmTimer);
-		delete this.mmTimer;
-
 		document.removeEventListener('mousemove', this._onMouseMove, true);
-		this.CurrentSelection.IsLargeEnoughToActivate()
-			&& this.StopNextContextMenu();
-		this.CurrentSelection.remove();
-		delete this.CurrentSelection;
+		document.removeEventListener('keydown', this._onKeyDown, true);
 
-		delete this.ElementIndexer;
+		if(this.mmTimer) {
+			clearInterval(this.mmTimer);
+			delete this.mmTimer;
+		}
 
-		this.ActUpon(this.SelectedElements, e);
-		delete this.SelectedElements;
+		if(this.CurrentSelection) {
+			this.CurrentSelection.remove();
+			delete this.CurrentSelection;
+		}
 
-		this.ElementHighlighter.destruct(); delete this.ElementHighlighter;
-		this.SvgOverlay.destruct(); delete this.SvgOverlay;
+		if(this.ElementIndexer) {
+			delete this.ElementIndexer;
+		}
+
+		if(this.ElementHighlighter) {
+			this.ElementHighlighter.destruct();
+			delete this.ElementHighlighter;
+		}
+		if(this.SvgOverlay) {
+			this.SvgOverlay.destruct();
+			delete this.SvgOverlay;
+		}
 
 		// Chrome doesn't support/need set/releaseCapture
-		document.releaseCapture &&
+		if(document.releaseCapture)
 			document.releaseCapture();
 	}
 
@@ -217,16 +255,11 @@ new (class EventHandler {
 		window.addEventListener('contextmenu', this._onContextMenu, true);
 	}
 
-	onContextMenu(e) {
-		window.removeEventListener('oncontextmenu', this._onContextMenu, true);
-		e.preventDefault();
-	}
-
 	ActUpon(tElems) {
 		// For now we are simply going to create new tabs for the selected elements
 		chrome.runtime.sendMessage({
-			Action: OPEN_URLS_IN_TABS,
-			tUrls : tElems.map((elem) => elem.href),
-		});
+									   Action: OPEN_URLS_IN_TABS,
+									   tUrls : tElems.map((elem) => elem.href),
+								   });
 	}
 });
