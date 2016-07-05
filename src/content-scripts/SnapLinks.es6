@@ -160,7 +160,7 @@ new (class EventHandler {
 	}
 
 	onContextMenu(e) {
-		window.removeEventListener('oncontextmenu', this._onContextMenu, true);
+		window.removeEventListener('contextmenu', this._onContextMenu, true);
 		e.preventDefault();
 	}
 
