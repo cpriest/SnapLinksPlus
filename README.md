@@ -1,4 +1,4 @@
-# Snap Links Plus [![](http://img.shields.io/gratipay/cpriest.svg)](https://gratipay.com/cpriest)
+# Snap Links Plus
 
 Snap Links Plus is being re-written from the ground up to be a [Web Extension](https://developer.mozilla.org/en-US/Add-ons/WebExtensions).
 
@@ -8,7 +8,7 @@ Personally I have put off fixing Snap Links Plus because I have not had the time
 
 I wholly encourage forking this project and submitting code and patches for inclusion.
 
-It is doubtful that all v2 features will be rewritten for v3 without the help of others.
+**It is doubtful that all v2 features will be rewritten for v3 without the help of others**.
 
 ----
 
@@ -26,4 +26,4 @@ To install the addon, please go to the [addon page](https://addons.mozilla.org/e
 
 # Version History
 
-v3.0a0 - Purging of old code base
+See [Release Notes](ReleaseNotes.md) for version information.
