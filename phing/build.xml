@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2016 Clint Priest
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  ~ to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+  ~ and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+  ~ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+  ~ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+  ~ DEALINGS IN THE SOFTWARE.
+  -->
+
+<project name="SnapLinks" default="build-again" basedir="../">
+
+	<fileset dir="." id="AllFiles_Compiled">
+		<include name="manifest.json"/>
+		<include name="**/*-compiled.js"/>
+		<include name="**/*-compiled.js.map"/>
+		<exclude name="**/*Test*"/>
+		<exclude name="**/*Playground*"/>
+	</fileset>
+
+	<fileset dir="." id="AllFiles">
+		<include name="**/*.png"/>
+		<include name="**/*.es6"/>
+		<exclude name="**/*Test*"/>
+		<exclude name="res/Screenshot*.*"/>
+		<exclude name="**/*Playground*"/>
+	</fileset>
+
+
+	<!-- 	PREPARE 					-->
+
+
+	<target name="prepare">
+		<delete dir="${builddir}" />
+
+		<echo msg="Creating build directory." />
+		<mkdir dir="${builddir}"/>
+	</target>
+
+	<target name="init">
+		<property file="phing/build.properties"/>
+		<property name="dist-dir" value="./dist"/>
+
+		<property name="moz-ext" value=".xpi"/>
+		<property name="chrome-ext" value=".crx"/>
+
+		<!--<property name="package" value="${phing.project.name}" override="true"/>-->
+		<property name="builddir" value="./build" override="true"/>
+		<!--<property name="srcdir" value="${project.basedir}" override="true"/>-->
+
+	</target>
+
+
+	<!-- 	BUILD 					-->
+
+
+	<target name="build" depends="prepare">
+
+		<property name="version" value="${version.major}.${version.minor}.${version.patch}.${version.build}"/>
+		<if>
+			<equals arg1="${version.type}" arg2="beta"/>
+			<then>
+				<property name="version_name" value="${version.major}.${version.minor}.${version.patch}b${version.build}"/>
+			</then>
+			<else>
+				<property name="version_name" value="${version}"/>
+			</else>
+		</if>
+
+		<echo msg="Copying files to build directory..." />
+		<copy file="phing/manifest-in.json" tofile="build/manifest.json">
+			<filterchain>
+				<expandproperties/>
+			</filterchain>
+		</copy>
+		<copy todir="${builddir}">
+			<fileset refid="AllFiles"/>
+		</copy>
+		<copy file="build/manifest.json" tofile="manifest.json" />
+	</target>
+
+	<target name="build-increment">
+		<php expression="${version.build}+1" returnProperty="version.build"/>
+		<phingcall target="create-dist"/>
+		<echoproperties regex="/^(version)\..+$/" destfile="phing/build.properties"/>
+	</target>
+
+
+	<!--	EXECUTION TARGETS -->
+
+
+	<target name="build-again" depends="init">
+		<phingcall target="create-dist"/>
+	</target>
+
+	<target name="build-release" depends="init">
+		<property name="version.type" value="release" override="true"/>
+		<phingcall target="build-increment"/>
+	</target>
+
+	<target name="build-beta" depends="init">
+		<property name="version.type" value="beta" override="true"/>
+		<phingcall target="build-increment"/>
+	</target>
+
+
+	<!--	PACKAGE				-->
+
+	<target name="create-dist" depends="build">
+		<property name="basename" value="SnapLinks-${version_name}" />
+
+		<property name="filepath" value="${dist-dir}/${basename}.zip"/>
+		<echo msg="Creating Zip Archive: ${filepath}..."/>
+		<zip destfile="${filepath}" basedir="${builddir}"/>
+		<echo msg="Done."/>
+	</target>
+
+</project>

@@ -1,3 +1,21 @@
-- 2.4.1
-	- Fixed selection rectangle exceeding web browser pane boundaries
- 	- Improved response time of regular right-click by delaying indexing until it's actually needed
+v3.0.0b3
+========
+- Pressing escape will now cancel an already started drag operation
+
+v3.0.0b2
+========
+- Mostly a build system setup, compatibility with Chrome & submission
+  to AMO/Chrome Mostly a build system setup, compatibility with Chrome
+  & submission to AMO/Chrome
+
+v3.0b1
+======
+ - Initial beta version 1 of 3.0 - Tracer bullet to the target
+ - Supports a single complete use-case which is right-click-drag
+   to select any A[href] links and open them in tabs
+ - Auto-scrolling of drag rect
+ - Should be compatible with chrome
+ 
+v3.0a1
+======
+ - Initial purging of old XUL/XPCOM files

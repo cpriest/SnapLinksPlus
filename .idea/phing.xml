@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PhingConfiguration">
+    <buildFilePaths>
+      <buildFile options="" path="file://$PROJECT_DIR$/phing/build.xml">
+        <targetsToHide>
+          <target value="prepare" />
+          <target value="init" />
+          <target value="build" />
+          <target value="build-increment" />
+          <target value="create-dist" />
+        </targetsToHide>
+      </buildFile>
+    </buildFilePaths>
+    <phingPath>C:/sync/lib/phing/phing-latest_2.phar</phingPath>
+  </component>
+</project>

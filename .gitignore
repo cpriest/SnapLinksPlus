@@ -1,7 +1,9 @@
 babelzilla/
-build
 dist/amo
 dist/babelzilla
 src/snaplinks@snaplinks.mozdev.org
 /LocalNotes.txt
 /.idea/shelf
+/build
+/.idea/workspace.xml
+.idea/SnapLinks3.time
