@@ -43,20 +43,22 @@ class RectMapper {
 	/** Returns an array of { top, left, width, height } objects which combined make up the bounding rects of the given element,
 	 *    this uses the built-in .getClientRects() and additionally compensates for 'block' elements which it would appear is not
 	 *    handled appropriately for our needs by Mozilla or the standard
-	 */
+	 **/
 	GetElementRects(elem, offset) {
 		offset = offset || { x: 0, y: 0 };
 
-		var Rects = $A(elem.getClientRects());
+		let Rects = $A(elem.getClientRects());
 
-		$A(elem.querySelectorAll('IMG')).forEach(function(elem) {
-			Rects = Rects.concat($A(elem.getClientRects()));
-		}, this);
+		$A(elem.querySelectorAll('IMG'))
+			.forEach(function(elem) {
+				Rects = Rects.concat($A(elem.getClientRects()));
+			}, this);
 		return Rects.map(function(rect) {
 			return new Rect(rect.top + offset.y, rect.left + offset.x,
 				rect.bottom + offset.y, rect.right + offset.x);
 		});
 	}
+
 	clear() {
 		this.ElemRects = new WeakMap();
 	}
@@ -71,7 +73,7 @@ ElemDocRects = new RectMapper();
  */
 class ElementIndexer {
 	constructor() {
-		this.Anchors      = document.querySelectorAll('A[href]');
+		this.Anchors = document.querySelectorAll('A[href]');
 
 		this.UpdateIndex();
 	}
@@ -86,16 +88,16 @@ class ElementIndexer {
 		let offset    = { x: document.documentElement.scrollLeft, y: document.documentElement.scrollTop };
 
 		this.BoundaryIndex = [];
-		for(var j = 0; j < Buckets; j++)
-			this.BoundaryIndex[ j ] = [];
+		for(let j = 0; j < Buckets; j++)
+			this.BoundaryIndex[j] = [];
 
 //		@PerfTest
 //		var rr = new RateReporter('Calculated ${Count} Elements in ${Elapsed} (${PerSecond})');
 		for(elem of this.Anchors) {
 			/* GetBucketFromTop() */
 			idx = Math.floor((elem.getBoundingClientRect().top + scrollTop) * Buckets / docHeight);
-			if(this.BoundaryIndex[ idx ])
-				this.BoundaryIndex[ idx ].push(elem);
+			if(this.BoundaryIndex[idx])
+				this.BoundaryIndex[idx].push(elem);
 //			@PerfTest
 //			ElemDocRects.get(elem, offset);
 		}
@@ -117,12 +119,12 @@ class ElementIndexer {
 			offset      = { x: document.documentElement.scrollLeft, y: document.documentElement.scrollTop },
 			tMatches    = [];
 
-		for(var j = FirstBucket; j <= LastBucket; j++) {
-			for(var elem of this.BoundaryIndex[ j ]) {
-				for(var r of ElemDocRects.get(elem, offset)) {
+		for(let j = FirstBucket; j <= LastBucket; j++) {
+			for(let elem of this.BoundaryIndex[j]) {
+				for(let r of ElemDocRects.get(elem, offset)) {
 					if(SelectionRect.intersects(r)) {
 						tMatches.push(elem);
-						break;	// for(var r...
+						break;	// for(let r...
 					}
 				}
 			}

@@ -17,7 +17,7 @@
 "use strict";
 
 /**
- * This class is intended to be a transparent element sized to overlay the entire document and
+ * This class is intended to manage a transparent element sized to overlay the entire document and
  *    used to highlight elements in various ways.
  *
  *    To start with, it will just be to replace the elem.style.outline that's presently used and doesn't
@@ -45,14 +45,14 @@ class SvgOverlay {
 		if(this.AvailableRects.length)
 			return this.AvailableRects.pop();
 
-		var elem = this.Overlay.firstElementChild.cloneNode();
+		let elem = this.Overlay.firstElementChild.cloneNode();
 		this.Overlay.appendChild(elem);
 		return elem;
 	}
 
 	/**
 	 *
-	 * @param tSvgElems SVGRect[]	An array of SVGRects that are no longer needed, they are hidden and added to available rects
+	 * @param tSvgElems SVGRect[]    An array of SVGRects that are no longer needed, they are hidden and added to available rects
 	 */
 	ReleaseRects(tSvgElems) {
 		for(let elem of tSvgElems) {

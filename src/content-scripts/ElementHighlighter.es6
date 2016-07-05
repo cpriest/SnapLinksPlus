@@ -71,7 +71,7 @@ class ElementHighlighter {
 						style : this.style,
 					};
 
-				for(var name in attr)
+				for(let name in attr)
 					svgRect.setAttribute(name, attr[name]);
 
 				tSvgRects.push(svgRect);
@@ -85,7 +85,7 @@ class ElementHighlighter {
 	 * Remove all highlights from the overlay and clear our internals
 	 */
 	Unhighlight() {
-		for(var elem of this.HighlightedElements)
+		for(let elem of this.HighlightedElements)
 			this.Overlay.ReleaseRects(this.HighlightElemMap.get(elem));
 		this.HighlightElemMap = new WeakMap();
 		this.HighlightedElements = [];
