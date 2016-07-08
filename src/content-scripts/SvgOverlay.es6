@@ -26,26 +26,31 @@
 class SvgOverlay {
 	/**
 	 * Creates the initial SVGSVGElement and adds it to the document
+	 * @param style        string        The style to be applied to the SVGRect elements
 	 */
-	constructor() {
+	constructor(style) {
+		this.style = style;
 		this.Overlay = CreateElement(`
 			<svg xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 0px; left: 0px; z-index: 999999; width: ${docElem.scrollWidth}px; height: ${docElem.scrollHeight}px; ">
 				<rect/> <!-- Used for easily cloning the properly namespaced rect -->
 			</svg>
 		`);
 		document.body.insertBefore(this.Overlay, document.body.firstElementChild);
+
+		this.HighlightElemMap    = new WeakMap();
+		this.HighlightedElements = [];
 		this.AvailableRects = [];
 	}
 
 	/**
 	 * Gets or Creates an SVGRect element and returns it
-	 * @returns SVGRect
+	 * @returns SVGRect|Node
 	 */
 	GetRect() {
 		if(this.AvailableRects.length)
 			return this.AvailableRects.pop();
 
-		let elem = this.Overlay.firstElementChild.cloneNode();
+		let elem = this.Overlay.firstElementChild.cloneNode(false);
 		this.Overlay.appendChild(elem);
 		return elem;
 	}
@@ -62,10 +67,59 @@ class SvgOverlay {
 	}
 
 	/**
-	 * Called maually to clean up when this object is no longer needed
+	 * Called to highlight document elements using the SvgOverlay layer
+	 * @param tElems Element[]    An array of elements which represent the current set of elements to be highlighted
 	 */
-	destruct() {
-		this.AvailableRects = [];
+	Highlight(tElems) {
+		let tPrevElems   = this.HighlightedElements,
+			tUnhighlight = tPrevElems.filter(
+				(elem) => { return !tElems.includes(elem); }
+			),
+			tHighlight   = tElems.filter(
+				(elem) => { return !tPrevElems.includes(elem); }
+			),
+			offset       = { x: document.documentElement.scrollLeft, y: document.documentElement.scrollTop };
+
+		/* Remove highlighting of elements no longer in tElems */
+		for(let elem of tUnhighlight)
+			this.ReleaseRects(this.HighlightElemMap.get(elem));
+
+		/* Add highlights for elements new to tElems */
+		for(let elem of tHighlight) {
+
+			let tSvgRects = [];
+			for(let r of ElemDocRects.get(elem)) {
+				let svgRect = this.GetRect(),
+					attr    = {
+						x     : r.left,
+						y     : r.top,
+						width : r.width,
+						height: r.height,
+						style : this.style,
+					};
+
+				for(let name in attr)
+					svgRect.setAttribute(name, attr[name]);
+
+				tSvgRects.push(svgRect);
+			}
+			this.HighlightElemMap.set(elem, tSvgRects);
+		}
+		this.HighlightedElements = tElems;
+	}
+
+	/**
+	 * Called manually to clean up when this object is no longer needed
+	 */
+	destructor() {
+		/** @note: unsure of "best way" of memory management - let GC just handle it, or manually release
+		 * 		The below code was originall in place to properly release all references, but is it necessary?
+		 *
+		 *	for(let elem of this.HighlightedElements)
+		 *		this.ReleaseRects(this.HighlightElemMap.get(elem));
+		 *	this.HighlightElemMap    = new WeakMap();
+		 *	this.HighlightedElements = [];
+		 */
 		this.Overlay.remove();
 	}
 }

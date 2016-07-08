@@ -37,7 +37,6 @@
 				"src/content-scripts/Utility.es6",
 				"src/content-scripts/SnapLinks.es6",
 				"src/content-scripts/ElementIndexer.es6",
-				"src/content-scripts/ElementHighlighter.es6",
 				"src/content-scripts/SvgOverlay.es6"
 			]
 		}

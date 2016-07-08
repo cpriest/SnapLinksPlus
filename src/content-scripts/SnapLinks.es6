@@ -208,13 +208,12 @@ new (class EventHandler {
 											 docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth));
 
 		if(this.ElementIndexer) {
-			this.ElementHighlighter.Highlight(
+			this.SvgOverlay.Highlight(
 				this.SelectedElements = this.ElementIndexer.Search(this.CurrentSelection.dims)
 			);
 		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
-			this.ElementIndexer     = new ElementIndexer();
-			this.SvgOverlay         = new SvgOverlay();
-			this.ElementHighlighter = new ElementHighlighter(this.SvgOverlay, data.HighlightStyles.ActOnElements);
+			this.ElementIndexer = new ElementIndexer();
+			this.SvgOverlay     = new SvgOverlay(data.HighlightStyles.ActOnElements);
 		}
 	}
 
@@ -223,32 +222,18 @@ new (class EventHandler {
 		document.removeEventListener('mousemove', this._onMouseMove, true);
 		document.removeEventListener('keydown', this._onKeyDown, true);
 
-		if(this.mmTimer) {
-			clearInterval(this.mmTimer);
-			delete this.mmTimer;
-		}
+		if(this.mmTimer)
+			this.mmTimer = clearInterval(this.mmTimer);
 
-		if(this.CurrentSelection) {
+		if(this.CurrentSelection)
 			this.CurrentSelection.remove();
-			delete this.CurrentSelection;
-		}
 
-		if(this.ElementIndexer) {
-			delete this.ElementIndexer;
-		}
+		if(this.SvgOverlay)
+			this.SvgOverlay.destructor();
 
-		if(this.ElementHighlighter) {
-			this.ElementHighlighter.destruct();
-			delete this.ElementHighlighter;
-		}
-		if(this.SvgOverlay) {
-			this.SvgOverlay.destruct();
-			delete this.SvgOverlay;
-		}
-
-		// Chrome doesn't support/need set/releaseCapture
-		if(document.releaseCapture)
-			document.releaseCapture();
+		delete this.CurrentSelection;
+		delete this.ElementIndexer;
+		delete this.SvgOverlay;
 	}
 
 	StopNextContextMenu() {
