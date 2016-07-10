@@ -113,7 +113,7 @@ class SvgOverlay {
 	 */
 	destructor() {
 		/** @note: unsure of "best way" of memory management - let GC just handle it, or manually release
-		 * 		The below code was originall in place to properly release all references, but is it necessary?
+		 * 		The below code was original in place to properly release all references, but is it necessary?
 		 *
 		 *	for(let elem of this.HighlightedElements)
 		 *		this.ReleaseRects(this.HighlightElemMap.get(elem));
