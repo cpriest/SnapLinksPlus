@@ -74,7 +74,7 @@ class DocRect extends Rect {
 
 class SelectionRect {
 	constructor(top, left) {
-		this.uiElem = CreateElement('<div style="outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999;" class="SL_SelRect"></div>');
+		this.uiElem = CreateElement('<div style="transition: initial; outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999;" class="SL_SelRect"></div>');
 		this.dims   = new Rect(top, left, top, left);
 		document.body.insertBefore(this.uiElem, document.body.firstElementChild);
 	}
@@ -112,6 +112,7 @@ new (class EventHandler {
 		this._onMouseMove   = this.onMouseMove.bind(this);
 		this._onContextMenu = this.onContextMenu.bind(this);
 		this._onKeyDown     = this.onKeyDown.bind(this);
+		window.addEventListener('resize', _.throttle(this.onThrottledResize.bind(this), 100), true);
 	}
 
 	RegisterActivationEvents() {
@@ -157,6 +158,13 @@ new (class EventHandler {
 				this.EndDrag(e);
 				break;
 		}
+	}
+
+	onThrottledResize(e) {
+		ElemDocRects.clear();
+
+		if(this.SvgOverlay)
+			this.SvgOverlay.Reposition();
 	}
 
 	onContextMenu(e) {
@@ -242,9 +250,10 @@ new (class EventHandler {
 
 	ActUpon(tElems) {
 		// For now we are simply going to create new tabs for the selected elements
-		chrome.runtime.sendMessage({
-									   Action: OPEN_URLS_IN_TABS,
-									   tUrls : tElems.map((elem) => elem.href),
-								   });
+		chrome.runtime.sendMessage(
+			{
+				Action: OPEN_URLS_IN_TABS,
+				tUrls : tElems.map((elem) => elem.href),
+			});
 	}
 });

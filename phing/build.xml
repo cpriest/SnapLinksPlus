@@ -48,6 +48,7 @@
 	<target name="init">
 		<property file="phing/build.properties"/>
 		<property name="dist-dir" value="./dist"/>
+		<property name="lib-dir" value="./src/lib"/>
 
 		<property name="moz-ext" value=".xpi"/>
 		<property name="chrome-ext" value=".crx"/>
@@ -93,6 +94,11 @@
 		<echoproperties regex="/^(version)\..+$/" destfile="phing/build.properties"/>
 	</target>
 
+	<target name="update-libraries" depends="init">
+		<echo msg="Building custom lodash script..."/>
+		<mkdir dir="${lib-dir}"/>
+		<exec command="lodash strict include=debounce,throttle -m -o lodash-snaplinks.js" dir="${lib-dir}" logoutput="true"/>
+	</target>
 
 	<!--	EXECUTION TARGETS -->
 

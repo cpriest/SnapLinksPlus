@@ -88,7 +88,7 @@ class SvgOverlay {
 		for(let elem of tHighlight) {
 
 			let tSvgRects = [];
-			for(let r of ElemDocRects.get(elem)) {
+			for(let r of ElemDocRects.get(elem, offset)) {
 				let svgRect = this.GetRect(),
 					attr    = {
 						x     : r.left,
@@ -106,6 +106,15 @@ class SvgOverlay {
 			this.HighlightElemMap.set(elem, tSvgRects);
 		}
 		this.HighlightedElements = tElems;
+	}
+
+	/**
+	 * Called to reconstruct and reposition all element highlights (such as onresize)
+	 */
+	Reposition() {
+		let tPrevElems = this.HighlightedElements;
+		this.Highlight([]);
+		this.Highlight(tPrevElems);
 	}
 
 	/**
