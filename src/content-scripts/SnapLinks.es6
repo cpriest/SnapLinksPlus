@@ -266,14 +266,15 @@ new (class EventHandler {
 	}
 
 	ActUpon(tElems, event) {
+		// removing duplicates
+		let links = Array.from(new Set(tElems.map((elem) => elem.href)));
 		if (event.ctrlKey) {
-			this.copyToClipboard(tElems.map((elem) => elem.href).join('\n'));
+			this.copyToClipboard(links.join('\n'));
 		} else {
 			// For now we are simply going to create new tabs for the selected elements
 			chrome.runtime.sendMessage({
-
 				Action: OPEN_URLS_IN_TABS,
-				tUrls : tElems.map((elem) => elem.href),
+				tUrls : links,
 			});
 		}
 	}
