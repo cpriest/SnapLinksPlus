@@ -130,8 +130,11 @@ class ElementIndexer {
 
 		for(let j = FirstBucket; j <= LastBucket; j++) {
 			for(let elem of this.BoundaryIndex[j]) {
+				if (this.isVisible(elem) == false) {
+					continue;
+				}
 				for(let r of ElemDocRects.get(elem, offset)) {
-					if(SelectionRect.intersects(r) && this.isVisible(elem)) {
+					if(SelectionRect.intersects(r)) {
 						tMatches.push(elem);
 						break;	// for(let r...
 					}
