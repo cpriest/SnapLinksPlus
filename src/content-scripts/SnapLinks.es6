@@ -75,7 +75,7 @@ class DocRect extends Rect {
 class SelectionRect {
 	constructor(top, left) {
 		this.uiElem = CreateElement('<div style="transition: initial; outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999;" class="SL_SelRect"><span style="position: absolute; left: 0px; top: 0px; background: #FFFFFF; border: 1px solid #000000; border-radius: 2px; padding: 2px;"></span></div>');
-		
+
 		this.dims   = new Rect(top, left, top, left);
 		document.body.insertBefore(this.uiElem, document.body.firstElementChild);
 	}
@@ -254,12 +254,27 @@ new (class EventHandler {
 		window.addEventListener('contextmenu', this._onContextMenu, true);
 	}
 
-	ActUpon(tElems) {
-		// For now we are simply going to create new tabs for the selected elements
-		chrome.runtime.sendMessage(
-			{
+	copyToClipboard(text) {
+		const input = document.createElement('textarea');
+		input.style.position = 'fixed';
+		input.style.opacity = 0;
+		input.value = text;
+		document.body.appendChild(input);
+		input.select();
+		document.execCommand('Copy');
+		document.body.removeChild(input);
+	}
+
+	ActUpon(tElems, event) {
+		if (event.ctrlKey) {
+			this.copyToClipboard(tElems.map((elem) => elem.href).join('\n'));
+		} else {
+			// For now we are simply going to create new tabs for the selected elements
+			chrome.runtime.sendMessage({
+
 				Action: OPEN_URLS_IN_TABS,
 				tUrls : tElems.map((elem) => elem.href),
 			});
+		}
 	}
 });
