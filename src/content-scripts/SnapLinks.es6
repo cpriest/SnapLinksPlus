@@ -74,7 +74,8 @@ class DocRect extends Rect {
 
 class SelectionRect {
 	constructor(top, left) {
-		this.uiElem = CreateElement('<div style="transition: initial; outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999;" class="SL_SelRect"></div>');
+		this.uiElem = CreateElement('<div style="transition: initial; outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999;" class="SL_SelRect"><span style="position: absolute; left: 0px; top: 0px; background: #FFFFFF; border: 1px solid #000000; border-radius: 2px; padding: 2px;"></span></div>');
+		
 		this.dims   = new Rect(top, left, top, left);
 		document.body.insertBefore(this.uiElem, document.body.firstElementChild);
 	}
@@ -93,6 +94,10 @@ class SelectionRect {
 		this.uiElem.style.display = this.IsLargeEnoughToActivate()
 			? ''
 			: 'none';
+	}
+
+	setCounter(count) {
+		this.uiElem.firstChild.innerHTML = count;
 	}
 
 	remove() {
@@ -219,6 +224,7 @@ new (class EventHandler {
 			this.SvgOverlay.Highlight(
 				this.SelectedElements = this.ElementIndexer.Search(this.CurrentSelection.dims)
 			);
+			this.CurrentSelection.setCounter(this.SelectedElements.length);
 		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
 			this.ElementIndexer = new ElementIndexer();
 			this.SvgOverlay     = new SvgOverlay(data.HighlightStyles.ActOnElements);
