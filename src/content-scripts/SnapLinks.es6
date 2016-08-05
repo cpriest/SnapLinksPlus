@@ -74,7 +74,7 @@ class DocRect extends Rect {
 
 class SelectionRect {
 	constructor(top, left) {
-		this.uiElem = CreateElement('<div style="transition: initial; outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999;" class="SL_SelRect"><span style="position: absolute; left: 0px; top: 0px; background: #FFFFFF; border: 1px solid #000000; border-radius: 2px; padding: 2px;"></span></div>');
+		this.uiElem = CreateElement('<div style="transition: initial; outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999;" class="SL_SelRect"><span style="position: absolute; background: #FFFFFF; border: 1px solid #000000; border-radius: 2px; padding: 2px;"></span></div>');
 
 		this.dims   = new Rect(top, left, top, left);
 		document.body.insertBefore(this.uiElem, document.body.firstElementChild);
@@ -98,6 +98,18 @@ class SelectionRect {
 
 	setCounter(count) {
 		this.uiElem.firstChild.innerHTML = count;
+	}
+
+	alignCounter(to_right, to_bottom) {
+		let style = this.uiElem.firstChild.style;
+
+		[style.right, style.left] = to_right  ? [0, ''] : ['', 0];
+		[style.bottom, style.top] = to_bottom ? [0, ''] : ['', 0];
+
+		// move slightly to the right for not to be blocked by mouse pointer
+		if (to_right == false && to_bottom == false) {
+			style.left = '16px';
+		}
 	}
 
 	remove() {
@@ -217,14 +229,16 @@ new (class EventHandler {
 		docElem.scrollTop += this.IntervalScrollOffset.y;
 
 		/* Set our bottom right to scroll + max(clientX/Y, clientWidth/Height) */
-		this.CurrentSelection.setBottomRight(docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight),
-											 docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth));
+		let new_bottom = docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight);
+		let new_right = docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth);
+		this.CurrentSelection.setBottomRight(new_bottom, new_right);
 
 		if(this.ElementIndexer) {
 			this.SvgOverlay.Highlight(
 				this.SelectedElements = this.ElementIndexer.Search(this.CurrentSelection.dims)
 			);
-			this.CurrentSelection.setCounter(this.SelectedElements.length);
+			this.CurrentSelection.setCounter((new Set(this.SelectedElements.map((elem) => elem.href))).size);
+			this.CurrentSelection.alignCounter(this.CurrentSelection.dims.left != new_right, this.CurrentSelection.dims.top != new_bottom);
 		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
 			this.ElementIndexer = new ElementIndexer();
 			this.SvgOverlay     = new SvgOverlay(data.HighlightStyles.ActOnElements);
