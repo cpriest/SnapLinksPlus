@@ -4,6 +4,10 @@ v3.0.0b3 - Not Yet Released
 - Fixed #97 - Context Menu no longer worked after dragging once.
 - Fixed #91.1 (Related) - Page resize/zooming now properly re-adjusts rects
 - Fixed #91.2 - transition CSS from page no longer affects selection rect
+- Contributions from AstrodogX
+    - Now skipping elements that are not visible
+    - Copy Links To Clipboard by Holding down ctrl while releasing the selection
+    - Count of selected elements appears
 
 v3.0.0b2
 ========
