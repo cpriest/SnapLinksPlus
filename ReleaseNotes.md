@@ -8,6 +8,8 @@ v3.0.0b3 - Not Yet Released
     - Now skipping elements that are not visible
     - Copy Links To Clipboard by Holding down ctrl while releasing the selection
     - Count of selected elements appears
+- "Greatest of Type" is now used when multiple types are lassoed (Links vs Buttons, etc)
+- Can now lasso buttons which causes them to be clicked
 
 v3.0.0b2
 ========
