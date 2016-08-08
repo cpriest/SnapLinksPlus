@@ -128,7 +128,7 @@ class SelectionRect {
 	}
 
 	IsLargeEnoughToActivate() {
-		return this.dims.width > data.selection.activate.minX && this.dims.height > data.selection.activate.minY;
+		return this.dims.width > data.selection.activate.minX || this.dims.height > data.selection.activate.minY;
 	}
 }
 
@@ -247,7 +247,8 @@ new (class EventHandler {
 			this.SvgOverlay.Highlight(
 				this.SelectedElements = this.ElementIndexer.Search(this.CurrentSelection.dims)
 			);
-			this.CurrentSelection.SetCounter((new Set(this.SelectedElements.map((elem) => elem.href))).size);
+
+			this.CurrentSelection.SetCounter((new Set(this.SelectedElements.Links.map((elem) => elem.href))).size);
 			this.CurrentSelection.AlignCounter(this.CurrentSelection.dims.left != NewRight, this.CurrentSelection.dims.top != NewBottom);
 		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
 			this.ElementIndexer = new ElementIndexer();
@@ -289,17 +290,34 @@ new (class EventHandler {
 		document.body.removeChild(input);
 	}
 
-	ActUpon(tElems, event) {
-		// removing duplicates
-		let links = Array.from(new Set(tElems.map((elem) => elem.href)));
-		if(event.ctrlKey) {
-			this.CopyToClipboard(links.join('\n'));
-		} else {
-			// For now we are simply going to create new tabs for the selected elements
-			chrome.runtime.sendMessage({
-										   Action: OPEN_URLS_IN_TABS,
-										   tUrls : links,
-									   });
+	/**
+	 *
+	 * @param {CategorizedCollection} SelectedElements    The elements selected by the user
+	 * @param event
+	 */
+	ActUpon(SelectedElements, event) {
+		switch(SelectedElements.GreatestType) {
+			case CT_LINKS:
+				// removing duplicates
+				let links = Array.from(new Set(SelectedElements.Links.map((elem) => elem.href)));
+
+				if(event.ctrlKey) {
+					this.CopyToClipboard(links.join('\n'));
+				} else {
+					// For now we are simply going to create new tabs for the selected elements
+
+					//noinspection JSUnresolvedVariable,JSUnresolvedFunction
+					chrome.runtime.sendMessage(
+						{
+							Action: OPEN_URLS_IN_TABS,
+							tUrls : links,
+						});
+				}
+				break;
+			case CT_BUTTONS:
+				for(let Button of SelectedElements.Buttons)
+					Button.click();
+				break;
 		}
 	}
 });

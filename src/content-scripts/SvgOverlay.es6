@@ -68,10 +68,12 @@ class SvgOverlay {
 
 	/**
 	 * Called to highlight document elements using the SvgOverlay layer
-	 * @param tElems Element[]    An array of elements which represent the current set of elements to be highlighted
+	 *
+	 * @param {CategorizedCollection} Elements 	A collection of elements which represent the current set of elements to be highlighted
 	 */
-	Highlight(tElems) {
-		let tPrevElems   = this.HighlightedElements,
+	Highlight(Elements) {
+		let tElems = Elements.All,
+			tPrevElems   = this.HighlightedElements,
 			tUnhighlight = tPrevElems.filter(
 				(elem) => { return !tElems.includes(elem); }
 			),

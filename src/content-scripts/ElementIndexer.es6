@@ -16,9 +16,6 @@
 
 let ElemDocRects;
 
-const CT_LINKS = 0,
-	  CT_BUTTONS = 1;
-
 "use strict";
 
 class RectMapper {
@@ -81,9 +78,16 @@ class ElementIndexer {
 		this.UpdateIndex();
 	}
 
+	/**
+	 * Updates the index of this.Elements separated into N buckets for quickly paring down the elements to be checked
+	 * 	for intersection of the selection rectangle
+	 *
+	 * 	@private
+	 */
 	UpdateIndex() {
-		let start     = Date.now(),
-			elem, idx,
+// @PerfTest
+//		let start     = Date.now();
+		let elem, idx,
 			docElem   = document.documentElement,
 			scrollTop = docElem.scrollTop,
 			docHeight = docElem.scrollHeight,
@@ -127,7 +131,7 @@ class ElementIndexer {
 	/**
 	 * Search the index for all elements that intersect with the selection rect
 	 *
-	 * @param {SelectionRect} SelectionRect
+	 * @param {Rect} SelectionRect
 	 */
 	Search(SelectionRect) {
 		let docHeight   = document.documentElement.scrollHeight,
@@ -149,39 +153,7 @@ class ElementIndexer {
 				}
 			}
 		}
-		return this.CategorizeMatches(tMatches);
-	}
-
-	/**
-	 * Categorizes an array of HtmlElements by categories such as Links, Buttons, etc.
-	 *
-	 * @private
-	 *
-	 * @param {Element[]} tMatches
-	 *
-	 * @return {Object.<string, Element[]>}
-	 */
-	CategorizeMatches(tMatches) {
-		let tLinks = [],
-			tButtons = [ ];
-
-		for(let elem of tMatches) {
-			switch(elem.tagName) {
-				case 'A':
-					if(elem.href.length > 0)
-						tLinks.push(elem);
-					break;
-				case 'INPUT':
-					if(['submit','reset','button'].indexOf(/** @type {HTMLInputElement} */ elem.type.toLowerCase()) !== -1) {
-						tButtons.push(elem);
-					}
-					break;
-			}
-		}
-		return {
-			CT_LINKS: tLinks,
-			CT_BUTTONS: tButtons,
-		}
+		return new CategorizedCollection(tMatches);
 	}
 }
 
