@@ -105,7 +105,7 @@ class ElementIndexer {
 //		rr.report(this.Anchors.length);
 	}
 
-	isVisible(element) {
+	IsVisible(element) {
 		let style = window.getComputedStyle(element);
 		return style.width !== 0 &&
 			style.height !== 0 &&
@@ -130,11 +130,8 @@ class ElementIndexer {
 
 		for(let j = FirstBucket; j <= LastBucket; j++) {
 			for(let elem of this.BoundaryIndex[j]) {
-				if (this.isVisible(elem) == false) {
-					continue;
-				}
 				for(let r of ElemDocRects.get(elem, offset)) {
-					if(SelectionRect.intersects(r)) {
+					if(SelectionRect.Intersects(r) && this.IsVisible(elem) === true) {
 						tMatches.push(elem);
 						break;	// for(let r...
 					}

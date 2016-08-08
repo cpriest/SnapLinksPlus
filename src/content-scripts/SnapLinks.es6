@@ -20,28 +20,28 @@ class Rect {
 	constructor(top, left, bottom, right) {
 		[this.originTop, this.originLeft]              = [top, left];
 		[this.top, this.left, this.bottom, this.right] = [top, left, bottom, right];
-		this.calculateProperties();
+		this.CalculateProperties();
 	}
 
-	setBottomRight(bottom, right) {
+	SetBottomRight(bottom, right) {
 		[this.top, this.left]     = [Math.min(this.originTop, bottom), Math.min(this.originLeft, right)];
 		[this.bottom, this.right] = [Math.max(this.originTop, bottom), Math.max(this.originLeft, right)];
-		return this.calculateProperties();
+		return this.CalculateProperties();
 	}
 
-	calculateProperties() {
+	CalculateProperties() {
 		this.width  = this.right - this.left;
 		this.height = this.bottom - this.top;
 		return this;
 	}
 
-	expand(x, y) {
+	Expand(x, y) {
 		[this.top, this.bottom] = [this.top - y, this.bottom + y];
 		[this.left, this.right] = [this.left - x, this.right + x];
-		return this.calculateProperties();
+		return this.CalculateProperties();
 	}
 
-	intersects(r) {
+	Intersects(r) {
 		/* Some/most of this code is duplicated from other parts of this class for performance reasons */
 
 		// If the greatest top is higher than the lowest bottom, they don't intersect
@@ -56,10 +56,10 @@ class Rect {
 		return GreatestLeft <= LowestRight;
 	}
 
-	clipTo(r) {
+	ClipTo(r) {
 		[this.top, this.left]     = [Math.max(this.top, r.top), Math.max(this.left, r.left)];
 		[this.bottom, this.right] = [Math.min(this.bottom, r.bottom), Math.min(this.right, r.right)];
-		return this.calculateProperties();
+		return this.CalculateProperties();
 	}
 
 	toString() { return `{ top: ${this.top}, left: ${this.left}, bottom: ${this.bottom}, right: ${this.right}, width: ${this.width}, height: ${this.height} }`; }
@@ -74,19 +74,23 @@ class DocRect extends Rect {
 
 class SelectionRect {
 	constructor(top, left) {
-		this.uiElem = CreateElement('<div style="transition: initial; outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999;" class="SL_SelRect"><span style="position: absolute; background: #FFFFFF; border: 1px solid #000000; border-radius: 2px; padding: 2px;"></span></div>');
+		this.uiElem = CreateElement(
+			'<div style="outline: 2px dashed rgba(0,255,0,1); transition: initial; position: absolute; z-index: 9999999; overflow: visible;" class="SL_SelRect">' +
+			'	<div style="position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap;"></div>' +
+			'</div>'
+		);
 
-		this.dims   = new Rect(top, left, top, left);
+		this.dims = new Rect(top, left, top, left);
 		document.body.insertBefore(this.uiElem, document.body.firstElementChild);
 	}
 
-	setBottomRight(bottom, right) {
+	SetBottomRight(bottom, right) {
 		let dr = (new DocRect(document))
-			.expand(-2, -2);
+			.Expand(-2, -2);
 		/* Based on current fixed style */
 		this.dims
-			.setBottomRight(bottom, right)
-			.clipTo(dr);
+			.SetBottomRight(bottom, right)
+			.ClipTo(dr);
 
 		[this.uiElem.style.top, this.uiElem.style.left]     = [this.dims.top + 'px', this.dims.left + 'px'];
 		[this.uiElem.style.height, this.uiElem.style.width] = [this.dims.height + 'px', this.dims.width + 'px'];
@@ -96,23 +100,29 @@ class SelectionRect {
 			: 'none';
 	}
 
-	setCounter(count) {
-		this.uiElem.firstChild.innerHTML = count;
+	SetCounter(count) {
+		this.uiElem.firstElementChild.innerHTML = `${count} Links`;
 	}
 
-	alignCounter(to_right, to_bottom) {
-		let style = this.uiElem.firstChild.style;
+	AlignCounter(to_right, to_bottom) {
+		let style = this.uiElem.firstElementChild.style;
 
-		[style.right, style.left] = to_right  ? [0, ''] : ['', 0];
-		[style.bottom, style.top] = to_bottom ? [0, ''] : ['', 0];
+		[style.right, style.left] =
+			to_right
+				? [0, '']
+				: ['', 0];
+		[style.bottom, style.top] =
+			to_bottom
+				? [0, '']
+				: ['', 0];
 
 		// move slightly to the right for not to be blocked by mouse pointer
-		if (to_right == false && to_bottom == false) {
+		if(to_right == false && to_bottom == false) {
 			style.left = '16px';
 		}
 	}
 
-	remove() {
+	Remove() {
 		this.uiElem.remove();
 		delete this.uiElem;
 	}
@@ -229,16 +239,16 @@ new (class EventHandler {
 		docElem.scrollTop += this.IntervalScrollOffset.y;
 
 		/* Set our bottom right to scroll + max(clientX/Y, clientWidth/Height) */
-		let new_bottom = docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight);
-		let new_right = docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth);
-		this.CurrentSelection.setBottomRight(new_bottom, new_right);
+		let NewBottom = docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight);
+		let NewRight  = docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth);
+		this.CurrentSelection.SetBottomRight(NewBottom, NewRight);
 
 		if(this.ElementIndexer) {
 			this.SvgOverlay.Highlight(
 				this.SelectedElements = this.ElementIndexer.Search(this.CurrentSelection.dims)
 			);
-			this.CurrentSelection.setCounter((new Set(this.SelectedElements.map((elem) => elem.href))).size);
-			this.CurrentSelection.alignCounter(this.CurrentSelection.dims.left != new_right, this.CurrentSelection.dims.top != new_bottom);
+			this.CurrentSelection.SetCounter((new Set(this.SelectedElements.map((elem) => elem.href))).size);
+			this.CurrentSelection.AlignCounter(this.CurrentSelection.dims.left != NewRight, this.CurrentSelection.dims.top != NewBottom);
 		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
 			this.ElementIndexer = new ElementIndexer();
 			this.SvgOverlay     = new SvgOverlay(data.HighlightStyles.ActOnElements);
@@ -254,7 +264,7 @@ new (class EventHandler {
 			this.mmTimer = clearInterval(this.mmTimer);
 
 		if(this.CurrentSelection)
-			this.CurrentSelection.remove();
+			this.CurrentSelection.Remove();
 
 		if(this.SvgOverlay)
 			this.SvgOverlay.destructor();
@@ -268,11 +278,11 @@ new (class EventHandler {
 		window.addEventListener('contextmenu', this._onContextMenu, true);
 	}
 
-	copyToClipboard(text) {
-		const input = document.createElement('textarea');
+	CopyToClipboard(text) {
+		const input          = document.createElement('textarea');
 		input.style.position = 'fixed';
-		input.style.opacity = 0;
-		input.value = text;
+		input.style.opacity  = 0;
+		input.value          = text;
 		document.body.appendChild(input);
 		input.select();
 		document.execCommand('Copy');
@@ -282,14 +292,14 @@ new (class EventHandler {
 	ActUpon(tElems, event) {
 		// removing duplicates
 		let links = Array.from(new Set(tElems.map((elem) => elem.href)));
-		if (event.ctrlKey) {
-			this.copyToClipboard(links.join('\n'));
+		if(event.ctrlKey) {
+			this.CopyToClipboard(links.join('\n'));
 		} else {
 			// For now we are simply going to create new tabs for the selected elements
 			chrome.runtime.sendMessage({
-				Action: OPEN_URLS_IN_TABS,
-				tUrls : links,
-			});
+										   Action: OPEN_URLS_IN_TABS,
+										   tUrls : links,
+									   });
 		}
 	}
 });
