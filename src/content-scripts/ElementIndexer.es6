@@ -16,6 +16,9 @@
 
 let ElemDocRects;
 
+const CT_LINKS = 0,
+	  CT_BUTTONS = 1;
+
 "use strict";
 
 class RectMapper {
@@ -73,7 +76,7 @@ ElemDocRects = new RectMapper();
  */
 class ElementIndexer {
 	constructor() {
-		this.Anchors = document.querySelectorAll('A[href]');
+		this.Elements = document.querySelectorAll('A[href], INPUT[type="button"], INPUT[type="submit"], INPUT[type="reset"]');
 
 		this.UpdateIndex();
 	}
@@ -93,7 +96,7 @@ class ElementIndexer {
 
 //		@PerfTest
 //		var rr = new RateReporter('Calculated ${Count} Elements in ${Elapsed} (${PerSecond})');
-		for(elem of this.Anchors) {
+		for(elem of this.Elements) {
 			/* GetBucketFromTop() */
 			idx = Math.floor((elem.getBoundingClientRect().top + scrollTop) * Buckets / docHeight);
 			if(this.BoundaryIndex[idx])
@@ -102,11 +105,18 @@ class ElementIndexer {
 //			ElemDocRects.get(elem, offset);
 		}
 //		@PerfTest
-//		rr.report(this.Anchors.length);
+//		rr.report(this.Elements.length);
 	}
 
-	IsVisible(element) {
-		let style = window.getComputedStyle(element);
+	/**
+	 * Returns true if the element is visible
+	 *
+	 * @param {HtmlElement} elem
+	 *
+	 * @returns {boolean}
+	 */
+	IsVisible(elem) {
+		let style = window.getComputedStyle(elem);
 		return style.width !== 0 &&
 			style.height !== 0 &&
 			style.opacity !== 0 &&
@@ -115,8 +125,9 @@ class ElementIndexer {
 	}
 
 	/**
+	 * Search the index for all elements that intersect with the selection rect
 	 *
-	 * @param SelectionRect
+	 * @param {SelectionRect} SelectionRect
 	 */
 	Search(SelectionRect) {
 		let docHeight   = document.documentElement.scrollHeight,
@@ -138,7 +149,39 @@ class ElementIndexer {
 				}
 			}
 		}
-		return tMatches;
+		return this.CategorizeMatches(tMatches);
+	}
+
+	/**
+	 * Categorizes an array of HtmlElements by categories such as Links, Buttons, etc.
+	 *
+	 * @private
+	 *
+	 * @param {Element[]} tMatches
+	 *
+	 * @return {Object.<string, Element[]>}
+	 */
+	CategorizeMatches(tMatches) {
+		let tLinks = [],
+			tButtons = [ ];
+
+		for(let elem of tMatches) {
+			switch(elem.tagName) {
+				case 'A':
+					if(elem.href.length > 0)
+						tLinks.push(elem);
+					break;
+				case 'INPUT':
+					if(['submit','reset','button'].indexOf(/** @type {HTMLInputElement} */ elem.type.toLowerCase()) !== -1) {
+						tButtons.push(elem);
+					}
+					break;
+			}
+		}
+		return {
+			CT_LINKS: tLinks,
+			CT_BUTTONS: tButtons,
+		}
 	}
 }
 
