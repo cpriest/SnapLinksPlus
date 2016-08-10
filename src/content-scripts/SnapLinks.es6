@@ -314,8 +314,8 @@ new (class EventHandler {
 						});
 				}
 				break;
-			case CT_BUTTONS:
-				for(let Button of SelectedElements.Buttons)
+			case CT_CLICKABLE:
+				for(let Button of SelectedElements.Clickable)
 					Button.click();
 				break;
 		}

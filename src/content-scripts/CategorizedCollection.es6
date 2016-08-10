@@ -16,8 +16,8 @@
 
 "use strict";
 
-const CT_LINKS   = 'Links',
-	  CT_BUTTONS = 'Buttons';
+const CT_LINKS     = 'Links',
+	  CT_CLICKABLE = 'Clickable';
 
 /**
  * This class categorizes a collection of selected elements and provide utilities around the collection of {Element}s
@@ -49,7 +49,7 @@ class CategorizedCollection {
 	 *
 	 * @returns {Element[]}
 	 */
-	get All() { return this.Links.concat(this.Buttons); }
+	get All() { return this.Links.concat(this.Clickable); }
 
 	/**
 	 * Categorizes an array of HtmlElements by categories such as Links, Buttons, etc.
@@ -59,8 +59,8 @@ class CategorizedCollection {
 	 * @param {Element[]} tElems    The elements to categorize
 	 */
 	CategorizeMatches(tElems) {
-		this.Links   = [];
-		this.Buttons = [];
+		this.Links     = [];
+		this.Clickable = [];
 
 		for(let elem of tElems) {
 			switch(elem.tagName) {
@@ -71,7 +71,7 @@ class CategorizedCollection {
 				case 'INPUT':
 					/** @var {HTMLInputElement} [elem] */
 					if(['submit', 'reset', 'button'].indexOf(elem.type.toLowerCase()) !== -1) {
-						this.Buttons.push(elem);
+						this.Clickable.push(elem);
 					}
 					break;
 			}
@@ -80,7 +80,7 @@ class CategorizedCollection {
 		// Determine GreatestType
 		let Counts        = new Map();
 		Counts.set(CT_LINKS, this.Links.length);
-		Counts.set(CT_BUTTONS, this.Buttons.length);
+		Counts.set(CT_CLICKABLE, this.Clickable.length);
 
 		let GreatestCount = 0;
 
