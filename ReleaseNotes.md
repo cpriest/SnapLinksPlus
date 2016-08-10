@@ -10,6 +10,9 @@ v3.0.3 - Not Yet Released
      - Count of selected elements appears
  - "Greatest of Type" is now used when multiple types are lassoed (Links vs Buttons, etc)
  - Can now lasso buttons which causes them to be clicked
+ - Can now lasso checkboxes (checks all or un-checks all)
+   (depending on opposite majority, prefers checking when equal)
+ -
 
 v3.0.0b2
 ========

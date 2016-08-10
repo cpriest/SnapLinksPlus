@@ -14,3 +14,7 @@
  - Add size-of-text minification (select greatest size font links unless shift is held)
  - Add Options GUI
  - Better handling of label placement (separate from sizing rect)
+
+# Todo
+ - Resolve all inspection errors
+ - JsDoc comments for everything
