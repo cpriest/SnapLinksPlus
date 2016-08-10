@@ -318,6 +318,17 @@ new (class EventHandler {
 				for(let Button of SelectedElements.Clickable)
 					Button.click();
 				break;
+			case CT_CHECKBOXES:
+				// Determine majority checked/unchecked, prefers checking if counts are event
+				let CheckedCount = SelectedElements.Checkboxes.reduce((acc, elem) => acc + elem.checked, 0),
+					UncheckedCount = SelectedElements.Checkboxes.length - CheckedCount,
+					CheckElements = UncheckedCount >= CheckedCount;
+
+				for(let elem of SelectedElements.Checkboxes)
+					elem.checked = CheckElements;
+				break;
+			case CT_RADIOBUTTONS:
+				break;
 		}
 	}
 });

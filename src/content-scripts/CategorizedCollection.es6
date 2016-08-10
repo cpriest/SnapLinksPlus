@@ -16,22 +16,26 @@
 
 "use strict";
 
-const CT_LINKS     = 'Links',
-	  CT_CLICKABLE = 'Clickable';
+const CT_LINKS        = 'Links',
+	  CT_CLICKABLE    = 'Clickable',
+	  CT_CHECKBOXES   = 'Checkboxes',
+	  CT_RADIOBUTTONS = 'Radio Buttons';
 
 /**
  * This class categorizes a collection of selected elements and provide utilities around the collection of {Element}s
  *
  * @property {string}    GreatestType   The CT_* constant representing the greatest number of elements among the categories
  *
- * @property {Element[]} Links			The A elements in the collection
- * @property {Element[]} Buttons		The INPUT elements in the collection that are buttons
+ * @property {Element[]} Links                  The A elements in the collection
+ * @property {HTMLInputElement[]} Buttons       The INPUT elements in the collection that are buttons
+ * @property Checkboxes {HTMLInputElement[]}    The INPUT elements in the collection that are checkboxes
+ * @property {HTMLInputElement[]} RadioButtons  The INPUT elements in the collection that are radio buttons
  */
 class CategorizedCollection {
 
 	/**
 	 *
-	 * @param {Element[]} tElems	The elements to categorize
+	 * @param {Element[]} tElems    The elements to categorize
 	 */
 	constructor(tElems = []) {
 		this.CategorizeMatches(tElems);
@@ -49,7 +53,20 @@ class CategorizedCollection {
 	 *
 	 * @returns {Element[]}
 	 */
-	get All() { return this.Links.concat(this.Clickable); }
+	get All() { return this.Links.concat(this.Clickable, this.Checkboxes, this.RadioButtons); }
+
+	/**
+	 * Returns a {Map} of element counts by CT_* Category
+	 * @returns {Map}
+	 */
+	get Counts() {
+		let Counts = new Map();
+		Counts.set(CT_LINKS, this.Links.length);
+		Counts.set(CT_CLICKABLE, this.Clickable.length);
+		Counts.set(CT_CHECKBOXES, this.Checkboxes.length);
+		Counts.set(CT_RADIOBUTTONS, this.RadioButtons.length);
+		return Counts;
+	}
 
 	/**
 	 * Categorizes an array of HtmlElements by categories such as Links, Buttons, etc.
@@ -59,8 +76,10 @@ class CategorizedCollection {
 	 * @param {Element[]} tElems    The elements to categorize
 	 */
 	CategorizeMatches(tElems) {
-		this.Links     = [];
-		this.Clickable = [];
+		this.Links        = [];
+		this.Clickable    = [];
+		this.Checkboxes   = [];
+		this.RadioButtons = [];
 
 		for(let elem of tElems) {
 			switch(elem.tagName) {
@@ -70,21 +89,27 @@ class CategorizedCollection {
 					break;
 				case 'INPUT':
 					/** @var {HTMLInputElement} [elem] */
-					if(['submit', 'reset', 'button'].indexOf(elem.type.toLowerCase()) !== -1) {
-						this.Clickable.push(elem);
+					switch(elem.type.toLowerCase()) {
+						case 'submit':
+						case 'reset':
+						case 'button':
+							this.Clickable.push(elem);
+							break;
+						case 'checkbox':
+							this.Checkboxes.push(elem);
+							break;
+						case 'radio':
+							this.RadioButtons.push(elem);
+							break;
 					}
 					break;
 			}
 		}
 
-		// Determine GreatestType
-		let Counts        = new Map();
-		Counts.set(CT_LINKS, this.Links.length);
-		Counts.set(CT_CLICKABLE, this.Clickable.length);
-
+		// Pre-calculate greatest count of categorized elements
 		let GreatestCount = 0;
 
-		for(let [ t, c ] of Counts) {
+		for(let [ t, c ] of this.Counts) {
 			if(c > GreatestCount) {
 				this.GreatestType = t;
 				GreatestCount     = c;

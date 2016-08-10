@@ -8,7 +8,8 @@
  - ~~Add selection of and .click()ing of highlighted buttons~~
  - ~~Add "greatest of types" activation.  5 buttons & 1 link selected, only buttons will be .click()ed~~
  - Add Elements that have cursor: pointer (and have a click handler?)
- - Add checking/un-checking of checkboxes
+ - ~~Add checking/un-checking of checkboxes~~
+ - Add LABEL support (checkboxes, radio button, etc)
  - Add selection of "highest" radio button
  - Add size-of-text minification (select greatest size font links unless shift is held)
  - Add Options GUI
