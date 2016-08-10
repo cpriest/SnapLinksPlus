@@ -1,21 +1,21 @@
-v3.0.0b3 - Not Yet Released
-===========================
-- Pressing escape will now cancel an already started drag operation
-- Fixed #97 - Context Menu no longer worked after dragging once.
-- Fixed #91.1 (Related) - Page resize/zooming now properly re-adjusts rects
-- Fixed #91.2 - transition CSS from page no longer affects selection rect
-- Contributions from AstrodogX
-    - Now skipping elements that are not visible
-    - Copy Links To Clipboard by Holding down ctrl while releasing the selection
-    - Count of selected elements appears
-- "Greatest of Type" is now used when multiple types are lassoed (Links vs Buttons, etc)
-- Can now lasso buttons which causes them to be clicked
+v3.0.3 - Not Yet Released
+=========================
+ - Pressing escape will now cancel an already started drag operation
+ - Fixed #97 - Context Menu no longer worked after dragging once.
+ - Fixed #91.1 (Related) - Page resize/zooming now properly re-adjusts rects
+ - Fixed #91.2 - transition CSS from page no longer affects selection rect
+ - Contributions from AstrodogX
+     - Now skipping elements that are not visible
+     - Copy Links To Clipboard by Holding down ctrl while releasing the selection
+     - Count of selected elements appears
+ - "Greatest of Type" is now used when multiple types are lassoed (Links vs Buttons, etc)
+ - Can now lasso buttons which causes them to be clicked
 
 v3.0.0b2
 ========
-- Mostly a build system setup, compatibility with Chrome & submission
-  to AMO/Chrome Mostly a build system setup, compatibility with Chrome
-  & submission to AMO/Chrome
+ - Mostly a build system setup, compatibility with Chrome & submission
+   to AMO/Chrome Mostly a build system setup, compatibility with Chrome
+   & submission to AMO/Chrome
 
 v3.0b1
 ======
