@@ -60,6 +60,10 @@ class RectMapper {
 				if(['checkbox','radio'].indexOf(elem.type) !== -1) {
 					if(elem.parentElement.tagName == 'LABEL')
 						Rects = Rects.concat($A(elem.parentElement.getClientRects()));
+					else if(elem.id) {
+						for(let label of document.querySelectorAll('LABEL[for="' + elem.id + '"]'))
+							Rects = Rects.concat($A(label.getClientRects()));
+					}
 				}
 				break;
 		}
