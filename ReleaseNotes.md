@@ -12,7 +12,8 @@ v3.0.3 - Not Yet Released
  - Can now lasso buttons which causes them to be clicked
  - Can now lasso checkboxes (checks all or un-checks all)
    (depending on opposite majority, prefers checking when equal)
- -
+ - Can now lasso labels for checkboxes and radio boxes
+ - Can now lasso radio buttons, selects the first radio of each group
 
 v3.0.0b2
 ========

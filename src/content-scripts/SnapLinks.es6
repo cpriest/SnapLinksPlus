@@ -328,6 +328,12 @@ new (class EventHandler {
 					elem.checked = CheckElements;
 				break;
 			case CT_RADIOBUTTONS:
+				let GroupedByName = SelectedElements.RadioButtons.reduce((/** Map */ acc, elem) => {
+					return acc.set(elem.name, (acc.get(elem.name) || []).concat([elem]));
+				}, new Map());
+
+				for(let [name, tElems] of GroupedByName)
+					tElems[0].checked = true;
 				break;
 		}
 	}
