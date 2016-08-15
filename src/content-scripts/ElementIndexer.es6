@@ -49,10 +49,20 @@ class RectMapper {
 
 		let Rects = $A(elem.getClientRects());
 
-		$A(elem.querySelectorAll('IMG'))
-			.forEach(function(elem) {
-				Rects = Rects.concat($A(elem.getClientRects()));
-			}, this);
+		switch(elem.tagName) {
+			case 'A':
+				$A(elem.querySelectorAll('IMG'))
+					.forEach(function(elem) {
+						Rects = Rects.concat($A(elem.getClientRects()));
+					}, this);
+				break;
+			case 'INPUT':
+				if(['checkbox','radio'].indexOf(elem.type) !== -1) {
+					if(elem.parentElement.tagName == 'LABEL')
+						Rects = Rects.concat($A(elem.parentElement.getClientRects()));
+				}
+				break;
+		}
 		return Rects.map(function(rect) {
 			return new Rect(rect.top + offset.y, rect.left + offset.x,
 				rect.bottom + offset.y, rect.right + offset.x);
