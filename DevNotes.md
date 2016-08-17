@@ -7,14 +7,24 @@
 # Plans
  - ~~Add selection of and .click()ing of highlighted buttons~~
  - ~~Add "greatest of types" activation.  5 buttons & 1 link selected, only buttons will be .click()ed~~
- - Add Elements that have cursor: pointer (and have a click handler?)
  - ~~Add checking/un-checking of checkboxes~~
  - ~~Add LABEL support (checkboxes, radio button, etc)~~
  - ~~Add selection of "highest" radio button~~
  - Add size-of-text minification (select greatest size font links unless shift is held)
  - Add Options GUI
  - Better handling of label placement (separate from sizing rect)
+ - Highlight "greatest of types" elements differently than elements which do not meet the greatest of.
+    eg: 3 Buttons and 1 Anchor lassoed, the 3 Buttons would be highlighted in green vs the Anchor being highlighted in grey
+
 
 # Todo
  - Resolve all inspection errors
  - JsDoc comments for everything
+
+# Test
+ - Test using the new CSS3 all property to reset styles for our elements, such as setting all: initial on
+   our SVG / SelectionRect DIV elements (may need to be contained by an element with style="all: inherit"
+   This would replace the fix that was put in place for one website that had an overt transform selector set.
+
+# Deferred / Possibly Won't Implement
+ - Add Elements that have cursor: pointer (and have a click handler?)
