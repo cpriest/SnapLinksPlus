@@ -2,7 +2,7 @@
  - [Issue #91](https://github.com/cpriest/SnapLinksPlus/issues/91)-1 - Width of selection box independent of zoom factor... possibly doable with SVG since it has it's own coordinate system??
  - Document size changes are not detected (on detection, need to clear DocElemRects)
  - Mutation Observer (clear DocElemRects, re-index if during drag)
- - Blank HREF's should be ignored
+ - ~~Blank HREF's should be ignored~~
 
 # Plans
  - ~~Add selection of and .click()ing of highlighted buttons~~
@@ -15,6 +15,7 @@
  - Better handling of label placement (separate from sizing rect)
  - Highlight "greatest of types" elements differently than elements which do not meet the greatest of.
     eg: 3 Buttons and 1 Anchor lassoed, the 3 Buttons would be highlighted in green vs the Anchor being highlighted in grey
+ - Move Inline Styles to Document <STYLE> block
 
 
 # Todo
