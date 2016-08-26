@@ -18,7 +18,9 @@
 
 /**
  * Handy shortcut for creating an element or element tree
- * @param html	string	Raw HTML to be used for creating the nodes
+ *
+ * @param {string} html		Raw HTML to be used for creating the nodes
+ *
  * @returns {Element}
  */
 function CreateElement(html) {
@@ -29,14 +31,15 @@ function CreateElement(html) {
 	DocFrag.firstChild.innerHTML = html;
 	result                       = DocFrag.firstElementChild.firstElementChild;
 	result.remove();
+
 	return result;
 }
 
 /**
  * Returns a string of the given properties, like propName: propValue
  *
- * @param obj
- * @param props
+ * @param {object}		obj		The object to inspect
+ * @param {string[]}	props	The properties to include
  */
 function dir(obj, props) {
 	let out = [];
@@ -55,22 +58,21 @@ function dir(obj, props) {
 class RateReporter {
 	/**
 	 *
-	 * @param msg         Template literal which should be passed as a string, when reporting
-	 *                    the following variables are available to the template:
-	 *                        Count:            The count variable passed in to report()
-	 *                        PerSecond:        The Count / Second rate
-	 *                        Elapsed:        The time that has elapsed
-	 * @param options
+	 * @param {string}	msg     Template literal which should be passed as a string, when reporting
+	 *                    		the following variables are available to the template:
+	 *                       		Count:            The count variable passed in to report()
+	 *                        		PerSecond:        The Count / Second rate
+	 *                        		Elapsed:        The time that has elapsed
 	 */
-	constructor(msg, options) {
+	constructor(msg) {
 		this.msg     = msg;
-		this.options = options;
 		this.started = Date.now();
 	}
 
 	/**
 	 * Report the results of the timing
-	 * @param Count
+	 *
+	 * @param {int}	Count	The number of operations performed
 	 */
 	report(Count) {
 		let ElapsedMS = (Date.now() - this.started),
@@ -91,11 +93,9 @@ class RateReporter {
 
 /**
  * Converts an iterable element to an array.
+ *
+ * @param {Array|object|} iterable	Any iterable arrayLike object
+ *
+ * @return {Array}
  */
-function $A(iterable) {
-	if(!iterable) return [];
-	if('toArray' in Object(iterable)) return iterable.toArray();
-	var length = iterable.length || 0, results = new Array(length);
-	while(length--) results[ length ] = iterable[ length ];
-	return results;
-}
+function $A(iterable) { return Array.from(iterable); }

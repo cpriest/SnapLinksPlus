@@ -24,17 +24,15 @@ const CT_LINKS        = 'Links',
 /**
  * This class categorizes a collection of selected elements and provide utilities around the collection of {Element}s
  *
- * @property {string}    GreatestType   The CT_* constant representing the greatest number of elements among the categories
+ * @property {string}    			GreatestType	The CT_* constant representing the greatest number of elements among the categories
  *
- * @property {Element[]} Links                  The A elements in the collection
- * @property {HTMLInputElement[]} Buttons       The INPUT elements in the collection that are buttons
- * @property Checkboxes {HTMLInputElement[]}    The INPUT elements in the collection that are checkboxes
- * @property {HTMLInputElement[]} RadioButtons  The INPUT elements in the collection that are radio buttons
+ * @property {Element[]}			Links			The A elements in the collection
+ * @property {HTMLInputElement[]}	Buttons			The INPUT elements in the collection that are buttons
+ * @property {HTMLInputElement[]}   Checkboxes		The INPUT elements in the collection that are checkboxes
+ * @property {HTMLInputElement[]} 	RadioButtons	The INPUT elements in the collection that are radio buttons
  */
 class CategorizedCollection {
-
 	/**
-	 *
 	 * @param {Element[]} tElems    The elements to categorize
 	 */
 	constructor(tElems = []) {
@@ -57,6 +55,7 @@ class CategorizedCollection {
 
 	/**
 	 * Returns a {Map} of element counts by CT_* Category
+	 *
 	 * @returns {Map}
 	 */
 	get Counts() {
