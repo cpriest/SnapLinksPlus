@@ -186,8 +186,8 @@ class SelectionRect {
 	/**
 	 * Re-aligns the label depending on the rect parameters
 	 *
-	 * @param {int}    toRight		The right coordinate that the rect was set to
-	 * @param {int}    toBottom		The bottom coordinate that the rect was set to
+	 * @param {boolean}    toRight		The right coordinate that the rect was set to
+	 * @param {boolean}    toBottom		The bottom coordinate that the rect was set to
 	 */
 	AlignCounter(toRight, toBottom) {
 		let style = this.uiElem.firstElementChild.style;

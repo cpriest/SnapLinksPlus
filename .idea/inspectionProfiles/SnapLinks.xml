@@ -52,7 +52,7 @@
       <option name="m_regex" value="([A-Z][a-z]+)+" />
     </inspection_tool>
     <inspection_tool class="JSLastCommaInObjectLiteral" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="JSMethodCanBeStatic" enabled="true" level="Informational" enabled_by_default="true" />
+    <inspection_tool class="JSMethodCanBeStatic" enabled="false" level="Informational" enabled_by_default="false" />
     <inspection_tool class="JSUnusedGlobalSymbols" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="JSUnusedLocalSymbols" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myIgnoreUnusedFunctionParameters" value="true" />
