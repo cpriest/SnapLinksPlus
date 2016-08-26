@@ -2,6 +2,9 @@
   <dictionary name="Clint">
     <words>
       <w>clickable</w>
+      <w>lodash</w>
+      <w>onresize</w>
+      <w>radiobuttons</w>
     </words>
   </dictionary>
 </component>

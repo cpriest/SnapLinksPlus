@@ -20,7 +20,7 @@
 
 # Todo
  - Resolve all inspection errors
- - JsDoc comments for everything
+ - ~~JsDoc comments for everything~~
 
 # Test
  - Test using the new CSS3 all property to reset styles for our elements, such as setting all: initial on

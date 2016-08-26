@@ -26,7 +26,8 @@
 class SvgOverlay {
 	/**
 	 * Creates the initial SVGSVGElement and adds it to the document
-	 * @param style        string        The style to be applied to the SVGRect elements
+	 *
+	 * @param {string} style    The style to be applied to the SVGRect elements
 	 */
 	constructor(style) {
 		this.style = style;
@@ -44,7 +45,8 @@ class SvgOverlay {
 
 	/**
 	 * Gets or Creates an SVGRect element and returns it
-	 * @returns SVGRect|Node
+	 *
+	 * @returns {SVGRectElement|Node}
 	 */
 	GetRect() {
 		if(this.AvailableRects.length)
@@ -57,7 +59,7 @@ class SvgOverlay {
 
 	/**
 	 *
-	 * @param tSvgElems SVGRect[]    An array of SVGRects that are no longer needed, they are hidden and added to available rects
+	 * @param {SVGRectElement[]}	tSvgElems    An array of SVGRects that are no longer needed, they are hidden and added to available rects
 	 */
 	ReleaseRects(tSvgElems) {
 		for(let elem of tSvgElems) {
@@ -69,7 +71,7 @@ class SvgOverlay {
 	/**
 	 * Called to highlight document elements using the SvgOverlay layer
 	 *
-	 * @param {CategorizedCollection} Elements 	A collection of elements which represent the current set of elements to be highlighted
+	 * @param {CategorizedCollection|Array} Elements 	A collection of elements which represent the current set of elements to be highlighted
 	 */
 	Highlight(Elements) {
 		let tElems = Elements.All,
