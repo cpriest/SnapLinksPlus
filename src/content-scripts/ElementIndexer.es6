@@ -156,24 +156,24 @@ class ElementIndexer {
 	/**
 	 * Search the index for all elements that intersect with the selection rect
 	 *
-	 * @param {Rect} r    The rect in document coordinates to search
+	 * @param {Rect} sel    The rect in document coordinates to search
 	 */
-	Search(r) {
+	Search(sel) {
 		let docHeight   = document.documentElement.scrollHeight,
 			Buckets     = data.IndexBuckets,
 			/* GetBucketFromTop() */
-			FirstBucket = Math.floor(r.top * Buckets / docHeight),
+			FirstBucket = Math.floor(sel.top * Buckets / docHeight),
 			/* GetBucketFromTop() */
-			LastBucket  = Math.floor(r.bottom * Buckets / docHeight),
+			LastBucket  = Math.floor(sel.bottom * Buckets / docHeight),
 			offset      = { x: document.documentElement.scrollLeft, y: document.documentElement.scrollTop },
 			tMatches    = [];
 
 		for(let j = FirstBucket; j <= LastBucket; j++) {
 			for(let elem of this.BoundaryIndex[j]) {
 				for(let r of ElemDocRects.get(elem, offset)) {
-					if(r.Intersects(r) && this.IsVisible(elem) === true) {
+					if(sel.Intersects(r) && this.IsVisible(elem) === true) {
 						tMatches.push(elem);
-						break;	// for(let r...
+						break;	// for(let sel...
 					}
 				}
 			}
