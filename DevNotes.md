@@ -15,12 +15,15 @@
  - Better handling of label placement (separate from sizing rect)
  - Highlight "greatest of types" elements differently than elements which do not meet the greatest of.
     eg: 3 Buttons and 1 Anchor lassoed, the 3 Buttons would be highlighted in green vs the Anchor being highlighted in grey
- - Move Inline Styles to Document <STYLE> block
+ - Move Inline Styles to Document \<STYLE> block
 
 
 # Todo
  - Resolve all inspection errors
  - ~~JsDoc comments for everything~~
+ - Externalize CSS Styles
+ - Separate all classes into their own files
+ - Compiler/minimizer for production build?
 
 # Test
  - Test using the new CSS3 all property to reset styles for our elements, such as setting all: initial on
@@ -29,3 +32,21 @@
 
 # Deferred / Possibly Won't Implement
  - Add Elements that have cursor: pointer (and have a click handler?)
+
+
+<style>
+    del { opacity: .5; }
+    A { color: #36a3d9; text-decoration: underline; }
+    BODY { background-color: black; }
+    ARTICLE.markdown-body { padding: 35px !important; background-color: #1a1817 !important; }
+
+/*  span { position: relative; }
+    del::after {
+        border-bottom: 1px solid rgba(255,255,255,.4);
+        content: "";
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 50%;
+    } */
+</style>

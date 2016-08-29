@@ -36,6 +36,7 @@
 				"src/globals.es6",
 				"src/lib/lodash-snaplinks.min.js",
 				"src/content-scripts/Utility.es6",
+				"src/content-scripts/SelectionRect.es6",
 				"src/content-scripts/SnapLinks.es6",
 				"src/content-scripts/ElementIndexer.es6",
 				"src/content-scripts/SvgOverlay.es6",
