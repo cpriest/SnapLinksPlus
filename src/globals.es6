@@ -43,6 +43,8 @@ const data = {
 	},
 	HighlightStyles: {
 		ActOnElements: 'fill: rgba(255,0,0,.1); stroke: red; stroke-width: .75px;',
-	}
+	},
+
+	DevMode: false,
 };
 

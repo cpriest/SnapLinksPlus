@@ -63,3 +63,9 @@ Node.prototype.parentElement = 0;
 
 
 SVGRectElement = { };
+
+chrome = {
+	runtime: {
+		sendMessage: function() {}
+	}
+};
