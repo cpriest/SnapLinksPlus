@@ -30,7 +30,7 @@ class SvgOverlay {
 	 * @param {string} style    The style to be applied to the SVGRect elements
 	 */
 	constructor(style) {
-		this.style = style;
+		this.style   = style;
 		this.Overlay = CreateElement(`
 			<svg xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 0px; left: 0px; z-index: 999999; width: ${docElem.scrollWidth}px; height: ${docElem.scrollHeight}px; ">
 				<rect/> <!-- Used for easily cloning the properly namespaced rect -->
@@ -40,10 +40,11 @@ class SvgOverlay {
 
 		this.HighlightElemMap    = new WeakMap();
 		this.HighlightedElements = [];
-		this.AvailableRects = [];
+		this.AvailableRects      = [];
 	}
 
 	/**
+	 * @protected
 	 * Gets or Creates an SVGRect element and returns it
 	 *
 	 * @returns {SVGRectElement|Node}
@@ -54,27 +55,33 @@ class SvgOverlay {
 
 		let elem = this.Overlay.firstElementChild.cloneNode(false);
 		this.Overlay.appendChild(elem);
+
 		return elem;
 	}
 
 	/**
+	 * @param {SVGRectElement[]}    tSvgElems    An array of SVGRects that are no longer needed, they are hidden and added to available rects
 	 *
-	 * @param {SVGRectElement[]}	tSvgElems    An array of SVGRects that are no longer needed, they are hidden and added to available rects
+	 * @returns {SvgOverlay}
 	 */
 	ReleaseRects(tSvgElems) {
 		for(let elem of tSvgElems) {
 			elem.style.display = 'none';
 			this.AvailableRects.push(elem);
 		}
+
+		return this;
 	}
 
 	/**
 	 * Called to highlight document elements using the SvgOverlay layer
 	 *
-	 * @param {CategorizedCollection|Array} Elements 	A collection of elements which represent the current set of elements to be highlighted
+	 * @param {CategorizedCollection|Array} Elements    A collection of elements which represent the current set of elements to be highlighted
+	 *
+	 * @returns {SvgOverlay}
 	 */
 	Highlight(Elements) {
-		let tElems = Elements.All,
+		let tElems       = Elements.All || [ ],
 			tPrevElems   = this.HighlightedElements,
 			tUnhighlight = tPrevElems.filter(
 				(elem) => { return !tElems.includes(elem); }
@@ -92,6 +99,7 @@ class SvgOverlay {
 		for(let elem of tHighlight) {
 
 			let tSvgRects = [];
+
 			for(let r of ElemDocRects.get(elem, offset)) {
 				let svgRect = this.GetRect(),
 					attr    = {
@@ -110,29 +118,30 @@ class SvgOverlay {
 			this.HighlightElemMap.set(elem, tSvgRects);
 		}
 		this.HighlightedElements = tElems;
+
+		this.Overlay.style.display =
+			this.HighlightedElements.length
+				? ''
+				: 'none';
+
+		return this;
 	}
 
 	/**
 	 * Called to reconstruct and reposition all element highlights (such as onresize)
+	 *
+	 * @returns {SvgOverlay}
 	 */
 	Reposition() {
 		let tPrevElems = this.HighlightedElements;
 		this.Highlight([]);
-		this.Highlight(tPrevElems);
+		return this.Highlight(tPrevElems);
 	}
 
 	/**
 	 * Called manually to clean up when this object is no longer needed
+	 *
+	 * @returns {SvgOverlay}
 	 */
-	destructor() {
-		/** @note: unsure of "best way" of memory management - let GC just handle it, or manually release
-		 * 		The below code was original in place to properly release all references, but is it necessary?
-		 *
-		 *	for(let elem of this.HighlightedElements)
-		 *		this.ReleaseRects(this.HighlightElemMap.get(elem));
-		 *	this.HighlightElemMap    = new WeakMap();
-		 *	this.HighlightedElements = [];
-		 */
-		this.Overlay.remove();
-	}
+	Hide() { return this.Highlight([]); }
 }

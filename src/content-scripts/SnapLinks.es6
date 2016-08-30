@@ -190,15 +190,10 @@ new (class EventHandler {
 		document.removeEventListener('mousemove', this._onMouseMove, true);
 		document.removeEventListener('keydown', this._onKeyDown, true);
 
-		if(this.mmTimer)
-			this.mmTimer = clearInterval(this.mmTimer);
+		this.mmTimer = clearInterval(this.mmTimer);
 
 		this.CurrentSelection.Hide();
-
-		if(this.SvgOverlay) {
-			this.SvgOverlay.destructor();
-			delete this.SvgOverlay;
-		}
+		this.SvgOverlay.Hide();
 
 		delete this.ElementIndexer;
 	}
