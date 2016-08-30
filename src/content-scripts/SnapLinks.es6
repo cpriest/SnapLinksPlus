@@ -35,7 +35,7 @@ new (class EventHandler {
 	}
 
 	/**
-	 *	Registers document/window always active events
+	 *    Registers document/window always active events
 	 */
 	RegisterActivationEvents() {
 		document.addEventListener('mousedown', this.onMouseDown.bind(this), true);
@@ -120,8 +120,11 @@ new (class EventHandler {
 	 * @param {MouseEvent} e
 	 */
 	BeginDrag(e) {
-		this.CurrentSelection = new SelectionRect(e.pageY, e.pageX);
-		this.LastMouseEvent   = e;
+		this.CurrentSelection =
+			(this.CurrentSelection || new SelectionRect())
+				.SetOrigin(e.pageY, e.pageX);
+
+		this.LastMouseEvent = e;
 
 		// Chrome doesn't support/need set/releaseCapture
 		if(document.documentElement.setCapture)
@@ -174,8 +177,8 @@ new (class EventHandler {
 			this.CurrentSelection.SetCounter((new Set(this.SelectedElements.Links.map((elem) => elem.href))).size);
 			this.CurrentSelection.AlignCounter(this.CurrentSelection.dims.left != NewRight, this.CurrentSelection.dims.top != NewBottom);
 		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
+			this.SvgOverlay     = this.SvgOverlay || new SvgOverlay(data.HighlightStyles.ActOnElements);
 			this.ElementIndexer = new ElementIndexer();
-			this.SvgOverlay     = new SvgOverlay(data.HighlightStyles.ActOnElements);
 		}
 	}
 
@@ -190,15 +193,14 @@ new (class EventHandler {
 		if(this.mmTimer)
 			this.mmTimer = clearInterval(this.mmTimer);
 
-		if(this.CurrentSelection)
-			this.CurrentSelection.Remove();
+		this.CurrentSelection.Hide();
 
-		if(this.SvgOverlay)
+		if(this.SvgOverlay) {
 			this.SvgOverlay.destructor();
+			delete this.SvgOverlay;
+		}
 
-		delete this.CurrentSelection;
 		delete this.ElementIndexer;
-		delete this.SvgOverlay;
 	}
 
 	/** Stops the next context menu from showing, will de-register its-self upon one cycle */
@@ -223,10 +225,10 @@ new (class EventHandler {
 	}
 
 	/**
-	 *	Performs the default action for the SelectedElements
+	 *    Performs the default action for the SelectedElements
 	 *
-	 * @param {CategorizedCollection} SelectedElements	The elements selected by the user
-	 * @param {MouseEvent} e							The final event that completed activated the action
+	 * @param {CategorizedCollection} SelectedElements    The elements selected by the user
+	 * @param {MouseEvent} e                            The final event that completed activated the action
 	 */
 	ActUpon(SelectedElements, e) {
 		switch(SelectedElements.GreatestType) {
@@ -253,9 +255,9 @@ new (class EventHandler {
 				break;
 			case CT_CHECKBOXES:
 				// Determine majority checked/unchecked, prefers checking if counts are e
-				let CheckedCount = SelectedElements.Checkboxes.reduce((acc, elem) => acc + elem.checked, 0),
+				let CheckedCount   = SelectedElements.Checkboxes.reduce((acc, elem) => acc + elem.checked, 0),
 					UncheckedCount = SelectedElements.Checkboxes.length - CheckedCount,
-					CheckElements = UncheckedCount >= CheckedCount;
+					CheckElements  = UncheckedCount >= CheckedCount;
 
 				for(let elem of SelectedElements.Checkboxes)
 					elem.checked = CheckElements;

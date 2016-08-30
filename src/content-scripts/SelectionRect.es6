@@ -33,10 +33,21 @@ class Rect {
 	 * @param {int} bottom  The bottom coordinate
 	 * @param {int} right   The right coordinate
 	 */
-	constructor(top, left, bottom, right) {
+	constructor(top=0, left=0, bottom=0, right=0) {
 		[this.originTop, this.originLeft]              = [top, left];
 		[this.top, this.left, this.bottom, this.right] = [top, left, bottom, right];
 		this.CalculateProperties();
+	}
+
+	/**
+	 * @param {int} top     The initial top coordinate (typically of the mousedown event)
+	 * @param {int} left    The initial left coordinate (typically of the mousedown event)
+	 */
+	SetOrigin(top, left) {
+		this.originTop = top;
+		this.originLeft = left;
+
+		return this.CalculateProperties();
 	}
 
 	/**
@@ -137,23 +148,34 @@ class DocRect extends Rect {
  */
 class SelectionRect {
 	/**
-	 * @param {int} top        The initial top coordinate (typically of the mousedown event)
-	 * @param {int} left    The initial left coordinate (typically of the mousedown event)
-	 *
 	 * @constructor
 	 */
-	constructor(top, left) {
-		this.htmContainer = CreateElement(
-			'<div id="SL_Container">' +
+	constructor() {
+		this.dims = new Rect();
+
+		this.elContainer = CreateElement(
+			'<div class="SL_Container" style="display: none;">' +
 			'	<div style="outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999; overflow: visible;" class="SL_SelRect">' +
 			'	<div style="position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap;"></div>' +
 			'	</div>' +
 			'</div>'
 		);
+		this.elRect = this.elContainer.firstElementChild;
 
-		this.uiElem = this.htmContainer.firstElementChild;
-		this.dims   = new Rect(top, left, top, left);
-		document.body.insertBefore(this.htmContainer, document.body.firstElementChild);
+		document.body.insertBefore(this.elContainer, document.body.firstElementChild);
+	}
+
+	/**
+	 * @param {int} top     The initial top coordinate (typically of the mousedown event)
+	 * @param {int} left    The initial left coordinate (typically of the mousedown event)
+	 *
+	 * @returns {SelectionRect}
+	 */
+	SetOrigin(top, left) {
+		this.dims.SetOrigin(top, left);
+		this.elContainer.style.display = '';
+
+		return this;
 	}
 
 	/**
@@ -161,6 +183,8 @@ class SelectionRect {
 	 *
 	 * @param {int} bottom        The bottom coordinate of the rect to set
 	 * @param {int} right        The right coordinate of the rect to set
+	 *
+	 * @returns {SelectionRect}
 	 */
 	SetBottomRight(bottom, right) {
 		let dr = (new DocRect(document))
@@ -170,20 +194,25 @@ class SelectionRect {
 			.SetBottomRight(bottom, right)
 			.ClipTo(dr);
 
-		[this.uiElem.style.top, this.uiElem.style.left]     = [this.dims.top + 'px', this.dims.left + 'px'];
-		[this.uiElem.style.height, this.uiElem.style.width] = [this.dims.height + 'px', this.dims.width + 'px'];
+		[this.elRect.style.top, this.elRect.style.left]     = [this.dims.top + 'px', this.dims.left + 'px'];
+		[this.elRect.style.height, this.elRect.style.width] = [this.dims.height + 'px', this.dims.width + 'px'];
 
-		this.uiElem.style.display = this.IsLargeEnoughToActivate()
+		this.elRect.style.display = this.IsLargeEnoughToActivate()
 			? ''
 			: 'none';
+
+		return this;
 	}
 
 	/**
 	 * Sets the label for the rect to {count} Links
 	 * @param {int} count    The count of the links to set the label to
+	 *
+	 * @returns {SelectionRect}
 	 */
 	SetCounter(count) {
-		this.uiElem.firstElementChild.innerHTML = `${count} Links`;
+		this.elRect.firstElementChild.innerHTML = `${count} Links`;
+		return this;
 	}
 
 	/**
@@ -191,9 +220,11 @@ class SelectionRect {
 	 *
 	 * @param {boolean}    toRight        The right coordinate that the rect was set to
 	 * @param {boolean}    toBottom        The bottom coordinate that the rect was set to
+	 *
+	 * @returns {SelectionRect}
 	 */
 	AlignCounter(toRight, toBottom) {
-		let style = this.uiElem.firstElementChild.style;
+		let style = this.elRect.firstElementChild.style;
 
 		[style.right, style.left] =
 			toRight
@@ -208,15 +239,7 @@ class SelectionRect {
 		if(toRight == false && toBottom == false) {
 			style.left = '16px';
 		}
-	}
-
-	/**
-	 * Called to remove the element from the document, just prior to deletion of the object instance
-	 */
-	Remove() {
-		this.htmContainer.remove();
-		delete this.htmContainer;
-		delete this.uiElem;
+		return this;
 	}
 
 	/**
@@ -226,5 +249,18 @@ class SelectionRect {
 	 */
 	IsLargeEnoughToActivate() {
 		return this.dims.width > data.selection.activate.minX || this.dims.height > data.selection.activate.minY;
+	}
+
+	/**
+	 * Called to indicate it's consumer is no longer using it, SetOrigin() will show the container again
+	 *
+	 * @returns {SelectionRect}
+	 */
+	Hide() {
+		this.dims                      = new Rect();
+		this.elContainer.style.display = 'none';
+		this.elRect.style.display      = 'none';
+
+		return this;
 	}
 }
