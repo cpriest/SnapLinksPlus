@@ -26,18 +26,14 @@ new (class EventHandler {
 	 * @constructor
 	 */
 	constructor() {
-		this.RegisterActivationEvents();
 		this._onMouseUp     = this.onMouseUp.bind(this);
 		this._onMouseMove   = this.onMouseMove.bind(this);
 		this._onContextMenu = this.onContextMenu.bind(this);
 		this._onKeyDown     = this.onKeyDown.bind(this);
-		window.addEventListener('resize', _.throttle(this.onThrottledResize.bind(this), 100), true);
-	}
 
-	/**
-	 *    Registers document/window always active events
-	 */
-	RegisterActivationEvents() {
+		/** @refactor: When full screen object resizing is implemented, this can be removed/replaced by same */
+		window.addEventListener('resize', _.throttle(this.onThrottledResize.bind(this), 100), true);
+
 		document.addEventListener('mousedown', this.onMouseDown.bind(this), true);
 	}
 
@@ -52,8 +48,10 @@ new (class EventHandler {
 			switch(e.mods) {
 				// @Development
 				case CTRL + ALT:
-					this.StopNextContextMenu();
-					chrome.runtime.sendMessage({ Action: RELOAD_EXTENSION });
+					if(data.DevMode) {
+						this.StopNextContextMenu();
+						chrome.runtime.sendMessage({ Action: RELOAD_EXTENSION });
+					}
 					break;
 
 				case NONE:
@@ -177,8 +175,16 @@ new (class EventHandler {
 			this.CurrentSelection.SetCounter((new Set(this.SelectedElements.Links.map((elem) => elem.href))).size);
 			this.CurrentSelection.AlignCounter(this.CurrentSelection.dims.left != NewRight, this.CurrentSelection.dims.top != NewBottom);
 		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
-			this.SvgOverlay     = this.SvgOverlay || new SvgOverlay(data.HighlightStyles.ActOnElements);
 			this.ElementIndexer = new ElementIndexer();
+			this.SvgOverlay     = this.SvgOverlay || new SvgOverlay(data.HighlightStyles.ActOnElements);
+
+			document.head.appendChild(
+				CreateElement(`
+					<style>
+						.SL_Container :not([xyz]) { all: initial; }
+					</style>
+				`)
+			);
 		}
 	}
 
