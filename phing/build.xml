@@ -84,6 +84,11 @@
 		</copy>
 		<copy todir="${builddir}">
 			<fileset refid="AllFiles"/>
+			<filterchain>
+				<replaceregexp>
+					<regexp pattern=".*#DevCode.*[\r\n]{1,2}" replace="" modifiers="i" />
+				</replaceregexp>
+			</filterchain>
 		</copy>
 		<copy file="build/manifest.json" tofile="manifest.json" />
 	</target>
