@@ -23,21 +23,42 @@
  *    To start with, it will just be to replace the elem.style.outline that's presently used and doesn't
  *    work correctly with elements which are clipped.
  */
-class SvgOverlay {
+let SvgOverlay = new class SvgOverlayMgr {
 	/**
-	 * Creates the initial SVGSVGElement and adds it to the document
-	 *
-	 * @param {string} style    The style to be applied to the SVGRect elements
+	 * Creates the SvgOverlay Manager
 	 */
-	constructor(style) {
-		this.style   = style;
-		this.Overlay = CreateElement(`
-			<svg xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 0px; left: 0px; z-index: 999999; width: ${docElem.scrollWidth}px; height: ${docElem.scrollHeight}px; ">
-				<rect/> <!-- Used for easily cloning the properly namespaced rect -->
-			</svg>
-		`);
-		document.body.insertBefore(this.Overlay, document.body.firstElementChild);
+	constructor() {
+		sub(ElementsSelected, (topic, Elements, Subscription) => {
+			if(!this.Overlay)
+				this.Init();
 
+			this.Highlight(Elements);
+		});
+
+		sub(DragCompleted, (topic, data, Subscription) => {
+			this.Hide();
+		});
+
+//		/**
+//		 * Where I'm At
+//		 * 		The DOCSIZECHANGE even is all good!  sweet.
+//		 *
+//		 * 		Next Up:
+//		 * 			Get a go() function going that CSP's a check against document size changes
+//		 */
+//		let Subscription = sub(DOCSIZECHANGE, (topic, e, Subscription) => {
+//			console.log(topic, e);
+//		});
+	}
+
+	Init() {
+		this.style = data.HighlightStyles.ActOnElements;
+		this.Overlay = CreateElement(`
+				<svg xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 0px; left: 0px; z-index: 999999; width: ${docElem.scrollWidth}px; height: ${docElem.scrollHeight}px; ">
+					<rect/> <!-- Used for easily cloning the properly namespaced rect -->
+				</svg>
+			`);
+		document.body.insertBefore(this.Overlay, document.body.firstElementChild);
 		this.HighlightElemMap    = new WeakMap();
 		this.HighlightedElements = [];
 		this.AvailableRects      = [];
@@ -62,7 +83,7 @@ class SvgOverlay {
 	/**
 	 * @param {SVGRectElement[]}    tSvgElems    An array of SVGRects that are no longer needed, they are hidden and added to available rects
 	 *
-	 * @returns {SvgOverlay}
+	 * @returns {SvgOverlayMgr}
 	 */
 	ReleaseRects(tSvgElems) {
 		for(let elem of tSvgElems) {
@@ -78,7 +99,7 @@ class SvgOverlay {
 	 *
 	 * @param {CategorizedCollection|Array} Elements    A collection of elements which represent the current set of elements to be highlighted
 	 *
-	 * @returns {SvgOverlay}
+	 * @returns {SvgOverlayMgr}
 	 */
 	Highlight(Elements) {
 		let tElems       = Elements.All || [ ],
@@ -130,7 +151,7 @@ class SvgOverlay {
 	/**
 	 * Called to reconstruct and reposition all element highlights (such as onresize)
 	 *
-	 * @returns {SvgOverlay}
+	 * @returns {SvgOverlayMgr}
 	 */
 	Reposition() {
 		let tPrevElems = this.HighlightedElements;
@@ -141,7 +162,7 @@ class SvgOverlay {
 	/**
 	 * Called manually to clean up when this object is no longer needed
 	 *
-	 * @returns {SvgOverlay}
+	 * @returns {SvgOverlayMgr}
 	 */
 	Hide() { return this.Highlight([]); }
-}
+};

@@ -16,12 +16,30 @@
 
 "use strict";
 
+// Pub-Sub Events
+const DragStarted     = 'DragStarted',
+	  DragRectChanged = 'DragRectChanged',
+	  DragCompleted   = 'DragCompleted';
+
+/**
+ * WHERE I'M AT:
+ *
+ * 		Screw Channels For Now!!!
+ *
+ * 	Use pub/sub to break apart tight integrations such as SvgOverlay.Highlight via:
+ * 		pub(SelectionChanged) -> pub(ElementsSelected), etc...
+ *
+ * 	and
+ * 		pub(Selection Started) -> sub(Initialize SvgOverlay, ElementIndexer, etc)
+ * 	basically de-couple them...
+ */
+
 /**
  * The main Event Handler for Snap Links, registers/un-registers event handlers as appropriate
  *
  * @refactor This class is probably doing too much
  */
-new (class EventHandler {
+class EventHandler {
 	/**
 	 * @constructor
 	 */
@@ -31,10 +49,24 @@ new (class EventHandler {
 		this._onContextMenu = this.onContextMenu.bind(this);
 		this._onKeyDown     = this.onKeyDown.bind(this);
 
-		/** @refactor: When full screen object resizing is implemented, this can be removed/replaced by same */
-		window.addEventListener('resize', _.throttle(this.onThrottledResize.bind(this), 100), true);
+//		/** @refactor: When full screen object resizing is implemented, this can be removed/replaced by same */
+//		window.addEventListener('resize', _.throttle(this.onThrottledResize.bind(this), 100), true);
 
 		document.addEventListener('mousedown', this.onMouseDown.bind(this), true);
+
+//		go(function*(v) {
+//			do {
+//				if(!this.docSize || this.docSize.x != docElem.scrollWidth || this.docSize.y != docElem.scrollHeight) {
+//					this.docSize = { x: docElem.scrollWidth, y: docElem.scrollHeight };
+//					pub(DOCSIZECHANGE, { this.docSize });
+//				}
+//			} while(!(yield csp.timeout(250)));
+//		}.bind(this));
+//		setInterval(() => console.log(this.docSize, this), 1000);
+// <#DevCode>
+//		pg_initial_csp_testing();			#DevCode
+//		pg_pubsub();						#DevCode
+// </#DevCode>
 	}
 
 	/**
@@ -74,11 +106,6 @@ new (class EventHandler {
 			this.StopNextContextMenu();
 
 		this.EndDrag(e);
-
-		if(this.SelectedElements) {
-			this.ActUpon(this.SelectedElements, e);
-			delete this.SelectedElements;
-		}
 	}
 
 	/**
@@ -100,8 +127,8 @@ new (class EventHandler {
 	onThrottledResize(e) {
 		ElemDocRects.clear();
 
-		if(this.SvgOverlay)
-			this.SvgOverlay.Reposition();
+//		if(this.SvgOverlay)
+//			this.SvgOverlay.Reposition();
 	}
 
 	/**
@@ -131,6 +158,11 @@ new (class EventHandler {
 		document.addEventListener('mouseup', this._onMouseUp, true);
 		document.addEventListener('mousemove', this._onMouseMove, true);
 		document.addEventListener('keydown', this._onKeyDown, true);
+
+		sub(ElementsSelected, (topic, Elements) => {
+			this.SelectedElements = Elements;
+		});
+
 		this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
 	}
 
@@ -167,25 +199,26 @@ new (class EventHandler {
 		let NewRight  = docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth);
 		this.CurrentSelection.SetBottomRight(NewBottom, NewRight);
 
-		if(this.ElementIndexer) {
-			this.SvgOverlay.Highlight(
-				this.SelectedElements = this.ElementIndexer.Search(this.CurrentSelection.dims)
-			);
+//		if(this.ElementIndexer) {
+//			this.SvgOverlay.Highlight(
+//				this.SelectedElements = this.ElementIndexer.Search(this.CurrentSelection.dims)
+//			);
 
-			this.CurrentSelection.SetCounter((new Set(this.SelectedElements.Links.map((elem) => elem.href))).size);
-			this.CurrentSelection.AlignCounter(this.CurrentSelection.dims.left != NewRight, this.CurrentSelection.dims.top != NewBottom);
-		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
-			this.ElementIndexer = new ElementIndexer();
-			this.SvgOverlay     = this.SvgOverlay || new SvgOverlay(data.HighlightStyles.ActOnElements);
+//			this.CurrentSelection.SetCounter((new Set(this.SelectedElements.Links.map((elem) => elem.href))).size);
+//			this.CurrentSelection.AlignCounter(this.CurrentSelection.dims.left != NewRight, this.CurrentSelection.dims.top != NewBottom);
+//		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
+//			pub( DragStarted );
+//			this.ElementIndexer = new ElementIndexer();
+//			this.SvgOverlay     = this.SvgOverlay || new SvgOverlay(data.HighlightStyles.ActOnElements);
 
-			document.head.appendChild(
-				CreateElement(`
-					<style>
-						.SL_Container :not([xyz]) { all: initial; }
-					</style>
-				`)
-			);
-		}
+//			document.head.appendChild(
+//				CreateElement(`
+//					<style>
+//						.SL_Container :not([xyz]) { all: initial; }
+//					</style>
+//				`)
+//			);
+//		}
 	}
 
 	/**
@@ -198,79 +231,17 @@ new (class EventHandler {
 
 		this.mmTimer = clearInterval(this.mmTimer);
 
-		this.CurrentSelection.Hide();
-		this.SvgOverlay.Hide();
+		pub( DragCompleted, { SelectedElements: this.SelectedElements, e: e } );
+		delete this.SelectedElements;
 
-		delete this.ElementIndexer;
+		this.CurrentSelection.Hide();
+//		this.SvgOverlay.Hide();
 	}
 
 	/** Stops the next context menu from showing, will de-register its-self upon one cycle */
 	StopNextContextMenu() {
 		window.addEventListener('contextmenu', this._onContextMenu, true);
 	}
+}
 
-	/**
-	 * Copies the given text to the clipboard
-	 *
-	 * @param {string} text
-	 */
-	CopyToClipboard(text) {
-		const input          = document.createElement('textarea');
-		input.style.position = 'fixed';
-		input.style.opacity  = 0;
-		input.value          = text;
-		document.body.appendChild(input);
-		input.select();
-		document.execCommand('Copy');
-		document.body.removeChild(input);
-	}
-
-	/**
-	 *    Performs the default action for the SelectedElements
-	 *
-	 * @param {CategorizedCollection} SelectedElements    The elements selected by the user
-	 * @param {MouseEvent} e                            The final event that completed activated the action
-	 */
-	ActUpon(SelectedElements, e) {
-		switch(SelectedElements.GreatestType) {
-			case CT_LINKS:
-				// removing duplicates
-				let links = Array.from(new Set(SelectedElements.Links.map((elem) => elem.href)));
-
-				if(e.ctrlKey) {
-					this.CopyToClipboard(links.join('\n'));
-				} else {
-					// For now we are simply going to create new tabs for the selected elements
-
-					//noinspection JSUnresolvedVariable,JSUnresolvedFunction
-					chrome.runtime.sendMessage(
-						{
-							Action: OPEN_URLS_IN_TABS,
-							tUrls : links,
-						});
-				}
-				break;
-			case CT_CLICKABLE:
-				for(let Button of SelectedElements.Clickable)
-					Button.click();
-				break;
-			case CT_CHECKBOXES:
-				// Determine majority checked/unchecked, prefers checking if counts are e
-				let CheckedCount   = SelectedElements.Checkboxes.reduce((acc, elem) => acc + elem.checked, 0),
-					UncheckedCount = SelectedElements.Checkboxes.length - CheckedCount,
-					CheckElements  = UncheckedCount >= CheckedCount;
-
-				for(let elem of SelectedElements.Checkboxes)
-					elem.checked = CheckElements;
-				break;
-			case CT_RADIOBUTTONS:
-				let GroupedByName = SelectedElements.RadioButtons.reduce((/** Map */ acc, elem) => {
-					return acc.set(elem.name, (acc.get(elem.name) || []).concat([elem]));
-				}, new Map());
-
-				for(let [, tElems] of GroupedByName)
-					tElems[0].checked = true;
-				break;
-		}
-	}
-});
+let eh = new EventHandler();

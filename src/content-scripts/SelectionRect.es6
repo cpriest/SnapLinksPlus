@@ -189,17 +189,26 @@ class SelectionRect {
 	SetBottomRight(bottom, right) {
 		let dr = (new DocRect(document))
 			.Expand(-2, -2);
+
+		let { width, height } = this.dims;
+
 		/* Based on current fixed style */
 		this.dims
 			.SetBottomRight(bottom, right)
 			.ClipTo(dr);
 
-		[this.elRect.style.top, this.elRect.style.left]     = [this.dims.top + 'px', this.dims.left + 'px'];
-		[this.elRect.style.height, this.elRect.style.width] = [this.dims.height + 'px', this.dims.width + 'px'];
+		if( width != this.dims.width || height != this.dims.height ) {
+			[this.elRect.style.top, this.elRect.style.left]     = [this.dims.top + 'px', this.dims.left + 'px'];
+			[this.elRect.style.height, this.elRect.style.width] = [this.dims.height + 'px', this.dims.width + 'px'];
 
-		this.elRect.style.display = this.IsLargeEnoughToActivate()
-			? ''
-			: 'none';
+			if(this.IsLargeEnoughToActivate()) {
+				this.elRect.style.display = '';
+				pub(DragRectChanged, { dims: this.dims, visible: true } );
+			} else {
+				this.elRect.style.display = 'none';
+				pub(DragRectChanged, { dims: this.dims, visible: false});
+			}
+		}
 
 		return this;
 	}

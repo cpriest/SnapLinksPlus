@@ -33,14 +33,19 @@
 				"<all_urls>"
 			],
 			"js":      [
-				"src/globals.es6",
 				"src/lib/lodash-snaplinks.min.js",
+				"src/lib/csp.min.js",
+				"src/lib/transducers.js",
+				"src/globals.es6",
+				"src/CSP.es6",
+				"src/playground/csp-testing.es6",
 				"src/content-scripts/Utility.es6",
 				"src/content-scripts/SelectionRect.es6",
 				"src/content-scripts/SnapLinks.es6",
 				"src/content-scripts/ElementIndexer.es6",
 				"src/content-scripts/SvgOverlay.es6",
-				"src/content-scripts/CategorizedCollection.es6"
+				"src/content-scripts/CategorizedCollection.es6",
+				"src/content-scripts/ActionMgr.es6"
 			]
 		}
 	]

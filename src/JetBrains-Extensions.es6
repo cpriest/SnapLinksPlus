@@ -2,7 +2,7 @@
  @browser Gecko
  @type {number}
  */
-MouseEvent.prototype.mods = 0;
+Event.prototype.mods = 0;
 
 
 

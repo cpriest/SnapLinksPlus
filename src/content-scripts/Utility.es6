@@ -99,3 +99,14 @@ class RateReporter {
  * @return {Array}
  */
 function $A(iterable) { return Array.from(iterable); }
+
+/**
+ * Adds a mods bitfield to an event based on ctrlKey, altKey and shiftKey states
+ *
+ * @param {Event} e
+ * @returns {Event}
+ */
+function AddModsToEvent(e) {
+	e.mods = (e.ctrlKey) + (e.altKey << 1) + (e.shiftKey << 2);
+	return e;
+}

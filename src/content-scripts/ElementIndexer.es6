@@ -18,6 +18,10 @@ let ElemDocRects;
 
 "use strict";
 
+// Pub-Sub Events
+const ElementsSelected = 'ElementsSelected';
+
+
 ElemDocRects = new (
 	/**
 	 * This class provides for a cached WeakMap of {Element} to
@@ -97,12 +101,25 @@ ElemDocRects = new (
  *  - Identifying/Tracking which elements in the document are selectable
  *  - Quickly filtering selectable elements by a document coordinate rect
  */
-class ElementIndexer {
+let ElemIndex = new class ElementIndexer {
 	/** Constructs a new ElementIndexer */
 	constructor() {
-		this.Elements = document.querySelectorAll('A[href]:not([href=""]), INPUT[type="button"], INPUT[type="submit"], INPUT[type="reset"], INPUT[type="checkbox"], INPUT[type="radio"]');
+		sub(DragRectChanged, (topic, data, Subscription) => {
+			if(!this.Elements) {
+				this.Elements = document.querySelectorAll('A[href]:not([href=""]), INPUT[type="button"], INPUT[type="submit"], INPUT[type="reset"], INPUT[type="checkbox"], INPUT[type="radio"]');
 
-		this.UpdateIndex();
+				this.UpdateIndex();
+			}
+//			console.log(topic, data.dims);												// #DevCode
+			if(data.visible) {
+				pub(ElementsSelected, this.Search(data.dims));
+//				console.log('ElementIndexer: %s(%o) -> %o', topic, data, Results);		// #DevCode
+			}
+		});
+
+		sub(DragCompleted, () => {
+			delete this.Elements;
+		});
 	}
 
 	/**
@@ -180,5 +197,4 @@ class ElementIndexer {
 		}
 		return new CategorizedCollection(tMatches);
 	}
-}
-
+};

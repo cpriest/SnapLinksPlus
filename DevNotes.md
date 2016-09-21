@@ -1,8 +1,12 @@
 # Bugs
  - [Issue #91](https://github.com/cpriest/SnapLinksPlus/issues/91)-1 - Width of selection box independent of zoom factor... possibly doable with SVG since it has it's own coordinate system??
- - Document size changes are not detected (on detection, need to clear DocElemRects)
+ - ***Document size changes are not detected (on detection, need to clear DocElemRects)**\*
  - Mutation Observer (clear DocElemRects, re-index if during drag)
  - ~~Blank HREF's should be ignored~~
+ - Since pub/sub
+     - document.execCommand(‘cut’/‘copy’) was denied because it was not called from inside a short running user-generated event handler.1ActionMgr.es6:40:3
+
+
 
 # Plans
  - ~~Add selection of and .click()ing of highlighted buttons~~
@@ -21,14 +25,22 @@
 # Todo
  - Resolve all inspection errors
  - ~~JsDoc comments for everything~~
- - Externalize CSS Styles
+ - Externalize CSS Styles♠
  - Separate all classes into their own files
  - Compiler/minimizer for production build?
+ - docElem is a sandboxed global, replace document.documentElement references with docElem
+ - Update phing (if js-csp/transducers.js work out)
+    - js-csp
+        - npm install
+        - copy csp.min.js to src/lib
+    - transducers.js
+        - download/install (npm?)
+        - copy transducers.js to src/lib
 
 # Test
- - Test using the new CSS3 all property to reset styles for our elements, such as setting all: initial on
+ - ~~Test using the new CSS3 all property to reset styles for our elements, such as setting all: initial on
    our SVG / SelectionRect DIV elements (may need to be contained by an element with style="all: inherit"
-   This would replace the fix that was put in place for one website that had an overt transform selector set.
+   This would replace the fix that was put in place for one website that had an overt transform selector set.~~
 
 # Deferred / Possibly Won't Implement
  - Add Elements that have cursor: pointer (and have a click handler?)

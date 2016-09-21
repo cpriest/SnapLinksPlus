@@ -2,3 +2,7 @@
 /.idea/workspace.xml
 .idea/SnapLinks3.time
 misc/
+
+/vendor/
+/composer.lock
+/node_modules/
