@@ -122,6 +122,7 @@ class Rect {
 	ClipTo(r) {
 		[this.top, this.left]     = [Math.max(this.top, r.top), Math.max(this.left, r.left)];
 		[this.bottom, this.right] = [Math.min(this.bottom, r.bottom), Math.min(this.right, r.right)];
+
 		return this.CalculateProperties();
 	}
 
@@ -156,13 +157,21 @@ class SelectionRect {
 		this.elContainer = CreateElement(
 			'<div class="SL_Container" style="display: none;">' +
 			'	<div style="outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999; overflow: visible;" class="SL_SelRect">' +
-			'	<div style="position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap;"></div>' +
+			'		<div style="position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap;"></div>' +
 			'	</div>' +
 			'</div>'
 		);
 		this.elRect = this.elContainer.firstElementChild;
 
 		document.body.insertBefore(this.elContainer, document.body.firstElementChild);
+
+		sub(ElementsSelected, (topic, Elements, Subscription) => {
+			this.SetCounter((new Set(Elements.Links.map((elem) => elem.href))).size);
+		});
+
+		sub(DragCompleted, () => {
+			this.Hide();
+		});
 	}
 
 	/**
@@ -221,33 +230,35 @@ class SelectionRect {
 	 */
 	SetCounter(count) {
 		this.elRect.firstElementChild.innerHTML = `${count} Links`;
-		return this;
+
+		return this.AlignCounter();
 	}
 
 	/**
 	 * Re-aligns the label depending on the rect parameters
 	 *
-	 * @param {boolean}    toRight        The right coordinate that the rect was set to
-	 * @param {boolean}    toBottom        The bottom coordinate that the rect was set to
-	 *
 	 * @returns {SelectionRect}
 	 */
-	AlignCounter(toRight, toBottom) {
-		let style = this.elRect.firstElementChild.style;
+	AlignCounter() {
+		let style = this.elRect.firstElementChild.style,
+			inset = data.selection.label.paddingFromCursor + 'px';
+
+		let InvertedHorizontally = this.dims.originLeft != this.dims.left,
+			InvertedVertically = this.dims.originTop != this.dims.top;
 
 		[style.right, style.left] =
-			toRight
-				? [0, '']
-				: ['', 0];
+			!InvertedHorizontally
+				? [inset, '']
+				: ['', inset];
 		[style.bottom, style.top] =
-			toBottom
-				? [0, '']
-				: ['', 0];
+			!InvertedVertically
+				? [inset, '']
+				: ['', inset];
 
 		// move slightly to the right for not to be blocked by mouse pointer
-		if(toRight == false && toBottom == false) {
-			style.left = '16px';
-		}
+		if(InvertedHorizontally && InvertedVertically)
+			style.left = (data.selection.label.paddingFromCursor + 16) + 'px';
+
 		return this;
 	}
 

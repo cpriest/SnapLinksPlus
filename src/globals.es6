@@ -18,6 +18,8 @@
 
 let docElem = document.documentElement;
 
+console.log(document);
+
 const NONE  = 0,
 	  CTRL  = 1,
 	  ALT   = 2,
@@ -39,6 +41,9 @@ const data = {
 		activate: {
 			minX: 5,
 			minY: 5,
+		},
+		label: {
+			paddingFromCursor: 2,
 		}
 	},
 	HighlightStyles: {

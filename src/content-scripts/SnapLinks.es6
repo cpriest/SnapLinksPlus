@@ -21,18 +21,6 @@ const DragStarted     = 'DragStarted',
 	  DragRectChanged = 'DragRectChanged',
 	  DragCompleted   = 'DragCompleted';
 
-/**
- * WHERE I'M AT:
- *
- * 		Screw Channels For Now!!!
- *
- * 	Use pub/sub to break apart tight integrations such as SvgOverlay.Highlight via:
- * 		pub(SelectionChanged) -> pub(ElementsSelected), etc...
- *
- * 	and
- * 		pub(Selection Started) -> sub(Initialize SvgOverlay, ElementIndexer, etc)
- * 	basically de-couple them...
- */
 
 /**
  * The main Event Handler for Snap Links, registers/un-registers event handlers as appropriate
@@ -67,6 +55,21 @@ class EventHandler {
 //		pg_initial_csp_testing();			#DevCode
 //		pg_pubsub();						#DevCode
 // </#DevCode>
+		sub(DragStarted, (topic, data, Subscription) => {
+			this.InitDocument();
+
+			Subscription.unsub();
+		});
+	}
+
+	InitDocument() {
+		document.head.appendChild(
+			CreateElement(`
+				<style>
+					.SL_Container :not([xyz]) { all: initial; }
+				</style>
+			`)
+		);
 	}
 
 	/**
@@ -109,7 +112,7 @@ class EventHandler {
 	}
 
 	/**
-	 * @param {MouseEvent} e
+	 * @param {KeyboardEvent} e
 	 */
 	onKeyDown(e) {
 		switch(e.key) {
@@ -170,8 +173,7 @@ class EventHandler {
 	 * Called regularly by an interval timer setup in BeginDrag()
 	 */
 	onMouseMoveInterval() {
-		let e       = this.LastMouseEvent,
-			docElem = document.documentElement;
+		let e       = this.LastMouseEvent;
 
 		if(e) {
 			this.IntervalScrollOffset = {
@@ -195,30 +197,9 @@ class EventHandler {
 		docElem.scrollTop += this.IntervalScrollOffset.y;
 
 		/* Set our bottom right to scroll + max(clientX/Y, clientWidth/Height) */
-		let NewBottom = docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight);
-		let NewRight  = docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth);
-		this.CurrentSelection.SetBottomRight(NewBottom, NewRight);
-
-//		if(this.ElementIndexer) {
-//			this.SvgOverlay.Highlight(
-//				this.SelectedElements = this.ElementIndexer.Search(this.CurrentSelection.dims)
-//			);
-
-//			this.CurrentSelection.SetCounter((new Set(this.SelectedElements.Links.map((elem) => elem.href))).size);
-//			this.CurrentSelection.AlignCounter(this.CurrentSelection.dims.left != NewRight, this.CurrentSelection.dims.top != NewBottom);
-//		} else if(this.CurrentSelection.IsLargeEnoughToActivate()) {
-//			pub( DragStarted );
-//			this.ElementIndexer = new ElementIndexer();
-//			this.SvgOverlay     = this.SvgOverlay || new SvgOverlay(data.HighlightStyles.ActOnElements);
-
-//			document.head.appendChild(
-//				CreateElement(`
-//					<style>
-//						.SL_Container :not([xyz]) { all: initial; }
-//					</style>
-//				`)
-//			);
-//		}
+		this.CurrentSelection.SetBottomRight(
+			docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight),
+			docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth));
 	}
 
 	/**
@@ -233,12 +214,11 @@ class EventHandler {
 
 		pub( DragCompleted, { SelectedElements: this.SelectedElements, e: e } );
 		delete this.SelectedElements;
-
-		this.CurrentSelection.Hide();
-//		this.SvgOverlay.Hide();
 	}
 
-	/** Stops the next context menu from showing, will de-register its-self upon one cycle */
+	/**
+	 * Stops the next context menu from showing, will de-register its-self upon one cycle
+	 */
 	StopNextContextMenu() {
 		window.addEventListener('contextmenu', this._onContextMenu, true);
 	}

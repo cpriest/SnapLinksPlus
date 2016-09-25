@@ -68,9 +68,11 @@ ElemDocRects = new (
 			switch(elem.tagName) {
 				case 'A':
 					$A(elem.querySelectorAll('IMG'))
-						.forEach(function(elem) {
-							Rects = Rects.concat($A(elem.getClientRects()));
-						}, this);
+						.forEach(
+							/** @param {Element} elem */
+							function(elem) {
+								Rects = Rects.concat($A(elem.getClientRects()));
+							}, this);
 					break;
 				case 'INPUT':
 					if(['checkbox', 'radio'].indexOf(elem.type) !== -1) {
@@ -110,10 +112,8 @@ let ElemIndex = new class ElementIndexer {
 
 				this.UpdateIndex();
 			}
-//			console.log(topic, data.dims);												// #DevCode
 			if(data.visible) {
 				pub(ElementsSelected, this.Search(data.dims));
-//				console.log('ElementIndexer: %s(%o) -> %o', topic, data, Results);		// #DevCode
 			}
 		});
 
@@ -127,8 +127,7 @@ let ElemIndex = new class ElementIndexer {
 	 * Updates the index of this.Elements separated into N buckets for quickly paring down the elements to be checked for intersection of the selection rectangle
 	 */
 	UpdateIndex() {
-// @PerfTest
-//		let start     = Date.now();
+//		let start     = Date.now();																		// #DevCode #PerfTest
 		let idx,
 			docElem   = document.documentElement,
 			scrollTop = docElem.scrollTop,
@@ -140,18 +139,15 @@ let ElemIndex = new class ElementIndexer {
 		for(let j = 0; j < Buckets; j++)
 			this.BoundaryIndex[j] = [];
 
-//		@PerfTest
-//		var rr = new RateReporter('Calculated ${Count} Elements in ${Elapsed} (${PerSecond})');
+//		var rr = new RateReporter('Calculated ${Count} Elements in ${Elapsed} (${PerSecond})');			// #DevCode #PerfTest
 		for(let elem of this.Elements) {
 			/* GetBucketFromTop() */
 			idx = Math.floor((elem.getBoundingClientRect().top + scrollTop) * Buckets / docHeight);
 			if(this.BoundaryIndex[idx])
 				this.BoundaryIndex[idx].push(elem);
-//			@PerfTest
-//			ElemDocRects.get(elem, offset);
+//			ElemDocRects.get(elem, offset);																// #DevCode #PerfTest
 		}
-//		@PerfTest
-//		rr.report(this.Elements.length);
+//		rr.report(this.Elements.length);																// #DevCode #PerfTest
 	}
 
 	/**
@@ -178,9 +174,7 @@ let ElemIndex = new class ElementIndexer {
 	Search(sel) {
 		let docHeight   = document.documentElement.scrollHeight,
 			Buckets     = data.IndexBuckets,
-			/* GetBucketFromTop() */
 			FirstBucket = Math.floor(sel.top * Buckets / docHeight),
-			/* GetBucketFromTop() */
 			LastBucket  = Math.floor(sel.bottom * Buckets / docHeight),
 			offset      = { x: document.documentElement.scrollLeft, y: document.documentElement.scrollTop },
 			tMatches    = [];

@@ -1,52 +1,8 @@
 /**
- @browser Gecko
- @type {number}
+ * My own property I add to an event which is a bitfield of the modifier keys
+ * @type {number}
  */
 Event.prototype.mods = 0;
-
-
-
-/**
- @type {float}
- @const
- */
-DOMRect.prototype.x = 0;
-/**
- @type {float}
- @const
- */
-DOMRect.prototype.y = 0;
-/**
- @type {float}
- @const
- */
-DOMRect.prototype.width = 0;
-/**
- @type {float}
- @const
- */
-DOMRect.prototype.height = 0;
-/**
- @type {float}
- @const
- */
-DOMRect.prototype.top = 0;
-/**
- @type {float}
- @const
- */
-DOMRect.prototype.right = 0;
-/**
- @type {float}
- @const
- */
-DOMRect.prototype.bottom = 0;
-/**
- @type {float}
- @const
- */
-DOMRect.prototype.left = 0;
-DOMRect           = {};
 
 
 /**
@@ -61,7 +17,6 @@ Element.prototype.getClientRects = function() { };
  */
 Node.prototype.parentElement = 0;
 
-
 SVGRectElement = { };
 
 chrome = {
@@ -69,3 +24,22 @@ chrome = {
 		sendMessage: function() {}
 	}
 };
+
+///** @constructor */
+//function console() {}
+//
+////noinspection JSPotentiallyInvalidConstructorUsage
+///**
+// * @browser Gecko
+// * @param {string} profileName
+// * @see https://developer.mozilla.org/en-US/docs/Web/API/Console/profile
+// */
+//console.prototype.profile = function(profileName) { };
+//
+////noinspection JSPotentiallyInvalidConstructorUsage
+///**
+// * @browser Gecko
+// * @see https://developer.mozilla.org/en-US/docs/Web/API/Console/profileEnd
+// */
+//console.prototype.profileEnd = function() { };
+//
