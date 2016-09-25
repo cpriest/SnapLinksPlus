@@ -1,10 +1,11 @@
 # Bugs
  - [Issue #91](https://github.com/cpriest/SnapLinksPlus/issues/91)-1 - Width of selection box independent of zoom factor... possibly doable with SVG since it has it's own coordinate system??
- - ***Document size changes are not detected (on detection, need to clear DocElemRects)**\*
  - Mutation Observer (clear DocElemRects, re-index if during drag)
- - ~~Blank HREF's should be ignored~~
  - Since pub/sub
      - document.execCommand(‘cut’/‘copy’) was denied because it was not called from inside a short running user-generated event handler.1ActionMgr.es6:40:3
+ -
+ - ~~Blank HREF's should be ignored~~
+ - ~~Document size changes are not detected (on detection, need to clear DocElemRects)~~
 
 
 
@@ -14,6 +15,7 @@
  - ~~Add checking/un-checking of checkboxes~~
  - ~~Add LABEL support (checkboxes, radio button, etc)~~
  - ~~Add selection of "highest" radio button~~
+ - ~~Switch to using pub/sub model and de-couple the various parts~~
  - Add size-of-text minification (select greatest size font links unless shift is held)
  - Add Options GUI
  - Better handling of label placement (separate from sizing rect)
@@ -25,8 +27,8 @@
 # Todo
  - Resolve all inspection errors
  - ~~JsDoc comments for everything~~
- - Externalize CSS Styles♠
- - Separate all classes into their own files
+ - Externalize CSS Styles
+ - ~~Separate all classes into their own files~~
  - Compiler/minimizer for production build?
  - docElem is a sandboxed global, replace document.documentElement references with docElem
  - Update phing (if js-csp/transducers.js work out)

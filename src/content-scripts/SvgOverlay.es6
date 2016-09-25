@@ -62,6 +62,10 @@ let SvgOverlay = new class SvgOverlayMgr {
 		this.HighlightElemMap    = new WeakMap();
 		this.HighlightedElements = [];
 		this.AvailableRects      = [];
+
+		sub(DocSizeChanged, (topic, data, Subscription) => {
+			this.Reposition();
+		});
 	}
 
 	/**

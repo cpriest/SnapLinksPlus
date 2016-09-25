@@ -18,8 +18,6 @@
 
 let docElem = document.documentElement;
 
-console.log(document);
-
 const NONE  = 0,
 	  CTRL  = 1,
 	  ALT   = 2,
@@ -50,6 +48,6 @@ const data = {
 		ActOnElements: 'fill: rgba(255,0,0,.1); stroke: red; stroke-width: .75px;',
 	},
 
-	DevMode: false,
+	DevMode: true,						// #DevCode
 };
 

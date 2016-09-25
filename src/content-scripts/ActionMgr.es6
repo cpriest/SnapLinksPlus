@@ -21,6 +21,9 @@ let ActionHandler = new (
 	class ActionMgr {
 		constructor() {
 			sub(DragCompleted, (topic, msg) => {
+				if(data.DevMode == true)																			// #DevCode
+					console.log('ActUpon(%s) - %o', msg.SelectedElements.GreatestType, msg.SelectedElements);		// #DevCode
+																													// #DevCode
 				this.ActUpon(msg.SelectedElements, msg.e)
 			});
 		}

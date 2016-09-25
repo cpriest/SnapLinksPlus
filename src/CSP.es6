@@ -15,8 +15,6 @@
  */
 "use strict";
 
-const DOCSIZECHANGE = 'Doc:Size Changed';
-
 class PubSubHandler {
 	constructor() {
 		this.Channel   = csp.chan();

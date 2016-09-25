@@ -29,6 +29,10 @@ ElemDocRects = new (
 	class RectMapper {
 		/** Creates a new RectMapper */
 		constructor() {
+			sub(DocSizeChanged, (topic, data, Subscription) => {
+				this.clear();
+			});
+
 			this.clear();
 		}
 

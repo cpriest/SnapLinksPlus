@@ -21,6 +21,8 @@ const DragStarted     = 'DragStarted',
 	  DragRectChanged = 'DragRectChanged',
 	  DragCompleted   = 'DragCompleted';
 
+const DocSizeChanged  = 'DocSizeChanged';
+
 
 /**
  * The main Event Handler for Snap Links, registers/un-registers event handlers as appropriate
@@ -37,24 +39,8 @@ class EventHandler {
 		this._onContextMenu = this.onContextMenu.bind(this);
 		this._onKeyDown     = this.onKeyDown.bind(this);
 
-//		/** @refactor: When full screen object resizing is implemented, this can be removed/replaced by same */
-//		window.addEventListener('resize', _.throttle(this.onThrottledResize.bind(this), 100), true);
-
 		document.addEventListener('mousedown', this.onMouseDown.bind(this), true);
 
-//		go(function*(v) {
-//			do {
-//				if(!this.docSize || this.docSize.x != docElem.scrollWidth || this.docSize.y != docElem.scrollHeight) {
-//					this.docSize = { x: docElem.scrollWidth, y: docElem.scrollHeight };
-//					pub(DOCSIZECHANGE, { this.docSize });
-//				}
-//			} while(!(yield csp.timeout(250)));
-//		}.bind(this));
-//		setInterval(() => console.log(this.docSize, this), 1000);
-// <#DevCode>
-//		pg_initial_csp_testing();			#DevCode
-//		pg_pubsub();						#DevCode
-// </#DevCode>
 		sub(DragStarted, (topic, data, Subscription) => {
 			this.InitDocument();
 
@@ -123,18 +109,6 @@ class EventHandler {
 	}
 
 	/**
-	 * Throttled by lodash lib _throttle function
-	 *
-	 * @param {MouseEvent} e
-	 */
-	onThrottledResize(e) {
-		ElemDocRects.clear();
-
-//		if(this.SvgOverlay)
-//			this.SvgOverlay.Reposition();
-	}
-
-	/**
 	 * @param {MouseEvent} e
 	 */
 	onContextMenu(e) {
@@ -174,6 +148,11 @@ class EventHandler {
 	 */
 	onMouseMoveInterval() {
 		let e       = this.LastMouseEvent;
+
+		if(!this.docSize || this.docSize.x != docElem.scrollWidth || this.docSize.y != docElem.scrollHeight) {
+			this.docSize = { x: docElem.scrollWidth, y: docElem.scrollHeight };
+			pub(DocSizeChanged, this.docSize );
+		}
 
 		if(e) {
 			this.IntervalScrollOffset = {
