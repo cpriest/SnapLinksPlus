@@ -30,7 +30,7 @@ class PubSubHandler {
 	 * @param {object|null} data
 	 */
 	pub(topic, data) {
-//		console.log('pub: %s -> %o', topic, data);			// #DevCode
+//		console.log('pub: %s -> %o', topic, data);							// #DevCode
 		csp.putAsync(this.Channel, { topic: topic, data: data });
 	}
 
@@ -48,26 +48,34 @@ class PubSubHandler {
 		if(!(topics instanceof Array))
 			topics = [topics];
 
-//		console.log('sub: topics=%o', topics);							// #DevCode
+//		console.log('sub: topics=%o', topics);								// #DevCode
 
 		for(let topic of topics)
 			csp.operations.pub.sub(this.Publisher, topic, SubscriberChannel);
+
+		let enabled = true;
 
 		let Subscription = {
 			unsub: () => {
 				for(let topic of topics)
 					csp.operations.pub.unsub(this.Publisher, topic, SubscriberChannel);
-//				console.log('unsub() called');							// #DevCode
 				SubscriberChannel.close();
-			}
+			},
+			get enabled() { return enabled; },
+
+			set enabled(x) { enabled = x; return this; },
+
 		};
 
 		go(function*(val) {
 			while((val = yield SubscriberChannel) != csp.CLOSED){
-//				console.log('sub->go() val=%o', val);					// #DevCode
-				handler(val.topic, val.data, Subscription);
+				if(enabled) {
+//					console.log('sub->go() val=%o', val);					// #DevCode
+					handler(val.topic, val.data, Subscription);
+				} else {
+//					console.log('sub->go(DISABLED) val=%o', val);			// #DevCode
+				}
 			}
-//			console.log('exiting sub->go()');							// #DevCode
 		});
 
 		return Subscription;
@@ -77,8 +85,6 @@ class PubSubHandler {
 let PubSub = new PubSubHandler();
 let pub    = PubSub.pub.bind(PubSub);
 let sub    = PubSub.sub.bind(PubSub);
-
-// console.log('Created PubSubHandler: %o', PubSub);					// #DevCode
 
 // Imports from csp
 let { go } = csp;
