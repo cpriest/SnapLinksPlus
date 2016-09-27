@@ -1,12 +1,17 @@
+# Before Next Release
+ - **Bugs**
+    - Since pub/sub:
+        - document.execCommand(‘cut’/‘copy’) was denied because it was not called from inside a short running user-generated event handler.1ActionMgr.es6:40:3
+- **Features**
+    - Add size-of-text minification (select greatest size font links unless shift is held)
+- **Test, issue?**
+    - Clicking on js links from test document don't seem to work (possibly dev-mode related)
+
 # Bugs
  - [Issue #91](https://github.com/cpriest/SnapLinksPlus/issues/91)-1 - Width of selection box independent of zoom factor... possibly doable with SVG since it has it's own coordinate system??
  - Mutation Observer (clear DocElemRects, re-index if during drag)
- - Since pub/sub
-     - document.execCommand(‘cut’/‘copy’) was denied because it was not called from inside a short running user-generated event handler.1ActionMgr.es6:40:3
- -
  - ~~Blank HREF's should be ignored~~
  - ~~Document size changes are not detected (on detection, need to clear DocElemRects)~~
-
 
 
 # Plans
@@ -16,12 +21,11 @@
  - ~~Add LABEL support (checkboxes, radio button, etc)~~
  - ~~Add selection of "highest" radio button~~
  - ~~Switch to using pub/sub model and de-couple the various parts~~
- - Add size-of-text minification (select greatest size font links unless shift is held)
  - Add Options GUI
  - Better handling of label placement (separate from sizing rect)
  - Highlight "greatest of types" elements differently than elements which do not meet the greatest of.
     eg: 3 Buttons and 1 Anchor lassoed, the 3 Buttons would be highlighted in green vs the Anchor being highlighted in grey
- - Move Inline Styles to Document \<STYLE> block
+ - ~~Move Inline Styles to Document \<STYLE> block~~
 
 
 # Todo
