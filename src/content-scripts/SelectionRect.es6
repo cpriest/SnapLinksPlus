@@ -155,7 +155,7 @@ class SelectionRect {
 		this.dims = new Rect();
 
 		this.elContainer = CreateElement(
-			'<div class="SnapLinksContainer" style="display: none;">' +
+			'<div class="SnapLinksContainer">' +
 			'	<div class="SL_SelectionRect">' +
 			'		<div class="SL_SelectionLabel"></div>' +
 			'	</div>' +
@@ -164,6 +164,16 @@ class SelectionRect {
 		this.elRect = this.elContainer.firstElementChild;
 
 		document.body.insertBefore(this.elContainer, document.body.firstElementChild);
+
+		if(this.elContainer.offsetParent) {
+			let parentStyle = window.getComputedStyle(this.elContainer.offsetParent);
+			if(parentStyle.marginLeft)
+				this.elContainer.style.marginLeft = `-${parentStyle.marginLeft}`;
+			if(parentStyle.marginTop)
+				this.elContainer.style.marginTop = `-${parentStyle.marginTop}`;
+		}
+
+		this.elContainer.style.display = 'none';
 
 		sub(ElementsSelected, (topic, Elements, Subscription) => {
 			this.SetCounter((new Set(Elements.Links.map((elem) => elem.href))).size);
