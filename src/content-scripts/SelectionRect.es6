@@ -16,6 +16,10 @@
 
 "use strict";
 
+// Pub-Sub Events
+const ContainerElementCreated = 'ContainerElementCreated';
+
+
 /**
  * @property {int} top        The normalized top coordinate of the Rect
  * @property {int} left        The normalized left coordinate of the Rect
@@ -174,6 +178,8 @@ class SelectionRect {
 		}
 
 		this.elContainer.style.display = 'none';
+
+		pub(ContainerElementCreated, this.elContainer);
 
 		sub(ElementsSelected, (topic, Elements, Subscription) => {
 			this.SetCounter((new Set(Elements.Links.map((elem) => elem.href))).size);

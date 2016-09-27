@@ -28,10 +28,13 @@ let SvgOverlay = new class SvgOverlayMgr {
 	 * Creates the SvgOverlay Manager
 	 */
 	constructor() {
-		sub(ElementsSelected, (topic, Elements, Subscription) => {
-			if(!this.Overlay)
-				this.Init();
+		sub(ContainerElementCreated, (topic, Container, Subscription) => {
+			this.Init(Container);
 
+			Subscription.unsub();
+		});
+
+		sub(ElementsSelected, (topic, Elements, Subscription) => {
 			this.Highlight(Elements);
 		});
 
@@ -51,14 +54,20 @@ let SvgOverlay = new class SvgOverlayMgr {
 //		});
 	}
 
-	Init() {
+	/**
+	 * Initializes the SvgOverlay
+	 *
+	 * @param {HTMLElement} Container	The SnapLinks Container Element
+	 */
+	Init(Container) {
 		this.style = data.HighlightStyles.ActOnElements;
 		this.Overlay = CreateElement(`
 				<svg class="SnapLinksHighlighter" xmlns="http://www.w3.org/2000/svg" style="width: ${docElem.scrollWidth}px; height: ${docElem.scrollHeight}px; ">
 					<rect/> <!-- Used for easily cloning the properly namespaced rect -->
 				</svg>
 			`);
-		document.body.insertBefore(this.Overlay, document.body.firstElementChild);
+		Container.appendChild(this.Overlay);
+
 		this.HighlightElemMap    = new WeakMap();
 		this.HighlightedElements = [];
 		this.AvailableRects      = [];
