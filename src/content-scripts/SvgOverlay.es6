@@ -54,7 +54,7 @@ let SvgOverlay = new class SvgOverlayMgr {
 	Init() {
 		this.style = data.HighlightStyles.ActOnElements;
 		this.Overlay = CreateElement(`
-				<svg xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 0px; left: 0px; z-index: 999999; width: ${docElem.scrollWidth}px; height: ${docElem.scrollHeight}px; ">
+				<svg class="SnapLinksHighlighter" xmlns="http://www.w3.org/2000/svg" style="width: ${docElem.scrollWidth}px; height: ${docElem.scrollHeight}px; ">
 					<rect/> <!-- Used for easily cloning the properly namespaced rect -->
 				</svg>
 			`);

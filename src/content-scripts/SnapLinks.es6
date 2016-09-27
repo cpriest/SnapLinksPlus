@@ -17,7 +17,7 @@
 "use strict";
 
 // Pub-Sub Events
-const DragStarted     = 'DragStarted',
+const // DragStarted     = 'DragStarted',
 	  DragRectChanged = 'DragRectChanged',
 	  DragCompleted   = 'DragCompleted';
 
@@ -41,7 +41,7 @@ class EventHandler {
 
 		document.addEventListener('mousedown', this.onMouseDown.bind(this), true);
 
-		sub(DragStarted, (topic, data, Subscription) => {
+		sub(DragRectChanged, (topic, data, Subscription) => {
 			this.InitDocument();
 
 			Subscription.unsub();
@@ -49,10 +49,15 @@ class EventHandler {
 	}
 
 	InitDocument() {
+		//noinspection CssUnusedSymbol
 		document.head.appendChild(
 			CreateElement(`
 				<style>
-					.SL_Container :not([xyz]) { all: initial; }
+					.SnapLinksContainer :not([xyz]) { all: initial; }
+					.SnapLinksHighlighter :not([xyz]) { all: initial; }
+					.SnapLinksHighlighter { position: absolute; top: 0px; left: 0px; z-index: 999999; }
+					.SnapLinksContainer > .SL_SelectionRect { outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999; overflow: visible; }
+					.SL_SelectionRect > .SL_SelectionLabel { position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap; }
 				</style>
 			`)
 		);

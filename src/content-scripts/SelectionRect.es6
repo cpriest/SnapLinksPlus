@@ -155,9 +155,9 @@ class SelectionRect {
 		this.dims = new Rect();
 
 		this.elContainer = CreateElement(
-			'<div class="SL_Container" style="display: none;">' +
-			'	<div style="outline: 2px dashed rgba(0,255,0,1); position: absolute; z-index: 9999999; overflow: visible;" class="SL_SelRect">' +
-			'		<div style="position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap;"></div>' +
+			'<div class="SnapLinksContainer" style="display: none;">' +
+			'	<div class="SL_SelectionRect">' +
+			'		<div class="SL_SelectionLabel"></div>' +
 			'	</div>' +
 			'</div>'
 		);
