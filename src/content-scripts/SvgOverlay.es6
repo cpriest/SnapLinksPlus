@@ -124,7 +124,7 @@ let SvgOverlay = new class SvgOverlayMgr {
 				(elem) => { return !tPrevElems.includes(elem); }
 			),
 			offset       = { x: document.documentElement.scrollLeft, y: document.documentElement.scrollTop };
-
+	
 		/* Remove highlighting of elements no longer in tElems */
 		for(let elem of tUnhighlight)
 			this.ReleaseRects(this.HighlightElemMap.get(elem));
@@ -146,6 +146,7 @@ let SvgOverlay = new class SvgOverlayMgr {
 
 				for(let name in attr)
 					svgRect.setAttribute(name, attr[name]);
+					
 
 				tSvgRects.push(svgRect);
 			}
@@ -158,6 +159,10 @@ let SvgOverlay = new class SvgOverlayMgr {
 				? ''
 				: 'none';
 
+				
+		var bodyStyle = document.body.currentStyle || window.getComputedStyle(document.body);
+		this.Overlay.style.marginLeft = '-' + bodyStyle.marginLeft;
+				
 		return this;
 	}
 
