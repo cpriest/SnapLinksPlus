@@ -40,28 +40,6 @@ class EventHandler {
 		this._onKeyDown     = this.onKeyDown.bind(this);
 
 		document.addEventListener('mousedown', this.onMouseDown.bind(this), true);
-
-		sub(DragRectChanged, (topic, data, Subscription) => {
-			this.InitDocument();
-
-			Subscription.unsub();
-		});
-	}
-
-	InitDocument() {
-		//noinspection CssUnusedSymbol
-		document.head.appendChild(
-			CreateElement(`
-				<style>
-					.SnapLinksContainer :not([xyz]) { all: initial; }
-					.SnapLinksHighlighter :not([xyz]) { all: initial; }
-					.SnapLinksHighlighter { position: absolute; top: 0px; left: 0px; }
-					.SnapLinksContainer { z-index: 999999; margin: 0px; padding: 0px; position: absolute; height: 0px; width: 0px; }
-					.SnapLinksContainer > .SL_SelectionRect { outline: 2px dashed rgba(0,255,0,1); position: absolute; overflow: visible; }
-					.SL_SelectionRect > .SL_SelectionLabel { position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap; }
-				</style>
-			`)
-		);
 	}
 
 	/**
