@@ -175,6 +175,9 @@ class EventHandler {
 
 		this.mmTimer = clearInterval(this.mmTimer);
 
+		if(e.type != "mouseup" || !this.CurrentSelection.IsLargeEnoughToActivate())
+			delete this.SelectedElements;
+
 		pub( DragCompleted, { SelectedElements: this.SelectedElements, e: e } );
 		delete this.SelectedElements;
 	}

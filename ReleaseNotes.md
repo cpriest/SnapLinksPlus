@@ -14,6 +14,7 @@ v3.0.3 - Not Yet Released
    (depending on opposite majority, prefers checking when equal)
  - Can now lasso labels for checkboxes and radio boxes
  - Can now lasso radio buttons, selects the first radio of each group
+ - Document Size Changes are now detected properly
 
 v3.0.0b2
 ========
