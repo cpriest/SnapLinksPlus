@@ -22,9 +22,12 @@ let ActionHandler = new (
 		constructor() {
 			sub(DragCompleted, (topic, msg) => {
 				if(msg.SelectedElements) {
-					if(data.DevMode == true)																			// #DevCode
-						console.log('ActUpon(%s) - %o', msg.SelectedElements.GreatestType, msg.SelectedElements);		// #DevCode
-																														// #DevCode
+					if(data.Dev) {
+						if(data.Dev.Log.ActionMessages == true)															// #DevCode
+							console.log('ActUpon(%s) - %o', msg.SelectedElements.GreatestType, msg.SelectedElements);	// #DevCode
+						if(data.Dev.Skip.AllActions == true)															// #DevCode
+							return;																						// #DevCode
+					}																									// #DevCode
 					this.ActUpon(msg.SelectedElements, msg.e)
 				}
 			});

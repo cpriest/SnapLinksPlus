@@ -51,13 +51,12 @@ class EventHandler {
 
 		if(e.buttons == RMB) {
 			switch(e.mods) {
-				// @Development
-				case CTRL + ALT:
-					if(data.DevMode) {
-						this.StopNextContextMenu();
-						chrome.runtime.sendMessage({ Action: RELOAD_EXTENSION });
-					}
-					break;
+				case CTRL + ALT:												// #DevCode
+					this.StopNextContextMenu();									// #DevCode
+					chrome.runtime.sendMessage({ Action: RELOAD_EXTENSION });	// #DevCode
+					e.preventDefault(); 										// #DevCode
+					e.stopPropagation();										// #DevCode
+					break;														// #DevCode
 
 				case NONE:
 					this.BeginDrag(e);

@@ -48,6 +48,13 @@ const data = {
 		ActOnElements: 'fill: rgba(255,0,0,.1); stroke: red; stroke-width: .75px;',
 	},
 
-	DevMode: true,						// #DevCode
+	Dev: {							// #DevCode
+		Log: {						// #DevCode
+			ActionMessages: true,	// #DevCode
+		},							// #DevCode
+		Skip: {						// #DevCode
+			AllActions: true,		// #DevCode
+		},							// #DevCode
+	},								// #DevCode
 };
 

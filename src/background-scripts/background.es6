@@ -29,11 +29,7 @@ function onMessage(msg) {
 			chrome.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			//noinspection LoopStatementThatDoesntLoopJS	// #DevCode
 			for(let url of msg.tUrls) {
-				break;										// #DevCode
-				//noinspection UnreachableCodeJS			// #DevCode
-
 				chrome.tabs.create({
 					url     : url,
 					active  : false,
