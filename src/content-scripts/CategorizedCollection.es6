@@ -83,7 +83,9 @@ class CategorizedCollection {
 		for(let elem of tElems) {
 			switch(elem.tagName) {
 				case 'A':
-					if(elem.href.length > 0)
+					if(elem.href.length == 0 || elem.href.substr(0, 11) == 'javascript:')
+						this.Clickable.push(elem);
+					else
 						this.Links.push(elem);
 					break;
 				case 'INPUT':

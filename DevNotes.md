@@ -47,6 +47,7 @@
  - ~~Test using the new CSS3 all property to reset styles for our elements, such as setting all: initial on
    our SVG / SelectionRect DIV elements (may need to be contained by an element with style="all: inherit"
    This would replace the fix that was put in place for one website that had an overt transform selector set.~~
+ - Javascript based .click() resulting in a new tab/popup are blocked, there may be a way to use channels to loop on a yield csp.timeout() from within the onMouseDown() waiting until the rest of the selection has completed and finally call ActionMgr.ActUpon (still within the onMouseDown 'event')??  Something to play with.
 
 # Deferred / Possibly Won't Implement
  - Add Elements that have cursor: pointer (and have a click handler?)
