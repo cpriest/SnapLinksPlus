@@ -20,17 +20,6 @@
 let ActionHandler = new (
 	class ActionMgr {
 		constructor() {
-			sub(DragCompleted, (topic, msg) => {
-				if(msg.SelectedElements) {
-					if(data.Dev) {
-						if(data.Dev.Log.ActionMessages == true)															// #DevCode
-							console.log('ActUpon(%s) - %o', msg.SelectedElements.GreatestType, msg.SelectedElements);	// #DevCode
-						if(data.Dev.Skip.AllActions == true)															// #DevCode
-							return;																						// #DevCode
-					}																									// #DevCode
-					this.ActUpon(msg.SelectedElements, msg.e)
-				}
-			});
 		}
 
 		/**
@@ -56,6 +45,13 @@ let ActionHandler = new (
 		 * @param {MouseEvent}             e                   The final event that completed activated the action
 		 */
 		ActUpon(SelectedElements, e) {
+			if(data.Dev) {
+				if(data.Dev.Log.ActionMessages == true)													// #DevCode
+					console.log('ActUpon(%s) - %o', SelectedElements.GreatestType, SelectedElements);	// #DevCode
+				if(data.Dev.Skip.AllActions == true)													// #DevCode
+					return;																				// #DevCode
+			}																							// #DevCode
+
 			switch(SelectedElements.GreatestType) {
 				case CT_LINKS:
 					// removing duplicates

@@ -1,15 +1,13 @@
 # Before Next Release
  - **Bugs**
     - Since pub/sub:
-        - document.execCommand(‘cut’/‘copy’) was denied because it was not called from inside a short running user-generated event handler.1ActionMgr.es6:40:3
+        - ~~document.execCommand(‘cut’/‘copy’) was denied because it was not called from inside a short running user-generated event handler.ActionMgr.es6:40~~
 - **Features**
     - Add size-of-text minification (select greatest size font links unless shift is held)
 - **Test, issue?**
-    - Clicking on js links from test document don't seem to work (possibly dev-mode related)
+    - ~~Clicking on js links from test document don't seem to work (possibly dev-mode related)~~
 
 # Bugs
- - [Issue #91](https://github.com/cpriest/SnapLinksPlus/issues/91)-1 - Width of selection box independent of zoom factor... possibly doable with SVG since it has it's own coordinate system??
- - Mutation Observer (clear DocElemRects, re-index if during drag)
  - ~~Blank HREF's should be ignored~~
  - ~~Document size changes are not detected (on detection, need to clear DocElemRects)~~
 
@@ -29,6 +27,7 @@
 
 
 # Todo
+ - Mutation Observer (clear DocElemRects, re-index if during drag)
  - Resolve all inspection errors
  - ~~JsDoc comments for everything~~
  - Externalize CSS Styles
@@ -52,6 +51,8 @@
 # Deferred / Possibly Won't Implement
  - Add Elements that have cursor: pointer (and have a click handler?)
 
+# Feature Requests
+ - [Issue #91](https://github.com/cpriest/SnapLinksPlus/issues/91)-1 - Width of selection box independent of zoom factor... possibly doable with SVG since it has it's own coordinate system??
 
 <style>
     del { opacity: .5; }

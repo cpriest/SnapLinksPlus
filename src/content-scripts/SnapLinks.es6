@@ -161,24 +161,36 @@ class EventHandler {
 		/* Set our bottom right to scroll + max(clientX/Y, clientWidth/Height) */
 		this.CurrentSelection.SetBottomRight(
 			docElem.scrollTop + Math.min(this.MousePos.clientY, docElem.clientHeight),
-			docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth));
+			docElem.scrollLeft + Math.min(this.MousePos.clientX, docElem.clientWidth)
+		);
 	}
 
 	/**
 	 * @param {MouseEvent|KeyboardEvent} e
 	 */
 	EndDrag(e) {
+		this.mmTimer = clearInterval(this.mmTimer);
+
+		if(e.type == "mouseup" && this.CurrentSelection.IsLargeEnoughToActivate()) {
+			pub(DragCompleted, { SelectedElements: this.SelectedElements, e: e });
+
+			/**
+			 * Unfortunately ActionMgr has to be called directly within the event hook chain,
+			 * using pub/sub results in actions being considered "outside of short running user-generated event handlers
+			 * @note Perhaps a synchronous channel may work, something to try in the future
+			 **/
+			if(this.SelectedElements)
+				ActionHandler.ActUpon(this.SelectedElements, e);
+		}
+
+		delete this.SelectedElements;
+
 		document.removeEventListener('mouseup', this._onMouseUp, true);
 		document.removeEventListener('mousemove', this._onMouseMove, true);
 		document.removeEventListener('keydown', this._onKeyDown, true);
 
-		this.mmTimer = clearInterval(this.mmTimer);
-
-		if(e.type != "mouseup" || !this.CurrentSelection.IsLargeEnoughToActivate())
-			delete this.SelectedElements;
-
-		pub( DragCompleted, { SelectedElements: this.SelectedElements, e: e } );
-		delete this.SelectedElements;
+		if(document.releaseCapture)
+			document.releaseCapture();
 	}
 
 	/**
