@@ -17,12 +17,12 @@
 "use strict";
 
 // Pub-Sub Events
-const // DragStarted     = 'DragStarted',
-	  DragRectChanged = 'DragRectChanged',
+const DragRectChanged = 'DragRectChanged',
 	  DragCompleted   = 'DragCompleted';
 
 const DocSizeChanged  = 'DocSizeChanged';
 
+let LastModifierKeys;
 
 /**
  * The main Event Handler for Snap Links, registers/un-registers event handlers as appropriate
@@ -68,15 +68,15 @@ class EventHandler {
 	/**
 	 * @param {MouseEvent} e
 	 */
-	onMouseMove(e) { this.LastMouseEvent = e; }
+	onMouseMove(e) {
+		this.LastMouseEvent = AddModsToEvent(e);
+		LastModifierKeys = e.mods;
+	}
 
 	/**
 	 * @param {MouseEvent} e
 	 */
 	onMouseUp(e) {
-		if(this.CurrentSelection.IsLargeEnoughToActivate())
-			this.StopNextContextMenu();
-
 		this.EndDrag(e);
 	}
 
@@ -130,11 +130,11 @@ class EventHandler {
 	 * Called regularly by an interval timer setup in BeginDrag()
 	 */
 	onMouseMoveInterval() {
-		let e       = this.LastMouseEvent;
+		let e = this.LastMouseEvent;
 
 		if(!this.docSize || this.docSize.x != docElem.scrollWidth || this.docSize.y != docElem.scrollHeight) {
 			this.docSize = { x: docElem.scrollWidth, y: docElem.scrollHeight };
-			pub(DocSizeChanged, this.docSize );
+			pub(DocSizeChanged, this.docSize);
 		}
 
 		if(e) {
@@ -172,6 +172,7 @@ class EventHandler {
 		this.mmTimer = clearInterval(this.mmTimer);
 
 		if(e.type == "mouseup" && this.CurrentSelection.IsLargeEnoughToActivate()) {
+			this.StopNextContextMenu();
 			pub(DragCompleted, { SelectedElements: this.SelectedElements, e: e });
 
 			/**

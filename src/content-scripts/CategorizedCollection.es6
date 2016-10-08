@@ -82,8 +82,6 @@ class CategorizedCollection {
 		this.Checkboxes        = [];
 		this.RadioButtons      = [];
 
-		let GreatestTextSize = true;
-
 		for(let elem of tElems) {
 			switch(elem.tagName) {
 				case 'A':
@@ -111,7 +109,8 @@ class CategorizedCollection {
 			}
 		}
 
-		if(GreatestTextSize) {
+		//noinspection JSBitwiseOperatorUsage
+		if(!(LastModifierKeys & SHIFT)) {
 			if(this.Links.length)
 				[this.Links, this.FilteredLinks] = this.FilterByFontScore(this.Links);
 
