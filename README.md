@@ -10,6 +10,17 @@ I wholly encourage forking this project and submitting code and patches for incl
 
 **It is doubtful that all v2 features will be rewritten for v3 without the help of others**.
 
+Great progress has been made with v3, the next release due soon will have the majority of the v2 features, **but without a configuration panel.  The next release will have configurable options.**
+
+Please see [Dev Notes](DevNotes.md) for the latest development status.
+
+## Known Issues & Some Planned Features
+ * Add Options GUI
+ * Open links next to current tab
+ * Open in New Tabs/New Windows/Tabs In New Window
+ * Releasing the mouse button while holding down shift causes Context Menu to appear ([unfixable at the moment](https://bugzilla.mozilla.org/show_bug.cgi?id=692139)) - Plan is to have alternative method to bypass Greatest Font Size Filter
+
+
 ----
 
 [Snap Links Plus](https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/) is a Firefox addon that lets you draw a lasso around links, checkboxes and other on-screen elements and open them in new tabs as  well as other actions:
