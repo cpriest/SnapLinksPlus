@@ -4,12 +4,15 @@
         - ~~document.execCommand(‘cut’/‘copy’) was denied because it was not called from inside a short running user-generated event handler.ActionMgr.es6:40~~
 - **Features**
     - Add size-of-text minification (select greatest size font links unless shift is held)
+    - Open links next to current tab
 - **Test, issue?**
     - ~~Clicking on js links from test document don't seem to work (possibly dev-mode related)~~
+    - [Issue #96](https://github.com/cpriest/SnapLinksPlus/issues/96) - 3.0.2 Doesn't work well with imgur.com's comments section
 
 # Bugs
  - ~~Blank HREF's should be ignored~~
  - ~~Document size changes are not detected (on detection, need to clear DocElemRects)~~
+ - The document size is being changed during selection by the selection process
 
 
 # Plans
@@ -41,6 +44,7 @@
     - transducers.js
         - download/install (npm?)
         - copy transducers.js to src/lib
+- Refactor ElemDocRects / RectMapper to ElemCache/ElemCacher (to reflect new font-size cache functionality)
 
 # Test
  - ~~Test using the new CSS3 all property to reset styles for our elements, such as setting all: initial on

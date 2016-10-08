@@ -62,12 +62,10 @@ let ActionHandler = new (
 					} else {
 						// For now we are simply going to create new tabs for the selected elements
 
-						//noinspection JSUnresolvedVariable,JSUnresolvedFunction
-						chrome.runtime.sendMessage(
-							{
-								Action: OPEN_URLS_IN_TABS,
-								tUrls : links,
-							});
+						chrome.runtime.sendMessage({
+							Action: OPEN_URLS_IN_TABS,
+							tUrls : links,
+						});
 					}
 					break;
 				case CT_CLICKABLE:

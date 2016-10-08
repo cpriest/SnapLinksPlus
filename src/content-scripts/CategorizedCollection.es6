@@ -24,12 +24,12 @@ const CT_LINKS        = 'Links',
 /**
  * This class categorizes a collection of selected elements and provide utilities around the collection of {Element}s
  *
- * @property {string}    			GreatestType	The CT_* constant representing the greatest number of elements among the categories
+ * @property {string}                GreatestType    The CT_* constant representing the greatest number of elements among the categories
  *
- * @property {Element[]}			Links			The A elements in the collection
- * @property {HTMLInputElement[]}	Buttons			The INPUT elements in the collection that are buttons
- * @property {HTMLInputElement[]}   Checkboxes		The INPUT elements in the collection that are checkboxes
- * @property {HTMLInputElement[]} 	RadioButtons	The INPUT elements in the collection that are radio buttons
+ * @property {Element[]}            Links            The A elements in the collection
+ * @property {HTMLInputElement[]}    Buttons            The INPUT elements in the collection that are buttons
+ * @property {HTMLInputElement[]}   Checkboxes        The INPUT elements in the collection that are checkboxes
+ * @property {HTMLInputElement[]}    RadioButtons    The INPUT elements in the collection that are radio buttons
  */
 class CategorizedCollection {
 	/**
@@ -75,10 +75,14 @@ class CategorizedCollection {
 	 * @param {Element[]} tElems    The elements to categorize
 	 */
 	CategorizeMatches(tElems) {
-		this.Links        = [];
-		this.Clickable    = [];
-		this.Checkboxes   = [];
-		this.RadioButtons = [];
+		this.Links             = [];
+		this.FilteredLinks     = [];
+		this.Clickable         = [];
+		this.FilteredClickable = [];
+		this.Checkboxes        = [];
+		this.RadioButtons      = [];
+
+		let GreatestTextSize = true;
 
 		for(let elem of tElems) {
 			switch(elem.tagName) {
@@ -107,6 +111,14 @@ class CategorizedCollection {
 			}
 		}
 
+		if(GreatestTextSize) {
+			if(this.Links.length)
+				[this.Links, this.FilteredLinks] = this.FilterByFontScore(this.Links);
+
+			if(this.Clickable.length)
+				[this.Clickable, this.FilteredClickable] = this.FilterByFontScore(this.Clickable);
+		}
+
 		// Pre-calculate greatest count of categorized elements
 		let GreatestCount = 0;
 
@@ -116,5 +128,31 @@ class CategorizedCollection {
 				GreatestCount     = c;
 			}
 		}
+	}
+
+	/**
+	 * Scores the elements by their font score and returns the separated elements.
+	 *
+	 * @param {Element[]} Elements
+	 *
+	 * @return {[ Element[], Element[] ]}        [ GreatestScoreElements, FilteredElements ]
+	 */
+	FilterByFontScore(Elements) {
+		let ScoredElems = Elements
+			.reduce((acc, elem) => {
+				let fontSize  = ElemDocRects.GetFontScore(elem);
+				acc[fontSize] = (acc[fontSize] || []);
+				acc[fontSize].push(elem);
+				return acc;
+			}, {});
+		let HighScore   = Object.keys(ScoredElems)
+								.sort()
+								.reverse()
+								.shift();
+
+		let HighScoreElems = ScoredElems[HighScore];
+		delete ScoredElems[HighScore];
+
+		return [HighScoreElems, [].concat(...Object.values(ScoredElems))];
 	}
 }

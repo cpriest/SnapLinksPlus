@@ -14,15 +14,13 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-let ElemDocRects;
-
 "use strict";
 
 // Pub-Sub Events
 const ElementsSelected = 'ElementsSelected';
 
 
-ElemDocRects = new (
+let ElemDocRects = new (
 	/**
 	 * This class provides for a cached WeakMap of {Element} to
 	 */
@@ -95,9 +93,33 @@ ElemDocRects = new (
 			});
 		}
 
+		/**
+		 * Gets the computed font score for the given element, caching the results
+		 * 		Takes into account fontSize and bold
+		 *
+		 * @param {Element} elem	The element to retrieve the computed fontSize of
+		 *
+		 * @returns int
+		 */
+		GetFontScore(elem) {
+			let CachedStyle = this.StyleCache.get(elem);
+
+			if(!CachedStyle) {
+				let ComputedStyle = window.getComputedStyle(elem);
+				CachedStyle   = {
+					fontSize: 	ComputedStyle.fontSize,
+					fontWeight: ComputedStyle.fontWeight,
+					fontScore:	parseInt(ComputedStyle.fontWeight) + parseInt(ComputedStyle.fontSize.replace(/[^\d]+/g, '')),
+				};
+				this.StyleCache.set(elem, CachedStyle);
+			}
+			return CachedStyle.fontScore;
+		}
+
 		/** Clears the cache of client rects */
 		clear() {
 			this.ElemRects = new WeakMap();
+			this.StyleCache = new WeakMap();
 		}
 	}
 )();
