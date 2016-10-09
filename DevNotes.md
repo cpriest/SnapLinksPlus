@@ -7,7 +7,7 @@
     - ~~Open links next to current tab~~
 - **Test, issue?**
     - ~~Clicking on js links from test document don't seem to work (possibly dev-mode related)~~
-    - [Issue #96](https://github.com/cpriest/SnapLinksPlus/issues/96) - 3.0.2 Doesn't work well with imgur.com's comments section
+    - ~~[Issue #96](https://github.com/cpriest/SnapLinksPlus/issues/96) - 3.0.2 Doesn't work well with imgur.com's comments section~~
 
 # Known Bugs
  - ~~Blank HREF's should be ignored~~

@@ -21,7 +21,6 @@ v3.0.3 - Not Yet Released
  - New tabs will open to the right of the current tab
  - New tabs will be opened in document element order
  - The first tab by document order opened will also become active
- -
 
 v3.0.0b2
 ========

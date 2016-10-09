@@ -139,9 +139,9 @@ class CategorizedCollection {
 	FilterByFontScore(Elements) {
 		let ScoredElems = Elements
 			.reduce((acc, elem) => {
-				let fontSize  = ElemDocRects.GetFontScore(elem);
-				acc[fontSize] = (acc[fontSize] || []);
-				acc[fontSize].push(elem);
+				let Score  = ElemDocRects.GetFontScore(elem);
+				acc[Score] = (acc[Score] || []);
+				acc[Score].push(elem);;;;
 				return acc;
 			}, {});
 		let HighScore   = Object.keys(ScoredElems)

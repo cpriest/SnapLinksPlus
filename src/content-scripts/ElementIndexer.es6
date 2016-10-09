@@ -109,8 +109,9 @@ let ElemDocRects = new (
 				CachedStyle   = {
 					fontSize: 	ComputedStyle.fontSize,
 					fontWeight: ComputedStyle.fontWeight,
-					fontScore:	parseInt(ComputedStyle.fontWeight) + parseInt(ComputedStyle.fontSize.replace(/[^\d]+/g, '')),
+					fontScore:	(parseInt(ComputedStyle.fontSize.replace(/[^\d]+/g, '')) * 10) + (parseInt(ComputedStyle.fontWeight) / 100),
 				};
+//				console.log(elem.textContent, CachedStyle.fontSize, CachedStyle.fontWeight, CachedStyle.fontScore);								// #DevCode
 				this.StyleCache.set(elem, CachedStyle);
 			}
 			return CachedStyle.fontScore;
