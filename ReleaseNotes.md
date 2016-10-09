@@ -15,6 +15,13 @@ v3.0.3 - Not Yet Released
  - Can now lasso labels for checkboxes and radio boxes
  - Can now lasso radio buttons, selects the first radio of each group
  - Document Size Changes are now detected properly
+ - "Greatest Size of Text" is now used for Links / Javascript Links
+   - This can be bypassed by holding down shift while dragging
+     **Note:** Releasing the mouse button with shift held down will cause the context menu to show ([Web Standards](https://bugzilla.mozilla.org/show_bug.cgi?id=692139))
+ - New tabs will open to the right of the current tab
+ - New tabs will be opened in document element order
+ - The first tab by document order opened will also become active
+ -
 
 v3.0.0b2
 ========

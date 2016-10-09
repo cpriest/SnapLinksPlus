@@ -26,16 +26,28 @@
 function onMessage(msg) {
 	switch(msg.Action) {
 		case RELOAD_EXTENSION:
+			chrome.runtime.onMessage.removeListener(onMessage);
 			chrome.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			for(let url of msg.tUrls) {
-				chrome.tabs.create({
-					url     : url,
-					active  : false,
-//					selected: false,
-				});
-			}
+			chrome.tabs.query({
+					active       : true,
+					currentWindow: true
+				}, (tabs) => {
+					if(tabs.length) {
+						let TabsLeft = msg.tUrls.length;
+
+						// Reverse the url order so that we are opening in the correct order
+						for(let url of msg.tUrls.reverse()) {
+							chrome.tabs.create({
+								url   : url,
+								active: (--TabsLeft) == 0,	// Activate the last tab to be opened
+								index: tabs[0].index+1,
+							});
+						}
+					}
+				}
+			);
 			break;
 	}
 }

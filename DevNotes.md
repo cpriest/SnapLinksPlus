@@ -4,7 +4,7 @@
         - ~~document.execCommand(‘cut’/‘copy’) was denied because it was not called from inside a short running user-generated event handler.ActionMgr.es6:40~~
 - **Features**
     - ~~Add size-of-text minification (select greatest size font links unless shift is held)~~
-    - Open links next to current tab
+    - ~~Open links next to current tab~~
 - **Test, issue?**
     - ~~Clicking on js links from test document don't seem to work (possibly dev-mode related)~~
     - [Issue #96](https://github.com/cpriest/SnapLinksPlus/issues/96) - 3.0.2 Doesn't work well with imgur.com's comments section
