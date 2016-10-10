@@ -103,8 +103,8 @@ function $A(iterable) { return Array.from(iterable); }
 /**
  * Adds a mods bitfield to an event based on ctrlKey, altKey and shiftKey states
  *
- * @param {Event} e
- * @returns {Event}
+ * @param {MouseEvent|KeyboardEvent} e
+ * @returns {MouseEvent|KeyboardEvent}
  */
 function AddModsToEvent(e) {
 	e.mods = (e.ctrlKey) + (e.altKey << 1) + (e.shiftKey << 2);

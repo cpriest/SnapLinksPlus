@@ -86,7 +86,7 @@ class EventHandler {
 	onKeyDown(e) {
 		switch(e.key) {
 			case 'Escape':
-				this.EndDrag(e);
+				this.EndDrag(AddModsToEvent(e));
 				break;
 		}
 	}
@@ -171,17 +171,26 @@ class EventHandler {
 	EndDrag(e) {
 		this.mmTimer = clearInterval(this.mmTimer);
 
-		if(e.type == "mouseup" && this.CurrentSelection.IsLargeEnoughToActivate()) {
-			this.StopNextContextMenu();
-			pub(DragCompleted, { SelectedElements: this.SelectedElements, e: e });
+		switch(e.type) {
+			case 'mouseup':
+				if(this.CurrentSelection.IsLargeEnoughToActivate()) {
+					this.StopNextContextMenu();
+					pub(DragCompleted, { SelectedElements: this.SelectedElements, e: e });
 
-			/**
-			 * Unfortunately ActionMgr has to be called directly within the event hook chain,
-			 * using pub/sub results in actions being considered "outside of short running user-generated event handlers
-			 * @note Perhaps a synchronous channel may work, something to try in the future
-			 **/
-			if(this.SelectedElements)
-				ActionHandler.ActUpon(this.SelectedElements, e);
+					/**
+					 * Unfortunately ActionMgr has to be called directly within the event hook chain,
+					 * using pub/sub results in actions being considered "outside of short running user-generated event handlers
+					 * @note Perhaps a synchronous channel may work, something to try in the future
+					 **/
+					if(this.SelectedElements)
+						ActionHandler.ActUpon(this.SelectedElements, e);
+				}
+				break;
+			case 'keydown':
+				this.StopNextContextMenu();
+				if(!(e.mods & SHIFT && e.key == 'Escape'))
+					pub(DragCompleted, { SelectedElements: [], e: e });
+				break;
 		}
 
 		delete this.SelectedElements;
