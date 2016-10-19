@@ -45,7 +45,7 @@ const data = {
 		}
 	},
 	HighlightStyles: {
-		ActOnElements: 'fill: rgba(255,0,0,.1); stroke: red; stroke-width: .75px;',
+		ActOnElements: 'fill: rgba(0,255,0,.05); stroke: rgba(0,255,0,1); stroke-width: .5px;',
 	},
 
 	Dev: {							// #DevCode

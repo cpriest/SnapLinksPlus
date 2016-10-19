@@ -166,7 +166,7 @@ class SelectionRect {
 					.SnapLinksHighlighter :not([xyz]) { all: initial; }
 					.SnapLinksHighlighter { position: absolute; top: 0px; left: 0px; }
 					.SnapLinksContainer { z-index: 999999; top: 0px; left: 0px; margin: 0px; padding: 0px; position: absolute; height: 0px; width: 0px; }
-					.SnapLinksContainer > .SL_SelectionRect { outline: 2px dashed rgba(0,255,0,1); position: absolute; overflow: visible; }
+					.SnapLinksContainer > .SL_SelectionRect { outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; }
 					.SL_SelectionRect > .SL_SelectionLabel { position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap; }
 				</style>
 			`)
@@ -183,14 +183,13 @@ class SelectionRect {
 
 		document.body.insertBefore(this.elContainer, document.body.firstElementChild);
 
-		if(this.elContainer.offsetParent) {
-			let parentStyle = window.getComputedStyle(this.elContainer.offsetParent);
-
-			if(parentStyle.marginLeft)
-				this.elContainer.style.marginLeft = `-${parentStyle.marginLeft}`;
-			if(parentStyle.marginTop)
-				this.elContainer.style.marginTop = `-${parentStyle.marginTop}`;
-		}
+		/* This adjusts the main containing element to position it at 0,0 no matter how it may be
+			offset by parent CSS.  This works better than body.marginLeft because that only
+			applies in the position is set
+		 */
+		let rContainer = this.elContainer.getClientRects()[0];
+		this.elContainer.style.marginLeft = `-${rContainer.left + docElem.scrollLeft}px`;
+		this.elContainer.style.marginTop = `-${rContainer.top + docElem.scrollTop}px`;
 
 		pub(ContainerElementCreated, this.elContainer);
 

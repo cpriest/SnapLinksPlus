@@ -90,6 +90,7 @@
 			</table>
 			Fixed by <a href="https://github.com/cpriest/SnapLinksPlus/commit/ece03f88a34013322370ce063681803e1fa62c3a">ece03f88a34013322370ce063681803e1fa62c3a</a>
 		</div>
+		<h1
 
 		<h1><a href="http://code.google.com/p/snaplinksplus/issues/detail?id=49">Issue 49</a> - Iframe w/ Transitional DOCTYPE, try to select test40-test50</h1>
 		<div>
@@ -101,6 +102,13 @@
 			This is because as soon as the right-click-down event fires the document calculations are made, which take very little time but it is noticeable on pages with many elements. This could be delayed until the drag begins or possibly to a non-ui worker thread.<br>
 			<a target="_blank" href="http://imdb.com/search/title?at=0&count=100">IMDB Search (100)</a><br>
 			<a target="_blank" href="http://imdb.com/search/title?at=0&count=1000">IMDB Search (1000)</a><br>
+		</div>
+
+		<h1><a class="Fixed" target="blank" href="https://github.com/cpriest/SnapLinksPlus/issues/100">Issue 100</a> Body Margins Causes Offset of Highlights</h1>
+		<div>
+			This happens because our container's offsetParent is the BODY tag and if it has margins.<br>
+			<b>This test document also has margin and padding set to ensure the fix works correctly.</b><br>
+			<a target="_blank" href="https://tweakers.net/">https://tweakers.net/</a><br>
 		</div>
 
 		<h1 class="Open">General Testing Sites</h1>
