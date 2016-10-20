@@ -1,4 +1,4 @@
-v3.0.3 - Not Yet Released
+v3.1.0 - Not Yet Released
 =========================
  - Pressing escape will now cancel an already started drag operation
  - Fixed #97 - Context Menu no longer worked after dragging once.
@@ -16,11 +16,11 @@ v3.0.3 - Not Yet Released
  - Can now lasso radio buttons, selects the first radio of each group
  - Document Size Changes are now detected properly
  - "Greatest Size of Text" is now used for Links / Javascript Links
-   - This can be bypassed by holding down shift while dragging
-     **Note:** Releasing the mouse button with shift held down will cause the context menu to show ([Web Standards](https://bugzilla.mozilla.org/show_bug.cgi?id=692139))
+   - This can be bypassed by holding down alt while dragging
  - New tabs will open to the right of the current tab
  - New tabs will be opened in document element order
  - The first tab by document order opened will also become active
+ - Added website and new welcome page with introduction on how to use SnapLinks v3
 
 v3.0.0b2
 ========
