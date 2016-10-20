@@ -38,6 +38,7 @@ class EventHandler {
 		this._onMouseMove   = this.onMouseMove.bind(this);
 		this._onContextMenu = this.onContextMenu.bind(this);
 		this._onKeyDown     = this.onKeyDown.bind(this);
+		this._onKeyUp       = this.onKeyUp.bind(this);
 
 		document.addEventListener('mousedown', this.onMouseDown.bind(this), true);
 	}
@@ -84,11 +85,25 @@ class EventHandler {
 	 * @param {KeyboardEvent} e
 	 */
 	onKeyDown(e) {
+		e = AddModsToEvent(e);
 		switch(e.key) {
 			case 'Escape':
-				this.EndDrag(AddModsToEvent(e));
-				break;
+				this.EndDrag(e);
+				e.stop();
+				return;
 		}
+		if(this.CurrentSelection.IsLargeEnoughToActivate())
+			e.stop();
+	}
+
+	/**
+	 * @param {KeyboardEvent} e
+	 */
+	onKeyUp(e) {
+		e = AddModsToEvent(e);
+
+		if(this.CurrentSelection.IsLargeEnoughToActivate())
+			e.stop();
 	}
 
 	/**
@@ -118,6 +133,7 @@ class EventHandler {
 		document.addEventListener('mouseup', this._onMouseUp, true);
 		document.addEventListener('mousemove', this._onMouseMove, true);
 		document.addEventListener('keydown', this._onKeyDown, true);
+		document.addEventListener('keyup', this._onKeyUp, true);
 
 		sub(ElementsSelected, (topic, Elements) => {
 			this.SelectedElements = Elements;

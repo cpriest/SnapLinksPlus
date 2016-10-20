@@ -4,6 +4,11 @@
  */
 Event.prototype.mods = 0;
 
+/**
+ * My own stop event propagation/preventDefault wrapper
+ */
+Event.prototype.stop = function() { };
+
 
 /**
  * @returns {DOMRect[]}

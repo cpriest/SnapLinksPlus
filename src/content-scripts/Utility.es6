@@ -108,5 +108,9 @@ function $A(iterable) { return Array.from(iterable); }
  */
 function AddModsToEvent(e) {
 	e.mods = (e.ctrlKey) + (e.altKey << 1) + (e.shiftKey << 2);
+	e.stop = () => {
+		e.preventDefault();
+		e.stopPropagation();
+	};
 	return e;
 }
