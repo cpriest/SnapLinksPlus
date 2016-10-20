@@ -110,7 +110,7 @@ class CategorizedCollection {
 		}
 
 		//noinspection JSBitwiseOperatorUsage
-		if(!(LastModifierKeys & SHIFT)) {
+		if(!(LastModifierKeys & ALT)) {
 			if(this.Links.length)
 				[this.Links, this.FilteredLinks] = this.FilterByFontScore(this.Links);
 
@@ -141,7 +141,7 @@ class CategorizedCollection {
 			.reduce((acc, elem) => {
 				let Score  = ElemDocRects.GetFontScore(elem);
 				acc[Score] = (acc[Score] || []);
-				acc[Score].push(elem);;;;
+				acc[Score].push(elem);
 				return acc;
 			}, {});
 		let HighScore   = Object.keys(ScoredElems)
