@@ -191,6 +191,8 @@ class SelectionRect {
 		this.elContainer.style.marginLeft = `-${rContainer.left + docElem.scrollLeft}px`;
 		this.elContainer.style.marginTop = `-${rContainer.top + docElem.scrollTop}px`;
 
+		this.elContainer.style.display = 'none';
+
 		pub(ContainerElementCreated, this.elContainer);
 
 		sub(ElementsSelected, (topic, Elements, Subscription) => {
@@ -210,7 +212,6 @@ class SelectionRect {
 	 */
 	SetOrigin(top, left) {
 		this.dims.SetOrigin(top, left);
-		this.elContainer.style.display = '';
 
 		return this;
 	}
@@ -239,10 +240,10 @@ class SelectionRect {
 			[this.elRect.style.height, this.elRect.style.width] = [this.dims.height + 'px', this.dims.width + 'px'];
 
 			if(this.IsLargeEnoughToActivate()) {
-				this.elRect.style.display = '';
+				this.elContainer.style.display = '';
 				pub(DragRectChanged, { dims: this.dims, visible: true } );
 			} else {
-				this.elRect.style.display = 'none';
+				this.elContainer.style.display = 'none';
 				pub(DragRectChanged, { dims: this.dims, visible: false});
 			}
 		}
