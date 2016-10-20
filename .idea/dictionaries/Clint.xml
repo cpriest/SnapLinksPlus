@@ -2,11 +2,16 @@
   <dictionary name="Clint">
     <words>
       <w>astrodog</w>
+      <w>chivo</w>
+      <w>clearfix</w>
       <w>clickable</w>
       <w>github</w>
+      <w>googleapis</w>
+      <w>jasonlong</w>
       <w>lodash</w>
       <w>onresize</w>
       <w>radiobuttons</w>
+      <w>wikipedia</w>
     </words>
   </dictionary>
 </component>

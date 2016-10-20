@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2016 Clint Priest
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+  ~ to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+  ~ and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+  ~ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+  ~ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+  ~ DEALINGS IN THE SOFTWARE.
+  -->
+
+<!--suppress CheckImageSize -->
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="chrome=1">
+	<link href="https://fonts.googleapis.com/css?family=Chivo:900" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+	<link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+	<title>SnapLinks by Clint Priest</title>
+</head>
+
+<body>
+<div id="container">
+	<div class="inner">
+		<header>
+			<h1><a href="/"><img height="48px" width="48px" src="images/SnapLinksLogo.png"></a><a href="/">Snap Links</a></h1>
+			<h2>Snap Links is a Browser Addon that lets you lasso links, checkboxes and other elements and do things with them.</h2>
+		</header>
+
+		<hr>
+
+		<section id="main_content">
+			<h3>Introduction</h3>
+
+			<p>Thank you for giving SnapLinks v3 a try, it is currently under active development (a re-write of v2). Here is a quick tutorial to get you started:</p>
+
+
+			<div style="padding: 0px 25px;">
+				<p>Snap Links lets you <em>"lasso" elements on a page</em> and do things with them. By default, this is handled by <strong>holding down the right mouse button and dragging a selection
+				rectangle</strong> around elements.</p>
+				<p>It works with <a href="#">links</a>, image links, <label><input type="checkbox">checkboxes</label>, <label><input type="radio">radio buttons</label>, even JavaScript based links and
+					other "clickable" elements.</p>
+			</div>
+
+
+			<h3>Give it a Try</h3>
+			<ol>
+				<li>Hold down the right mouse button and drag a selection around the links below.</li>
+				<li><p>When they are highlighted, let go of the right mouse button <strong>(then switch back to this tab)</strong>.</p>
+					<p>Notice how the links opened up in one or two new tabs and the first tab was switched to.</p>
+				</li>
+			</ol>
+
+			<h4>Links</h4>
+			<div>
+				<a href="http://www.google.com">Google</a>, <a href="http://wikipedia.com">Wikipedia</a>
+			</div>
+			<details>
+				<summary>More Information</summary>
+				<p>With links you can hold down the control key when highlighting links to copy the links to the clipboard.</p>
+			</details>
+
+			<h4>Check-boxes</h4>
+			<div>
+				<span><label><input type="checkbox"/>Sample Checkbox 2</label></span>
+				<span><label><input type="checkbox"/>Sample Checkbox 3</label></span>
+				<span><label><input type="checkbox"/>Sample Checkbox 1</label></span>
+			</div>
+			<details>
+				<summary>More Information</summary>
+				SnapLinks will check or uncheck all checkboxes, determined by "opposite majority."  So if the majority of the elements highlighted are already checked,
+				then the checkboxes will be unchecked.
+			</details>
+
+			<h4>Radio Buttons</h4>
+
+			<div>
+				<span><label><input type="radio" name="sample" checked/>Sample Radio 1</label></span>
+				<span><label><input type="radio" name="sample"/>Sample Radio 2</label></span>
+				<span><label><input type="radio" name="sample"/>Sample Radio 3</label></span>
+				<details>
+					<summary>More Information</summary>
+					SnapLinks will select the highest document-order radio button highlighted.
+				</details>
+			</div>
+
+			<h3>Greatest Types</h3>
+			<div>
+				<p>You can highlight multiple types of elements at the same time but SnapLinks will only act upon one group at a time.
+					It will act upon the group with greatest number of elements.</p>
+			</div>
+
+
+			<h3>Greatest Font Size</h3>
+			<div>
+				<p>When highlighting a number of elements, if there is a font-size difference, SnapLinks will work with elements with
+					the greatest font size and filter out the rest, this can be over-ridden by holding down alt while dragging.</p>
+				<p>
+					<a href="http://www.google.com">Google</a>, <a style="font-weight: bold;" href="http://wikipedia.com">Wikipedia</a>
+				</p>
+			</div>
+
+		</section>
+
+		<footer>
+			SnapLinks is maintained by <a href="https://github.com/cpriest">Clint Priest</a><br>
+			This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+		</footer>
+	</div>
+</div>
+</body>
+</html>
