@@ -135,7 +135,14 @@ let ElemIndex = new class ElementIndexer {
 	constructor() {
 		sub(DragRectChanged, (topic, data, Subscription) => {
 			if(!this.Elements) {
-				this.Elements = document.querySelectorAll('A[href]:not([href=""]), INPUT[type="button"], INPUT[type="submit"], INPUT[type="reset"], INPUT[type="checkbox"], INPUT[type="radio"]');
+				this.Elements = document.querySelectorAll(
+					'A[href]:not([href=""]), ' +
+					'INPUT[type="button"], ' +
+					'INPUT[type="submit"], ' +
+					'INPUT[type="reset"], ' +
+					'INPUT[type="checkbox"], ' +
+					'INPUT[type="radio"]'
+				);
 
 				this.UpdateIndex();
 			}
