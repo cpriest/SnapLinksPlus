@@ -62,10 +62,10 @@ let SvgOverlay = new class SvgOverlayMgr {
 	Init(Container) {
 		this.style = data.HighlightStyles.ActOnElements;
 		this.Overlay = CreateElement(`
-				<svg class="SnapLinksHighlighter" xmlns="http://www.w3.org/2000/svg" style="width: ${docElem.scrollWidth}px; height: ${docElem.scrollHeight}px; ">
-					<rect/> <!-- Used for easily cloning the properly namespaced rect -->
-				</svg>
-			`);
+			<svg class="SnapLinksHighlighter" xmlns="http://www.w3.org/2000/svg">
+				<rect/> <!-- Used for easily cloning the properly namespaced rect -->
+			</svg>
+		`);
 		Container.appendChild(this.Overlay);
 
 		this.HighlightElemMap    = new WeakMap();
