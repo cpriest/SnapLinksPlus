@@ -64,7 +64,7 @@ function CheckInstallation() {
 
 		let manifest = chrome.runtime.getManifest();
 
-		if(true || !item || !item.LastInstalledVersion) {
+		if(!item || !item.LastInstalledVersion) {
 			// New installation
 			chrome.tabs.create({
 				url:	'http://cpriest.github.io/SnapLinksPlus/welcome.html',
