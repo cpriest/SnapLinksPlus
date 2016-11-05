@@ -308,7 +308,6 @@ class SelectionRect {
 	Hide() {
 		this.dims                      = new Rect();
 		this.elContainer.style.display = 'none';
-		this.elRect.style.display      = 'none';
 
 		return this;
 	}
