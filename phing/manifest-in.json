@@ -10,6 +10,10 @@
 
 	"minimum_chrome_version": "51",
 
+	"permissions": [
+		"storage"
+	],
+
 	"icons":                  {
 		"48":  "res/icon48.png",
 		"128": "res/icon128.png"
@@ -33,12 +37,10 @@
 				"<all_urls>"
 			],
 			"js":      [
-				"src/lib/lodash-snaplinks.min.js",
 				"src/lib/csp.min.js",
 				"src/lib/transducers.js",
 				"src/globals.es6",
 				"src/CSP.es6",
-				"src/playground/csp-testing.es6",
 				"src/content-scripts/Utility.es6",
 				"src/content-scripts/SelectionRect.es6",
 				"src/content-scripts/SnapLinks.es6",

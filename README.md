@@ -1,5 +1,7 @@
 # Snap Links Plus
 
+New Website Online: [Snap Links v3](http://cpriest.github.io/SnapLinksPlus/)
+
 Snap Links Plus is being re-written from the ground up to be a [Web Extension](https://developer.mozilla.org/en-US/Add-ons/WebExtensions).
 
 The reasons behind this are simple, [electrolysis](https://wiki.mozilla.org/Electrolysis) is coming, [XUL/XPCOM are on the way out and chrome style plugins are the new standard](https://blog.mozilla.org/addons/2015/08/21/the-future-of-developing-firefox-add-ons/), which also happens to be both restartless and compatible with chrome, opera and in the future, other browsers.

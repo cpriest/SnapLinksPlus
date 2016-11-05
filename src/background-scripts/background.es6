@@ -52,3 +52,32 @@ function onMessage(msg) {
 	}
 }
 chrome.runtime.onMessage.addListener(onMessage);
+
+
+/**
+ * Check storage.LastInstalledVersion to see if we're newly	installed or a new version or what
+ */
+function CheckInstallation() {
+	chrome.storage.local.get('LastInstalledVersion', (item) => {
+		if(chrome.runtime.lastError)
+			return console.error('Error while getting LastInstalledVersion: ', chrome.runtime.lastError);
+
+		let manifest = chrome.runtime.getManifest();
+
+		if(true || !item || !item.LastInstalledVersion) {
+			// New installation
+			chrome.tabs.create({
+				url:	'http://cpriest.github.io/SnapLinksPlus/welcome.html',
+				active: true,
+			});
+		} else if(item.LastInstalledVersion != manifest.version) {
+			// Update/Upgrade
+		}
+
+		chrome.storage.local.set({ 'LastInstalledVersion': manifest.version });
+	});
+}
+
+setTimeout(() => {
+	CheckInstallation();
+}, 250);

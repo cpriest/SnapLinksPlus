@@ -31,7 +31,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="Generated files" level="project" />
-    <orderEntry type="library" name="chrome-DefinitelyTyped" level="application" />
     <orderEntry type="library" name="geometry-dom-DefinitelyTyped" level="application" />
+    <orderEntry type="library" name="chrome-DefinitelyTyped" level="application" />
   </component>
 </module>
