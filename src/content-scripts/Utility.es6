@@ -19,7 +19,7 @@
 /**
  * Handy shortcut for creating an element or element tree
  *
- * @param {string} html		Raw HTML to be used for creating the nodes
+ * @param {string} html        Raw HTML to be used for creating the nodes
  *
  * @returns {Element}
  */
@@ -38,8 +38,8 @@ function CreateElement(html) {
 /**
  * Returns a string of the given properties, like propName: propValue
  *
- * @param {object}		obj		The object to inspect
- * @param {string[]}	props	The properties to include
+ * @param {object}        obj        The object to inspect
+ * @param {string[]}    props    The properties to include
  */
 function dir(obj, props) {
 	let out = [];
@@ -47,7 +47,7 @@ function dir(obj, props) {
 		return 'dir(): not an object';
 
 	for(let prop of props)
-		out.push(prop + ': ' + obj[ prop ]);
+		out.push(prop + ': ' + obj[prop]);
 	return out.join(', ');
 }
 
@@ -58,11 +58,11 @@ function dir(obj, props) {
 class RateReporter {
 	/**
 	 *
-	 * @param {string}	msg     Template literal which should be passed as a string, when reporting
-	 *                    		the following variables are available to the template:
-	 *                       		Count:            The count variable passed in to report()
-	 *                        		PerSecond:        The Count / Second rate
-	 *                        		Elapsed:        The time that has elapsed
+	 * @param {string}    msg     Template literal which should be passed as a string, when reporting
+	 *                            the following variables are available to the template:
+	 *                            Count:            The count variable passed in to report()
+	 *                                PerSecond:        The Count / Second rate
+	 *                                Elapsed:        The time that has elapsed
 	 */
 	constructor(msg) {
 		this.msg     = msg;
@@ -94,7 +94,7 @@ class RateReporter {
 /**
  * Converts an iterable element to an array.
  *
- * @param {Array|object|} iterable	Any iterable arrayLike object
+ * @param {Array|object|} iterable    Any iterable arrayLike object
  *
  * @return {Array}
  */

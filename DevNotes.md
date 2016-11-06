@@ -6,16 +6,17 @@
     - ~~Add size-of-text minification (select greatest size font links unless shift is held)~~
     - ~~Open links next to current tab~~
     - ~~New Install Welcome Page~~
-    - Updated Plugin Page
 - **Test, issue?**
     - ~~Clicking on js links from test document don't seem to work (possibly dev-mode related)~~
     - ~~[Issue #96](https://github.com/cpriest/SnapLinksPlus/issues/96) - 3.0.2 Doesn't work well with imgur.com's comments section~~
     -
 
+
+
 # Known Bugs
  - ~~Blank HREF's should be ignored~~
  - ~~Document size changes are not detected (on detection, need to clear DocElemRects)~~
- - The document size is being changed during selection by the selection process
+ - ~~The document size is being changed during selection by the selection process~~
 
 
 # Plans
@@ -25,8 +26,10 @@
  - ~~Add LABEL support (checkboxes, radio button, etc)~~
  - ~~Add selection of "highest" radio button~~
  - ~~Switch to using pub/sub model and de-couple the various parts~~
+ - Create Updated Plugin Page
+ - Setup site using Jekyll
  - Add Options GUI
- - Better handling of label placement (separate from sizing rect)
+ - Better handling of label placement (separate from sizing rect, above <SVG> Element)
  - Highlight "greatest of types" elements differently than elements which do not meet the greatest of.
     eg: 3 Buttons and 1 Anchor lassoed, the 3 Buttons would be highlighted in green vs the Anchor being highlighted in grey
  - ~~Move Inline Styles to Document \<STYLE> block~~

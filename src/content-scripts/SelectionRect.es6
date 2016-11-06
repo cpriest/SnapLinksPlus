@@ -187,8 +187,8 @@ class SelectionRect {
 			applies in the position is set
 		 */
 		let rContainer = this.elContainer.getClientRects()[0];
-		this.elContainer.style.marginLeft = `-${rContainer.left + docElem.scrollLeft}px`;
-		this.elContainer.style.marginTop = `-${rContainer.top + docElem.scrollTop}px`;
+		this.elContainer.style.marginLeft = `-${rContainer.left + window.scrollX}px`;
+		this.elContainer.style.marginTop  = `-${rContainer.top + window.scrollY}px`;
 
 		this.elContainer.style.display = 'none';
 

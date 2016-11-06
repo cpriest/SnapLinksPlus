@@ -123,7 +123,7 @@ let SvgOverlay = new class SvgOverlayMgr {
 			tHighlight   = tElems.filter(
 				(elem) => { return !tPrevElems.includes(elem); }
 			),
-			offset       = { x: document.documentElement.scrollLeft, y: document.documentElement.scrollTop };
+			offset = { x: window.scrollX, y: window.scrollY };
 
 		/* Remove highlighting of elements no longer in tElems */
 		for(let elem of tUnhighlight)

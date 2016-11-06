@@ -95,9 +95,9 @@ let ElemDocRects = new (
 
 		/**
 		 * Gets the computed font score for the given element, caching the results
-		 * 		Takes into account fontSize and bold
+		 *        Takes into account fontSize and bold
 		 *
-		 * @param {Element} elem	The element to retrieve the computed fontSize of
+		 * @param {Element} elem    The element to retrieve the computed fontSize of
 		 *
 		 * @returns int
 		 */
@@ -106,10 +106,10 @@ let ElemDocRects = new (
 
 			if(!CachedStyle) {
 				let ComputedStyle = window.getComputedStyle(elem);
-				CachedStyle   = {
-					fontSize: 	ComputedStyle.fontSize,
+				CachedStyle       = {
+					fontSize  : ComputedStyle.fontSize,
 					fontWeight: ComputedStyle.fontWeight,
-					fontScore:	(parseInt(ComputedStyle.fontSize.replace(/[^\d]+/g, '')) * 10) + (parseInt(ComputedStyle.fontWeight) / 100),
+					fontScore : (parseInt(ComputedStyle.fontSize.replace(/[^\d]+/g, '')) * 10) + (parseInt(ComputedStyle.fontWeight) / 100),
 				};
 //				console.log(elem.textContent, CachedStyle.fontSize, CachedStyle.fontWeight, CachedStyle.fontScore);								// #DevCode
 				this.StyleCache.set(elem, CachedStyle);
@@ -119,7 +119,7 @@ let ElemDocRects = new (
 
 		/** Clears the cache of client rects */
 		clear() {
-			this.ElemRects = new WeakMap();
+			this.ElemRects  = new WeakMap();
 			this.StyleCache = new WeakMap();
 		}
 	}
@@ -161,25 +161,22 @@ let ElemIndex = new class ElementIndexer {
 	 * Updates the index of this.Elements separated into N buckets for quickly paring down the elements to be checked for intersection of the selection rectangle
 	 */
 	UpdateIndex() {
-//		let start     = Date.now();																		// #DevCode #PerfTest
 		let idx,
 			docElem   = document.documentElement,
-			scrollTop = docElem.scrollTop,
+			scrollY   = window.scrollY,
 			docHeight = docElem.scrollHeight,
 			Buckets   = data.IndexBuckets;
-//		let offset    = { x: document.documentElement.scrollLeft, y: document.documentElement.scrollTop };
 
 		this.BoundaryIndex = [];
 		for(let j = 0; j < Buckets; j++)
 			this.BoundaryIndex[j] = [];
 
-//		var rr = new RateReporter('Calculated ${Count} Elements in ${Elapsed} (${PerSecond})');			// #DevCode #PerfTest
+//		let rr = new RateReporter('Calculated ${Count} Elements in ${Elapsed} (${PerSecond})');			// #DevCode #PerfTest
 		for(let elem of this.Elements) {
 			/* GetBucketFromTop() */
-			idx = Math.floor((elem.getBoundingClientRect().top + scrollTop) * Buckets / docHeight);
+			idx = Math.floor((elem.getBoundingClientRect().top + scrollY) * Buckets / docHeight);
 			if(this.BoundaryIndex[idx])
 				this.BoundaryIndex[idx].push(elem);
-//			ElemDocRects.get(elem, offset);																// #DevCode #PerfTest
 		}
 //		rr.report(this.Elements.length);																// #DevCode #PerfTest
 	}
@@ -206,11 +203,13 @@ let ElemIndex = new class ElementIndexer {
 	 * @param {Rect} sel    The rect in document coordinates to search
 	 */
 	Search(sel) {
+//		let rr = new RateReporter('Found ${Count} Elements in ${Elapsed} (${PerSecond})');			// #DevCode #PerfTest
+
 		let docHeight   = document.documentElement.scrollHeight,
 			Buckets     = data.IndexBuckets,
 			FirstBucket = Math.floor(sel.top * Buckets / docHeight),
 			LastBucket  = Math.floor(sel.bottom * Buckets / docHeight),
-			offset      = { x: document.documentElement.scrollLeft, y: document.documentElement.scrollTop },
+			offset      = { x: window.scrollX, y: window.scrollY },
 			tMatches    = [];
 
 		for(let j = FirstBucket; j <= LastBucket; j++) {
@@ -223,6 +222,9 @@ let ElemIndex = new class ElementIndexer {
 				}
 			}
 		}
+
+//		rr.report(tMatches.length);																	// #DevCode #PerfTest
+
 		return new CategorizedCollection(tMatches);
 	}
 };
