@@ -153,13 +153,20 @@ class EventHandler {
 			pub(DocSizeChanged, this.docSize);
 		}
 
+		let clientHeight = docElem.clientHeight,
+			clientWidth = docElem.clientWidth;
+
+		if(document.documentElement.clientHeight > window.innerHeight) {
+			clientHeight = document.body.clientHeight;
+			clientWidth = document.body.clientWidth;
+		}
+
 		if(e) {
-			let clientHeight = Math.min(docElem.clientHeight, document.body.clientHeight);
 			this.IntervalScrollOffset = {
 				x: e.clientX < 0
 					? e.clientX
-					: e.clientX > docElem.clientWidth
-					   ? e.clientX - docElem.clientWidth
+					: e.clientX > clientWidth
+					   ? e.clientX - clientWidth
 					   : 0,
 				y: e.clientY < 0
 					? e.clientY
@@ -172,12 +179,12 @@ class EventHandler {
 			delete this.LastMouseEvent;
 		}
 
-		window.scrollBy(this.IntervalScrollOffset.x, this.IntervalScrollOffset.y);;;;;;;;;;;
+		window.scrollBy(this.IntervalScrollOffset.x, this.IntervalScrollOffset.y);
 
 		/* Set our bottom right to scroll + max(clientX/Y, clientWidth/Height) */
 		this.CurrentSelection.SetBottomRight(
-			window.scrollY + Math.min(this.MousePos.clientY, docElem.clientHeight),
-			window.scrollX + Math.min(this.MousePos.clientX, docElem.clientWidth)
+			window.scrollY + Math.min(this.MousePos.clientY, clientHeight),
+			window.scrollX + Math.min(this.MousePos.clientX, clientWidth)
 		);
 	}
 

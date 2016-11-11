@@ -11,7 +11,7 @@
 <meta name="revisit-after" content="15 days">
 <title>Snap Links Plus Test Page</title>
 	<style type="text/css">
-		BODY { font-family: Verdana, sans-serif; min-width: 1024px; margin: 35px;}
+		BODY { font-family: Verdana, sans-serif; font-size: 12px; min-width: 1024px; margin: 35px;}
 		A { color: blue; text-decoration: underline; }
 
 		#JS_Click_Events_Tester IMG 				{ border: 2px solid transparent; cursor: pointer; }
@@ -21,7 +21,7 @@
 		#JS_Click_Events_Tester .highlighted { border: 2px solid black !important; }
 
 		DIV.Issues { margin-left: 25px; }
-		DIV.Issues DIV { font-weight: bold; margin-bottom: 15px;}
+		DIV.Issues DIV {  margin-bottom: 15px;}
 		DIV.Issues A { font-weight: normal; }
 		DIV.Issues H1 > A,
 		DIV.Issues H1 > SPAN{ color: red; }
@@ -120,6 +120,25 @@
 				<li><a href="http://www.wikipedia.com/" target="_blank">http://www.wikipedia.com/</a> - Performance Testing of lots of links</li>
 				<li><a href="http://www.testufo.com/#test=animation-time-graph" target="_blank">animation-time-graph/</a> - Performance Testing of lots of links</li>
 				<li><a href="" target="_blank">Blank HREF should be ignored </a></li>
+			</ul>
+		</div>
+		<h1>Sites that have given v3 some issues</h1>
+		<div>
+			<ul>
+				<li><a href="http://www.ldraw.org/cgi-bin/ptlist.cgi" target="_blank">ldraw.org</a> - HTML 4.01 Website, docElem.scrollHeight wasn't valid, switched to using
+					window.scrollX/Y, also docElem.clientHeight wasn't accurate, switching to min(docElem.clientHeight, document.body.clientHeight)</li>
+				<li><a href="http://www.nfohump.com/forum/index.php" target="_blank">nfohump.com</a> - XHTML 1.0 Transitional - min(docElem.clientHeight,
+					document.body.clientHeight) has doc.body.clientHeight as 0 - so testing revealed the current winner is docElem.clientHeight unless > window.innerHeight,
+					then doc.body.clientHeight is accurate.<br />
+					<br/>
+					<b>Properties that could be of use if further issues occur</b>
+					<ul>
+						<li>document.clientHeight</li>
+						<li>docElem.clientHeight</li>
+						<li>doc.body.clientHeight</li>
+						<li>doc.body.parentElement.clientHeight (should be same as docElem.clientHeight)</li>
+					</ul>
+				</li>
 			</ul>
 		</div>
 
