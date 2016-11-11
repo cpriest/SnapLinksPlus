@@ -16,12 +16,6 @@
 
 "use strict";
 
-// Pub-Sub Events
-const DragRectChanged = 'DragRectChanged',
-	  DragCompleted   = 'DragCompleted';
-
-const DocSizeChanged  = 'DocSizeChanged';
-
 let LastModifierKeys;
 
 /**

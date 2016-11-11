@@ -43,11 +43,11 @@
 				"src/CSP.es6",
 				"src/content-scripts/Utility.es6",
 				"src/content-scripts/SelectionRect.es6",
-				"src/content-scripts/SnapLinks.es6",
 				"src/content-scripts/ElementIndexer.es6",
 				"src/content-scripts/SvgOverlay.es6",
 				"src/content-scripts/CategorizedCollection.es6",
-				"src/content-scripts/ActionMgr.es6"
+				"src/content-scripts/ActionMgr.es6",
+				"src/content-scripts/SnapLinks.es6"
 			]
 		}
 	]

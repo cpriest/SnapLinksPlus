@@ -16,9 +16,6 @@
 
 "use strict";
 
-// Pub-Sub Events
-const ContainerElementCreated = 'ContainerElementCreated';
-
 
 /**
  * @property {int} top        The normalized top coordinate of the Rect

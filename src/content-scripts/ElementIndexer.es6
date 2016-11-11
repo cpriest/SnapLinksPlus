@@ -16,10 +16,6 @@
 
 "use strict";
 
-// Pub-Sub Events
-const ElementsSelected = 'ElementsSelected';
-
-
 let ElemDocRects = new (
 	/**
 	 * This class provides for a cached WeakMap of {Element} to

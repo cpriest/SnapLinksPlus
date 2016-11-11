@@ -29,18 +29,18 @@ const LMB = 1,	// Left Mouse Button
 	  MMB = 4;	// Middle Mouse Button
 
 // Actions
-const RELOAD_EXTENSION = 'ReloadExtension';
+const RELOAD_EXTENSION  = 'ReloadExtension';
 const OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
 
 const data = {
-	IndexBuckets: 10,
-	scrollRate  : 8,
-	selection   : {
+	IndexBuckets   : 10,
+	scrollRate     : 8,
+	selection      : {
 		activate: {
 			minX: 5,
 			minY: 5,
 		},
-		label: {
+		label   : {
 			paddingFromCursor: 2,
 		}
 	},
@@ -49,7 +49,7 @@ const data = {
 	},
 
 	Dev: {							// #DevCode
-		Log: {						// #DevCode
+		Log : {						// #DevCode
 			ActionMessages: true,	// #DevCode
 		},							// #DevCode
 		Skip: {						// #DevCode
@@ -58,3 +58,16 @@ const data = {
 	},								// #DevCode
 };
 
+
+/** Pub-Sub Events */
+
+// Publisher: EventHandler
+const DragRectChanged = 'DragRectChanged',
+	  DragCompleted   = 'DragCompleted';
+const DocSizeChanged  = 'DocSizeChanged';
+
+// Publisher: SelectionRect
+const ContainerElementCreated = 'ContainerElementCreated';
+
+// Publisher: ElementIndexer
+const ElementsSelected = 'ElementsSelected';
