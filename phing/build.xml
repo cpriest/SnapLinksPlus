@@ -18,16 +18,6 @@
 
 <project name="SnapLinks" default="build-again" basedir="../">
 
-	<fileset dir="." id="AllFiles_Compiled">
-		<include name="manifest.json"/>
-		<include name="**/*-compiled.js"/>
-		<include name="**/*-compiled.js.map"/>
-		<exclude name="**/*Test*"/>
-		<exclude name="**/*Playground*"/>
-		<exclude name="docs/"/>
-		<exclude name="src/JetBrains-Extensions.es6"/>
-	</fileset>
-
 	<fileset dir="." id="AllFiles">
 		<include name="src/" />
 		<include name="res/" />
@@ -36,7 +26,7 @@
 		<exclude name="**/*Playground*"/>
 		<exclude name="src/JetBrains-Extensions.es6"/>
 		<exclude name="src/lib/lodash*"/>
-		<exclude name="src/lib/transducers*"/>
+		<!--<exclude name="src/lib/transducers*"/>-->
 		<exclude name="**/*-compiled*"/>
 	</fileset>
 
@@ -86,6 +76,9 @@
 		<copy file="phing/manifest-in.json" tofile="build/manifest.json">
 			<filterchain>
 				<expandproperties/>
+				<replaceregexp>
+					<regexp pattern=".*@Chrome.*[\r\n]{1,2}" replace="" modifiers="i"/>
+				</replaceregexp>
 			</filterchain>
 		</copy>
 		<copy todir="${builddir}">

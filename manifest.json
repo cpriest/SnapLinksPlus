@@ -2,11 +2,9 @@
 	"manifest_version":       2,
 	"name":                   "Snap Links",
 	"short_name":             "Snap Links",
-	"version":                "3.1.0.2",
-	"version_name":           "3.1.0b2",
+	"version":                "3.1.0.3",
 	"description":            "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
 	"homepage_url":           "https://github.com/cpriest/SnapLinksPlus",
-	"author":                 "Clint Priest",
 
 	"minimum_chrome_version": "51",
 

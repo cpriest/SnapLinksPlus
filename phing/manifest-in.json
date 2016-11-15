@@ -3,10 +3,10 @@
 	"name":                   "Snap Links",
 	"short_name":             "Snap Links",
 	"version":                "${version}",
-	"version_name":           "${version_name}",
+	"version_name":           "${version_name}",										// @Chrome
 	"description":            "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
 	"homepage_url":           "https://github.com/cpriest/SnapLinksPlus",
-	"author":                 "Clint Priest",
+	"author":                 "Clint Priest",											// @Chrome
 
 	"minimum_chrome_version": "51",
 
