@@ -191,7 +191,7 @@ pre code {
 	border:           none;
 }
 ul, ol, dl {
-	margin-left:   30px;
+	margin-left:   10px;
 	margin-bottom: 20px;
 }
 /* COMMON STYLES */
@@ -285,16 +285,12 @@ ol li {
 dl dt {
 	color: #303030;
 }
-details {
-	margin: 4px 0px;
-}
-details > summary {
-	text-decoration: underline;
-	font-weight:     bold;
-	cursor:          pointer;
-	font-size:       90%;
-}
+
 h3 + div > span { padding-right: 10px; }
+
+h4 + div { margin: 5px 0px; }
+h4 + div + section { font-size: 95%; margin: 10px 25px; }
+
 footer {
 	padding-top:    20px;
 	padding-bottom: 30px;
