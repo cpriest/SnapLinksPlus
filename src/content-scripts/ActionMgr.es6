@@ -45,7 +45,7 @@ let ActionHandler = new (
 		 * @param {MouseEvent}             e                   The final event that completed activated the action
 		 */
 		ActUpon(SelectedElements, e) {
-			if(data.Dev) {
+			if(data.Dev) {																				// #DevCode
 				if(data.Dev.Log.ActionMessages == true)													// #DevCode
 					console.log('ActUpon(%s) - %o', SelectedElements.GreatestType, SelectedElements);	// #DevCode
 				if(data.Dev.Skip.AllActions == true)													// #DevCode
