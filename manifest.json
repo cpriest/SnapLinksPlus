@@ -2,11 +2,11 @@
 	"manifest_version":       2,
 	"name":                   "Snap Links",
 	"short_name":             "Snap Links",
-	"version":                "3.1.0.3",
+	"version":                "3.1.0.4",
 	"description":            "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
 	"homepage_url":           "https://github.com/cpriest/SnapLinksPlus",
 
-	"minimum_chrome_version": "51",
+	"minimum_chrome_version":	"51",
 
 	"permissions": [
 		"storage"
@@ -20,7 +20,7 @@
 	"applications":           {
 		"gecko": {
 			"id":                 "snaplinks@snaplinks.mozdev.org",
-			"strict_min_version": "45.0.0"
+			"strict_min_version": "45.0"
 		}
 	},
 	"background":             {

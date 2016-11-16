@@ -78,6 +78,7 @@
 				<expandproperties/>
 				<replaceregexp>
 					<regexp pattern=".*@Chrome.*[\r\n]{1,2}" replace="" modifiers="i"/>
+					<regexp pattern="\s+//.+" replace="" modifiers="i"/>
 				</replaceregexp>
 			</filterchain>
 		</copy>

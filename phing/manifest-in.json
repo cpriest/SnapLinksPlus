@@ -8,7 +8,7 @@
 	"homepage_url":           "https://github.com/cpriest/SnapLinksPlus",
 	"author":                 "Clint Priest",											// @Chrome
 
-	"minimum_chrome_version": "51",
+	"minimum_chrome_version":	"51",
 
 	"permissions": [
 		"storage"
@@ -19,12 +19,12 @@
 		"128": "res/icon128.png"
 	},
 
-	"applications":           {
-		"gecko": {
-			"id":                 "snaplinks@snaplinks.mozdev.org",
-			"strict_min_version": "45.0.0"
-		}
-	},
+	"applications":           {															// @Mozilla
+		"gecko": {																		// @Mozilla
+			"id":                 "snaplinks@snaplinks.mozdev.org",						// @Mozilla
+			"strict_min_version": "45.0"												// @Mozilla
+		}																				// @Mozilla
+	},																					// @Mozilla
 	"background":             {
 		"scripts": [
 			"src/globals.es6",
