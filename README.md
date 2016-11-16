@@ -2,7 +2,8 @@
 
 New Website Online: [Snap Links v3](http://cpriest.github.io/SnapLinksPlus/)
 
-Latest Beta (unsigned, **testers welcomed!!**) [Snap Links v3.1.0b2](https://github.com/cpriest/SnapLinksPlus/raw/master/dist/SnapLinks-3.1.0b2.xpi)
+Latest Release: v3.1.0.4, available at [Mozilla Addons](https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/)
+Latest Beta (unsigned, **testers welcomed**): See [dist directory](https://github.com/cpriest/SnapLinksPlus/tree/master/dist)
 
 Snap Links Plus is being re-written from the ground up to be a [Web Extension](https://developer.mozilla.org/en-US/Add-ons/WebExtensions).
 
@@ -14,16 +15,13 @@ I wholly encourage forking this project and submitting code and patches for incl
 
 **It is doubtful that all v2 features will be rewritten for v3 without the help of others**.
 
-Great progress has been made with v3, the next release due soon will have the majority of the v2 features, **but without a configuration panel.  The next release will have configurable options.**
+Version 3.1 has been released and has the majority of the v2 features, **but without a configuration panel.  The next release will have configurable options.**
 
 Please see [Dev Notes](DevNotes.md) for the latest development status.
 
 ## Known Issues & Some Planned Features
  * Add Options GUI
- * Open links next to current tab
  * Open in New Tabs/New Windows/Tabs In New Window
- * Releasing the mouse button while holding down shift causes Context Menu to appear ([unfixable at the moment](https://bugzilla.mozilla.org/show_bug.cgi?id=692139)) - Plan is to have alternative method to bypass Greatest Font Size Filter
-
 
 ----
 
