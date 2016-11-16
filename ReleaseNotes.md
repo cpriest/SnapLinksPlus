@@ -1,13 +1,9 @@
-v3.1.0 - Not Yet Released
+v3.1.0.4 - Released Nov 15th, 2016
 =========================
  - Pressing escape will now cancel an already started drag operation
  - Fixed #97 - Context Menu no longer worked after dragging once.
  - Fixed #91.1 (Related) - Page resize/zooming now properly re-adjusts rects
  - Fixed #91.2 - transition CSS from page no longer affects selection rect
- - Contributions from AstrodogX
-     - Now skipping elements that are not visible
-     - Copy Links To Clipboard by Holding down ctrl while releasing the selection
-     - Count of selected elements appears
  - "Greatest of Type" is now used when multiple types are lassoed (Links vs Buttons, etc)
  - Can now lasso buttons which causes them to be clicked
  - Can now lasso checkboxes (checks all or un-checks all)
@@ -21,6 +17,12 @@ v3.1.0 - Not Yet Released
  - New tabs will be opened in document element order
  - The first tab by document order opened will also become active
  - Added website and new welcome page with introduction on how to use SnapLinks v3
+ - Contributions from AstrodogX
+     - Now skipping elements that are not visible
+     - Copy Links To Clipboard by Holding down ctrl while releasing the selection
+     - Count of selected elements appears
+ - Contributions from Phyxion
+     - Tireless testing on a wide variety of websites, **thank you!**
 
 v3.0.0b2
 ========
