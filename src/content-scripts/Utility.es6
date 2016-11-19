@@ -114,3 +114,19 @@ function AddModsToEvent(e) {
 	};
 	return e;
 }
+
+/**
+ * Returns the client dimensions, adjusting for various situations
+ *
+ * @returns {[{int},{int}]}
+ */
+function GetClientDims() {
+	let clientHeight = docElem.clientHeight,
+		clientWidth  = docElem.clientWidth;
+
+	if(document.documentElement.clientHeight > window.innerHeight) {
+		clientHeight = document.body.clientHeight;
+		clientWidth  = document.body.clientWidth;
+	}
+	return [ clientWidth, clientHeight ];
+}

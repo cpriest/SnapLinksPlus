@@ -147,13 +147,7 @@ class EventHandler {
 			pub(DocSizeChanged, this.docSize);
 		}
 
-		let clientHeight = docElem.clientHeight,
-			clientWidth = docElem.clientWidth;
-
-		if(document.documentElement.clientHeight > window.innerHeight) {
-			clientHeight = document.body.clientHeight;
-			clientWidth = document.body.clientWidth;
-		}
+		let [ clientWidth, clientHeight ] = GetClientDims();
 
 		if(e) {
 			this.IntervalScrollOffset = {
