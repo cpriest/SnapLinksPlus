@@ -1,52 +1,53 @@
 {
-	"manifest_version":       2,
-	"name":                   "Snap Links",
-	"short_name":             "Snap Links",
-	"version":                "3.1.0.4",
-	"description":            "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
-	"homepage_url":           "https://github.com/cpriest/SnapLinksPlus",
-
-	"minimum_chrome_version":	"51",
-
-	"permissions": [
-		"storage"
-	],
-
-	"icons":                  {
-		"48":  "res/icon48.png",
-		"128": "res/icon128.png"
-	},
-
-	"applications":           {
-		"gecko": {
-			"id":                 "snaplinks@snaplinks.mozdev.org",
-			"strict_min_version": "45.0"
-		}
-	},
-	"background":             {
-		"scripts": [
-			"src/globals.es6",
-			"src/background-scripts/background.es6"
-		]
-	},
-	"content_scripts":        [
-		{
-			"matches": [
-				"<all_urls>"
-			],
-			"js":      [
-				"src/lib/csp.min.js",
-				"src/lib/transducers.js",
-				"src/globals.es6",
-				"src/CSP.es6",
-				"src/content-scripts/Utility.es6",
-				"src/content-scripts/SelectionRect.es6",
-				"src/content-scripts/ElementIndexer.es6",
-				"src/content-scripts/SvgOverlay.es6",
-				"src/content-scripts/CategorizedCollection.es6",
-				"src/content-scripts/ActionMgr.es6",
-				"src/content-scripts/SnapLinks.es6"
-			]
-		}
-	]
+    "applications": {
+        "gecko": {
+            "id": "snaplinks@snaplinks.mozdev.org",
+            "strict_min_version": "45.0"
+        }
+    },
+    "background": {
+        "scripts": [
+            "src/lib/Configs.js",
+            "src/globals.es6",
+            "src/background-scripts/background.es6"
+        ]
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "src/lib/Configs.js",
+                "src/lib/csp.min.js",
+                "src/lib/transducers.js",
+                "src/globals.es6",
+                "src/CSP.es6",
+                "src/content-scripts/Utility.es6",
+                "src/content-scripts/SelectionRect.es6",
+                "src/content-scripts/ElementIndexer.es6",
+                "src/content-scripts/SvgOverlay.es6",
+                "src/content-scripts/CategorizedCollection.es6",
+                "src/content-scripts/ActionMgr.es6",
+                "src/content-scripts/SnapLinks.es6"
+            ]
+        }
+    ],
+    "description": "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
+    "homepage_url": "https://github.com/cpriest/SnapLinksPlus",
+    "icons": {
+        "48": "res/icon48.png",
+        "128": "res/icon128.png"
+    },
+    "manifest_version": 2,
+    "minimum_chrome_version": "51",
+    "name": "Snap Links",
+    "options_ui": {
+        "page": "src/html/options.html"
+    },
+    "permissions": [
+        "storage"
+    ],
+    "short_name": "Snap Links",
+    "version": "3.1.0.4"
 }

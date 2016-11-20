@@ -27,8 +27,8 @@ class EventHandler {
 	/**
 	 * @constructor
 	 */
-	constructor() {
-		this._onMouseUp     = this.onMouseUp.bind(this);
+    constructor() {
+        this._onMouseUp     = this.onMouseUp.bind(this);
 		this._onMouseMove   = this.onMouseMove.bind(this);
 		this._onContextMenu = this.onContextMenu.bind(this);
 		this._onKeyDown     = this.onKeyDown.bind(this);

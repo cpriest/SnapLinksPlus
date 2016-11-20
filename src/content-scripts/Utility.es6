@@ -26,7 +26,7 @@
 function CreateElement(html) {
 	let DocFrag = document.createDocumentFragment();
 	let result;
-
+    
 	DocFrag.appendChild(document.createElement('div'));
 	DocFrag.firstChild.innerHTML = html;
 	result                       = DocFrag.firstElementChild.firstElementChild;
