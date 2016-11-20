@@ -1,46 +1,44 @@
-# Before Next Release
+# Next Minor Release (3.1.1)
  - **Bugs**
-    - Since pub/sub:
-        - ~~document.execCommand(‘cut’/‘copy’) was denied because it was not called from inside a short running user-generated event handler.ActionMgr.es6:40~~
-- **Features**
-    - ~~Add size-of-text minification (select greatest size font links unless shift is held)~~
-    - ~~Open links next to current tab~~
-    - ~~New Install Welcome Page~~
-- **Test, issue?**
-    - ~~Clicking on js links from test document don't seem to work (possibly dev-mode related)~~
-    - ~~[Issue #96](https://github.com/cpriest/SnapLinksPlus/issues/96) - 3.0.2 Doesn't work well with imgur.com's comments section~~
+    - Escape Key on https://thirteenag.github.io/wfp is not being stopped
+
+ - **Features**
+    - Add &lt;button> as clickable type
+    - ~~Proper culling of obscured elements (hidden behind overlays...)~~
+        - ~~Ensure performance is good~~
+    - Signing of beta versions for wider testing
+
+ - **Test, issue?**
+    - How does pub/sub impact performance?
+    - How does SnapLinks affect page load speed performance
+
+# Next Major Release (3.2.0)
+ - **Bugs**
+    -
+
+ - **Features**
+    - Options GUI (minimal)
+
+ - **Test, issue?**
     -
 
 
-
 # Known Bugs
- - ~~Blank HREF's should be ignored~~
- - ~~Document size changes are not detected (on detection, need to clear DocElemRects)~~
- - ~~The document size is being changed during selection by the selection process~~
 
 
 # Plans
- - ~~Add selection of and .click()ing of highlighted buttons~~
- - ~~Add "greatest of types" activation.  5 buttons & 1 link selected, only buttons will be .click()ed~~
- - ~~Add checking/un-checking of checkboxes~~
- - ~~Add LABEL support (checkboxes, radio button, etc)~~
- - ~~Add selection of "highest" radio button~~
- - ~~Switch to using pub/sub model and de-couple the various parts~~
  - Create Updated Plugin Page
  - Setup site using Jekyll
  - Add Options GUI
- - Better handling of label placement (separate from sizing rect, above <SVG> Element)
+ - Better handling of label placement (separate from sizing rect, above &lt;SVG> Element)
  - Highlight "greatest of types" elements differently than elements which do not meet the greatest of.
     eg: 3 Buttons and 1 Anchor lassoed, the 3 Buttons would be highlighted in green vs the Anchor being highlighted in grey
- - ~~Move Inline Styles to Document \<STYLE> block~~
 
 
-# Todo
+# Todo / Ideas
  - Mutation Observer (clear DocElemRects, re-index if during drag)
  - Resolve all inspection errors
- - ~~JsDoc comments for everything~~
  - Externalize CSS Styles
- - ~~Separate all classes into their own files~~
  - Compiler/minimizer for production build?
  - docElem is a sandboxed global, replace document.documentElement references with docElem
  - Update phing (if js-csp/transducers.js work out)
@@ -53,10 +51,7 @@
 - Refactor ElemDocRects / RectMapper to ElemCache/ElemCacher (to reflect new font-size cache functionality)
 
 # Test
- - ~~Test using the new CSS3 all property to reset styles for our elements, such as setting all: initial on
-   our SVG / SelectionRect DIV elements (may need to be contained by an element with style="all: inherit"
-   This would replace the fix that was put in place for one website that had an overt transform selector set.~~
- - Javascript based .click() resulting in a new tab/popup are blocked, there may be a way to use channels to loop on a yield csp.timeout() from within the onMouseDown() waiting until the rest of the selection has completed and finally call ActionMgr.ActUpon (still within the onMouseDown 'event')??  Something to play with.
+ -
 
 # Deferred / Possibly Won't Implement
  - Add Elements that have cursor: pointer (and have a click handler?)

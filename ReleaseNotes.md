@@ -1,5 +1,11 @@
+v3.1.1.X - Not Yet Released
+===========================================
+ - Proper culling of obscured elements (hidden behind overlays...)
+    - Ensure performance is good
+
+
 v3.1.0.4 - Released Nov 15th, 2016
-=========================
+===================================
  - Pressing escape will now cancel an already started drag operation
  - Fixed #97 - Context Menu no longer worked after dragging once.
  - Fixed #91.1 (Related) - Page resize/zooming now properly re-adjusts rects

@@ -45,9 +45,18 @@ const data = {
 		}
 	},
 	HighlightStyles: {
-		ActOnElements: 'fill: rgba(0,255,0,.05); stroke: rgba(0,255,0,1); stroke-width: .5px;',
+		ActOnElements: 'fill: rgba(0,255,0,.10); stroke: rgba(0,255,0,1); stroke-width: 1px;',
 	},
 
+	Debug: {
+		Measure: {
+			IndexingSpeed:	false,
+			SearchSpeed:	false,
+		},
+		Log: {
+			OutOfBoundElements: false,		// Elements who's top/bottom are greater than the documents height are skipped during indexing
+		}
+	},
 	Dev: {							// #DevCode
 		Log : {						// #DevCode
 			ActionMessages: true,	// #DevCode
