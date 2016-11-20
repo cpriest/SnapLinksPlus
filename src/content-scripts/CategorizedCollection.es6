@@ -59,7 +59,7 @@ class CategorizedCollection {
 	 * @returns {Map}
 	 */
 	get Counts() {
-		let Counts = new Map();
+		let Counts = new Map();        
 		Counts.set(CT_LINKS, this.Links.length);
 		Counts.set(CT_CLICKABLE, this.Clickable.length);
 		Counts.set(CT_CHECKBOXES, this.Checkboxes.length);

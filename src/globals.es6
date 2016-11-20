@@ -50,13 +50,20 @@ const data = {
 
 	Dev: {							// #DevCode
 		Log : {						// #DevCode
-			ActionMessages: true,	// #DevCode
+			ActionMessages: false,	// #DevCode
 		},							// #DevCode
 		Skip: {						// #DevCode
-			AllActions: true,		// #DevCode
+			AllActions: false,		// #DevCode
 		},							// #DevCode
 	},								// #DevCode
 };
+
+// Configurations
+var configs = new Configs({
+    switchFocusToNewTab: true,
+    showNumberOfLinks: true,
+});
+
 
 
 /** Pub-Sub Events */
