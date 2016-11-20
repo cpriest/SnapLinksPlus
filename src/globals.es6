@@ -67,6 +67,11 @@ const data = {
 	},								// #DevCode
 };
 
+// Configurations
+let configs = new Configs({
+	switchFocusToNewTab: true,
+	showNumberOfLinks: true,
+});
 
 /** Pub-Sub Events */
 
