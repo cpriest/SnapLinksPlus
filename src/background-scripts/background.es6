@@ -30,7 +30,8 @@ function onMessage(msg) {
 			chrome.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			chrome.tabs.query({
+			configs.$loaded.then(function() {
+				chrome.tabs.query({
 					active       : true,
 					currentWindow: true
 				}, (tabs) => {
@@ -41,13 +42,13 @@ function onMessage(msg) {
 						for(let url of msg.tUrls.reverse()) {
 							chrome.tabs.create({
 								url   : url,
-								active: (--TabsLeft) == 0,	// Activate the last tab to be opened
+								active: configs.switchFocusToNewTab ? (--TabsLeft) == 0 : false,	// Activate the last tab to be opened
 								index: tabs[0].index+1,
 							});
 						}
 					}
-				}
-			);
+				});
+            });
 			break;
 	}
 }
