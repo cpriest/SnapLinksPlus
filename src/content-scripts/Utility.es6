@@ -69,6 +69,7 @@ class RateReporter {
 		this.started = Date.now();
 	}
 
+
 	/**
 	 * Report the results of the timing
 	 *
@@ -118,7 +119,7 @@ function AddModsToEvent(e) {
 /**
  * Returns the client dimensions, adjusting for various situations
  *
- * @returns {[{int},{int}]}
+ * @returns {[number,number]}
  */
 function GetClientDims() {
 	let clientHeight = docElem.clientHeight,

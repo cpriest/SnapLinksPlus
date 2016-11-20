@@ -26,14 +26,14 @@ const CT_LINKS        = 'Links',
  *
  * @property {string}                GreatestType    The CT_* constant representing the greatest number of elements among the categories
  *
- * @property {Element[]}            Links            The A elements in the collection
- * @property {HTMLInputElement[]}    Buttons            The INPUT elements in the collection that are buttons
- * @property {HTMLInputElement[]}   Checkboxes        The INPUT elements in the collection that are checkboxes
+ * @property {Element[]}	         Links           The A elements in the collection
+ * @property {HTMLInputElement[]}    Buttons         The INPUT elements in the collection that are buttons
+ * @property {HTMLInputElement[]}    Checkboxes      The INPUT elements in the collection that are checkboxes
  * @property {HTMLInputElement[]}    RadioButtons    The INPUT elements in the collection that are radio buttons
  */
 class CategorizedCollection {
 	/**
-	 * @param {Element[]} tElems    The elements to categorize
+	 * @param {Element[]|Set} tElems    The elements to categorize
 	 */
 	constructor(tElems = []) {
 		this.CategorizeMatches(tElems);
