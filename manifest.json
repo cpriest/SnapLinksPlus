@@ -25,7 +25,7 @@
 	},
 	"background":             {
 		"scripts": [
-			"src/lib/Configs.es6",
+			"src/lib/Configs.js",
 			"src/globals.es6",
 			"src/background-scripts/background.es6"
 		]
