@@ -50,5 +50,9 @@
 				"src/content-scripts/SnapLinks.es6"
 			]
 		}
-	]
+	],
+	"options_ui":             {
+		"page":         "src/html/options.html",
+		"chrome_style": true
+	}
 }
