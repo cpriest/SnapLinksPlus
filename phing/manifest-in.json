@@ -27,6 +27,7 @@
 	},																					// @Mozilla
 	"background":             {
 		"scripts": [
+			"src/lib/Configs.js",
 			"src/globals.es6",
 			"src/background-scripts/background.es6"
 		]
@@ -37,6 +38,7 @@
 				"<all_urls>"
 			],
 			"js":      [
+				"src/lib/Configs.js",
 				"src/lib/csp.min.js",
 				"src/lib/transducers.js",
 				"src/globals.es6",
@@ -50,5 +52,9 @@
 				"src/content-scripts/SnapLinks.es6"
 			]
 		}
-	]
+	],
+	"options_ui": {
+		"page":         "src/html/options.html",
+		"chrome_style": true
+	}
 }
