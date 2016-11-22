@@ -284,10 +284,10 @@ class SelectionRect {
 		if(InvertedHorizontally && InvertedVertically)
 			style.left = (data.selection.label.paddingFromCursor + 16) + 'px';
 
-		if (!configs.showNumberOfLinks) {
-			style.display = 'none';
-		}
-		
+		style.display = Prefs.ShowNumberOfLinks
+			? ''
+			: 'none';
+
 		return this;
 	}
 

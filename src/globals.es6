@@ -57,21 +57,23 @@ const data = {
 			OutOfBoundElements: false,		// Elements who's top/bottom are greater than the documents height are skipped during indexing
 		}
 	},
-	Dev: {							// #DevCode
-		Log : {						// #DevCode
-			ActionMessages: true,	// #DevCode
-		},							// #DevCode
-		Skip: {						// #DevCode
-			AllActions: true,		// #DevCode
-		},							// #DevCode
-	},								// #DevCode
+	Dev: {									// #DevCode
+		Log : {								// #DevCode
+			ActionMessages: true,			// #DevCode
+		},									// #DevCode
+		Skip: {								// #DevCode
+			AllActions: 	true,			// #DevCode
+		},									// #DevCode
+	},										// #DevCode
+};
+
+const DefaultPrefs = {
+	SwitchFocusToNewTab	: true,
+	ShowNumberOfLinks  	: true,
 };
 
 // Configurations
-let configs = new Configs({
-	switchFocusToNewTab: true,
-	showNumberOfLinks: true,
-});
+let Prefs = new Configs(DefaultPrefs);
 
 /** Pub-Sub Events */
 

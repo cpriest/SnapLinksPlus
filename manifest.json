@@ -37,7 +37,7 @@
 			],
 			"js":      [
 				"src/lib/Configs.js",
-				"src/lib/csp.min.js",				
+				"src/lib/csp.min.js",
 				"src/lib/transducers.js",
 				"src/globals.es6",
 				"src/CSP.es6",

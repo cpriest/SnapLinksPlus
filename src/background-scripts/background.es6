@@ -30,7 +30,7 @@ function onMessage(msg) {
 			chrome.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			configs.$loaded.then(function() {
+			Prefs.$loaded.then(() => {
 				chrome.tabs.query({
 					active       : true,
 					currentWindow: true
@@ -42,7 +42,7 @@ function onMessage(msg) {
 						for(let url of msg.tUrls.reverse()) {
 							chrome.tabs.create({
 								url   : url,
-								active: configs.switchFocusToNewTab ? (--TabsLeft) == 0 : false,	// Activate the last tab to be opened
+								active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) == 0 : false,	// Activate the last tab to be opened
 								index: tabs[0].index+1,
 							});
 						}
