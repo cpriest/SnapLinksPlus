@@ -22,7 +22,7 @@
 	"applications":           {															// @Mozilla
 		"gecko": {																		// @Mozilla
 			"id":                 "snaplinks@snaplinks.mozdev.org",						// @Mozilla
-			"strict_min_version": "45.0"												// @Mozilla
+			"strict_min_version": "50.0"												// @Mozilla
 		}																				// @Mozilla
 	},																					// @Mozilla
 	"background":             {
