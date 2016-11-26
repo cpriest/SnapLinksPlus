@@ -73,6 +73,10 @@ function CheckInstallation() {
 			});
 		} else if(item.LastInstalledVersion != manifest.version) {
 			// Update/Upgrade
+			chrome.tabs.create({
+				url   : 'http://cpriest.github.io/SnapLinksPlus/updated.html',
+				active: true,
+			});
 		}
 
 		chrome.storage.local.set({ 'LastInstalledVersion': manifest.version });
@@ -81,4 +85,4 @@ function CheckInstallation() {
 
 setTimeout(() => {
 	CheckInstallation();
-}, 250);
+}, 1000);
