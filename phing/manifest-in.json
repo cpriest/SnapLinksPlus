@@ -2,7 +2,8 @@
 	"manifest_version":       2,
 	"name":                   "Snap Links",
 	"short_name":             "Snap Links",
-	"version":                "${version}",
+	"version":                "${version}",												// @Chrome
+	"version":                "${version_mozilla}",										// @Mozilla
 	"version_name":           "${version_name}",										// @Chrome
 	"description":            "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
 	"homepage_url":           "https://github.com/cpriest/SnapLinksPlus",

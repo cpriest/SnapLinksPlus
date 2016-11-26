@@ -62,12 +62,16 @@
 	<target name="build" depends="prepare">
 
 		<property name="version" value="${version.major}.${version.minor}.${version.patch}.${version.build}"/>
+		<property name="version_mozilla" value="${version.major}.${version.minor}.${version.patch}.${version.build}"/>
 		<if>
 			<equals arg1="${version.type}" arg2="beta"/>
 			<then>
+				<echo msg="Beta Build..."/>
 				<property name="version_name" value="${version.major}.${version.minor}.${version.patch}b${version.build}"/>
+				<property name="version_mozilla" value="${version.major}.${version.minor}.${version.patch}b${version.build}" override="true"/>
 			</then>
 			<else>
+				<echo msg="Release Build..."/>
 				<property name="version_name" value="${version}"/>
 			</else>
 		</if>
