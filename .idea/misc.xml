@@ -8,4 +8,7 @@
     <xml-schema-version>XMLSchema_1_1</xml-schema-version>
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="1.8" project-jdk-type="JavaSDK" />
+  <component name="UnicodeBrowser">
+    <option name="fontName" value="Monoisome" />
+  </component>
 </project>

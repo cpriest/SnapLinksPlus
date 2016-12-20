@@ -9,6 +9,8 @@
           <target value="build" />
           <target value="build-increment" />
           <target value="create-dist" />
+          <target value="encrypt-file" />
+          <target value="secure-init" />
         </targetsToHide>
       </buildFile>
     </buildFilePaths>
