@@ -111,7 +111,6 @@
 
 	<!--	EXECUTION TARGETS -->
 
-
 	<target name="build-again" depends="init">
 		<phingcall target="create-dist"/>
 	</target>
@@ -126,6 +125,39 @@
 		<phingcall target="build-increment"/>
 	</target>
 
+	<!--	ENCRYPT/DECRYPT FILES	-->
+
+	<!-- http://stackoverflow.com/questions/7143514/how-to-encrypt-a-large-file-in-openssl-using-public-key -->
+	<!--
+		Encrypt Large File
+			1. Generate Random Password For Symmetric Encryption
+			2. Encrypt file with password file from #1
+			3. Encrypt password file with public key
+			4. Delete unencrypted password file
+
+		Decrypt Large File
+			1. Decrypt password file with private key (password protected)
+			2. Decrypt file with decrypted password file
+			3. Delete decrypted password file
+	-->
+
+	<target name="secure-init">
+		<property name="pubkey" value="misc/keys/public.pem" />
+		<property name="privkey" value="misc/keys/private.pem" />
+	</target>
+
+	<target name="encrypt-files" depends="secure-init">
+		<phingcall target="encrypt-file">
+			<property name="filename" value="secure.properties"/>
+		</phingcall>
+		<phingcall target="encrypt-file">
+			<property name="filename" value="ChromeExtension.pem"/>
+		</phingcall>
+	</target>
+
+	<target name="encrypt-file">
+		<exec command="openssl rsautl -encrypt -inkey ${pubkey} -pubin -in misc/${filename} -out phing/${filename}.dat" passthru="true" checkreturn="true" />
+	</target>
 
 	<!--	PACKAGE				-->
 
