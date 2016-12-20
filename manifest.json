@@ -2,7 +2,7 @@
 	"manifest_version":       2,
 	"name":                   "Snap Links",
 	"short_name":             "Snap Links",
-	"version":                "3.1.1.2",
+	"version":                "3.1.1.3",
 	"description":            "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
 	"homepage_url":           "https://github.com/cpriest/SnapLinksPlus",
 

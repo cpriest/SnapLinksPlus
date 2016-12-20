@@ -90,7 +90,6 @@
 			</table>
 			Fixed by <a href="https://github.com/cpriest/SnapLinksPlus/commit/ece03f88a34013322370ce063681803e1fa62c3a">ece03f88a34013322370ce063681803e1fa62c3a</a>
 		</div>
-		<h1
 
 		<h1><a href="http://code.google.com/p/snaplinksplus/issues/detail?id=49">Issue 49</a> - Iframe w/ Transitional DOCTYPE, try to select test40-test50</h1>
 		<div>
@@ -109,6 +108,23 @@
 			This happens because our container's offsetParent is the BODY tag and if it has margins.<br>
 			<b>This test document also has margin and padding set to ensure the fix works correctly.</b><br>
 			<a target="_blank" href="https://tweakers.net/">https://tweakers.net/</a><br>
+		</div>
+
+		<h1><a target="blank" href="https://github.com/cpriest/SnapLinksPlus/pull/66">Github Pull #66</a>Test case - Inappropriate trigger for object element</h1>
+		<div>
+			<ol>
+				<li>
+					<embed width="100" height="100" src="http://www.w3schools.com/html/bookmark.swf"/>
+				</li>
+				<li>
+					<object width="100" height="100" data="http://www.w3schools.com/html/bookmark.swf"></object>
+				</li>
+				<li>
+					<object width="100" height="100" data="http://www.w3schools.com/html/bookmark.swf">
+						<param value="Opaque" name="wmode">
+					</object>
+				</li>
+			</ol>
 		</div>
 
 		<h1 class="Open">General Testing Sites</h1>

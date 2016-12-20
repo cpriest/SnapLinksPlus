@@ -86,18 +86,18 @@ class EventHandler {
 				e.stop();
 				return;
 		}
-		if(this.CurrentSelection.IsLargeEnoughToActivate())
-			e.stop();
+//		if(this.CurrentSelection.IsLargeEnoughToActivate())
+//			e.stop();
 	}
 
 	/**
 	 * @param {KeyboardEvent} e
 	 */
 	onKeyUp(e) {
-		e = AddModsToEvent(e);
+//		e = AddModsToEvent(e);
 
-		if(this.CurrentSelection.IsLargeEnoughToActivate())
-			e.stop();
+//		if(this.CurrentSelection.IsLargeEnoughToActivate())
+//			e.stop();
 	}
 
 	/**
