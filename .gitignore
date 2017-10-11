@@ -1,7 +1,7 @@
 /.idea/shelf
 /.idea/workspace.xml
 .idea/SnapLinks3.time
-misc/
+/insecure/
 
 /vendor/
 /composer.lock
