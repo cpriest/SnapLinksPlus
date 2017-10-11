@@ -1,12 +1,12 @@
 {
-  "name": "snaplinks-3",
-  "version": "3.0.1",
-  "description": "",
-  "license": "GPL2",
-  "repository": "https://github.com/cpriest/SnapLinksPlus",
-  "private": true,
-  "preferGlobal": false,
-  "devDependencies": {
-    "js-csp": "*"
-  }
+	"name":            "snaplinks-3",
+	"version":         "3.0.1",
+	"description":     "",
+	"license":         "GPL2",
+	"repository":      "https://github.com/cpriest/SnapLinksPlus",
+	"private":         true,
+	"preferGlobal":    false,
+	"devDependencies": {
+		"js-csp": "*"
+	}
 }
