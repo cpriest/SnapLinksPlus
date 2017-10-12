@@ -1,12 +1,24 @@
 {
-	"name":            "snaplinks-3",
-	"version":         "3.0.1",
-	"description":     "",
-	"license":         "GPL2",
-	"repository":      "https://github.com/cpriest/SnapLinksPlus",
-	"private":         true,
-	"preferGlobal":    false,
+	"name": "snaplinks-3",
+	"version": "3.0.1",
+	"description": "",
+	"license": "GPL2",
+	"repository": "https://github.com/cpriest/SnapLinksPlus",
+	"private": true,
+	"preferGlobal": false,
 	"devDependencies": {
+		"del": "^3.0.0",
+		"gulp": "^3.9.1",
+		"gulp-install": "^1.1.0",
+		"gulp-replace": "^0.6.1",
+		"gulp-shell": "^0.6.3",
+		"gulp-sourcemaps": "^2.6.1",
+		"gulp-util": "^3.0.7",
+		"gulp-zip": "^4.0.0",
 		"js-csp": "*"
-	}
+	},
+	"scripts": {
+		"build": "gulp"
+	},
+	"dependencies": {}
 }

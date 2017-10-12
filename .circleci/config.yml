@@ -33,6 +33,7 @@ jobs:
       - run:
         command: |
           npm install
+          gulp build
 
 #        yarn install
 
