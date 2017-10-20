@@ -2,7 +2,11 @@
 /.idea/workspace.xml
 .idea/SnapLinks3.time
 /insecure/
+/local/
+/build/
 
 /vendor/
 /composer.lock
+/package-lock.json
+/artifacts/
 /node_modules/

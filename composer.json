@@ -44,7 +44,7 @@
 		"require-npm": {
 			"js-csp": "*"
 		},
-		"comments": {
+		"comments":    {
 			"require": {
 				"jlongster/transducers-js": "master",
 				"ubolonton/js-csp":         "master"
@@ -55,9 +55,6 @@
 					"cd vendor\\ubolonton\\js-csp && npm run build"
 				]
 			},
-
-
-
 			"":        {
 				"blah": 0
 			}

@@ -1,12 +1,33 @@
 {
-  "name": "snaplinks-3",
-  "version": "3.0.1",
-  "description": "",
-  "license": "GPL2",
-  "repository": "https://github.com/cpriest/SnapLinksPlus",
-  "private": true,
-  "preferGlobal": false,
-  "devDependencies": {
-    "js-csp": "*"
-  }
+	"name": "SnapLinks3",
+	"FullName": "Snap Links",
+	"version": "3.1.2-b1",
+	"description": "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
+	"author": "Clint Priest",
+	"license": "MIT",
+	"homepage": "https://cpriest.github.com/SnapLinksPlus",
+	"repository": "https://github.com/cpriest/SnapLinksPlus",
+	"private": true,
+	"preferGlobal": false,
+	"devDependencies": {
+		"crx": "^3.2.1",
+		"del": "^3.0.0",
+		"gulp": "^3.9.1",
+		"gulp-hb": "^6.0.2",
+		"gulp-install": "^1.1.0",
+		"gulp-rename": "^1.2.2",
+		"gulp-replace": "^0.6.1",
+		"gulp-shell": "^0.6.3",
+		"gulp-sourcemaps": "^2.6.1",
+		"gulp-util": "^3.0.7",
+		"gulp-zip": "^4.0.0",
+		"js-csp": "*",
+		"merge-stream": "^1.0.1",
+		"web-ext": "^2.2.2"
+	},
+	"scripts": {
+		"build": "gulp",
+		"ff:lint": "gulp ff:lint"
+	},
+	"dependencies": {}
 }
