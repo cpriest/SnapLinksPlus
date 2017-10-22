@@ -1,7 +1,7 @@
 {
 	"name": "SnapLinks3",
 	"FullName": "Snap Links",
-	"version": "3.1.2-b1",
+	"version": "3.1.2b1",
 	"description": "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
 	"author": "Clint Priest",
 	"license": "MIT",
@@ -23,11 +23,11 @@
 		"gulp-zip": "^4.0.0",
 		"js-csp": "*",
 		"merge-stream": "^1.0.1",
+		"run-sequence": "^2.2.0",
 		"web-ext": "^2.2.2"
 	},
 	"scripts": {
-		"build": "gulp",
-		"ff:lint": "gulp ff:lint"
+		"build": "gulp"
 	},
 	"dependencies": {}
 }
