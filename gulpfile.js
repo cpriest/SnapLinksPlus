@@ -41,7 +41,7 @@ const Chrome = {
 	BuildPath     : './build/chrome',
 	BuildData     : {
 		Chrome      : true,
-		quad_version: PackageData.version.replace(/\D+/, '.')
+		quad_version: PackageData.version.replace(/[^\d.]+/g, '.')
 	}
 };
 
