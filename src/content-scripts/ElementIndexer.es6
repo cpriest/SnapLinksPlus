@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Clint Priest
+ * Copyright (c) 2017 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -136,10 +136,10 @@ let ElemDocRects = new (
 				let ComputedStyle = window.getComputedStyle(elem);
 				CachedStyle       = {
 					fontSize  : ComputedStyle.fontSize,
-					fontWeight: ComputedStyle.fontWeight,
-					fontScore : (parseInt(ComputedStyle.fontSize.replace(/[^\d]+/g, '')) * 10) + (parseInt(ComputedStyle.fontWeight) / 100),
+					fontWeight: this.TranslateWeight(ComputedStyle.fontWeight),
 				};
-//				console.log(elem.textContent, CachedStyle.fontSize, CachedStyle.fontWeight, CachedStyle.fontScore);								// #DevCode
+				CachedStyle.fontScore = (parseInt(CachedStyle.fontSize.replace(/\D+/g, '')) * 100) + (CachedStyle.fontWeight / 10);
+				// console.log(elem.textContent, CachedStyle.fontSize, CachedStyle.fontWeight, CachedStyle.fontScore);								// #DevCode
 				this.StyleCache.set(elem, CachedStyle);
 			}
 			return CachedStyle.fontScore;
@@ -149,6 +149,16 @@ let ElemDocRects = new (
 		clear() {
 			this.ElemRects  = new WeakMap();
 			this.StyleCache = new WeakMap();
+		}
+
+		TranslateWeight(fontWeight) {
+			let n;
+
+			if(!isNaN(n = parseInt(fontWeight)))
+				return n;
+			if(fontWeight === 'bold')
+				return 700;
+			return 400;
 		}
 	}
 )();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Clint Priest
+ * Copyright (c) 2017 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -159,8 +159,8 @@ class SelectionRect {
 		document.head.appendChild(
 			CreateElement(`
 				<style>
-					.SnapLinksContainer :not([xyz]) { all: initial; }
-					.SnapLinksContainer .SnapLinksHighlighter { position: absolute; top: 0px; left: 0px; width: 10px; height: 10px; overflow: visible; }
+					.SnapLinksContainer :not([xyz]) {  }
+					.SnapLinksContainer .SnapLinksHighlighter { all: initial; position: absolute; top: 0px; left: 0px; width: 10px; height: 10px; overflow: visible; }
 					.SnapLinksContainer { z-index: 999999; top: 0px; left: 0px; margin: 0px; padding: 0px; position: absolute; height: 0px; width: 0px; }
 					.SnapLinksContainer > .SL_SelectionRect { outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1; }
 					.SL_SelectionRect > .SL_SelectionLabel { position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap; }

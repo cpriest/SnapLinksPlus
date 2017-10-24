@@ -113,6 +113,14 @@ gulp.task('default', ['build'], () => {
 	// gulp.watch('./package.json', watchOpts, ['infra']);
 });
 
+gulp.task('watch', ['build'], (cb) => {
+	let files = SourceFiles.concat(UIFiles, 'src/templates/*.hbs');
+	let watcher = gulp.watch(files, watchOpts, ['build']);
+	watcher.on('change', (e) => {
+		console.log(`${new Date} - ${e.path} changed, rebuilding...`);
+	});
+});
+
 /**
  *        Chrome Building Tasks
  */
