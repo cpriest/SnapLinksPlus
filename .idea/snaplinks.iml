@@ -17,13 +17,15 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/pear/structures_graph" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pear/xml_util" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phing/phing" />
+      <excludePattern pattern="build/*" />
+      <excludePattern pattern="test" />
+      <excludePattern pattern="/*" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Generated files" level="project" />
     <orderEntry type="library" name="geometry-dom-DefinitelyTyped" level="application" />
     <orderEntry type="library" name="chrome-DefinitelyTyped" level="application" />
-    <orderEntry type="library" name="node-DefinitelyTyped" level="application" />
     <orderEntry type="library" name="@types/gulp" level="application" />
     <orderEntry type="library" name="@types/gulp-util" level="application" />
     <orderEntry type="library" name="@types/del" level="application" />

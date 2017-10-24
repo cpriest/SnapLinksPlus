@@ -298,7 +298,7 @@ let ElemIndex = new class ElementIndexer {
 					if(!sel.Intersects(r))
 						continue;
 
-//					if(this.IsVisible(elem) === false)		// This is really slow!  The below sect	ion handles most
+//					if(this.IsVisible(elem) === false)		// This is really slow!  The below section handles most
 //						break;								// of this much faster as well as other situations
 
 					// Check to see if the point in the middle of the rect is the element or a descendent, if not then
@@ -311,7 +311,7 @@ let ElemIndex = new class ElementIndexer {
 						if (left > 0 && left < clientWidth && top > 0 && top < clientHeight) {
 							let elPoint = document.elementFromPoint(left, top);
 
-							if(elPoint != elem && !elem.contains(elPoint)) {
+							if(elPoint != elem && !elem.contains(elPoint) && elPoint.tagName !== 'LABEL') {
 								elemNotes.Obscured = true;
 								this.BoundaryIndex[j].delete(elem);
 

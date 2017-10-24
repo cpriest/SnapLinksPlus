@@ -177,7 +177,7 @@ class SelectionRect {
 		);
 		this.elRect = this.elContainer.firstElementChild;
 
-		document.body.appendChild(this.elContainer, document.body.firstElementChild);
+		document.body.appendChild(this.elContainer);
 
 		/* This adjusts the main containing element to position it at 0,0 no matter how it may be
 			offset by parent CSS.  This works better than body.marginLeft because that only
