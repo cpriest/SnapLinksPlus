@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Clint Priest
+ * Copyright (c) 2017 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -40,6 +40,7 @@ const data = {
 			minX: 5,
 			minY: 5,
 		},
+
 		label   : {
 			paddingFromCursor: 2,
 		}
@@ -57,14 +58,15 @@ const data = {
 			OutOfBoundElements: false,		// Elements who's top/bottom are greater than the documents height are skipped during indexing
 		}
 	},
-	Dev: {									// #DevCode
-		Log : {								// #DevCode
-			ActionMessages: true,			// #DevCode
-		},									// #DevCode
-		Skip: {								// #DevCode
-			AllActions: 	true,			// #DevCode
-		},									// #DevCode
-	},										// #DevCode
+	Dev: {
+		Enabled:			false,
+		Log : {
+			ActionMessages: true,
+		},
+		Skip: {
+			AllActions: 	true,
+		},
+	},
 };
 
 const DefaultPrefs = {

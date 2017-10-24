@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Clint Priest
+ * Copyright (c) 2017 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -46,12 +46,14 @@ class EventHandler {
 
 		if(e.buttons == RMB) {
 			switch(e.mods) {
-				case CTRL + ALT:												// #DevCode
-					this.StopNextContextMenu();									// #DevCode
-					chrome.runtime.sendMessage({ Action: RELOAD_EXTENSION });	// #DevCode
-					e.preventDefault(); 										// #DevCode
-					e.stopPropagation();										// #DevCode
-					break;														// #DevCode
+				case CTRL + ALT:
+					if(data.Dev.Enabled) {
+						this.StopNextContextMenu();
+						chrome.runtime.sendMessage({ Action: RELOAD_EXTENSION });
+						e.preventDefault();
+						e.stopPropagation();
+					}
+					break;
 
 				case NONE:
 					this.BeginDrag(e);

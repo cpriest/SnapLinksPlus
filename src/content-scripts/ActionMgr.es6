@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Clint Priest
+ * Copyright (c) 2017 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -45,12 +45,12 @@ let ActionHandler = new (
 		 * @param {MouseEvent}             e                   The final event that completed activated the action
 		 */
 		ActUpon(SelectedElements, e) {
-			if(data.Dev) {																				// #DevCode
-				if(data.Dev.Log.ActionMessages == true)													// #DevCode
-					console.log('ActUpon(%s) - %o', SelectedElements.GreatestType, SelectedElements);	// #DevCode
-				if(data.Dev.Skip.AllActions == true)													// #DevCode
-					return;																				// #DevCode
-			}																							// #DevCode
+			if(data.Dev.Enabled) {
+				if(data.Dev.Log.ActionMessages == true)
+					console.log('ActUpon(%s) - %o', SelectedElements.GreatestType, SelectedElements);
+				if(data.Dev.Skip.AllActions == true)
+					return;
+			}
 
 			switch(SelectedElements.GreatestType) {
 				case CT_LINKS:
