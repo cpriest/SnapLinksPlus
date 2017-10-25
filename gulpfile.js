@@ -59,7 +59,10 @@ function npx(cmd, options = execDefaultOpts) {
 	return cp.spawnSync('npx.cmd', ['-c', cmd], options);
 }
 
-const SourceFiles = [
+const TaskGlobs = new Map(),
+		SpecialGlobs = new Map();
+
+TaskGlobs.set('src', [
 	'src/**/*.es6',
 	'src/**/*.js',
 
@@ -68,17 +71,23 @@ const SourceFiles = [
 	'!**/lib/lodash*',
 	'!**/*-compiled*',
 	'!**/*Playground*',
-];
+]);
 
-const UIFiles = [
+TaskGlobs.set('lib', [
+	'node_modules/webextension-polyfill/dist/browser-polyfill.min.js',
+]);
+TaskGlobs.set('ui', [
 	'src/**/*.htm*',
-];
-
-const ResourceFiles = [
+]);
+TaskGlobs.set('res', [
 	'res/**',
 
 	'!res/Screenshot*'
-];
+]);
+
+SpecialGlobs.set('manifest', [
+	'src/templates/*.hbs'
+]);
 
 const watchOpts = {
 	debounceDelay: 2000
@@ -91,19 +100,26 @@ const watchOpts = {
 gulp.task('clean', () => del(['./build/tmp']));
 
 gulp.task('src', ['clean'], () =>
-	merge(
-		gulp.src(SourceFiles)
-			.pipe(gulp.dest('./build/tmp/src')),
-		gulp.src(UIFiles)
-			.pipe(gulp.dest('./build/tmp/src'))
-	)
+	gulp.src(TaskGlobs.get('src'))
+		.pipe(gulp.dest('./build/tmp/src'))
+);
+
+gulp.task('ui', ['clean'], () =>
+	gulp.src(TaskGlobs.get('ui'))
+		.pipe(gulp.dest('./build/tmp/src'))
 );
 
 gulp.task('res', ['clean'], () =>
-	gulp.src(ResourceFiles)
+	gulp.src(TaskGlobs.get('res'))
 		.pipe(gulp.dest('./build/tmp/res'))
 );
 
+gulp.task('lib', ['clean'], () =>
+	gulp.src(TaskGlobs.get('lib'))
+		.pipe(gulp.dest('./build/tmp/src/lib'))
+);
+
+gulp.task('build:tmp', Array.from(TaskGlobs.keys()));
 
 gulp.task('build', ['chrome', 'ff']);
 
@@ -114,7 +130,7 @@ gulp.task('default', ['build'], () => {
 });
 
 gulp.task('watch', ['build'], (cb) => {
-	let files = SourceFiles.concat(UIFiles, 'src/templates/*.hbs');
+	let files = [].concat(...TaskGlobs.values(), ...SpecialGlobs.values());
 	let watcher = gulp.watch(files, watchOpts, ['build']);
 	watcher.on('change', (e) => {
 		console.log(`${new Date} - ${e.path} changed, rebuilding...`);
@@ -124,7 +140,7 @@ gulp.task('watch', ['build'], (cb) => {
 /**
  *        Chrome Building Tasks
  */
-gulp.task('chrome', ['res', 'src'], (cb) =>
+gulp.task('chrome', ['build:tmp'], (cb) =>
 	sequence(
 		'chrome:clean',
 		'chrome:copy-tmp',
@@ -166,7 +182,7 @@ gulp.task('chrome:package', ['chrome'], () => {
  *        Firefox Building Tasks
  */
 
-gulp.task('ff', ['res', 'src'], (cb) =>
+gulp.task('ff', ['build:tmp'], (cb) =>
 	sequence(
 		'ff:clean',
 		'ff:copy-tmp',

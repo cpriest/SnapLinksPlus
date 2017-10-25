@@ -12,6 +12,9 @@
     - How does pub/sub impact performance?
     - How does SnapLinks affect page load speed performance
 
+ -  **Todo**
+
+
 # Next Major Release (3.2.0)
  - **Bugs**
     -

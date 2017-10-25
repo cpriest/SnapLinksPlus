@@ -49,7 +49,7 @@ class EventHandler {
 				case CTRL + ALT:
 					if(data.Dev.Enabled) {
 						this.StopNextContextMenu();
-						chrome.runtime.sendMessage({ Action: RELOAD_EXTENSION });
+						browser.runtime.sendMessage({ Action: RELOAD_EXTENSION });
 						e.preventDefault();
 						e.stopPropagation();
 					}

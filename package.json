@@ -24,7 +24,8 @@
 		"js-csp": "*",
 		"merge-stream": "^1.0.1",
 		"run-sequence": "^2.2.0",
-		"web-ext": "^2.2.2"
+		"web-ext": "^2.2.2",
+		"webextension-polyfill": "^0.2.1"
 	},
 	"scripts": {
 		"build": "gulp"

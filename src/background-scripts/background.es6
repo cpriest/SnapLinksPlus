@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Clint Priest
+ * Copyright (c) 2017 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -22,67 +22,72 @@
  * which we read from the message.
  *
  * @param msg object
+ * @param sender MessageSender
+ * @param respond function
  */
-function onMessage(msg) {
+function onMessage(msg, sender, respond) {
 	switch(msg.Action) {
 		case RELOAD_EXTENSION:
-			chrome.runtime.onMessage.removeListener(onMessage);
-			chrome.runtime.reload();
+			browser.runtime.onMessage.removeListener(onMessage);
+			browser.tabs.reload();
+			browser.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			Prefs.$loaded.then(() => {
-				chrome.tabs.query({
+			Prefs.$loaded.then(async () => {
+				let tabs = await browser.tabs.query({
 					active       : true,
 					currentWindow: true
-				}, (tabs) => {
-					if(tabs.length) {
-						let TabsLeft = msg.tUrls.length;
-
-						// Reverse the url order so that we are opening in the correct order
-						for(let url of msg.tUrls.reverse()) {
-							chrome.tabs.create({
-								url   : url,
-								active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) == 0 : false,	// Activate the last tab to be opened
-								index: tabs[0].index+1,
-							});
-						}
-					}
 				});
-            });
+				if(!tabs.length)
+					return;
+				let TabsLeft = msg.tUrls.length;
+
+				// Reverse the url order so that we are opening in the correct order
+				for(let url of msg.tUrls.reverse()) {
+					browser.tabs.create({
+						url   : url,
+						active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
+						index : tabs[0].index + 1,
+					});
+				}
+			});
 			break;
 	}
 }
-chrome.runtime.onMessage.addListener(onMessage);
+
+browser.runtime.onMessage.addListener(onMessage);
 
 
 /**
- * Check storage.LastInstalledVersion to see if we're newly	installed or a new version or what
+ * Check storage.LastInstalledVersion to see if we're newly    installed or a new version or what
  */
-function CheckInstallation() {
-	chrome.storage.local.get('LastInstalledVersion', (item) => {
-		if(chrome.runtime.lastError)
-			return console.error('Error while getting LastInstalledVersion: ', chrome.runtime.lastError);
+async function CheckInstallation() {
+	try {
+		let item = await browser.storage.local.get('LastInstalledVersion');
 
-		let manifest = chrome.runtime.getManifest();
+		let manifest = browser.runtime.getManifest();
 
 		if(!item || !item.LastInstalledVersion) {
 			// New installation
-			chrome.tabs.create({
-				url:	'http://cpriest.github.io/SnapLinksPlus/welcome.html',
+			browser.tabs.create({
+				url   : 'http://cpriest.github.io/SnapLinksPlus/welcome.html',
 				active: true,
 			});
 		} else if(item.LastInstalledVersion != manifest.version) {
 			// Update/Upgrade
-			chrome.tabs.create({
+			browser.tabs.create({
 				url   : 'http://cpriest.github.io/SnapLinksPlus/updated.html',
 				active: true,
 			});
 		}
 
-		chrome.storage.local.set({ 'LastInstalledVersion': manifest.version });
-	});
+		browser.storage.local.set({ 'LastInstalledVersion': manifest.version });
+	} catch(e) {
+		console.error('Error while getting LastInstalledVersion: ', e);
+	}
 }
 
 setTimeout(() => {
+	// noinspection JSIgnoredPromiseFromCall
 	CheckInstallation();
 }, 1000);
