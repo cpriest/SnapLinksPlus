@@ -212,9 +212,9 @@ let ElemIndex = new class ElementIndexer {
 //		console.log('Buckets: %d, scrollY: %d, docHeight: %d', Buckets, scrollY, docHeight);			// #DevCode
 //		console.log(this.BoundaryIndex);																// #DevCode
 
-		let rr;																							// #DebugCode
-		if(data.Debug.Measure.IndexingSpeed)															// #DebugCode
-			rr = new RateReporter('Calculated ${Count} Elements in ${Elapsed} (${PerSecond})');			// #DebugCode
+		let rr;
+		if(data.Debug.Measure.IndexingSpeed)
+			rr = new RateReporter('Calculated ${Count} Elements in ${Elapsed} (${PerSecond})');
 
 		for(let elem of this.Elements) {
 
@@ -229,8 +229,8 @@ let ElemIndex = new class ElementIndexer {
 
 			if(!this.BoundaryIndex[topIdx] || !this.BoundaryIndex[botIdx]) {
 				// Elements top or bottom is out of bounds, skip it
-				if(data.Debug.Log.OutOfBoundElements)																											// #DebugCode
-					console.log('oob: %o, br.t: %d, br.b: %d, scrollY: %d, docHeight: %d', elem, br.top, br.bottom, scrollY, docHeight, topIdx, botIdx);		// #DebugCode
+				if(data.Debug.Log.OutOfBoundElements)
+					console.log('oob: %o, br.t: %d, br.b: %d, scrollY: %d, docHeight: %d', elem, br.top, br.bottom, scrollY, docHeight, topIdx, botIdx);
 				continue;
 			}
 
@@ -238,8 +238,8 @@ let ElemIndex = new class ElementIndexer {
 			if(topIdx != botIdx)
 				this.BoundaryIndex[botIdx].add(elem);
 		}
-		if(data.Debug.Measure.IndexingSpeed)
-			rr.report(this.Elements.length);															// #DebugCode
+		if(rr)
+			rr.report(this.Elements.length);
 	}
 
 	/**
@@ -264,9 +264,9 @@ let ElemIndex = new class ElementIndexer {
 	 * @param {Rect} sel    The rect in document coordinates to search
 	 */
 	Search(sel) {
-		let rr;																						// #DebugCode
-		if(data.Debug.Measure.SearchSpeed)															// #DebugCode
-			rr = new RateReporter('Found ${Count} Elements in ${Elapsed} (${PerSecond})');			// #DebugCode
+		let rr;
+		if(data.Debug.Measure.SearchSpeed)
+			rr = new RateReporter('Found ${Count} Elements in ${Elapsed} (${PerSecond})');
 
 		let docHeight   = document.documentElement.scrollHeight,
 			Buckets     = data.IndexBuckets,
@@ -333,8 +333,8 @@ let ElemIndex = new class ElementIndexer {
 		}
 		elContainer.style.zIndex = '';
 
-		if(data.Debug.Measure.SearchSpeed)								// #DebugCode
-			rr.report(Matches.size);									// #DebugCode
+		if(rr)
+			rr.report(Matches.size);
 
 		return new CategorizedCollection(Matches);
 	}
