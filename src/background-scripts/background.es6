@@ -45,9 +45,11 @@ function onMessage(msg, sender, respond) {
 				// Reverse the url order so that we are opening in the correct order
 				for(let url of msg.tUrls.reverse()) {
 					browser.tabs.create({
-						url   : url,
-						active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
-						index : tabs[0].index + 1,
+						url          : url,
+						active       : Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
+						index        : tabs[0].index + 1,
+						cookieStoreId: tabs[0].cookieStoreId,
+						openerTabId  : tabs[0].id,
 					});
 				}
 			});
