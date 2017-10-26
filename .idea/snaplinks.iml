@@ -31,5 +31,8 @@
     <orderEntry type="library" name="@types/del" level="application" />
     <orderEntry type="library" name="@types/gulp-rename" level="application" />
     <orderEntry type="library" name="@types/merge-stream" level="application" />
+    <orderEntry type="library" name="Project Libraries" level="project" />
+    <orderEntry type="library" name="@types/run-sequence" level="application" />
+    <orderEntry type="library" name="MyExtensions-Patches.d.ts" level="project" />
   </component>
 </module>

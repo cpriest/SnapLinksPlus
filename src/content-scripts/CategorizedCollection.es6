@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Clint Priest
+ * Copyright (c) 2017 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -85,7 +85,7 @@ class CategorizedCollection {
 		for(let elem of tElems) {
 			switch(elem.tagName) {
 				case 'A':
-					if(elem.href.length == 0 || elem.href.substr(0, 11) == 'javascript:')
+					if(elem.href.length === 0 || elem.href.substr(0, 11) == 'javascript:')
 						this.Clickable.push(elem);
 					else
 						this.Links.push(elem);

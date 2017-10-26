@@ -30,7 +30,7 @@ let ActionHandler = new (
 		CopyToClipboard(text) {
 			const input          = document.createElement('textarea');
 			input.style.position = 'fixed';
-			input.style.opacity  = 0;
+			input.style.opacity  = '0';
 			input.value          = text;
 			document.body.appendChild(input);
 			input.select();
@@ -46,9 +46,9 @@ let ActionHandler = new (
 		 */
 		ActUpon(SelectedElements, e) {
 			if(data.Dev.Enabled) {
-				if(data.Dev.Log.ActionMessages == true)
+				if(data.Dev.Log.ActionMessages)
 					console.log('ActUpon(%s) - %o', SelectedElements.GreatestType, SelectedElements);
-				if(data.Dev.Skip.AllActions == true)
+				if(data.Dev.Skip.AllActions)
 					return;
 			}
 

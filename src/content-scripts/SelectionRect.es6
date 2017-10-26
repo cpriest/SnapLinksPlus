@@ -35,6 +35,10 @@ class Rect {
 	 * @param {int} right   The right coordinate
 	 */
 	constructor(top=0, left=0, bottom=0, right=0) {
+		// Next line is only present because PhpStorm misses them being
+		// declared by the array comprehensions on the following two lines
+		this.top = this.left = this.bottom = this.right = this.originTop = this.originLeft = 0;
+
 		[this.originTop, this.originLeft]              = [top, left];
 		[this.top, this.left, this.bottom, this.right] = [top, left, bottom, right];
 		this.CalculateProperties();
@@ -175,6 +179,7 @@ class SelectionRect {
 			'	</div>' +
 			'</div>'
 		);
+
 		this.elRect = this.elContainer.firstElementChild;
 
 		document.body.appendChild(this.elContainer);

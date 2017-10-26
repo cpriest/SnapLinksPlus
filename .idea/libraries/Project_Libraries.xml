@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Project Libraries" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/src/lib" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/src/lib" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>

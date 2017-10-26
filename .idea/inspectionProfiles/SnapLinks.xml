@@ -53,7 +53,7 @@
     <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="12">
+          <list size="13">
             <item index="0" class="java.lang.String" itemvalue="nobr" />
             <item index="1" class="java.lang.String" itemvalue="noembed" />
             <item index="2" class="java.lang.String" itemvalue="comment" />
@@ -66,6 +66,7 @@
             <item index="9" class="java.lang.String" itemvalue="command" />
             <item index="10" class="java.lang.String" itemvalue="box" />
             <item index="11" class="java.lang.String" itemvalue="overlay" />
+            <item index="12" class="java.lang.String" itemvalue="all_urls" />
           </list>
         </value>
       </option>
@@ -129,6 +130,11 @@
         </list>
       </option>
       <option name="optionConfigurationMigrated" value="true" />
+    </inspection_tool>
+    <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
+      <option name="processCode" value="true" />
+      <option name="processLiterals" value="true" />
+      <option name="processComments" value="true" />
     </inspection_tool>
   </profile>
 </component>

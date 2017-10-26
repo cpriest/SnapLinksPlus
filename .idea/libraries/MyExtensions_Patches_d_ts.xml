@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="MyExtensions-Patches.d.ts" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/src/JetBrains-Extensions.d.ts" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/src/JetBrains-Extensions.d.ts" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>

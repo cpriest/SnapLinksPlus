@@ -36,7 +36,7 @@ let ElemDocRects = new (
 		 * @param elem    HtmlElement    The element being requested
 		 * @param offset  object        The {x,y} offset the document is currently scrolled to (passed for performance reasons)
 		 *
-		 * @returns {Rect}
+		 * @returns {Rect[]}
 		 */
 		get(elem, offset) {
 			let Rects = this.ElemRects.get(elem);
@@ -58,7 +58,7 @@ let ElemDocRects = new (
 		 */
 		getBounding(elem, offset) {
 			let Rects = this.get(elem, offset);
-			if(Rects.length == 0)
+			if(Rects.length === 0)
 				return new Rect();
 
 			let br = Rects
@@ -251,10 +251,12 @@ let ElemIndex = new class ElementIndexer {
 	 */
 	IsVisible(elem) {
 		let style = window.getComputedStyle(elem);
-		return style.width !== 0 &&
-			   style.height !== 0 &&
-			   style.opacity !== 0 &&
-			   style.display !== 'none' &&
+
+		// noinspection EqualityComparisonWithCoercionJS, JSValidateTypes
+		return style.width == 0 &&
+			   style.height == 0 &&
+			   style.opacity == 0 &&
+			   style.display != 'none' &&
 			   style.visibility !== 'hidden';
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Clint Priest
+ * Copyright (c) 2017 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -119,7 +119,6 @@ a.button {
 	display:               block;
 	float:                 left;
 	width:                 179px;
-	xpadding:              12px 8px 12px 8px;
 	padding:               0px;
 	margin-right:          14px;
 	font-size:             15px;
@@ -134,10 +133,9 @@ a.button {
 	background:            -ms-linear-gradient(top, #FDFDFD 0%, #F2F2F2 100%); /* IE10+ */
 	background:            linear-gradient(top, #FDFDFD 0%, #F2F2F2 100%); /* W3C */
 	filter:                progid:DXImageTransform.Microsoft.gradient(startColorstr='#fdfdfd', endColorstr='#f2f2f2', GradientType=0); /* IE6-9 */
-	border-top:            solid 1px #CBCBCB;
-	border-right:          solid 1px #B7B7B7;
-	border-bottom:         solid 1px #B3B3B3;
-	border-left:           solid 1px #B7B7B7;
+	border:                1px solid #B7B7B7;
+	border-top-color:      #CBCBCB;
+	border-bottom-color:   #B3B3B3;
 	border-radius:         30px;
 	-webkit-box-shadow:    10px 10px 5px #888888;
 	-moz-box-shadow:       10px 10px 5px #888888;
@@ -184,7 +182,7 @@ a.button span {
 }
 code, pre {
 	margin-bottom: 30px;
-	font-family:   Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal;
+	font-family:   Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal, monospace;
 	font-size:     14px;
 	color:         #222222;
 }

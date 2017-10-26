@@ -36,7 +36,7 @@
 			}
 		}
 	],
-	"minimum-stability": "dev",
+	"minimum-stability": "stable",
 	"require":           {
 		"koala-framework/composer-extra-assets": "~1.1"
 	},
