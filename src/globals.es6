@@ -14,7 +14,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-"use strict";
+'use strict';
 
 let docElem = document.documentElement;
 
@@ -33,45 +33,53 @@ const RELOAD_EXTENSION  = 'ReloadExtension';
 const OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
 
 const data = {
-	IndexBuckets   : 10,
-	scrollRate     : 8,
-	selection      : {
+	IndexBuckets:    10,
+	scrollRate:      8,
+	selection:       {
 		activate: {
 			minX: 5,
 			minY: 5,
 		},
 
-		label   : {
+		label: {
 			paddingFromCursor: 2,
-		}
+		},
 	},
 	HighlightStyles: {
-		ActOnElements: 'fill: rgba(0,255,0,.10); stroke: rgba(0,255,0,1); stroke-width: 1px;',
+		ActOnElements:       'fill: rgba(0,255,0,.10); stroke: rgba(0,255,0,1); stroke-width: 1px;',
+		IndexBoundaryMarker: 'fill: rgba(128,128,128,.5);',
 	},
 
 	Debug: {
 		Measure: {
-			IndexingSpeed:	false,
-			SearchSpeed:	false,
+			IndexingSpeed: false,
+			SearchSpeed:   false,
 		},
-		Log: {
+		Log:     {
 			OutOfBoundElements: false,		// Elements who's top/bottom are greater than the documents height are skipped during indexing
+		},
+		Show: {
+			IndexBoundaryMarkers: false,		// Shows markers indicating the element index buckets
 		}
 	},
-	Dev: {
-		Enabled:			false,
-		Log : {
+	Dev:   {
+		Enabled:         false,
+		Log:             {
 			ActionMessages: true,
 		},
-		Skip: {
-			AllActions: 	true,
+		Skip:            {
+			AllActions: true,
 		},
 	},
 };
 
+/**
+ * @note: When we expose the data object to the user, we need to ensure that these elements exist
+ */
+
 const DefaultPrefs = {
-	SwitchFocusToNewTab	: true,
-	ShowNumberOfLinks  	: true,
+	SwitchFocusToNewTab: true,
+	ShowNumberOfLinks:   true,
 };
 
 // Configurations
@@ -79,7 +87,7 @@ let Prefs = new Configs(DefaultPrefs);
 
 /** Pub-Sub Events */
 
-// Publisher: EventHandler
+	// Publisher: EventHandler
 const DragRectChanged = 'DragRectChanged',
 	  DragCompleted   = 'DragCompleted';
 const DocSizeChanged  = 'DocSizeChanged';

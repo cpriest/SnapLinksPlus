@@ -205,9 +205,14 @@ let ElemIndex = new class ElementIndexer {
 
 		this.ElemChecks = new Map();
 
+		if(data.Debug.Show.IndexBoundaryMarkers)
+			SvgOverlay.Release('.IndexBoundaryMarker');
 		this.BoundaryIndex = [];
-		for(let j = 0; j < Buckets; j++)
+		for(let j = 0; j < Buckets; j++) {
+			if(data.Debug.Show.IndexBoundaryMarkers)
+				SvgOverlay.AddIndexBoundaryMark((docHeight / Buckets) * j);
 			this.BoundaryIndex[j] = new Set();
+		}
 
 //		console.log('Buckets: %d, scrollY: %d, docHeight: %d', Buckets, scrollY, docHeight);			// #DevCode
 //		console.log(this.BoundaryIndex);																// #DevCode

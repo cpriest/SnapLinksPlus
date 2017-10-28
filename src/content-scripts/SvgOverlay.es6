@@ -57,10 +57,10 @@ let SvgOverlay = new class SvgOverlayMgr {
 	/**
 	 * Initializes the SvgOverlay
 	 *
-	 * @param {HTMLElement} Container	The SnapLinks Container Element
+	 * @param {HTMLElement} Container    The SnapLinks Container Element
 	 */
 	Init(Container) {
-		this.style = data.HighlightStyles.ActOnElements;
+		this.style   = data.HighlightStyles.ActOnElements;
 		this.Overlay = CreateElement(`
 			<svg class="SnapLinksHighlighter" xmlns="http://www.w3.org/2000/svg">
 				<rect width="0" height="0"/> <!-- Used for easily cloning the properly namespaced rect -->
@@ -83,18 +83,23 @@ let SvgOverlay = new class SvgOverlayMgr {
 	 *
 	 * @returns {SVGRectElement|Node}
 	 */
-	GetRect() {
-		if(this.AvailableRects.length)
-			return this.AvailableRects.pop();
+	AddRect(attr) {
+		let elem;
+		if(!this.AvailableRects.length) {
+			elem = this.Overlay.firstElementChild.cloneNode(false);
+			this.Overlay.appendChild(elem);
+		} else {
+			elem = this.AvailableRects.pop();
+		}
 
-		let elem = this.Overlay.firstElementChild.cloneNode(false);
-		this.Overlay.appendChild(elem);
+		for(let name of Object.keys(attr))
+			elem.setAttribute(name, attr[name]);
 
 		return elem;
 	}
 
 	/**
-	 * @param {SVGRectElement[]}    tSvgElems    An array of SVGRects that are no longer needed, they are hidden and added to available rects
+	 * @param {Node[]}    tSvgElems    An array of SVGRects that are no longer needed, they are hidden and added to available rects
 	 *
 	 * @returns {SvgOverlayMgr}
 	 */
@@ -115,7 +120,7 @@ let SvgOverlay = new class SvgOverlayMgr {
 	 * @returns {SvgOverlayMgr}
 	 */
 	Highlight(Elements) {
-		let tElems       = Elements.All || [ ],
+		let tElems       = Elements.All || [],
 			tPrevElems   = this.HighlightedElements,
 			tUnhighlight = tPrevElems.filter(
 				(elem) => { return !tElems.includes(elem); }
@@ -123,7 +128,7 @@ let SvgOverlay = new class SvgOverlayMgr {
 			tHighlight   = tElems.filter(
 				(elem) => { return !tPrevElems.includes(elem); }
 			),
-			offset = { x: window.scrollX, y: window.scrollY };
+			offset       = { x: window.scrollX, y: window.scrollY };
 
 		/* Remove highlighting of elements no longer in tElems */
 		for(let elem of tUnhighlight)
@@ -135,30 +140,38 @@ let SvgOverlay = new class SvgOverlayMgr {
 			let tSvgRects = [];
 
 			for(let r of ElemDocRects.get(elem, offset)) {
-				let svgRect = this.GetRect(),
-					attr    = {
+				tSvgRects.push(
+					this.AddRect({
 						x     : r.left,
 						y     : r.top,
 						width : r.width,
 						height: r.height,
 						style : this.style,
-					};
-
-				for(let name in attr)
-					svgRect.setAttribute(name, attr[name]);
-
-				tSvgRects.push(svgRect);
+						class : 'ActOn'
+					})
+				);
 			}
 			this.HighlightElemMap.set(elem, tSvgRects);
 		}
 		this.HighlightedElements = tElems;
 
-		this.Overlay.style.display =
-			this.HighlightedElements.length
-				? ''
-				: 'none';
+		// this.Overlay.style.display =
+		// 	this.HighlightedElements.length
+		// 		? ''
+		// 		: 'none';
 
 		return this;
+	}
+
+	AddIndexBoundaryMark(y) {
+		this.AddRect({
+			x     : 0,
+			y     : y,
+			width : docElem.scrollWidth,
+			height: 2,
+			style : data.HighlightStyles.IndexBoundaryMarker,
+			class : 'IndexBoundaryMarker'
+		});
 	}
 
 	/**
@@ -178,4 +191,13 @@ let SvgOverlay = new class SvgOverlayMgr {
 	 * @returns {SvgOverlayMgr}
 	 */
 	Hide() { return this.Highlight([]); }
+
+	/**
+	 * Releases the rects that match the given selector
+	 * @param {string} selector    Any valid css selector
+	 */
+	Release(selector) {
+		this.ReleaseRects(Array.from(this.Overlay.querySelectorAll(selector)));
+		return this;
+	}
 };
