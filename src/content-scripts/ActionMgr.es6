@@ -78,8 +78,10 @@ let ActionHandler = new (
 						UncheckedCount = SelectedElements.Checkboxes.length - CheckedCount,
 						CheckElements  = UncheckedCount >= CheckedCount;
 
-					for(let elem of SelectedElements.Checkboxes)
-						elem.checked = CheckElements;
+					SelectedElements.Checkboxes
+						.filter( (elem) => elem.checked != CheckElements)
+						.forEach( (elem) => elem.click());
+
 					break;
 				case CT_RADIOBUTTONS:
 					let GroupedByName = SelectedElements.RadioButtons.reduce((/** Map */ acc, elem) => {
@@ -87,7 +89,7 @@ let ActionHandler = new (
 					}, new Map());
 
 					for(let [, tElems] of GroupedByName)
-						tElems[0].checked = true;
+						tElems[0].click();
 					break;
 			}
 		}
