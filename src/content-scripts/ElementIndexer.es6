@@ -118,6 +118,8 @@ let ElemDocRects = new (
 			return Rects.map(function(rect) {
 				return new Rect(rect.top + offset.y, rect.left + offset.x,
 					rect.bottom + offset.y, rect.right + offset.x);
+			}).filter((rect) => {
+				return rect.width !== 0 && rect.height !== 0;
 			});
 		}
 
@@ -325,6 +327,11 @@ let ElemIndex = new class ElementIndexer {
 								// let yy, zzz = Array.from(document.elementsFromPoint(left, top));		// #DevCode
 								// console.log(elem, elPoint, [zzz], zzz.indexOf(elem));   				// #DevCode
 
+								if(data.Debug.Show.ObscuredMarks) {
+									SvgOverlay.AddRect(r.left, r.top, r.width, r.height, 'ObscuredRect');
+									SvgOverlay.AddPoint(left, top, 'ObscuredPoint');
+									console.log('%o is obscured by %o, r=%o', elem, elPoint, r);
+								}
 								break;
 							} else {
 								elemNotes.Obscured = false;

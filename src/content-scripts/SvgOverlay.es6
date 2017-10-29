@@ -83,7 +83,7 @@ let SvgOverlay = new class SvgOverlayMgr {
 	 *
 	 * @returns {SVGRectElement|Node}
 	 */
-	AddRect(attr) {
+	_AddRect(attr) {
 		let elem;
 		if(!this.AvailableRects.length) {
 			elem = this.Overlay.firstElementChild.cloneNode(false);
@@ -141,7 +141,7 @@ let SvgOverlay = new class SvgOverlayMgr {
 
 			for(let r of ElemDocRects.get(elem, offset)) {
 				tSvgRects.push(
-					this.AddRect({
+					this._AddRect({
 						x     : r.left,
 						y     : r.top,
 						width : r.width,
@@ -164,14 +164,36 @@ let SvgOverlay = new class SvgOverlayMgr {
 	}
 
 	AddIndexBoundaryMark(y) {
-		this.AddRect({
-			x     : 0,
-			y     : y,
-			width : docElem.scrollWidth,
+		this._AddRect({
+			x:      0,
+			y:      y,
+			width:  docElem.scrollWidth,
 			height: 2,
-			style : data.HighlightStyles.IndexBoundaryMarker,
-			class : 'IndexBoundaryMarker'
+			style:  data.HighlightStyles.IndexBoundaryMarker,
+			class:  'IndexBoundaryMarker'
 		});
+	}
+
+	AddPoint(x, y, type, attr = {}) {
+		this._AddRect(Object.assign({
+			x:      x,
+			y:      y,
+			width:  1,
+			height: 1,
+			style:  data.HighlightStyles[type],
+			class:  type
+		}, attr));
+	}
+
+	AddRect(x, y, width, height, type, attr = {}) {
+		this._AddRect(Object.assign({
+			x:      x,
+			y:      y,
+			width:  width,
+			height: height,
+			style:  data.HighlightStyles[type],
+			class:  type
+		}, attr));
 	}
 
 	/**

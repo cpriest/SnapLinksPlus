@@ -58,9 +58,10 @@ const data = {
 		Log:     {
 			OutOfBoundElements: false,		// Elements who's top/bottom are greater than the documents height are skipped during indexing
 		},
-		Show: {
+		Show:    {
 			IndexBoundaryMarkers: false,		// Shows markers indicating the element index buckets
-		}
+			ObscuredMarks: false,
+		},
 	},
 	Dev:   {
 		Enabled:         false,
@@ -70,8 +71,15 @@ const data = {
 		Skip:            {
 			AllActions: true,
 		},
+		HighlightStyles: {
+			ObscuredPoint: 'fill: rgba(255,0,0,.80);',
+			ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
+		},
 	},
 };
+
+if(data.Dev.Enabled)
+	Object.assign(data.HighlightStyles, data.Dev.HighlightStyles);
 
 /**
  * @note: When we expose the data object to the user, we need to ensure that these elements exist

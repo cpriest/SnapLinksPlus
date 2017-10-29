@@ -16,37 +16,33 @@
 
 "use strict";
 
-
 /**
- * @property {int} top        The normalized top coordinate of the Rect
- * @property {int} left        The normalized left coordinate of the Rect
- * @property {int} bottom    The normalized bottom coordinate of the Rect
- * @property {int} right    The normalized right coordinate of the Rect
- * @property {int} width    The width of the Rect
- * @property {int} height    The height of the Rect
+ * @property {number} top       The normalized top coordinate of the Rect
+ * @property {number} left      The normalized left coordinate of the Rect
+ * @property {number} bottom    The normalized bottom coordinate of the Rect
+ * @property {number} right     The normalized right coordinate of the Rect
+ * @property {number} width     The width of the Rect
+ * @property {number} height    The height of the Rect
+ * @implements {Rect}
  */
 class Rect {
 	/**
 	 * Constructs the {Rect} object
 	 *
-	 * @param {int} top     The top coordinate
-	 * @param {int} left    The left coordinate
-	 * @param {int} bottom  The bottom coordinate
-	 * @param {int} right   The right coordinate
+	 * @param {number} top     The top coordinate
+	 * @param {number} left    The left coordinate
+	 * @param {number} bottom  The bottom coordinate
+	 * @param {number} right   The right coordinate
 	 */
 	constructor(top=0, left=0, bottom=0, right=0) {
-		// Next line is only present because PhpStorm misses them being
-		// declared by the array comprehensions on the following two lines
-		this.top = this.left = this.bottom = this.right = this.originTop = this.originLeft = 0;
-
 		[this.originTop, this.originLeft]              = [top, left];
 		[this.top, this.left, this.bottom, this.right] = [top, left, bottom, right];
 		this.CalculateProperties();
 	}
 
 	/**
-	 * @param {int} top     The initial top coordinate (typically of the mousedown event)
-	 * @param {int} left    The initial left coordinate (typically of the mousedown event)
+	 * @param {number} top     The initial top coordinate (typically of the mousedown event)
+	 * @param {number} left    The initial left coordinate (typically of the mousedown event)
 	 */
 	SetOrigin(top, left) {
 		this.originTop = top;
@@ -58,8 +54,8 @@ class Rect {
 	/**
 	 * Sets the bottom/right coordinate and ensures top/left are lowest numbers in case of inversion
 	 *
-	 * @param {int} bottom    The bottom coordinate
-	 * @param {int} right    The right coordinate
+	 * @param {number} bottom    The bottom coordinate
+	 * @param {number} right    The right coordinate
 	 *
 	 * @returns {Rect}
 	 */
@@ -84,8 +80,8 @@ class Rect {
 	 * Expands the rect by x, y.  eg: .Expand(1, 0) -> left--; right++;
 	 *    Negative values are permitted to
 	 *
-	 * @param {int} x    The amount by which to expand the {Rect}
-	 * @param {int} y    The amount by which to expand the {Rect}
+	 * @param {number} x    The amount by which to expand the {Rect}
+	 * @param {number} y    The amount by which to expand the {Rect}
 	 *
 	 * @returns {Rect}
 	 */
@@ -206,8 +202,8 @@ class SelectionRect {
 	}
 
 	/**
-	 * @param {int} top     The initial top coordinate (typically of the mousedown event)
-	 * @param {int} left    The initial left coordinate (typically of the mousedown event)
+	 * @param {number} top     The initial top coordinate (typically of the mousedown event)
+	 * @param {number} left    The initial left coordinate (typically of the mousedown event)
 	 *
 	 * @returns {SelectionRect}
 	 */
@@ -220,8 +216,8 @@ class SelectionRect {
 	/**
 	 * Set the bottom right of the rect, really the current mouse coordinates
 	 *
-	 * @param {int} bottom        The bottom coordinate of the rect to set
-	 * @param {int} right        The right coordinate of the rect to set
+	 * @param {number} bottom        The bottom coordinate of the rect to set
+	 * @param {number} right        The right coordinate of the rect to set
 	 *
 	 * @returns {SelectionRect}
 	 */
@@ -254,7 +250,7 @@ class SelectionRect {
 
 	/**
 	 * Sets the label for the rect to {count} Links
-	 * @param {int} count    The count of the links to set the label to
+	 * @param {number} count    The count of the links to set the label to
 	 *
 	 * @returns {SelectionRect}
 	 */
