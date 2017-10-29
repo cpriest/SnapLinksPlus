@@ -239,9 +239,8 @@ let ElemIndex = new class ElementIndexer {
 				continue;
 			}
 
-			this.BoundaryIndex[topIdx].add(elem);
-			if(topIdx != botIdx)
-				this.BoundaryIndex[botIdx].add(elem);
+			for(let j=topIdx;j<=botIdx; j++)
+				this.BoundaryIndex[j].add(elem);
 		}
 		if(rr)
 			rr.report(this.Elements.length);
@@ -280,7 +279,8 @@ let ElemIndex = new class ElementIndexer {
 			FirstBucket = Math.floor(sel.top * Buckets / docHeight),
 			LastBucket  = Math.floor(sel.bottom * Buckets / docHeight),
 			offset      = { x: window.scrollX, y: window.scrollY },
-			Matches     = new Set();
+			Matches     = new Set(),
+			NonMatches	= new Set();
 
 		let [ clientWidth, clientHeight ] = GetClientDims();
 		let elContainer = document.querySelector('DIV.SnapLinksContainer');
@@ -290,7 +290,7 @@ let ElemIndex = new class ElementIndexer {
 
 		for(let j = FirstBucket; j <= LastBucket; j++) {
 			for(let elem of this.BoundaryIndex[j]) {
-				if(Matches.has(elem))
+				if(Matches.has(elem) || NonMatches.has(elem))
 					continue;
 
 				let elemNotes = this.ElemChecks.get(elem) || { };
@@ -336,6 +336,7 @@ let ElemIndex = new class ElementIndexer {
 					break;	// for(let r of Rects...
 				}
 				this.ElemChecks.set(elem, elemNotes);
+				NonMatches.add(elem);
 			}
 		}
 		elContainer.style.zIndex = '';
