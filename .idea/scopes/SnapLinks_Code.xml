@@ -1,3 +1,0 @@
-<component name="DependencyValidationManager">
-  <scope name="SnapLinks Code" pattern="(file:src//*||file:test//*||file:LocalNotes.txt)&amp;&amp;!file[snaplinks]:src/lib/*" />
-</component>

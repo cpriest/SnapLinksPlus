@@ -4,13 +4,9 @@
 
  - **Features**
     - Add &lt;button> as clickable type
-    - ~~Proper culling of obscured elements (hidden behind overlays...)~~
-        - ~~Ensure performance is good~~
     - Signing of beta versions for wider testing
 
  - **Test, issue?**
-    - How does pub/sub impact performance?
-    - How does SnapLinks affect page load speed performance
 
  -  **Todo**
 

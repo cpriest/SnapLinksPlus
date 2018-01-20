@@ -24,15 +24,13 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Generated files" level="project" />
-    <orderEntry type="library" name="geometry-dom-DefinitelyTyped" level="application" />
-    <orderEntry type="library" name="chrome-DefinitelyTyped" level="application" />
+    <orderEntry type="library" name="@types/del" level="application" />
     <orderEntry type="library" name="@types/gulp" level="application" />
     <orderEntry type="library" name="@types/gulp-util" level="application" />
-    <orderEntry type="library" name="@types/del" level="application" />
-    <orderEntry type="library" name="@types/gulp-rename" level="application" />
     <orderEntry type="library" name="@types/merge-stream" level="application" />
-    <orderEntry type="library" name="Project Libraries" level="project" />
     <orderEntry type="library" name="@types/run-sequence" level="application" />
-    <orderEntry type="library" name="MyExtensions-Patches.d.ts" level="project" />
+    <orderEntry type="library" name="@types/html-entities" level="application" />
+    <orderEntry type="library" name="chrome-DefinitelyTyped" level="application" />
+    <orderEntry type="library" name="es6-promise-DefinitelyTyped" level="application" />
   </component>
 </module>
