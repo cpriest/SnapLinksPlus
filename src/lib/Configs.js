@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Clint Priest
+ * Copyright (c) 2018 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -58,8 +58,7 @@ Configs.prototype = {
 	},
 
 	get $shouldUseStorage() {
-		return typeof chrome.storage !== 'undefined' &&
-			   location.protocol === 'moz-extension:';
+		return typeof chrome.storage !== 'undefined';
 	},
 
 	$log: function(aMessage, ...aArgs) {
