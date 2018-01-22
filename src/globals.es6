@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Clint Priest
+ * Copyright (c) 2018 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -80,6 +80,9 @@ const data = {
 
 if(data.Dev.Enabled)
 	Object.assign(data.HighlightStyles, data.Dev.HighlightStyles);
+
+let isChrome = location.protocol === 'chrome-extenson:',
+	isFirefox = location.protocol === 'moz-extension:';
 
 /**
  * @note: When we expose the data object to the user, we need to ensure that these elements exist
