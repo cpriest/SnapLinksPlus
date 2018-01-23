@@ -1,5 +1,14 @@
-v3.1.1.X - Not Yet Released
-===========================================
+v3.1.2 - Not Yet Released
+=========================
+ - Added ability to control which modifier keys and which mouse button is used for activation
+ - Fixed issues with chrome
+ - Fixed an issue with radio button selection
+ - Fixed an issue with checkboxes
+ - Added support for Containers
+ - Added support for Child/Parent tabs (Tab Tree View)
+
+v3.1.1.3 - Released Dec 16, 2016
+================================
  - Proper culling of obscured elements (hidden behind overlays...)
     - Ensure performance is good
 
