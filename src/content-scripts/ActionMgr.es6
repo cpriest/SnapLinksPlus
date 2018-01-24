@@ -38,6 +38,24 @@ let ActionHandler = new (
 			document.body.removeChild(input);
 		}
 
+		/** Opens the specified links in new tabs
+		 *
+		 * @param {Element[]} links
+		 */
+		OpenLinks(links) {
+			//////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////
+			//! NOTE: This doesn't work in Firefox (popup blocker) !
+			//////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////
+
+			for(let elem of links) {
+				let oldTarget = elem.target;
+				elem.target   = "_blank";
+				elem.click();
+				elem.target = oldTarget;
+			}
+		}
 		/**
 		 * Performs the default action for the SelectedElements
 		 *
@@ -54,19 +72,19 @@ let ActionHandler = new (
 
 			switch(SelectedElements.GreatestType) {
 				case CT_LINKS:
-					// removing duplicates
-					let links = Array.from(new Set(SelectedElements.Links.map((elem) => elem.href)));
+					// removing duplicates by href
+					let links = Object.values(
+						Array.from(SelectedElements.Links)
+						.reduce((acc, elem) => {
+							acc[elem.href] = elem;
+							return acc;
+						}, {}));
 
-					if(e.ctrlKey) {
-						this.CopyToClipboard(links.join('\n'));
-					} else {
-						// For now we are simply going to create new tabs for the selected elements
+					if(e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey)
+						this.CopyToClipboard(links.map((elem) => elem.href).join('\n'));
+					else
+						this.OpenLinks(links);
 
-						browser.runtime.sendMessage({
-							Action: OPEN_URLS_IN_TABS,
-							tUrls : links,
-						});
-					}
 					break;
 				case CT_CLICKABLE:
 					for(let Button of SelectedElements.Clickable)
