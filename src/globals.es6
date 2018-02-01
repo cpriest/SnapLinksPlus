@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Clint Priest
+ * Copyright (c) 2016-2018 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -32,73 +32,54 @@ const LMB = 1,	// Left Mouse Button
 const RELOAD_EXTENSION  = 'ReloadExtension';
 const OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
 
-const data = {
-	IndexBuckets:    10,
-	scrollRate:      8,
-	selection:       {
-		activate: {
-			minX: 5,
-			minY: 5,
-		},
-
-		label: {
-			paddingFromCursor: 2,
-		},
-	},
-	HighlightStyles: {
-		ActOnElements:       'fill: rgba(0,255,0,.10); stroke: rgba(0,255,0,1); stroke-width: 1px;',
-		IndexBoundaryMarker: 'fill: rgba(128,128,128,.5);',
-	},
-
-	Debug: {
-		Measure: {
-			IndexingSpeed: false,
-			SearchSpeed:   false,
-		},
-		Log:     {
-			OutOfBoundElements: false,		// Elements who's top/bottom are greater than the documents height are skipped during indexing
-		},
-		Show:    {
-			IndexBoundaryMarkers: false,		// Shows markers indicating the element index buckets
-			ObscuredMarks: false,
-		},
-	},
-	Dev:   {
-		Enabled:         false,
-		Log:             {
-			ActionMessages: true,
-		},
-		Skip:            {
-			AllActions: true,
-		},
-		HighlightStyles: {
-			ObscuredPoint: 'fill: rgba(255,0,0,.80);',
-			ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
-		},
-	},
-};
-
-if(data.Dev.Enabled)
-	Object.assign(data.HighlightStyles, data.Dev.HighlightStyles);
-
-let isChrome = location.protocol === 'chrome-extenson:',
+let isChrome  = location.protocol === 'chrome-extenson:',
 	isFirefox = location.protocol === 'moz-extension:';
 
-/**
- * @note: When we expose the data object to the user, we need to ensure that these elements exist
- */
-
 const DefaultPrefs = {
+	IndexBuckets: 10,
+	ScrollRate:   8,
+
+	Activation_MinX: 5,
+	Activation_MinY: 5,
+
+	SelectionLabel_CursorMargin: 2,
+
+	HighlightStyles_ActOnElements:       'fill: rgba(0,255,0,.10); stroke: rgba(0,255,0,1); stroke-width: 1px;',
+	HighlightStyles_IndexBoundaryMarker: 'fill: rgba(128,128,128,.5);',
+
 	SwitchFocusToNewTab: true,
 	ShowNumberOfLinks:   true,
+	ActivateModifiers:   NONE,
+	ActivateMouseButton: RMB,
+
+	DevMode:            false,
+	Dev_Log_ActionMessages: true,
+	Dev_Skip_AllActions:    true,
+
+	Dev_HighlightStyles_ObscuredPoint: 'fill: rgba(255,0,0,.80);',
+	Dev_HighlightStyles_ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
+
+	Debug_Measure_IndexingSpeed:     false,
+	Debug_Measure_SearchSpeed:       false,
+	Debug_Log_OutOfBoundElements:    false,
+	Debug_Show_IndexBoundaryMarkers: false,
+	Debug_Show_ObscuredMarks:        false,
+
+	UI_AdvancedOptions_Section: false,
+	UI_DevOptions_Section: false,
 };
 
 // Configurations
 let Prefs = new Configs(DefaultPrefs);
+Prefs.loaded.then((aValues) => {
+	// if(data.Dev.Enabled)
+	// 	Object.assign(data.HighlightStyles, data.Dev.HighlightStyles);
+});
 
-/** Pub-Sub Events */
+// Pub-Sub Events
+///////////////////
 
-	// Publisher: EventHandler
+// Publisher: EventHandler
 const DragRectChanged = 'DragRectChanged',
 	  DragCompleted   = 'DragCompleted';
 const DocSizeChanged  = 'DocSizeChanged';
@@ -108,3 +89,11 @@ const ContainerElementCreated = 'ContainerElementCreated';
 
 // Publisher: ElementIndexer
 const ElementsSelected = 'ElementsSelected';
+
+/**
+ * @param {string} css
+ * @returns {Node[]}
+ */
+function $(css) {
+	return Array.from(document.documentElement.querySelectorAll(css));
+}

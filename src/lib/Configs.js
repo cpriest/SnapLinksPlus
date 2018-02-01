@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Clint Priest
+ * Copyright (c) 2016-2018 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -13,260 +13,256 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+/*
+ *	This code is a modification of webextensions-lib-configs which contains this license:
+ *		license: The MIT License, Copyright (c) 2016 YUKI "Piro" Hiroshi
+ *		original:
+ *			http://github.com/piroor/webextensions-lib-configs
+ */
 
-function Configs(aDefaults) {
-	this.$default    = aDefaults;
-	this.$lastValues = {};
-	this.$loaded     = this.$load();
-}
+'use strict';
 
-Configs.prototype = {
+class Configs {
+	constructor(aDefaults) {
+		this.lastValues = {};
+		this.observers  = [];
 
-	$observers: [],
+		this.default = aDefaults;
+		this.loaded  = this.load();
 
-	$reset: function() {
-		this.$applyValues(this.$default);
-		if(this.$shouldUseStorage) {
-			return this.$broadcast({
-				type: 'Configs:reseted'
+		return this._ = new Proxy(this,  {
+			get: (tgt, key, obj) => {
+				this.log(`get(${key})`);
+				if(key in this)
+					return this[key];
+				if(!(key in this.default))
+					throw `Prefs.${key} cannot be retrieved, not present in this.default`;
+				return this.lastValues[key]
+			},
+			set: (tgt, key, value, obj) => {
+				this.log(`set(${key}, %o)`, value);
+				if(key in this)
+					this[key] = value;
+				else {
+					if(!(key in this.default))
+						throw `Prefs.${key} cannot be set to ${value}, not present in this.default`;
+					this.lastValues[key] = value;
+					this.notifyUpdated(key);
+				}
+
+				return true;
+			}
+		});
+	}
+
+
+	get shouldUseStorage() {
+		return typeof chrome.storage !== 'undefined' && location.protocol.match(/.+-extension:$/);
+	}
+
+	reset() {
+		this.applyValues(this.default);
+
+		if(this.shouldUseStorage) {
+			return this.broadcast({
+				type: 'Configs:reseted',
 			});
 		}
-		else {
-			return new Promise((function(aResolve, aReject) {
-				chrome.runtime.sendMessage(
-					{
-						type: 'Configs:reset'
-					},
-					function() {
-						aResolve();
-					}
-				);
-			}).bind(this));
-		}
-	},
 
-	$addObserver: function(aObserver) {
-		let index = this.$observers.indexOf(aObserver);
-		if(index < 0)
-			this.$observers.push(aObserver);
-	},
+		return new Promise((aResolve, aReject) => {
+			chrome.runtime.sendMessage({
+				type: 'Configs:reset',
+			}, () => aResolve());
+		});
+	}
 
-	$removeObserver: function(aObserver) {
-		let index = this.$observers.indexOf(aObserver);
+	addObserver(aObserver) {
+		if(this.observers.indexOf(aObserver) < 0)
+			this.observers.push(aObserver);
+	}
+
+	removeObserver(aObserver) {
+		let index = this.observers.indexOf(aObserver);
 		if(index > -1)
-			this.$observers.splice(index, 1);
-	},
+			this.observers.splice(index, 1);
+	}
 
-	get $shouldUseStorage() {
-		return typeof chrome.storage !== 'undefined';
-	},
-
-	$log: function(aMessage, ...aArgs) {
-		// let type = this.$shouldUseStorage
-		// 	? 'storage'
-		// 	: 'bridge';
-		// aMessage = 'Configs[' + type + '] ' + aMessage;
+	log(aMessage, ...aArgs) {
+		// aMessage = `Prefs => ${aMessage}`;
 		// if(typeof log === 'function')
 		// 	log(aMessage, ...aArgs);
 		// else
 		// 	console.log(aMessage, ...aArgs);
-	},
+	}
 
-	$load: function() {
-		this.$log('load');
+	load() {
 		if('_promisedLoad' in this) {
 			if(this._promisedLoad) {
-				this.$log(' => waiting to be loaded');
+				this.log('load => waiting to be loaded');
 				return this._promisedLoad;
 			}
-			this.$log(' => already loaded');
-			return Promise.resolve(this.$lastValues);
+			this.log('load => already loaded');
+			return Promise.resolve(this.lastValues);
 		}
 
-		this.$applyValues(this.$default);
-		chrome.runtime.onMessage.addListener(this.$onMessage.bind(this));
+		this.applyValues(this.default);
+		chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
-		if(this.$shouldUseStorage) { // background mode
-			this.$log('load: try load from storage on  ' + location.href);
-			chrome.storage.onChanged.addListener(this.$onChanged.bind(this));
-			return this._promisedLoad = new Promise((function(aResolve, aReject) {
+		// server mode
+		if(this.shouldUseStorage) {
+			this.log('load: try load from storage on  ' + location.href);
+			chrome.storage.onChanged.addListener(this.onChanged.bind(this));
+			return this._promisedLoad = new Promise((aResolve, aReject) => {
 				try {
-					chrome.storage.local.get(this.$default, (function(aValues) {
-						aValues = aValues || this.$default;
-						this.$log('load: loaded for ' + location.origin, aValues);
-						this.$applyValues(aValues);
+					chrome.storage.local.get(this.default, (aValues) => {
+						aValues = aValues || this.default;
+						this.log('load: loaded for ' + location.origin, aValues);
+						this.applyValues(aValues);
 						this._promisedLoad = null;
 						aResolve(aValues);
-					}).bind(this));
-				}
-				catch(e) {
-					this.$log('load: failed', e);
+					});
+				} catch(e) {
+					this.log('load: failed', e);
 					aReject(e);
 				}
-			}).bind(this));
+			});
 		}
-		else { // content mode
-			this.$log('load: initialize promise on  ' + location.href);
-			return this._promisedLoad = new Promise((function(aResolve, aReject) {
-				chrome.runtime.sendMessage(
-					{ type: 'Configs:load' },
-					(function(aValues) {
-						aValues = aValues || this.$default;
-						this.$log('load: responded', aValues);
-						this.$applyValues(aValues);
-						this._promisedLoad = null;
-						aResolve(aValues);
-					}).bind(this)
-				);
-			}).bind(this));
-		}
-	},
+		// client mode
+		this.log('load: initialize promise on  ' + location.href);
+		return this._promisedLoad = new Promise((aResolve, aReject) => {
+			chrome.runtime.sendMessage(
+				{ type: 'Configs:load' },
+				(aValues) => {
+					aValues = aValues || this.default;
+					this.log('load: responded', aValues);
+					this.applyValues(aValues);
+					this._promisedLoad = null;
+					aResolve(aValues);
+				});
+		});
+	}
 
-	$applyValues: function(aValues) {
+	applyValues(aValues) {
 		Object.keys(aValues)
-			  .forEach(function(aKey) {
-				  this.$lastValues[aKey] = aValues[aKey];
-				  if(aKey in this)
-					  return;
-				  Object.defineProperty(this, aKey, {
-					  get: (function() {
-						  return this.$lastValues[aKey];
-					  }).bind(this),
-					  set: (function(aValue) {
-						  this.$log('set: ' + aKey + ' = ' + aValue);
-						  this.$lastValues[aKey] = aValue;
-						  this.$notifyUpdated(aKey);
-						  return aValue;
-					  }).bind(this)
-				  });
-			  }, this);
-	},
+			.forEach((aKey) => {
+				this.lastValues[aKey] = aValues[aKey];
+			});
+	}
 
-	$onMessage: function(aMessage, aSender, aRespond) {
-		this.$log('onMessage: ' + aMessage.type, aMessage, aSender);
+	onMessage(aMessage, aSender, aRespond) {
+		this.log('onMessage: ' + aMessage.type, aMessage, aSender);
 		switch(aMessage.type) {
-			// background
+			// server
 			case 'Configs:load':
-				this.$load()
+				this.load()
 					.then(aRespond);
 				return true;
 			case 'Configs:update':
-				this[aMessage.key] = aMessage.value;
+				this._[aMessage.key] = aMessage.value;
 				aRespond();
 				break;
 			case 'Configs:reset':
-				this.$reset()
+				this.reset()
 					.then(aRespond);
 				return true;
 
-			// content
+			// client
 			case 'Configs:updated':
-				this.$lastValues[aMessage.key] = aMessage.value;
-				this.$notifyToObservers(aMessage.key);
+				this.lastValues[aMessage.key] = aMessage.value;
+				this.notifyToObservers(aMessage.key);
 				aRespond();
 				break;
 			case 'Configs:reseted':
-				this.$applyValues(this.$default);
-				Object.keys(this.$default)
-					  .forEach(function(aKey) {
-						  this.$notifyToObservers(aKey);
-					  }, this);
+				this.applyValues(this.default);
+				Object.keys(this.default)
+					.forEach((aKey) => {
+						this.notifyToObservers(aKey);
+					});
 				aRespond();
 				break;
 		}
-	},
+	}
 
-	$onChanged: function(aChanges) {
+	onChanged(aChanges) {
 		let changedKeys = Object.keys(aChanges);
-		changedKeys.forEach(function(aKey) {
-			this.$lastValues[aKey] = aChanges[aKey].newValue;
-			this.$notifyToObservers(aKey);
-		}, this);
-	},
+		changedKeys.forEach((aKey) => {
+			this.lastValues[aKey] = aChanges[aKey].newValue;
+			this.notifyToObservers(aKey);
+		});
+	}
 
-	$broadcast: function(aMessage) {
+	broadcast(aMessage) {
 		let promises = [];
 
 		if(chrome.runtime) {
-			promises.push(new Promise((function(aResolve, aReject) {
-				chrome.runtime.sendMessage(aMessage, function(aResult) {
+			promises.push(new Promise((aResolve, aReject) => {
+				chrome.runtime.sendMessage(aMessage, (aResult) => {
 					aResolve([aResult]);
 				});
-			}).bind(this)));
+			}));
 		}
 
 		if(chrome.tabs) {
-			promises.push(new Promise((function(aResolve, aReject) {
-				chrome.tabs.query({}, (function(aTabs) {
-					let promises = aTabs.map(function(aTab) {
-						return new Promise((function(aResolve, aReject) {
-							chrome.tabs.sendMessage(
-								aTab.id,
-								aMessage,
-								null,
-								aResolve
-							);
-						}).bind(this));
-					}, this);
+			promises.push(new Promise((aResolve, aReject) => {
+				chrome.tabs.query({}, (aTabs) => {
+					let promises = aTabs.map(
+						(aTab) => new Promise((aResolve, aReject) => {
+							chrome.tabs.sendMessage(aTab.id, aMessage, null, aResolve);
+						}),
+					);
 					Promise.all(promises)
-						   .then(aResolve);
-				}).bind(this));
-			}).bind(this)));
+						.then(aResolve);
+				});
+			}));
 		}
 
 		return Promise.all(promises)
-					  .then(function(aResultSets) {
-						  let flattenResults = [];
-						  aResultSets.forEach(function(aResults) {
-							  flattenResults = flattenResults.concat(aResults);
-						  });
-						  return flattenResults;
-					  });
-	},
+			.then((aResultSets) => {
+				let flattenResults = [];
+				aResultSets.forEach((aResults) => {
+					flattenResults = flattenResults.concat(aResults);
+				});
+				return flattenResults;
+			});
+	}
 
-	$notifyUpdated: function(aKey) {
-		let value = this[aKey];
-		if(this.$shouldUseStorage) {
-			this.$log('broadcast updated config: ' + aKey + ' = ' + value);
+	notifyUpdated(aKey) {
+		let value = this._[aKey];
+		if(this.shouldUseStorage) {
+			this.log('broadcast updated config: ' + aKey + ' = ' + value);
 			try {
 				let updatedKey   = {};
 				updatedKey[aKey] = value;
-				chrome.storage.local.set(updatedKey, (function() {
-					this.$log('successfully saved', updatedKey);
-				}).bind(this));
+				chrome.storage.local.set(updatedKey, () => {
+					this.log('successfully saved', updatedKey);
+				});
+			} catch(e) {
+				this.log('save: failed', e);
 			}
-			catch(e) {
-				this.$log('save: failed', e);
-			}
-			return this.$broadcast({
-				type : 'Configs:updated',
-				key  : aKey,
-				value: value
+			return this.broadcast({
+				type:  'Configs:updated',
+				key:   aKey,
+				value: value,
 			});
 		}
-		else {
-			this.$log('request to store config: ' + aKey + ' = ' + value);
-			return new Promise((function(aResolve, aReject) {
-				chrome.runtime.sendMessage(
-					{
-						type : 'Configs:update',
-						key  : aKey,
-						value: value
-					},
-					function() {
-						aResolve();
-					}
-				);
-			}).bind(this));
-		}
-	},
+		this.log('request to store config: ' + aKey + ' = ' + value);
+		return new Promise((aResolve, aReject) => {
+			chrome.runtime.sendMessage({
+					type:  'Configs:update',
+					key:   aKey,
+					value: value,
+				},
+				() => { aResolve(); },
+			);
+		});
+	}
 
-	$notifyToObservers: function(aKey) {
-		this.$observers.forEach(function(aObserver) {
+	notifyToObservers(aKey) {
+		this.observers.forEach((aObserver) => {
 			if(typeof aObserver === 'function')
 				aObserver(aKey);
 			else if(aObserver && typeof aObserver.onChangeConfig === 'function')
 				aObserver.onChangeConfig(aKey);
-		}, this);
+		});
 	}
-};
+}

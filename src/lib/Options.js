@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Clint Priest
+ * Copyright (c) 2016-2018 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -13,101 +13,158 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+/*
+ *	This code is a modification of webextensions-lib-configs which contains this license:
+ *		license: The MIT License, Copyright (c) 2016 YUKI "Piro" Hiroshi
+ *		original:
+ *			http://github.com/piroor/webextensions-lib-configs
+ */
 
-function Options(aConfigs) {
-	this.configs = aConfigs;
+'use strict';
 
-	this.onReady = this.onReady.bind(this);
-	document.addEventListener('DOMContentLoaded', this.onReady);
-}
+class Options {
+	constructor(aConfigs) {
+		this.UI_MISSING         = null;
+		this.UI_TYPE_UNKNOWN    = 0;
+		this.UI_TYPE_TEXT_FIELD = 1;
+		this.UI_TYPE_CHECKBOX   = 2;
+		this.UI_TYPE_SELECT     = 3;
+		this.UI_TYPE_OPENER     = 4;
 
-Options.prototype = {
-	configs: null,
+		this.throttleTimers = {};
+		this.configs        = aConfigs;
 
-	throttleTimers: {},
+		this.onReady = this.onReady.bind(this);
+		document.addEventListener('DOMContentLoaded', this.onReady);
+	}
 
-	UI_MISSING        : null,
-	UI_TYPE_UNKNOWN   : 0,
-	UI_TYPE_TEXT_FIELD: 1 << 0,
-	UI_TYPE_CHECKBOX  : 1 << 1,
-
-	detectUIType: function(aKey) {
+	detectUIType(aKey) {
 		let node = document.getElementById(aKey);
 		if(!node)
 			return this.UI_MISSING;
 
-		if(node.localName == 'textarea')
-			return this.UI_TYPE_TEXT_FIELD;
-
-		if(node.localName != 'input')
-			return this.UI_TYPE_UNKNOWN;
+		switch(node.tagName) {
+			case 'TEXTAREA':
+				return this.UI_TYPE_TEXT_FIELD;
+			case 'SELECT':
+				return this.UI_TYPE_SELECT;
+			case 'DETAILS':
+				return this.UI_TYPE_OPENER;
+			case 'INPUT':
+				break;
+			default:
+				return this.UI_TYPE_UNKNOWN;
+		}
 
 		switch(node.type) {
 			case 'text':
 			case 'password':
 				return this.UI_TYPE_TEXT_FIELD;
-
 			case 'checkbox':
 				return this.UI_TYPE_CHECKBOX;
 
 			default:
 				return this.UI_TYPE_UNKNOWN;
 		}
-	},
+	}
 
-	throttledUpdate: function(aKey, aValue) {
+	throttledUpdate(aKey, aValue) {
 		if(this.throttleTimers[aKey])
 			clearTimeout(this.throttleTimers[aKey]);
-		this.throttleTimers[aKey] = setTimeout((function() {
+		this.throttleTimers[aKey] = setTimeout(() => {
 			delete this.throttleTimers[aKey];
 			this.configs[aKey] = aValue;
-		}).bind(this), 250);
-	},
+		}, 250);
+	}
 
-	bindToCheckbox: function(aKey) {
+	bindToCheckbox(aKey) {
 		let node     = document.getElementById(aKey);
 		node.checked = this.configs[aKey];
-		node.addEventListener('change', (function() {
+		node.addEventListener('change', () => {
 			this.throttledUpdate(aKey, node.checked);
-		}).bind(this));
-	},
+		});
+	}
 
-	bindToTextField: function(aKey) {
+	bindToTextField(aKey) {
 		let node   = document.getElementById(aKey);
 		node.value = this.configs[aKey];
-		node.addEventListener('input', (function() {
+		node.addEventListener('input', () => {
 			this.throttledUpdate(aKey, node.value);
-		}).bind(this));
-	},
+		});
+	}
 
-	onReady: function() {
+	bindToSelect(aKey) {
+		let node   = document.getElementById(aKey);
+		node.value = this.configs[aKey];
+		node.addEventListener('change', () => {
+			this.throttledUpdate(aKey, node.value);
+		});
+		node.addEventListener('keyup', () => {
+			this.throttledUpdate(aKey, node.value);
+		});
+	}
+
+	bindToOpener(aKey) {
+		let node   = document.getElementById(aKey);
+		node.open = this.configs[aKey];
+		node.addEventListener('toggle', () => {
+			this.throttledUpdate(aKey, node.open);
+		});
+	}
+
+	onReady() {
 		document.removeEventListener('DOMContentLoaded', this.onReady);
 
-		if(!this.configs || !this.configs.$loaded)
+		if(!this.configs || !this.configs.loaded)
 			throw new Error('you must give configs!');
 
-		this.configs.$loaded
-			.then((function() {
-				Object.keys(this.configs.$default)
-					  .forEach(function(aKey) {
-						  switch(this.detectUIType(aKey)) {
-							  case this.UI_TYPE_CHECKBOX:
-								  this.bindToCheckbox(aKey);
-								  break;
+		this.configs.loaded
+			.then(() => {
+				Object.keys(this.configs.default)
+					.forEach((aKey) => {
+						switch(this.detectUIType(aKey)) {
+							case this.UI_TYPE_CHECKBOX:
+								this.bindToCheckbox(aKey);
+								break;
 
-							  case this.UI_TYPE_TEXT_FIELD:
-								  this.bindToTextField(aKey);
-								  break;
+							case this.UI_TYPE_TEXT_FIELD:
+								this.bindToTextField(aKey);
+								break;
 
-							  case this.UI_MISSING:
-								  return;
+							case this.UI_TYPE_SELECT:
+								this.bindToSelect(aKey);
+								break;
 
-							  default:
-								  throw new Error('unknown type UI element for ' + aKey);
-						  }
-					  }, this);
-			}).bind(this));
+							case this.UI_TYPE_OPENER:
+								this.bindToOpener(aKey);
+								break;
+
+							case this.UI_MISSING:
+								return;
+
+							default:
+								throw new Error('unknown type UI element for ' + aKey);
+						}
+					});
+			})
+			.then(() => {
+				let devModeElem = $('#DevMode')[0],
+					devFieldset    = $('#DevMode_Options')[0];
+
+				let UpdateCheckboxState = () => {
+					devFieldset.disabled = !devModeElem.checked;
+				};
+				devModeElem.addEventListener('change', UpdateCheckboxState);
+				UpdateCheckboxState();
+			}).then(() => {
+				$('LABEL > INPUT[type=checkbox]')
+					.forEach((elem) => {
+						elem.addEventListener('change', (e) => {
+							console.log(e);
+						});
+					});
+			});
 	}
-};
+}
 
 new Options(Prefs);

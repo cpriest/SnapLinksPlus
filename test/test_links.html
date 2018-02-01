@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="author" content="">
+<meta name="generator" content="PhpED 5.8">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="creation-date" content="01/01/2009">
+<meta name="revisit-after" content="15 days">
+<title>Snap Links Plus Test Page</title>
+	<style type="text/css">
+		BODY { font-family: Verdana, sans-serif; font-size: 12px; min-width: 1024px; margin: 35px;}
+		A { color: blue; text-decoration: underline; }
+
+		#JS_Click_Events_Tester IMG 				{ border: 2px solid transparent; cursor: pointer; }
+		#JS_Click_Events_Tester SPAN 				{ padding: 0px 2px; border: 2px solid transparent; cursor: pointer; }
+		#JS_Click_Events_Tester DIV 				{ padding: 0px 2px; border: 2px solid transparent; cursor: pointer; }
+		#JS_Click_Events_Tester IMG.highlighted 	{ padding: 2px; }
+		#JS_Click_Events_Tester .highlighted { border: 2px solid black !important; }
+
+		DIV.Issues { margin-left: 25px; }
+		DIV.Issues DIV {  margin-bottom: 15px;}
+		DIV.Issues A { font-weight: normal; }
+		DIV.Issues H1 > A,
+		DIV.Issues H1 > SPAN{ color: red; }
+		DIV.Issues H1 > A.Fixed,
+		DIV.Issues H1 > SPAN.Fixed { color: green; text-decoration: line-through; }
+		DIV.Issues H1 > A.Reverted,
+		DIV.Issues H1 > SPAN.Reverted { color: gray; text-decoration: line-through; }
+
+		DIV.Issues H1 { cursor: pointer; font: bold 14px Verdana; padding-left: 15px; margin: 0px 5px 0px 3px; background: url(triangle_right.gif) no-repeat left center; border: 1px solid transparent; }
+		DIV.Issues H1:hover { border: 1px solid #AAAAAA; }
+		DIV.Issues H1.Open { background-image: url(triangle_down.gif); }
+		DIV.Issues H1 + DIV { margin-left: 6px; padding: 3px 0px 3px 10px; border-left: 1px solid #AAAAAA; display: none; }
+		DIV.Issues H1.Open + DIV { display: block; }
+		DIV#MouseBox { position: fixed; cursor: pointer; font: 10px Verdana; top: 10px; right: 0px; min-width: 200px; border: 1px solid black; padding: 10px; background-color: white; }
+		DIV#MouseBox:hover { opacity: 1.0; }
+		DIV#MouseBox.Closed { padding: 0px 2px; min-width: 0px; opacity: 0.5; background: blue; color: white; font: 14px Verdana; border: 1px solid #AAAAAA; }
+		DIV#MouseBox TH { text-align: right; padding-right: 5px; }
+	</style>
+</head>
+<body>
+	<div style="float: right; margin-right: 350px; height: 5px; width: 5px; background: black; cursor: pointer;">&nbsp;</div>
+	<h1>Snap Links Plus Test Page </h1>
+	<h2>Previous Problem Sites / Issues for Testing:</h2>
+	<DIV class="Issues">
+
+		<h1><span class="Fixed">Fixed</span> This websites' body.scrollHeight is not correct</h1>
+		<div>
+			<a href="http://www.iltalehti.fi/" target="_blank">http://www.iltalehti.fi/</a><br><br>
+
+			Fixed by <a href="http://code.google.com/p/snaplinksplus/source/detail?r=4dc264a0c378d27a931689a1dbba12c2f0e16916">4dc264a0c378</a><br>
+		</div>
+
+		<h1><a class="Reverted" href="http://code.google.com/p/snaplinksplus/issues/detail?id=31">Issue 31</a> - This websites' documentElement.scrollHeight is not correct</h1>
+		<div>
+			<a href="http://www.idarionis.com:9500" target="_blank">http://www.idarionis.com:9500</a><br>
+			Broken by <a href="http://code.google.com/p/snaplinksplus/source/detail?r=4dc264a0c378d27a931689a1dbba12c2f0e16916">4dc264a0c378</a><br>
+			Fixed by <a href="http://code.google.com/p/snaplinksplus/source/detail?r=593d646f7ee60b2d696b19e35545b604456103b1">593d646f7ee6</a><br>
+			Reverted by <a href="https://github.com/cpriest/SnapLinksPlus/commit/ece03f88a34013322370ce063681803e1fa62c3a">ece03f88a34013322370ce063681803e1fa62c3a</a> - Clint on 6/11/2013 - Google no longer has that wierd interface and the code screwed every other site up
+		</div>
+
+		<h1><a href="http://code.google.com/p/snaplinksplus/issues/detail?id=30">Issue 30</a> - This websites has a scrollable element within it's page</h1>
+		<div>
+			<a href="https://groups.google.com/forum/#!msg/snaplinksplus/7a18LX7n6uM/5A39Mdlx5RQJ">https://groups.google.com/forum/#!msg/snaplinksplus/7a18LX7n6uM/5A39Mdlx5RQJ</a><br>
+		</div>
+
+		<h1><a href="http://code.google.com/p/snaplinksplus/issues/detail?id=37">Issue 37</a> - Hover over an image for popover, drag over larger image, large image link and underlying (hidden) image links are both chosen</h1>
+		<div>
+			<a href="http://images.google.com/search?num=10&hl=en&site=&tbm=isch&source=hp&biw=1600&bih=1089&q=gold&oq=gold&gs_l=img.3..0l10.536.854.0.973.4.4.0.0.0.0.107.313.3j1.4.0...0.0...1ac.1.wdGShMYujzA#q=gold&hl=en&sa=X&tbas=0&tbm=isch&tbas=0&ei=EwiXUJjfM5LzqwHA-oG4Dg&ved=0CBYQuAs&bav=on.2,or.r_gc.r_pw.r_qf.&fp=d96a74ebefcc27a8&bpcl=37189454&biw=1600&bih=1089">Google Images Search for Gold</a><br>
+		</div>
+
+		<h1><a class="Fixed" href="http://code.google.com/p/snaplinksplus/issues/detail?id=46">Issue 46</a> - Links with common root url not captured properly</h1>
+		<div>
+			<table>
+					<tr><td>
+							<a href="http://www.csi.milano.it/">csi milano</a>
+					</td></tr>
+					<tr><td>
+							<a href="http://www.csi.milano.it/main.cfm?mode=provvedimenti&campionato=3&sport=CA">csi milano - provvedimenti calcio a 7</a>
+					</td></tr>
+					<tr><td>
+							<a href="http://www.csi.milano.it/main.cfm?mode=provvedimenti&campionato=6&sport=PV">csi milano - provvedimenti pvo</a>
+					</td></tr>
+					<tr><td>
+							<a href="http://www.csi.milano.it/main.cfm?mode=provvedimenti&campionato=7&sport=PC">csi milano - provvedimenti basket</a>
+					</td></tr>
+			</table>
+			Fixed by <a href="https://github.com/cpriest/SnapLinksPlus/commit/ece03f88a34013322370ce063681803e1fa62c3a">ece03f88a34013322370ce063681803e1fa62c3a</a>
+		</div>
+
+		<!--<h1><a href="http://code.google.com/p/snaplinksplus/issues/detail?id=49">Issue 49</a> - Iframe w/ Transitional DOCTYPE, try to select test40-test50</h1>-->
+		<!--<div>-->
+			<!--<iframe name="iframe" id="iframe" style="width: 100%; height: 600px;" src="iframe_issue49.htm"></iframe>-->
+		<!--</div>-->
+
+		<h1><a href="https://github.com/cpriest/SnapLinksPlus/issues/38">Issue 38</a> Right-clicking can cause a delay on some sites</h1>
+		<div>
+			This is because as soon as the right-click-down event fires the document calculations are made, which take very little time but it is noticeable on pages with many elements. This could be delayed until the drag begins or possibly to a non-ui worker thread.<br>
+			<a target="_blank" href="http://imdb.com/search/title?at=0&count=100">IMDB Search (100)</a><br>
+			<a target="_blank" href="http://imdb.com/search/title?at=0&count=1000">IMDB Search (1000)</a><br>
+		</div>
+
+		<h1><a class="Fixed" target="blank" href="https://github.com/cpriest/SnapLinksPlus/issues/100">Issue 100</a> Body Margins Causes Offset of Highlights</h1>
+		<div>
+			This happens because our container's offsetParent is the BODY tag and if it has margins.<br>
+			<b>This test document also has margin and padding set to ensure the fix works correctly.</b><br>
+			<a target="_blank" href="https://tweakers.net/">https://tweakers.net/</a><br>
+		</div>
+
+		<h1><a target="blank" href="https://github.com/cpriest/SnapLinksPlus/pull/66">Github Pull #66</a>Test case - Inappropriate trigger for object element</h1>
+		<div>
+			<ol>
+				<li>
+					<embed width="100" height="100" src="http://www.w3schools.com/html/bookmark.swf"/>
+				</li>
+				<li>
+					<object width="100" height="100" data="http://www.w3schools.com/html/bookmark.swf"></object>
+				</li>
+				<li>
+					<object width="100" height="100" data="http://www.w3schools.com/html/bookmark.swf">
+						<param value="Opaque" name="wmode">
+					</object>
+				</li>
+			</ol>
+		</div>
+
+		<h1 class="Open">General Testing Sites</h1>
+		<div>
+			<ul>
+				<li><a href="http://www.cnn.com/" target="_blank">http://www.cnn.com/</a></li>
+				<li><a href="http://www.yahoo.com/" target="_blank">http://www.yahoo.com/</a></li>
+				<li><a href="http://www.somesite.com/?f" target="_blank">http://www.somesite.com/?f</a></li>
+				<li><a href="http://www.wikipedia.com/" target="_blank">http://www.wikipedia.com/</a> - Performance Testing of lots of links</li>
+				<li><a href="https://meta.wikimedia.org/wiki/List_of_Wikipedias" target="_blank">wikipedia/List_of_Wikipedias</a> - Even more links (2k or so)</li>
+				<li><a href="http://www.testufo.com/#test=animation-time-graph" target="_blank">animation-time-graph/</a> - Performance Testing of lots of links</li>
+				<li><a href="" target="_blank">Blank HREF should be ignored </a></li>
+			</ul>
+		</div>
+		<h1>Sites that have given v3 some issues</h1>
+		<div>
+			<ul>
+				<li><a href="http://www.ldraw.org/cgi-bin/ptlist.cgi" target="_blank">ldraw.org</a> - HTML 4.01 Website, docElem.scrollHeight wasn't valid, switched to using
+					window.scrollX/Y, also docElem.clientHeight wasn't accurate, switching to min(docElem.clientHeight, document.body.clientHeight)</li>
+				<li><a href="http://www.nfohump.com/forum/index.php" target="_blank">nfohump.com</a> - XHTML 1.0 Transitional - min(docElem.clientHeight,
+					document.body.clientHeight) has doc.body.clientHeight as 0 - so testing revealed the current winner is docElem.clientHeight unless > window.innerHeight,
+					then doc.body.clientHeight is accurate.<br />
+					<br/>
+					<b>Properties that could be of use if further issues occur</b>
+					<ul>
+						<li>document.clientHeight</li>
+						<li>docElem.clientHeight</li>
+						<li>doc.body.clientHeight</li>
+						<li>doc.body.parentElement.clientHeight (should be same as docElem.clientHeight)</li>
+					</ul>
+				</li>
+				<li>
+					<a href="https://imgur.com/gallery/lwjG2CF" target="_blank">imgur.com</a> - docHeight issues, has elements which exceed the documents height which are now
+					skipped during indexing (they are in an overflow hidden scrollable element)
+				</li>
+			</ul>
+		</div>
+
+	</div>
+
+	<div style="width: 50%; float: right; margin-left: 15px; height:  600px;">
+		Commented Out IFRAME
+		<!--<iframe src="iframe_content.htm" style="width: 100%; height:600px; border:1px solid #000000; margin-bottom:50px;"></iframe>-->
+	</div>
+	<div>
+		<h2>Links Within Text</h2>
+			<p>
+				This is a test file for testing the link rect detection and drawing code.
+			</p>
+			<p>
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit. <a href="http://en.wikipedia.org/wiki/Gold">Duis mollis dolor et ante tincidunt</a> accumsan vitae sed elit. Integer id arcu ipsum. Vestibulum molestie convallis eros et commodo. Vestibulum ut odio lectus, <a href="http://en.wikipedia.org/wiki/Gold">quis scelerisque lacus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</a> Nam tincidunt massa eu nibh interdum mattis. Sed porta augue tortor, et blandit justo. Integer ut enim nisl. Cras vel lacus neque, nec vulputate neque. Aenean volutpat ante et nibh facilisis dapibus. Nam at odio ac est pharetra egestas. Maecenas congue, risus vitae lacinia placerat, mauris velit fringilla elit, non iaculis augue ipsum non sem. Duis ornare vestibulum nibh porttitor consectetur.
+			</p>
+			<p>
+		Suspendisse nibh orci, sodales dapibus consectetur sit amet, venenatis id leo. <a href="http://en.wikipedia.org/wiki/Gold" SnapLinksInspect="1">Cras a magna posuere mi placerat hendrerit ac quis tellus. Proin ante nibh, dapibus ac porta ac, egestas at orci. Nulla dignissim lacinia dolor nec tempus. Nulla nec velit libero, non tincidunt neque. Integer suscipit vestibulum imperdiet. Fusce vel nibh eget erat consectetur auctor nec vel nisl. Morbi non massa augue. Nullam ac mi ac massa facilisis venenatis id vitae libero. Mauris vulputate, elit in interdum ultricies, eros diam varius nisl, vitae feugiat dolor massa non diam. Aliquam eros ante, convallis tristique dapibus in, aliquam eu sapien. Aliquam sollicitudin pellentesque elit, ut dapibus nibh semper adipiscing. Sed accumsan ligula quis quam posuere hendrerit</a>. Curabitur eleifend tempor elit, a ullamcorper tortor laoreet in. Curabitur et eros nisi, et volutpat dolor. In nec tortor libero, aliquam gravida diam. Duis non vehicula elit. Morbi non eros a libero varius scelerisque. Maecenas ac dui ligula. Nunc scelerisque nunc sed dui hendrerit vitae venenatis dui tempor.
+			</p>
+			<p>
+		<a href="http://en.wikipedia.org/wiki/Gold"><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Ag-Au-Cu-colours-english.svg/220px-Ag-Au-Cu-colours-english.svg.png">Integer sodales, velit vel vulputate mattis</a>, orci ipsum volutpat erat, ut consequat enim est quis tellus. Proin fermentum libero vitae enim hendrerit eget dictum erat blandit. Etiam eget diam lorem. Vestibulum condimentum, lacus eget pretium dictum, enim elit vehicula urna, sit amet volutpat mi felis id leo. Cras porta rhoncus leo laoreet sodales. Cras lectus nunc, pretium quis suscipit vitae, eleifend in dolor. Nam hendrerit suscipit felis, ac fringilla dui hendrerit tristique. Fusce suscipit mi ante, ac vestibulum nunc. Suspendisse potenti. Vestibulum <a href="http://en.wikipedia.org/wiki/Gold">sollicitudin euismod mauris, ac fringilla nunc euismod ut. Vivamus est diam, consequat eget sagittis eget, consectetur et purus.</a> Morbi pulvinar urna id mauris lobortis sit amet pretium justo luctus. Donec at blandit orci. Nam at mauris ut erat dignissim euismod. Nam scelerisque mi nec purus lacinia sed porttitor urna auctor. Pellentesque ac est gravida enim tincidunt ultricies. Quisque erat sapien, gravida vitae molestie non, imperdiet eget quam.
+			</p>
+			<p>
+		<a href="http://en.wikipedia.org/wiki/Gold"><img style="float: left;" src="http://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Ag-Au-Cu-colours-english.svg/220px-Ag-Au-Cu-colours-english.svg.png">Vestibulum rhoncus adipiscing rhoncus</a>. Quisque quis pharetra arcu. Morbi in metus vel leo dignissim vulputate sit amet eget lacus. Donec sed est id tellus mollis luctus. Donec porta sem sed orci eleifend euismod. Aliquam vulputate consequat nisl, <a href="http://en.wikipedia.org/wiki/Gold">et semper nibh consectetur in. Praesent eu dolor lacus, id porttitor tellus. Sed nec consequat orci. In hac habitasse platea dictumst. Maecenas semper malesuada orci, vestibulum cursus mi venenatis vel. Nunc vitae augue turpis. Etiam molestie tempus purus posuere vehicula. Nulla facilisi.</a> Donec fermentum porta iaculis. Nam tristique arcu nunc. Sed volutpat blandit orci vitae tempus. Phasellus non turpis sed mauris vehicula posuere quis nec dui.
+			</p>
+			<p>
+		<a href="http://en.wikipedia.org/wiki/Gold"><img style="float: right;" src="http://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Ag-Au-Cu-colours-english.svg/220px-Ag-Au-Cu-colours-english.svg.png">Pellentesque</a> sit amet neque non tortor vehicula imperdiet vitae viverra velit. Morbi nunc arcu, dignissim quis ornare vel, mattis eget dui. Nulla urna massa, tincidunt sit amet auctor sit amet, dignissim et augue. Sed accumsan pharetra metus vel egestas. Phasellus semper elit nisl, at viverra dui. Donec faucibus tempus nibh, eu ullamcorper dolor varius et. Pellentesque venenatis odio a <a href="http://en.wikipedia.org/wiki/Gold">erat aliquam vehicula. Integer a odio sit amet lectus placerat blandit eget et quam. Aenean at</a> arcu nec urna pharetra eleifend non vel ligula. Ut velit ligula, cursus sit amet dapibus quis, consequat eu massa. Ut facilisis erat at magna sodales interdum. Cras sit amet eros sed elit convallis rutrum. Integer a ipsum vitae nibh auctor sagittis. Vestibulum sit amet turpis tortor, sit amet sagittis massa. Proin metus metus, elementum quis euismod id, tristique quis metus. Curabitur nisi arcu, ullamcorper eget facilisis non, blandit in odio. Quisque suscipit est sed dolor pretium vel semper orci adipiscing. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
+			</p>
+	</div>
+	<hr/>
+	<h2>Download Url Targets (image files)</h2>
+	<ul>
+		<li><a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYmikzzyFUXbVH1OZXdxjbn2R3J3ia-t2BFxIVm98HEgG3xUrV">Sample Image 1</a></li>
+		<li><a href="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQ-s6qdzk5C2JInyvLKbNnzDN7oh97bxJnI8lXqWw8achzXwt4C">Sample Image 2</a></li>
+		<li><a href="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTEDAJs_hJKiNUhV7bp5rbMw6hzV3T0zLZIjsUbqupcY-GIUtgWjg">Sample Image 3</a></li>
+	</ul>
+	<h2>Links with dangerous content (copy to clipboard sanitize)</h2>
+	<ul>
+		<li><a href="http://en.wikipedia.org/wiki/Gold">This link title contains a < and > in it</a></li>
+		<li><a href="&quot;&gt;http://<script src=&quot;//evil.com&quot;/&gt;">This link contains &lt;script&gt;</a></li>
+	</ul>
+	<div style="float: right;">
+		<div onmouseover="document.getElementById('gold-hover-show').style.display='';" style="margin-right: 100px;">
+			<span id="hover">Hover over me</span><br>
+			<a debug="1" which="under" href="http://images.google.com/imgres?q=gold&hl=en&sa=X&tbas=0&biw=1600&bih=1089&tbm=isch&tbnid=C0c1mqQ_Yaj6SM:&imgrefurl=http://nowiknow.com/south-koreas-reverse-gold-rush/&docid=S26NQjiXVJmrIM&imgurl=http://nowiknow.com/wp-content/uploads/2012/08/01-gold-bar.jpeg&w=500&h=353&ei=HLCXUNvQIce62gXgi4C4Aw&zoom=1&iact=rc&dur=235&sig=114325496102460811924&page=1&tbnh=137&tbnw=194&start=0&ndsp=41&ved=1t:429,r:2,s:0,i:140&tx=102&ty=62">
+				<img width="194" height="137" src="data:image/jpeg;base64,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">
+			</a>
+		</div>
+		<div id="gold-hover-show" style="display: none; position: relative; top: -175px; left: -50px;" onmouseout="this.style.display='';">
+			<a debug="1" which="over" href="http://images.google.com/imgres?q=gold&hl=en&sa=X&tbas=0&biw=1600&bih=1089&tbm=isch&tbnid=C0c1mqQ_Yaj6SM:&imgrefurl=http://nowiknow.com/south-koreas-reverse-gold-rush/&docid=S26NQjiXVJmrIM&imgurl=http://nowiknow.com/wp-content/uploads/2012/08/01-gold-bar.jpeg&w=500&h=353&ei=HLCXUNvQIce62gXgi4C4Aw&zoom=1&iact=rc&dur=235&sig=114325496102460811924&page=1&tbnh=137&tbnw=194&start=0&ndsp=41&ved=1t:429,r:2,s:0,i:140&tx=102&ty=62">
+				<img width="267" height="189" src="http://t1.gstatic.com/images?q=tbn:ANd9GcQ-s6qdzk5C2JInyvLKbNnzDN7oh97bxJnI8lXqWw8achzXwt4C">
+			</a>
+		</div>
+	</div>
+	<h2>Checkboxes &amp; Buttons</h2>
+		<p>
+			<input type="checkbox" value="0" checked> Non-Labeled Checkbox<br>
+			<input type="button" value="Button For Clicking"><br>
+			<label><input type="checkbox" value="0"> Labeled Checkbox (Enclosed)</label><br>
+			<input type="checkbox" id="label-for-checkbox" value="0" checked> <label for="label-for-checkbox">Labeled Checkbox (for=id)</label><br>
+			<input type="button" value="Button For Clicking"><br>
+			<input type="checkbox" value="0" checked> Non-Labeled Checkbox #2<br>
+		</p>
+		<p>
+			<input type="checkbox" value="0" checked> Non-Labeled Checkbox #3<br>
+			<input type="button" value="Button For Clicking"><br>
+			<label style="display: block;"><input type="checkbox" value="0"> Labeled Checkbox (Enclosed) #2</label>
+			<input type="checkbox" value="0" id="label-for-checkbox2"  checked> <span>Spacer</span> <label for="label-for-checkbox2">Labeled Checkbox (for=id) #2</label><br>
+		</p>
+		<p>
+			<input type="button" value="Button For Clicking">
+			<input type="submit" value="Submit Button For Clicking">
+		</p>
+		<p>
+			<span>
+				<label><input type="radio" name="Radio1" value="Radio1">Radio 1</label>
+				<label><input type="radio" name="Radio1" value="Radio2">Radio 2</label>
+				<label><input type="radio" name="Radio1" value="Radio3">Radio 3</label>
+			</span>
+		</p>
+		<p>
+			<span>
+				<label><input type="radio" name="Radio2" value="Radio1">Radio 1</label>
+				<label><input type="radio" name="Radio2" value="Radio2">Radio 2</label>
+				<label><input type="radio" name="Radio2" value="Radio3">Radio 3</label>
+			</span>
+		</p>
+	<script language="javascript">
+		/* Converts an iterable element to an array */
+		function $A(iterable) {
+			if (!iterable) return [];
+			if ('toArray' in Object(iterable)) return iterable.toArray();
+			var length = iterable.length || 0, results = new Array(length);
+			while (length--) results[length] = iterable[length];
+			return results;
+		}
+
+		window.addEventListener('load', function() {
+			$A(document.body.querySelectorAll('INPUT')).forEach( function(elem) {
+				if(elem.getAttribute('type') == 'button' || elem.getAttribute('type') == 'submit' || elem.getAttribute('type') == 'checkbox') {
+					elem.addEventListener('click', function(e) {
+						if(this.OrigValue == undefined) {
+							this.OrigValue = this.value;
+							this.value = 'Clicked!';
+							this.style.backgroundColor = '#00FF00';
+							this.style.border = '1px solid blue';
+							this.style.padding = '4px';
+						}
+						setTimeout( function() {
+							this.value = this.OrigValue;
+							delete this.OrigValue;
+							this.style.backgroundColor = '';
+							this.style.border = '';
+							this.style.padding = '';
+						}.bind(this), 3000);
+					}, false );
+				}
+			}, this );
+		}, false );
+	</script>
+	<hr/>
+	<h2>JavaScript Links - Assign Location</h2>
+		<table>
+			<thead>
+				<tr>
+					<th colspan="3">Normal</th>
+					<th colspan="3">JavaScript</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: large;">Gold</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: medium;">Gold</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: small;">Gold</a></td>
+					<td><a href="javascript:load_page('Gold')" style="font-size: large;">Gold</a></td>
+					<td><a href="javascript:load_page('Gold')" style="font-size: medium;">Gold</a></td>
+					<td><a href="javascript:load_page('Gold')" style="font-size: small;">Gold</a></td>
+				</tr>
+				<tr>
+					<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+					<td><a href="javascript:load_page('Gold')">Gold</a></td>
+					<td><a href="javascript:load_page('Gold')">Gold</a></td>
+					<td><a href="javascript:load_page('Gold')">Gold</a></td>
+				</tr>
+				<tr>
+					<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+					<td><a href="javascript:load_page('Silver')">Silver</a></td>
+					<td><a href="javascript:load_page('Silver')">Silver</a></td>
+					<td><a href="javascript:load_page('Silver')">Silver</a></td>
+				</tr>
+				<tr>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+					<td><a href="javascript:load_page('Bronze')">Bronze</a></td>
+					<td><a href="javascript:load_page('Bronze')">Bronze</a></td>
+					<td><a href="javascript:load_page('Bronze')">Bronze</a></td>
+				</tr>
+				<tr>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small;">Bronze</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small;">Bronze</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small;">Bronze</a></td>
+					<td><a href="javascript:load_page('Bronze')" style="font-size: small;">Bronze</a></td>
+					<td><a href="javascript:load_page('Bronze')" style="font-size: small;">Bronze</a></td>
+					<td><a href="javascript:load_page('Bronze')" style="font-size: small;">Bronze</a></td>
+				</tr>
+			</tbody>
+		</table>
+	<script language="javascript">
+	function load_page(page) { window.location.assign('http://en.wikipedia.org/wiki/'+ page); }
+	</script>
+	<hr/>
+	<h2>JavaScript Links - Popup Window</h2>
+		<table>
+			<thead>
+				<tr>
+					<th colspan="3">Normal</th>
+					<th colspan="3">JavaScript</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Gold">Gold</a></td>
+					<td><a href="javascript:popup_page('Gold')">Gold</a></td>
+					<td><a href="javascript:popup_page('Gold')">Gold</a></td>
+					<td><a href="javascript:popup_page('Gold')">Gold</a></td>
+				</tr>
+				<tr>
+					<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Silver">Silver</a></td>
+					<td><a href="javascript:popup_page('Silver')">Silver</a></td>
+					<td><a href="javascript:popup_page('Silver')">Silver</a></td>
+					<td><a href="javascript:popup_page('Silver')">Silver</a></td>
+				</tr>
+				<tr>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze">Bronze</a></td>
+					<td><a href="javascript:popup_page('Bronze')">Bronze</a></td>
+					<td><a href="javascript:popup_page('Bronze')">Bronze</a></td>
+					<td><a href="javascript:popup_page('Bronze')">Bronze</a></td>
+				</tr>
+			</tbody>
+		</table>
+	<script language="javascript">
+		function popup_page(page) { window.open('http://en.wikipedia.org/wiki/'+ page); }
+	</script>
+	<hr/>
+	<h2>Normal Links Table</h2>
+		<table>
+			<tbody>
+				<tr>
+					<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: large; font-weight: bold;">Gold 1</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: medium;">Gold 2</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: small;">Gold 3</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: large;">Gold 4</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: medium;">Gold 5</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Gold" style="font-size: small;">Gold 6</a></td>
+				</tr>
+				<tr>
+					<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: large;">Silver 1</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: medium; font-weight: bold;">Silver 2</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: small;">Silver 3</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: large;">Silver 4</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: medium;">Silver 5</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Silver" style="font-size: small;">Silver 6</a></td>
+				</tr>
+				<tr>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: large;">Bronze 1</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: medium;">Bronze 2</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small; font-weight: bold;">Bronze 3</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: large;">Bronze 4</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: medium;">Bronze 5</a></td>
+					<td><a href="http://en.wikipedia.org/wiki/Bronze" style="font: bold 16px Verdana; ">Bronze 6</a></td>
+				</tr>
+			</tbody>
+		</table>
+	<hr/>
+	<h2>Javascript Elements with click handlers (targeted for .click() because they have cursor: pointer</h2>
+	<table id="JS_Click_Events_Tester" style="border-spacing: 6px;">
+		<tr><th></th>			<TH>IMG</TH>	<TH>SPAN</TH>	<TH>DIV</TH></tr>
+		<tr>						<th>"onclick"</th>				<td><img src="http://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/22px-Flag_of_the_United_States.svg.png" onclick="this.classList.toggle('highlighted')"></td>
+																	<td><span onclick="this.classList.toggle('highlighted')">span</span></td>
+																	<td><div onclick="this.classList.toggle('highlighted')">div</div></td></tr>
+		<tr id="onclick-via-js">	<th>.onclick</th>				<td><img src="http://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/22px-Flag_of_the_United_States.svg.png"></td>
+																	<td><span>span</span></td>
+																	<td><div>div</div></td></tr>
+		<tr id="click_via_addEvent">		<th>.addEventListener</th>		<td><img src="http://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/22px-Flag_of_the_United_States.svg.png"></td>
+																	<td><span>span</span></td>
+																	<td><div>div</div></td></tr>
+	</table>
+	<a href="http://en.wikipedia.org/wiki/Bronze" style="font-size: small;">Bottom of Document Link (Wikipedia Bronze)</a>
+	<script language="javascript">
+		var elem;
+		elem = document.getElementById('onclick-via-js');
+		Array.prototype.forEach.call(elem.querySelectorAll('td > *'), function(elem) {
+			elem.onclick = () => this.classList.toggle('highlighted');
+		});
+
+		elem = document.getElementById('click_via_addEvent');
+		Array.prototype.forEach.call(elem.querySelectorAll('td > *'), function(elem) {
+			elem.addEventListener('click', () =>  this.classList.toggle('highlighted'));
+		});
+
+	</script>
+	<div id="MouseBox" class="Closed"></div>
+	<script defer="defer" type="text/javascript">
+		var MouseBox = document.getElementById('MouseBox');
+		MouseBox.UpdateContent = function(e) {
+			if(e) {
+				this.Detail =
+					'<table>' +
+						'<tr><th>' +	'e.clientX/Y'			+ '</th><td>' + e.clientX 						+ ', ' + e.clientY 						+ '</td></tr>' +
+						'<tr><th>' +	'e.screenX/Y'			+ '</th><td>' + e.screenX						+ ', ' + e.screenY 						+ '</td></tr>' +
+						'<tr><th>' +	'e.pageX/Y'				+ '</th><td>' + e.pageX 						+ ', ' + e.pageY 						+ '</td></tr>' +
+						'<tr><th>' +	'window.scrollX/Y'		+ '</th><td>' + window.scrollX 					+ ', ' + window.scrollY 				+ '</td></tr>' +
+						'<tr><th>' +	'window.scrollMaxX/Y'	+ '</th><td>' + window.scrollMaxX 				+ ', ' + window.scrollMaxY 				+ '</td></tr>' +
+					'</table>';
+			}
+			if(this.className.includes('Closed')) {
+				this.innerHTML = '&#9194;';
+			} else {
+				this.innerHTML = this.Detail;
+			}
+		};
+		document.addEventListener('mousemove', MouseBox.UpdateContent.bind(MouseBox), true);
+		MouseBox.addEventListener('click', function(e) {
+			this.className = this.className == 'Closed'
+				? ''
+				: 'Closed';
+			this.UpdateContent();
+		}.bind(MouseBox));
+		MouseBox.UpdateContent();
+		document.querySelector('DIV.Issues').addEventListener('click', function(e) {
+			if(e.target.nodeType == 1 && e.target.tagName == 'H1') {
+				e.target.className = e.target.className == ""
+					? 'Open'
+					: '';
+			}
+		} );
+	</script>
+	</body>
+</html>

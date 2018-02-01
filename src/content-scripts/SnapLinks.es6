@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Clint Priest
+ * Copyright (c) 2016-2018 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -44,21 +44,18 @@ class EventHandler {
 		/* Static use of no-modifiers down and right mouse button down */
 		e.mods = (e.ctrlKey) + (e.altKey << 1) + (e.shiftKey << 2);
 
-		if(e.buttons == RMB) {
-			switch(e.mods) {
-				case CTRL + ALT:
-					if(data.Dev.Enabled) {
-						this.StopNextContextMenu();
-						e.preventDefault();
-						e.stopPropagation();
-						browser.runtime.sendMessage({ Action: RELOAD_EXTENSION });
-					}
-					break;
-
-				case NONE:
-					this.BeginDrag(e);
-					break;
+		if(Prefs.DevMode) {
+			if(e.mods == CTRL + ALT && e.buttons == RMB) {
+				this.StopNextContextMenu();
+				e.preventDefault();
+				e.stopPropagation();
+				browser.runtime.sendMessage({ Action: RELOAD_EXTENSION });
 			}
+		}
+		if(e.mods == Prefs.ActivateModifiers && e.buttons == Prefs.ActivateMouseButton) {
+			this.BeginDrag(e);
+			e.preventDefault();
+			e.stopPropagation();
 		}
 	}
 

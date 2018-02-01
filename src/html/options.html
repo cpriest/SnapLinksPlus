@@ -1,6 +1,6 @@
 ﻿<!DOCTYPE html>
 <!--
-  ~ Copyright (c) 2016 Clint Priest
+  ~ Copyright (c) 2016-2018 Clint Priest
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
   ~ to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -17,14 +17,85 @@
 
 <html>
 <head>
-	<meta charset="utf-8" />
+	<meta charset="utf-8"/>
 	<script type="application/javascript" src="../lib/Configs.js"></script>
 	<script type="application/javascript" src="../globals.es6"></script>
 	<script type="application/javascript" src="../lib/Options.js"></script>
+	<style>
+		BODY { width: 500px; }
+		LABEL { display: block; margin: 8px 4px 8px 0px ; }
+		INPUT[type=checkbox] { margin: 0px 4px; vertical-align: -2px; }
+		INPUT[type=checkbox]:enabled { cursor: pointer; }
+		LABEL[title],
+			SELECT[title] { cursor: help;}
+		SUMMARY { font-weight: bold; }
+		DETAILS { margin: 12px 0px; }
+		FIELDSET { width: fit-content; width: -moz-fit-content; padding-right: 15px; }
+		FIELDSET:disabled { color: grey; }
+		FIELDSET:disabled INPUT { cursor: not-allowed; }
+
+	</style>
 </head>
 <body>
 
-    <p><label><input type="checkbox" id="SwitchFocusToNewTab">Switch focus to new tab</label></p>
-    <p><label><input type="checkbox" id="ShowNumberOfLinks">Show the number of selected links</label></p>
+<p><span>Select Elements when I hold down</span>
+	<select id="ActivateModifiers" title="The modifier keys to hold down while using the mouse button to activate selecting elements.">
+		<option value="0">No Modifier</option>
+		<option value="1">Control</option>
+		<option value="2">Alt</option>
+		<option value="3">Control & Alt</option>
+		<option value="4">Shift</option>
+		<option value="5">Control & Shift</option>
+		<option value="6">Alt & Shift</option>
+		<option value="7">Control, Alt & Shift</option>
+	</select>
+	<span>and I </span>
+	<select id="ActivateMouseButton" title="The mouse button to hold down and drag to select elements.">
+		<option value="1">Left Click</option>
+		<option value="4">Middle Click</option>
+		<option value="2">Right Click</option>
+	</select>
+	<span>and Drag</span>
+</p>
+<label title="Switch focus to the closest new tab when opening tabs.">
+	<input type="checkbox" id="SwitchFocusToNewTab">Switch focus to new tab
+</label>
+<label title="Show the number of selected unique links as a label while selecting.">
+	<input type="checkbox" id="ShowNumberOfLinks">Show the number of selected links
+</label>
+<details id="UI_AdvancedOptions_Section">
+	<summary>Advanced Settings</summary>
+	<p>
+	</p>
+	<details id="UI_DevOptions_Section">
+		<summary>Developer Options</summary>
+		<label title="Enable development mode features, usually for debugging issues.">
+			<input type="checkbox" id="DevMode">Enable Dev Mode
+		</label>
+		<fieldset id="DevMode_Options">
+			<label title="Log details about actions to console.">
+				<input type="checkbox" id="Dev_Log_ActionMessages">Log Action Messages
+			</label>
+			<label title="Logs elements whos coordinates are outside documents boundaries which are skipped during indexing.">
+				<input type="checkbox" id="Debug_Log_OutOfBoundElements">Log Out of Bound Elements
+			</label>
+			<label title="Skip all actions upon activation, this disables all actions from operating.">
+				<input type="checkbox" id="Dev_Skip_AllActions">Skip Activation Actions
+			</label>
+			<label title="Measure and report element indexing speed to console log (slows operation slightly).">
+				<input type="checkbox" id="Debug_Measure_IndexingSpeed">Measure Indexing Speed
+			</label>
+			<label title="Measure and report index search speed to console log (slows operation slightly).">
+				<input type="checkbox" id="Debug_Measure_SearchSpeed">Measure Search Speed
+			</label>
+			<label title="Visually shows index boundaries on document while selecting.">
+				<input type="checkbox" id="Debug_Show_IndexBoundaryMarkers">Show Index Boundary Markers
+			</label>
+			<label title="Shows markers indicating the element index buckets">
+				<input type="checkbox" id="Debug_Show_ObscuredMarks">Show Obscured Element Marks
+			</label>
+		</fieldset>
+	</details>
+</details>
 </body>
 </html>

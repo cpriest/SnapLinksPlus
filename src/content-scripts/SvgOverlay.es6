@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Clint Priest
+ * Copyright (c) 2016-2018 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -14,7 +14,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-"use strict";
+'use strict';
 
 /**
  * This class is intended to manage a transparent element sized to overlay the entire document and
@@ -60,7 +60,7 @@ let SvgOverlay = new class SvgOverlayMgr {
 	 * @param {HTMLElement} Container    The SnapLinks Container Element
 	 */
 	Init(Container) {
-		this.style   = data.HighlightStyles.ActOnElements;
+		this.style   = Prefs.HighlightStyles_ActOnElements;
 		this.Overlay = CreateElement(`
 			<svg class="SnapLinksHighlighter" xmlns="http://www.w3.org/2000/svg">
 				<rect width="0" height="0"/> <!-- Used for easily cloning the properly namespaced rect -->
@@ -123,10 +123,10 @@ let SvgOverlay = new class SvgOverlayMgr {
 		let tElems       = Elements.All || [],
 			tPrevElems   = this.HighlightedElements,
 			tUnhighlight = tPrevElems.filter(
-				(elem) => { return !tElems.includes(elem); }
+				(elem) => { return !tElems.includes(elem); },
 			),
 			tHighlight   = tElems.filter(
-				(elem) => { return !tPrevElems.includes(elem); }
+				(elem) => { return !tPrevElems.includes(elem); },
 			),
 			offset       = { x: window.scrollX, y: window.scrollY };
 
@@ -142,13 +142,13 @@ let SvgOverlay = new class SvgOverlayMgr {
 			for(let r of ElemDocRects.get(elem, offset)) {
 				tSvgRects.push(
 					this._AddRect({
-						x     : r.left,
-						y     : r.top,
-						width : r.width,
+						x:      r.left,
+						y:      r.top,
+						width:  r.width,
 						height: r.height,
-						style : this.style,
-						class : 'ActOn'
-					})
+						style:  this.style,
+						class:  'ActOn',
+					}),
 				);
 			}
 			this.HighlightElemMap.set(elem, tSvgRects);
@@ -169,8 +169,8 @@ let SvgOverlay = new class SvgOverlayMgr {
 			y:      y,
 			width:  docElem.scrollWidth,
 			height: 2,
-			style:  data.HighlightStyles.IndexBoundaryMarker,
-			class:  'IndexBoundaryMarker'
+			style:  Prefs.HighlightStyles_IndexBoundaryMarker,
+			class:  'IndexBoundaryMarker',
 		});
 	}
 
@@ -180,8 +180,8 @@ let SvgOverlay = new class SvgOverlayMgr {
 			y:      y,
 			width:  1,
 			height: 1,
-			style:  data.HighlightStyles[type],
-			class:  type
+			style:  Prefs[`HighlightStyles_${type}`],
+			class:  type,
 		}, attr));
 	}
 
@@ -191,8 +191,8 @@ let SvgOverlay = new class SvgOverlayMgr {
 			y:      y,
 			width:  width,
 			height: height,
-			style:  data.HighlightStyles[type],
-			class:  type
+			style:  Prefs[`HighlightStyles_${type}`],
+			class:  type,
 		}, attr));
 	}
 

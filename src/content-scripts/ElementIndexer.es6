@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Clint Priest
+ * Copyright (c) 2016-2018 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -202,16 +202,16 @@ let ElemIndex = new class ElementIndexer {
 	 */
 	UpdateIndex() {
 		let docHeight = docElem.scrollHeight,
-			Buckets   = data.IndexBuckets,
+			Buckets   = Prefs.IndexBuckets,
 			offset 	  = { x: window.scrollX, y: window.scrollY };
 
 		this.ElemChecks = new Map();
 
-		if(data.Debug.Show.IndexBoundaryMarkers)
+		if(Prefs.Debug_Show_IndexBoundaryMarkers)
 			SvgOverlay.Release('.IndexBoundaryMarker');
 		this.BoundaryIndex = [];
 		for(let j = 0; j < Buckets; j++) {
-			if(data.Debug.Show.IndexBoundaryMarkers)
+			if(Prefs.Debug_Show_IndexBoundaryMarkers)
 				SvgOverlay.AddIndexBoundaryMark((docHeight / Buckets) * j);
 			this.BoundaryIndex[j] = new Set();
 		}
@@ -220,7 +220,7 @@ let ElemIndex = new class ElementIndexer {
 //		console.log(this.BoundaryIndex);																// #DevCode
 
 		let rr;
-		if(data.Debug.Measure.IndexingSpeed)
+		if(Prefs.Debug_Measure_IndexingSpeed)
 			rr = new RateReporter('Calculated ${Count} Elements in ${Elapsed} (${PerSecond})');
 
 		for(let elem of this.Elements) {
@@ -236,7 +236,7 @@ let ElemIndex = new class ElementIndexer {
 
 			if(!this.BoundaryIndex[topIdx] || !this.BoundaryIndex[botIdx]) {
 				// Elements top or bottom is out of bounds, skip it
-				if(data.Debug.Log.OutOfBoundElements)
+				if(Prefs.Debug_Log_OutOfBoundElements)
 					console.log('oob: %o, br.t: %d, br.b: %d, scrollY: %d, docHeight: %d', elem, br.top, br.bottom, scrollY, docHeight, topIdx, botIdx);
 				continue;
 			}
@@ -273,11 +273,11 @@ let ElemIndex = new class ElementIndexer {
 	 */
 	Search(sel) {
 		let rr;
-		if(data.Debug.Measure.SearchSpeed)
+		if(Prefs.Debug_Measure_SearchSpeed)
 			rr = new RateReporter('Found ${Count} Elements in ${Elapsed} (${PerSecond})');
 
 		let docHeight   = document.documentElement.scrollHeight,
-			Buckets     = data.IndexBuckets,
+			Buckets     = Prefs.IndexBuckets,
 			FirstBucket = Math.floor(sel.top * Buckets / docHeight),
 			LastBucket  = Math.floor(sel.bottom * Buckets / docHeight),
 			offset      = { x: window.scrollX, y: window.scrollY },
@@ -327,7 +327,7 @@ let ElemIndex = new class ElementIndexer {
 								// let yy, zzz = Array.from(document.elementsFromPoint(left, top));		// #DevCode
 								// console.log(elem, elPoint, [zzz], zzz.indexOf(elem));   				// #DevCode
 
-								if(data.Debug.Show.ObscuredMarks) {
+								if(Prefs.Debug_Show_ObscuredMarks) {
 									SvgOverlay.AddRect(r.left, r.top, r.width, r.height, 'ObscuredRect');
 									SvgOverlay.AddPoint(left, top, 'ObscuredPoint');
 									console.log('%o is obscured by %o, r=%o', elem, elPoint, r);

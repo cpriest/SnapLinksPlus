@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Clint Priest
+ * Copyright (c) 2016-2018 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -267,7 +267,7 @@ class SelectionRect {
 	 */
 	AlignCounter() {
 		let style = this.elRect.firstElementChild.style,
-			inset = data.selection.label.paddingFromCursor + 'px';
+			inset = Prefs.SelectionLabel_CursorMargin + 'px';
 
 		let InvertedHorizontally = this.dims.originLeft != this.dims.left,
 			InvertedVertically = this.dims.originTop != this.dims.top;
@@ -283,7 +283,7 @@ class SelectionRect {
 
 		// move slightly to the right for not to be blocked by mouse pointer
 		if(InvertedHorizontally && InvertedVertically)
-			style.left = (data.selection.label.paddingFromCursor + 16) + 'px';
+			style.left = (Prefs.SelectionLabel_CursorMargin + 16) + 'px';
 
 		style.display = Prefs.ShowNumberOfLinks
 			? ''
@@ -298,7 +298,7 @@ class SelectionRect {
 	 * @returns {boolean}
 	 */
 	IsLargeEnoughToActivate() {
-		return this.dims.width > data.selection.activate.minX || this.dims.height > data.selection.activate.minY;
+		return this.dims.width > Prefs.Activation_MinX || this.dims.height > Prefs.Activation_MinY;
 	}
 
 	/**

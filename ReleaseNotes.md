@@ -6,6 +6,7 @@ v3.1.2 - Not Yet Released
  - Fixed an issue with checkboxes
  - Added support for Containers
  - Added support for Child/Parent tabs (Tab Tree View)
+ - Updated Options/Config to include expanded functionality
 
 v3.1.1.3 - Released Dec 16, 2016
 ================================
