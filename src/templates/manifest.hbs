@@ -15,7 +15,9 @@
 	"minimum_chrome_version": 	"51",
 
 	"permissions":	[
-		"storage"
+		"storage",
+		"tabs",
+		"<all_urls>"
 	],
 
 	"icons": {
@@ -33,11 +35,6 @@
 {{/Firefox}}
 
 	"background": {
-
-{{#Chrome}}
-{{!		"persistent": false, }}
-{{/Chrome}}
-
 		"scripts": [
 			"src/lib/browser-polyfill.min.js",
 			"src/lib/Configs.js",

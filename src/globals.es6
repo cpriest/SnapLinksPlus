@@ -97,3 +97,13 @@ const ElementsSelected = 'ElementsSelected';
 function $(css) {
 	return Array.from(document.documentElement.querySelectorAll(css));
 }
+
+/**
+ * Doesn't seem to be called in Chrome or Firefox, but may perhaps work one day in both
+ *    https://developer.mozilla.org/en-US/docs/Web/Events/unhandledrejection
+ **/
+window.addEventListener('unhandledrejection', (e) => {
+	console.error('Unhandled Promise Rejection: %o', e);
+});
+
+setTimeout(() => console.log('referer: %s', window.document.referrer),500);

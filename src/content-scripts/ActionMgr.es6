@@ -43,18 +43,28 @@ let ActionHandler = new (
 		 * @param {Element[]} links
 		 */
 		OpenLinks(links) {
+			// if(isFirefox) {
+				browser.runtime.sendMessage({
+					Action: OPEN_URLS_IN_TABS,
+					BaseUrl: window.location.href,
+					tUrls: links.map((elem) => elem.href),
+					// tUrls: links,
+				});
+			// return;
+			// }
+
 			//////////////////////////////////////////////////////
 			//////////////////////////////////////////////////////
 			//! NOTE: This doesn't work in Firefox (popup blocker) !
 			//////////////////////////////////////////////////////
 			//////////////////////////////////////////////////////
 
-			for(let elem of links) {
-				let oldTarget = elem.target;
-				elem.target   = "_blank";
-				elem.click();
-				elem.target = oldTarget;
-			}
+			// for(let elem of links) {
+			// 	let oldTarget = elem.target;
+			// 	elem.target   = "_blank";
+			// 	elem.click();
+			// 	elem.target = oldTarget;
+			// }
 		}
 		/**
 		 * Performs the default action for the SelectedElements
