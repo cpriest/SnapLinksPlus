@@ -7,9 +7,16 @@
     - Signing of beta versions for wider testing
 
  - **Test, issue?**
+    - Possible improvement to obscured element detection:
+        - Use the middle point of the intersection of the selection rect and the bounding rect
+            rather than the middle point of the bounding rect, this catches cases where the bottom
+            half of the element is obscured, but not all of it
+
+     - Consider: querySelectorAll('*:enabled') may give all elements of concern, even Elements which are divs but have an onclick() enabled or listened to.
+
 
  -  **Todo**
-
+    - Switch this._onKeyUp = ... .bind() to this.onKeyUp = ... .bind()
 
 # Next Major Release (3.2.0)
  - **Bugs**

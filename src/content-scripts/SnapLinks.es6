@@ -34,7 +34,12 @@ class EventHandler {
 		this._onKeyDown     = this.onKeyDown.bind(this);
 		this._onKeyUp       = this.onKeyUp.bind(this);
 
-		document.addEventListener('mousedown', this.onMouseDown.bind(this), true);
+		this.onMouseDown = this.onMouseDown.bind(this);
+
+		docElem.addEventListener('scroll', (e) => {
+			pub(ElementPositionsChanged, {});
+		}, true);
+		docElem.addEventListener('mousedown', this.onMouseDown, true);
 	}
 
 	/**

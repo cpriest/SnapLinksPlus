@@ -14,7 +14,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-"use strict";
+'use strict';
 
 let ElemDocRects = new (
 	/**
@@ -24,6 +24,9 @@ let ElemDocRects = new (
 		/** Creates a new RectMapper */
 		constructor() {
 			sub(DocSizeChanged, (topic, data, Subscription) => {
+				this.clear();
+			});
+			sub(ElementPositionsChanged, (topic, data, Subscription) => {
 				this.clear();
 			});
 
@@ -64,10 +67,10 @@ let ElemDocRects = new (
 			let br = Rects
 				.reduce((dims, r) => {
 					return {
-						top:	Math.min(dims.top, r.top),
-						left:	Math.min(dims.left, r.left),
+						top:    Math.min(dims.top, r.top),
+						left:   Math.min(dims.left, r.left),
 						bottom: Math.max(dims.bottom, r.bottom),
-						right:	Math.max(dims.right, r.right),
+						right:  Math.max(dims.right, r.right),
 					};
 				}, { top: Number.MAX_VALUE, left: Number.MAX_VALUE, bottom: 0, right: 0 });
 
@@ -92,7 +95,7 @@ let ElemDocRects = new (
 			switch(elem.tagName) {
 				case 'A':
 					// If an anchor has no innerText except white-space and has an IMG child, just use the IMG
-					if(elem.innerText.trim() == "" && elem.childElementCount == 1 && elem.firstElementChild.tagName == 'IMG') {
+					if(elem.innerText.trim() === '' && elem.childElementCount == 1 && elem.firstElementChild.tagName == 'IMG') {
 						Rects = Array.from(elem.firstElementChild.getClientRects());
 					} else {
 						// Otherwise, include all IMG elements within the <A>
@@ -100,8 +103,8 @@ let ElemDocRects = new (
 							.forEach(
 								/** @param {Element} elem */
 								(elem) =>
-									Rects = Rects.concat(Array.from(elem.getClientRects()))
-								);
+									Rects = Rects.concat(Array.from(elem.getClientRects())),
+							);
 					}
 					break;
 				case 'INPUT':
@@ -116,11 +119,12 @@ let ElemDocRects = new (
 					break;
 			}
 			return Rects.map(function(rect) {
-				return new Rect(rect.top + offset.y, rect.left + offset.x,
-					rect.bottom + offset.y, rect.right + offset.x);
-			}).filter((rect) => {
-				return rect.width !== 0 && rect.height !== 0;
-			});
+					return new Rect(rect.top + offset.y, rect.left + offset.x,
+						rect.bottom + offset.y, rect.right + offset.x);
+				})
+				.filter((rect) => {
+					return rect.width !== 0 && rect.height !== 0;
+				});
 		}
 
 		/**
@@ -135,9 +139,9 @@ let ElemDocRects = new (
 			let CachedStyle = this.StyleCache.get(elem);
 
 			if(!CachedStyle) {
-				let ComputedStyle = window.getComputedStyle(elem);
-				CachedStyle       = {
-					fontSize  : ComputedStyle.fontSize,
+				let ComputedStyle     = window.getComputedStyle(elem);
+				CachedStyle           = {
+					fontSize:   ComputedStyle.fontSize,
 					fontWeight: this.TranslateWeight(ComputedStyle.fontWeight),
 				};
 				CachedStyle.fontScore = (parseInt(CachedStyle.fontSize.replace(/\D+/g, '')) * 100) + (CachedStyle.fontWeight / 10);
@@ -174,26 +178,61 @@ let ElemIndex = new class ElementIndexer {
 	/** Constructs a new ElementIndexer */
 	constructor() {
 		sub(DragRectChanged, (topic, data, Subscription) => {
-			if(!this.Elements) {
-				this.Elements = document.querySelectorAll(
-					'A[href]:not([href=""]), ' +
-					'INPUT[type="button"], ' +
-					'INPUT[type="submit"], ' +
-					'INPUT[type="reset"], ' +
-					'INPUT[type="checkbox"], ' +
-					'INPUT[type="radio"]'
-				);
-
+			if(!this.Elements)
 				this.UpdateIndex();
-			}
+
+			this.LastDragDims = data.dims;
+
 			if(data.visible) {
-				pub(ElementsSelected, this.Search(data.dims));
+				pub(ElementsSelected, this.Search(this.LastDragDims));
 			}
 		});
 
 		sub(DragCompleted, () => {
-			delete this.Elements;
+			delete this._Elements;
 		});
+		sub(ElementPositionsChanged, () => {
+			this.UpdateIndex();
+			pub(ElementsSelected, this.Search(this.LastDragDims));
+		});
+	}
+
+	/**
+	 * @returns {Set<Element>}
+	 */
+	get Elements() {
+		if(this._Elements)
+			return this._Elements;
+
+		this._Elements = new Set(document.querySelectorAll(
+			'A[href]:not([href=""]), ' +
+			'INPUT[type="button"], ' +
+			'INPUT[type="submit"], ' +
+			'INPUT[type="reset"], ' +
+			'INPUT[type="checkbox"], ' +
+			'INPUT[type="radio"]',
+		));
+
+		let rr,	offset = { x: window.scrollX, y: window.scrollY },
+			Pruned = 0;
+
+		if(Prefs.Debug_Measure_IndexingSpeed)
+			rr = new RateReporter(`Pruned \${Count} of ${this._Elements.size} Queried Elements in \${Elapsed} (\${PerSecond})`);
+
+		for(let elem of this._Elements) {
+			let br = ElemDocRects.getBounding(elem, offset);
+
+			if(br.height <= 0 || br.width <= 0) {
+				Pruned++;
+				this._Elements.delete(elem);
+			}
+		}
+		if(rr)
+			rr.report(Pruned);
+
+		this.UpdateIndex();
+
+		return this._Elements;
 	}
 
 	/**
@@ -203,12 +242,14 @@ let ElemIndex = new class ElementIndexer {
 	UpdateIndex() {
 		let docHeight = docElem.scrollHeight,
 			Buckets   = Prefs.IndexBuckets,
-			offset 	  = { x: window.scrollX, y: window.scrollY };
+			offset    = { x: window.scrollX, y: window.scrollY },
+			rr;
 
 		this.ElemChecks = new Map();
 
 		if(Prefs.Debug_Show_IndexBoundaryMarkers)
 			SvgOverlay.Release('.IndexBoundaryMarker');
+
 		this.BoundaryIndex = [];
 		for(let j = 0; j < Buckets; j++) {
 			if(Prefs.Debug_Show_IndexBoundaryMarkers)
@@ -219,7 +260,6 @@ let ElemIndex = new class ElementIndexer {
 //		console.log('Buckets: %d, scrollY: %d, docHeight: %d', Buckets, scrollY, docHeight);			// #DevCode
 //		console.log(this.BoundaryIndex);																// #DevCode
 
-		let rr;
 		if(Prefs.Debug_Measure_IndexingSpeed)
 			rr = new RateReporter('Calculated ${Count} Elements in ${Elapsed} (${PerSecond})');
 
@@ -229,10 +269,20 @@ let ElemIndex = new class ElementIndexer {
 //			let br = elem.getBoundingClientRect();
 
 			// 5x Slower but perfectly accurate
-			let	br = ElemDocRects.getBounding(elem, offset);
+			let br = ElemDocRects.getBounding(elem, offset);
 
 			let topIdx = Math.floor(br.top * Buckets / docHeight),
 				botIdx = Math.floor(br.bottom * Buckets / docHeight);
+
+			if(Prefs.DevMode && Tracking(elem)) {
+				console.log('Track[Indexer]: %o\n\t%o', elem,
+					{
+						'Buckets.top/bottom/max': `${topIdx}, ${botIdx}, ${Prefs.IndexBuckets}`,
+						'BoundingRect':          { top: br.top, bottom: br.bottom },
+						'Window.scrollY':        scrollY,
+						'Document.scrollHeight': docHeight,
+					});
+			}
 
 			if(!this.BoundaryIndex[topIdx] || !this.BoundaryIndex[botIdx]) {
 				// Elements top or bottom is out of bounds, skip it
@@ -241,11 +291,10 @@ let ElemIndex = new class ElementIndexer {
 				continue;
 			}
 
-			for(let j=topIdx;j<=botIdx; j++)
+			for(let j = topIdx; j <= botIdx; j++)
 				this.BoundaryIndex[j].add(elem);
 		}
-		if(rr)
-			rr.report(this.Elements.length);
+		rr && rr.report(this.Elements.size);
 	}
 
 	/**
@@ -272,6 +321,9 @@ let ElemIndex = new class ElementIndexer {
 	 * @param {Rect} sel    The rect in document coordinates to search
 	 */
 	Search(sel) {
+		if(!(sel instanceof Rect))
+			return new CategorizedCollection();
+
 		let rr;
 		if(Prefs.Debug_Measure_SearchSpeed)
 			rr = new RateReporter('Found ${Count} Elements in ${Elapsed} (${PerSecond})');
@@ -282,10 +334,10 @@ let ElemIndex = new class ElementIndexer {
 			LastBucket  = Math.floor(sel.bottom * Buckets / docHeight),
 			offset      = { x: window.scrollX, y: window.scrollY },
 			Matches     = new Set(),
-			NonMatches	= new Set();
+			NonMatches  = new Set();
 
-		let [ clientWidth, clientHeight ] = GetClientDims();
-		let elContainer = document.querySelector('DIV.SnapLinksContainer');
+		let [clientWidth, clientHeight] = GetClientDims();
+		let elContainer                 = document.querySelector('DIV.SnapLinksContainer');
 
 		// We move our container down the zIndex for document.elementFromPoint purposes, seems to have little impact on performance
 		elContainer.style.zIndex = '-999999';
@@ -295,7 +347,7 @@ let ElemIndex = new class ElementIndexer {
 				if(Matches.has(elem) || NonMatches.has(elem))
 					continue;
 
-				let elemNotes = this.ElemChecks.get(elem) || { };
+				let elemNotes = this.ElemChecks.get(elem) || {};
 
 				// If the element is obscured, remove it and move on (could be in multiple buckets)
 				if(true === elemNotes.Obscured) {
@@ -317,7 +369,7 @@ let ElemIndex = new class ElementIndexer {
 						let left = r.left + (r.width / 2) - offset.x,
 							top  = r.top + (r.height / 2) - offset.y;
 
-						if (left > 0 && left < clientWidth && top > 0 && top < clientHeight) {
+						if(left > 0 && left < clientWidth && top > 0 && top < clientHeight) {
 							let elPoint = document.elementFromPoint(left, top);
 
 							if(elPoint != elem && !elem.contains(elPoint) && elPoint.tagName !== 'LABEL') {

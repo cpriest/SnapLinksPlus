@@ -47,17 +47,18 @@ const DefaultPrefs = {
 	HighlightStyles_ActOnElements:       'fill: rgba(0,255,0,.10); stroke: rgba(0,255,0,1); stroke-width: 1px;',
 	HighlightStyles_IndexBoundaryMarker: 'fill: rgba(128,128,128,.5);',
 
+	HighlightStyles_ObscuredPoint: 'fill: rgba(255,0,0,.80);',
+	HighlightStyles_ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
+
 	SwitchFocusToNewTab: true,
 	ShowNumberOfLinks:   true,
 	ActivateModifiers:   NONE,
 	ActivateMouseButton: RMB,
 
-	DevMode:            false,
+	DevMode:                false,
 	Dev_Log_ActionMessages: true,
 	Dev_Skip_AllActions:    true,
 
-	Dev_HighlightStyles_ObscuredPoint: 'fill: rgba(255,0,0,.80);',
-	Dev_HighlightStyles_ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
 
 	Debug_Measure_IndexingSpeed:     false,
 	Debug_Measure_SearchSpeed:       false,
@@ -66,7 +67,7 @@ const DefaultPrefs = {
 	Debug_Show_ObscuredMarks:        false,
 
 	UI_AdvancedOptions_Section: false,
-	UI_DevOptions_Section: false,
+	UI_DevOptions_Section:      false,
 };
 
 // Configurations
@@ -80,9 +81,10 @@ Prefs.loaded.then((aValues) => {
 ///////////////////
 
 // Publisher: EventHandler
-const DragRectChanged = 'DragRectChanged',
-	  DragCompleted   = 'DragCompleted';
-const DocSizeChanged  = 'DocSizeChanged';
+const DragRectChanged         = 'DragRectChanged',
+	  DragCompleted           = 'DragCompleted';
+const DocSizeChanged          = 'DocSizeChanged',
+	  ElementPositionsChanged = 'ElementPositionsChanged';
 
 // Publisher: SelectionRect
 const ContainerElementCreated = 'ContainerElementCreated';
@@ -96,4 +98,13 @@ const ElementsSelected = 'ElementsSelected';
  */
 function $(css) {
 	return Array.from(document.documentElement.querySelectorAll(css));
+}
+
+/**
+ * Returns true if we are tracking the given element
+ *
+ * @param {HTMLElement} el
+ */
+function Tracking(el) {
+	return false && el && el.tagName == 'A' && el.href == 'https://eggcave.com/click/2194270';
 }

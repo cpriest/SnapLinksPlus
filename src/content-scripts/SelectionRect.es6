@@ -160,8 +160,13 @@ class SelectionRect {
 			CreateElement(`
 				<style>
 					.SnapLinksContainer :not([xyz]) {  }
-					.SnapLinksContainer .SnapLinksHighlighter { all: initial; position: absolute; top: 0px; left: 0px; width: 10px; height: 10px; overflow: visible; }
-					.SnapLinksContainer { z-index: 999999; top: 0px; left: 0px; margin: 0px; padding: 0px; position: absolute; height: 0px; width: 0px; }
+					.SnapLinksContainer .SnapLinksHighlighter { 
+						all: initial; overflow: visible; 
+						position: absolute; top: 0px; left: 0px; width: 10px; height: 10px;  
+					}
+					.SnapLinksContainer { 
+						pointer-events: none; z-index: 999999;  
+						position: absolute; top: 0px; left: 0px; margin: 0px; padding: 0px; height: 0px; width: 0px; }
 					.SnapLinksContainer > .SL_SelectionRect { outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1; }
 					.SL_SelectionRect > .SL_SelectionLabel { position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap; }
 				</style>
@@ -241,7 +246,7 @@ class SelectionRect {
 				pub(DragRectChanged, { dims: this.dims, visible: true } );
 			} else {
 				this.elContainer.style.display = 'none';
-				pub(DragRectChanged, { dims: this.dims, visible: false});
+				pub(DragRectChanged, { dims: this.dims, visible: false} );
 			}
 		}
 

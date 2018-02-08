@@ -28,30 +28,16 @@ let SvgOverlay = new class SvgOverlayMgr {
 	 * Creates the SvgOverlay Manager
 	 */
 	constructor() {
+		this.HighlightElemMap    = new WeakMap();
+		this.HighlightedElements = [];
+		this.AvailableRects      = [];
+
 		sub(ContainerElementCreated, (topic, Container, Subscription) => {
 			this.Init(Container);
 
 			Subscription.unsub();
 		});
 
-		sub(ElementsSelected, (topic, Elements, Subscription) => {
-			this.Highlight(Elements);
-		});
-
-		sub(DragCompleted, (topic, data, Subscription) => {
-			this.Hide();
-		});
-
-//		/**
-//		 * Where I'm At
-//		 * 		The DOCSIZECHANGE even is all good!  sweet.
-//		 *
-//		 * 		Next Up:
-//		 * 			Get a go() function going that CSP's a check against document size changes
-//		 */
-//		let Subscription = sub(DOCSIZECHANGE, (topic, e, Subscription) => {
-//			console.log(topic, e);
-//		});
 	}
 
 	/**
@@ -68,11 +54,19 @@ let SvgOverlay = new class SvgOverlayMgr {
 		`);
 		Container.appendChild(this.Overlay);
 
-		this.HighlightElemMap    = new WeakMap();
-		this.HighlightedElements = [];
-		this.AvailableRects      = [];
-
 		sub(DocSizeChanged, (topic, data, Subscription) => {
+			this.Reposition();
+		});
+
+		sub(ElementsSelected, (topic, Elements, Subscription) => {
+			this.Highlight(Elements);
+		});
+
+		sub(DragCompleted, (topic, data, Subscription) => {
+			this.Hide();
+		});
+
+		sub(ElementPositionsChanged, () => {
 			this.Reposition();
 		});
 	}
@@ -81,9 +75,12 @@ let SvgOverlay = new class SvgOverlayMgr {
 	 * @protected
 	 * Gets or Creates an SVGRect element and returns it
 	 *
-	 * @returns {SVGRectElement|Node}
+	 * @returns {SVGRectElement|?Node}
 	 */
 	_AddRect(attr) {
+		if(!this.Overlay)
+			return null;
+
 		let elem;
 		if(!this.AvailableRects.length) {
 			elem = this.Overlay.firstElementChild.cloneNode(false);
@@ -219,7 +216,8 @@ let SvgOverlay = new class SvgOverlayMgr {
 	 * @param {string} selector    Any valid css selector
 	 */
 	Release(selector) {
-		this.ReleaseRects(Array.from(this.Overlay.querySelectorAll(selector)));
+		this.Overlay &&
+			this.ReleaseRects(Array.from(this.Overlay.querySelectorAll(selector)));
 		return this;
 	}
 };
