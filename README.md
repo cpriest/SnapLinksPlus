@@ -69,6 +69,7 @@ Please see [Dev Notes](DevNotes.md) for the latest development status.
 </div>
 
 <div>
+<button title="title" value="do">my button</button>
 <input type="button" value="Test Button">
 <label>
 <input type="checkbox" value="1">Test Checkbox</label>

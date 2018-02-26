@@ -1,3 +1,7 @@
 <component name="MarkdownNavigator.ProfileManager">
-  <settings default="" pdf-export="" />
+  <settings default="" pdf-export="">
+    <scope-profiles>
+      <element scope="Markdown Files" profile="Github Profile" />
+    </scope-profiles>
+  </settings>
 </component>
