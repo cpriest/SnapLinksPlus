@@ -68,6 +68,37 @@ Please see [Dev Notes](DevNotes.md) for the latest development status.
 
 </div>
 
+<div>
+<input type="button" value="Test Button">
+<label>
+<input type="checkbox" value="1">Test Checkbox</label>
+** Test Markdown 3 **
+</div>
+
+<div> <input type="button" value="Test Button"> <label> <input type="checkbox" value="1">Test Checkbox</label> ** Test Markdown 3 ** </div>
+
+<!-- @formatter:off -->
+
+<div> <input type="button" value="Test Button"> <label> <input type="checkbox" value="1">Test Checkbox</label> ** Test Markdown 3 ** </div>
+
+<!-- @formatter:on -->
+
+<form><div> <input type="button" value="Test Button"> <label> <input type="checkbox" value="1">Test Checkbox</label> ** Test Markdown 3 ** </div></form>
+
+
+<?php echo 'dodad'; ?>
+
+<table>
+
+<tr>
+
+<td>
+Hi
+</td>
+
+</tr>
+
+</table>
 
 ----
 
