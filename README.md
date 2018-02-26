@@ -35,15 +35,38 @@ I wholly encourage forking this project and submitting code and patches for incl
 
 Please see [Dev Notes](DevNotes.md) for the latest development status.
 
+
+## Known Issues & Some Planned Features
+ * Add Options GUI
+ * Open in New Tabs/New Windows/Tabs In New Window
+
+
+## HTML Rendering Examples from https://github.github.com/gfm/#html-block
+
+<DIV CLASS="foo">
+
+*Markdown class foo*
+
+</DIV>
+
+<del>
+*foo*
+</del>
+
 <div><input type="button" value="Test Button"><label><input type="checkbox" value="1"> Test Checkbox</label>
 
 ** Test Markdown **
 
 </div>
 
-## Known Issues & Some Planned Features
- * Add Options GUI
- * Open in New Tabs/New Windows/Tabs In New Window
+<div>
+<input type="button" value="Test Button">
+<label>
+<input type="checkbox" value="1">Test Checkbox</label>
+
+** Test Markdown 2 **
+
+</div>
 
 
 ----

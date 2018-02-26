@@ -1,5 +1,5 @@
-v3.1.2 - Not Yet Released
-=========================
+v3.1.2b1 - Not Yet Released
+===========================
  - Added ability to control which modifier keys and which mouse button is used for activation
  - Fixed issues with chrome
  - Fixed an issue with radio button selection
