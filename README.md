@@ -1,8 +1,28 @@
-# Snap Links Plus
+
+# [Snap Links Plus](https://cpriest.github.io/SnapLinksPlus/)
+
+<div style="float: right; width: 250px; position: relative; background: #FAFAFA; z-index: 10; padding-left: 10px;">
+    <div style="padding: 15px 15px; background: #FAFAFA; border: 1px solid #C0C0C0; border-radius: 5px; filter: drop-shadow(3px 3px 3px #555);">
+
+**Quick Links**
+
+  * [Help & Documentation](https://cpriest.github.io/SnapLinksPlus/welcome.html)
+  * [Release Notes](ReleaseNotes.md)
+  * Reporting Issues
+  * Contributing
+
+    </div>
+</div>
+
+## News
+
+* 2018-02-28 - New Release: ![Firefox][FF16] [3.1.2b1]() ![Chrome][CH16] [3.1.2.1]()
+*
 
 New Website Online: [Snap Links v3](http://cpriest.github.io/SnapLinksPlus/)
 
 Latest Release: v3.1.0.4, available at [Mozilla Addons](https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/)
+
 Latest Beta (unsigned, **testers welcomed**): See [dist directory](https://github.com/cpriest/SnapLinksPlus/tree/master/dist)
 
 Snap Links Plus is being re-written from the ground up to be a [Web Extension](https://developer.mozilla.org/en-US/Add-ons/WebExtensions).
@@ -15,13 +35,20 @@ I wholly encourage forking this project and submitting code and patches for incl
 
 **It is doubtful that all v2 features will be rewritten for v3 without the help of others**.
 
-Version 3.1 has been released and has the majority of the v2 features, **but without a configuration panel.  The next release will have configurable options.**
-
 Please see [Dev Notes](DevNotes.md) for the latest development status.
+
+<div>
+<input type="button" value="Test Button">
+<label><input type="checkbox" value="1"> Test Checkbox</label>
+
+** Test Markdown **
+
+</div>
 
 ## Known Issues & Some Planned Features
  * Add Options GUI
  * Open in New Tabs/New Windows/Tabs In New Window
+
 
 ----
 
@@ -35,8 +62,7 @@ Please see [Dev Notes](DevNotes.md) for the latest development status.
 * Copy to Clipboard
 
 # Installing
-To install the addon, please go to the [addon page](https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/) at Mozilla addons and click Add To Firefox
+To install the addon, click on one of the links for your browser on the [home page](https://cpriest.github.io/SnapLinksPlus/).
 
-# Version History
-
-See [Release Notes](ReleaseNotes.md) for version information.
+[FF16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_16x16.png
+[CH16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/chrome/chrome_16x16.png
