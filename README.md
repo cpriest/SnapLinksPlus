@@ -1,8 +1,7 @@
 
 # [Snap Links Plus](https://cpriest.github.io/SnapLinksPlus/)
 
-<div style="float: right; width: 250px; position: relative; background: #FAFAFA; z-index: 10; padding-left: 10px;">
-    <div style="padding: 15px 15px; background: #FAFAFA; border: 1px solid #C0C0C0; border-radius: 5px; filter: drop-shadow(3px 3px 3px #555);">
+<div style="float: right; width: 250px; position: relative; background: #FAFAFA; z-index: 10; padding-left: 10px;"><div style="padding: 15px 15px; background: #FAFAFA; border: 1px solid #C0C0C0; border-radius: 5px; filter: drop-shadow(3px 3px 3px #555);">
 
 **Quick Links**
 
@@ -11,8 +10,7 @@
   * Reporting Issues
   * Contributing
 
-    </div>
-</div>
+</div></div>
 
 ## News
 
@@ -37,9 +35,7 @@ I wholly encourage forking this project and submitting code and patches for incl
 
 Please see [Dev Notes](DevNotes.md) for the latest development status.
 
-<div>
-<input type="button" value="Test Button">
-<label><input type="checkbox" value="1"> Test Checkbox</label>
+<div><input type="button" value="Test Button"><label><input type="checkbox" value="1"> Test Checkbox</label>
 
 ** Test Markdown **
 
