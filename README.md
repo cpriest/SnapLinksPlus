@@ -1,5 +1,5 @@
 
-# [Snap Links Plus](https://cpriest.github.io/SnapLinksPlus/)
+# Snap Links Plus
 
 ## [Contributing](Contributing.md) &bull; [Help & Documentation](https://cpriest.github.io/SnapLinksPlus/welcome.html) &bull; [Reporting Issues](ReportingIssues.md)
 
@@ -8,10 +8,7 @@
 
 ## News
 
-* 2018-02-28 - **Beta** Release
-  [![Firefox Beta][FF16]][MozBeta] [3.1.2b1][MozBeta]
-  &nbsp;&bull;&nbsp;
-  [![Chrome][CH16]][ChromeRelease] [3.1.2.1][ChromeRelease]
+* 2018-02-28 - **Beta** Release v3.1.2b1 &nbsp; [![Firefox Beta][FF16]][MozBeta] &nbsp; [![Chrome][CH16]][ChromeRelease]
 * New Website Online: [Snap Links 3](http://cpriest.github.io/SnapLinksPlus/)
 
 ## Background on Snap Links
