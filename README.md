@@ -1,7 +1,7 @@
 
 # Snap Links Plus
 
-## [Contributing](Contributing.md) &bull; [Help & Documentation](https://cpriest.github.io/SnapLinksPlus/welcome.html) &bull; [Reporting Issues](ReportingIssues.md)
+## [Contributing](Contributing.md) &bull; [Help & Documentation][IntroPage] &bull; [Reporting Issues](ReportingIssues.md)
 
 * [Release Notes](ReleaseNotes.md) &bull; [Dev Notes](DevNotes.md)
 * [Enhancements]() &bull; [Bugs Reported]() &bull; [Roadmap/Plans]()
@@ -45,3 +45,5 @@ To install the latest release, click on the link for your browser on the [home p
 [ChromeRelease]: #
 [FF16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_16x16.png
 [CH16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/chrome/chrome_16x16.png
+
+[IntroPage]: http://cpriest.github.io/SnapLinksPlus/welcome

@@ -8,9 +8,7 @@
       <exportedFile path="$PROJECT_DIR$/build/Markdown/ReportingIssues.html" settingsVersion="ED6B5AAF-7D7EAB99" />
       <exportedFile path="$PROJECT_DIR$/build/Markdown/README.html" settingsVersion="ED6B5AAF-7D7EAB99" />
     </htmlFiles>
-    <imageFiles>
-      <exportedFile path="C:\code\WebExt\SnapLinks3/build/Markdown/img/res/firefox/logo16.png" settingsVersion="ED6B5AAF-7D7EAB99" />
-    </imageFiles>
+    <imageFiles />
     <otherFiles />
   </component>
 </project>
