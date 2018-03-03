@@ -61,7 +61,7 @@ Start by [![Forking][ForkIcon]][ForkRepo] [Forking][ForkRepo]
 
 
 [Gitter-Lobby]: https://gitter.im/SnapLinks/Lobby
-[GithubIssues]: issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc
+[GithubIssues]: ~/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc
 [IntroPage]: http://cpriest.github.io/SnapLinksPlus/welcome
 [ForkIcon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
-[ForkRepo]: tree/master#fork-destination-box
+[ForkRepo]: /tree/master#fork-destination-box
