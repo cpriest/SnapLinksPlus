@@ -23,21 +23,12 @@ __Ensure the bug is not already reported__ by searching on Github under [Issues]
 
 If you're unable to find an open issue addressing the problem, [open a new one][Issues-New].
 
-<table border="0" width="10" cellspacing="10" cellpadding="10">
-<tr>
-<td>&nbsp;</td>
-<td nowrap>
-
 __Be sure to include__:
 
   * *__A clear title and description__*.
   * A __publicly accessible link__ and instructions on reproducing the issue.
   * If possible *a screenshot or quick video* demonstrating the issue.
   * Any other *relevant details* that you can think of.
-
-</td>
-</tr>
-</table>
 
 
 &nbsp;
@@ -56,7 +47,7 @@ You'll need to setup the project locally and install a few tools to build Snap L
 1. Start by ![Forking][ForkIcon] [Forking][ForkRepo] Snap Links to your own area on github.
 2. Install [git](https://git-scm.com/downloads) and [node.js](https://nodejs.org/en/download/) on your machine.
 3. Clone your fork locally from a command line, something like:
-    ```bash
+    ```shell
     # Change directory to where you want to clone it
     cd c:\code
 
@@ -65,15 +56,15 @@ You'll need to setup the project locally and install a few tools to build Snap L
     ```
 4.  Setup node by running the following:
 
-    ```bash
+    ```shell
     # Install the gulp tool globally on your machine
     npm install -g gulp
 
     # Install the node packages for SnapLinks (these will go into node_modules/)
     npm install
     ```
-5. Finally, run `gulp` to build the Chrome and FireFox builds.
-    You may also use `gulp watch` to build updated versions as you modify files.
+5. Finally, run <kbd>gulp</kbd> to build the Chrome and FireFox builds.  
+    \* You may also use <kbd>gulp watch</kbd> to build updated versions as you modify files.
 
 By default, gulp will build the web extension in your project directory under build/chrome and build/ff.
 
@@ -81,16 +72,19 @@ By default, gulp will build the web extension in your project directory under bu
 
 **Firefox**
 
-You'll need to be using Firefox Developer edition or newer, there are a number of methods for loading the extension into firefox.
+You'll need to be using [Firefox Developer][FF-DevEd] edition or newer, there are a number of methods for loading the extension into firefox.
 
-The way I prefer to use is with a *proxy file*.  Find the extension directory for your profile (on Windows, typically %APPDATA%\Mozilla\Firefox\Profiles\...\extensions).  Create a text file there named `snaplinks@snaplinks.mozdev.org` and in that file should be the path to your firefox build (`C:\code\WebExt\SnapLinks3\build\ff` on my machine).
+The way I prefer to use is with a *proxy file*.  Find the extension directory for your profile (on Windows, typically `%APPDATA%\Mozilla\Firefox\Profiles\...\extensions`).  Create a text file there named `snaplinks@snaplinks.mozdev.org` and in that file should be the path to your firefox build (`C:\code\WebExt\SnapLinks3\build\ff` on my machine).
 
 **Note:** It's a good idea to keep a copy of that file elsewhere, sometimes FireFox will delete it under some conditions, especially when first being put in place.  Once you put that file in place start (or restart) FireFox and go to your addons and enable the extension.  If it is not showing, then it probably deleted that proxy file; in that case close FireFox and try again.
 
 **Chrome**
-Go to your extensions page, at the top right, check the box labeled `Developer Mode`, then click the button labeled `Load unpacked extension`and select the build\chrome directory.  You'll need to keep `Developer Mode` active for the extension to continue functioning.
 
-### Getting Developer Help
+Go to your extensions page, at the top right, check the box labeled **Developer Mode**, then click the button labeled **Load unpacked extension**and select the build\chrome directory.
+
+You'll need to keep Developer Mode active for the extension to continue functioning.
+
+## Getting Developer Help
 
 If you have any questions or trouble getting things up and running, please feel free to join the [gitter channel][Gitter-Lobby], I'd be happy to help.
 
@@ -104,7 +98,7 @@ If you have any questions or trouble getting things up and running, please feel 
 
 
 
-
+[FF-DevEd]: https://www.mozilla.org/en-US/firefox/developer/
 [MozBeta]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/
 [MozRelease]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/
 [ChromeRelease]: #
