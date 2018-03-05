@@ -23,12 +23,21 @@ __Ensure the bug is not already reported__ by searching on Github under [Issues]
 
 If you're unable to find an open issue addressing the problem, [open a new one][Issues-New].
 
+<table border="0" width="10" cellspacing="10" cellpadding="10">
+<tr>
+<td>&nbsp;</td>
+<td nowrap>
+
 __Be sure to include__:
 
-  * *A clear title and description*.
-  * A *publicly accessible link* and instructions on reproducing the issue.
+  * *__A clear title and description__*.
+  * A __publicly accessible link__ and instructions on reproducing the issue.
   * If possible *a screenshot or quick video* demonstrating the issue.
   * Any other *relevant details* that you can think of.
+
+</td>
+</tr>
+</table>
 
 
 &nbsp;
@@ -74,7 +83,7 @@ By default, gulp will build the web extension in your project directory under bu
 
 You'll need to be using Firefox Developer edition or newer, there are a number of methods for loading the extension into firefox.
 
-The way I prefer to use is with a proxy file.  Find the extension directory for your profile (on Windows, typically %APPDATA%\Mozilla\Firefox\Profiles\...\extensions).  Create a text file there named `snaplinks@snaplinks.mozdev.org` and in that file should be the path to your firefox build (`C:\code\WebExt\SnapLinks3\build\ff` on my machine).
+The way I prefer to use is with a *proxy file*.  Find the extension directory for your profile (on Windows, typically %APPDATA%\Mozilla\Firefox\Profiles\...\extensions).  Create a text file there named `snaplinks@snaplinks.mozdev.org` and in that file should be the path to your firefox build (`C:\code\WebExt\SnapLinks3\build\ff` on my machine).
 
 **Note:** It's a good idea to keep a copy of that file elsewhere, sometimes FireFox will delete it under some conditions, especially when first being put in place.  Once you put that file in place start (or restart) FireFox and go to your addons and enable the extension.  If it is not showing, then it probably deleted that proxy file; in that case close FireFox and try again.
 
@@ -103,9 +112,10 @@ If you have any questions or trouble getting things up and running, please feel 
 [CH16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/chrome/chrome_16x16.png
 [IntroPage]: http://cpriest.github.io/SnapLinksPlus/welcome
 [Gitter-Lobby]: https://gitter.im/SnapLinks/Lobby
-[Issues-Open]: https://github.com/cpriest/SnapLinksPlus/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc
-[Issues-Bugs]: https://github.com/cpriest/SnapLinksPlus/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Abug
-[Issues-Enh]: https://github.com/cpriest/SnapLinksPlus/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Aenhancement
+[Issues-Open]: https://github.com/cpriest/SnapLinksPlus/issues?q=is%3Aissue+is%3Aopen+sort%3Acomments-desc
+[Issues-Bugs]: https://github.com/cpriest/SnapLinksPlus/issues?q=is%3Aissue+is%3Aopen+label%3Abug+sort%3Acomments-desc
+[Issues-Enh]: https://github.com/cpriest/SnapLinksPlus/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement+sort%3Areactions-%2B1-desc
+[Milestones]: https://github.com/cpriest/SnapLinksPlus/milestones?direction=desc&sort=completeness&state=open
 [Issues-New]: https://github.com/cpriest/SnapLinksPlus/issues/new
 [ForkIcon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
 [ForkRepo]: https://github.com/cpriest/SnapLinksPlus#fork-destination-box
