@@ -4,7 +4,7 @@ v3.1.2b1 - Not Yet Released
  - Fixed issues with chrome
  - Fixed an issue with radio button selection
  - Fixed an issue with checkboxes
- - Added support for Containers
+ - Added support for FireFox Containers
  - Added support for Child/Parent tabs (Tab Tree View)
  - Updated Options/Config to include expanded functionality
 

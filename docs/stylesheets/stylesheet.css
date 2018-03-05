@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Clint Priest
+ * Copyright (c) 2016-2018 Clint Priest
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -288,14 +288,32 @@ blockquote {
 	border-left:   10px solid #E9E9E9;
 }
 ul li {
-	list-style-position: inside;
-	list-style:          disc;
+	list-style: disc inside;
 }
 ol li {
-	list-style-position: inside;
-	list-style:          decimal;
-	padding-left:        3px;
+	list-style:   decimal inside;
+	padding-left: 3px;
 }
+li.Version {
+	margin:      20px 0px 2px 0px;
+	font-size:   18px;
+	font-weight: bold;
+	color: #6D6D6D;
+	list-style: none;
+}
+li.Version.Latest {
+	color:       #D5000D;
+}
+li.Version > ul {
+	font-size: 16px;
+	font-weight: normal;
+	color: #6D6D6D;
+	list-style: disc inside;
+}
+
+div.ReleaseNotes { margin-left: -30px;  }
+
+
 dl dt {
 	color: #303030;
 }
