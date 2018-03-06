@@ -39,7 +39,8 @@ If you're unable to find an open issue relating to the feature, [open a new one]
 
 
 &nbsp;
-## Your First Code Contribution
+## **Your First Code Contribution**
+Mozilla authors and maintains fabulous documentation and tutorials at Mozilla Developer Network (MDN).  A great first read for web extensions is [Anatomy of an extension][MDN-Ext-Anatomy]
 
 ### Local Environment
 You'll need to setup the project locally and install a few tools to build Snap Links for yourself.
@@ -72,9 +73,11 @@ By default, gulp will build the web extension in your project directory under bu
 
 **Firefox**
 
-You'll need to be using [Firefox Developer][FF-DevEd] edition or newer, there are a number of methods for loading the extension into firefox.
+You'll need to be using [Firefox Developer][FF-DevEd] edition or newer, and set your *xpinstall.signatures.required* to true in *about:config*.
 
-The way I prefer to use is with a *proxy file*.  Find the extension directory for your profile (on Windows, typically `%APPDATA%\Mozilla\Firefox\Profiles\...\extensions`).  Create a text file there named `snaplinks@snaplinks.mozdev.org` and in that file should be the path to your firefox build (`C:\code\WebExt\SnapLinks3\build\ff` on my machine).
+There are a number of methods for loading the extension into firefox, I prefer to use is with a *proxy file*.
+
+Find the extension directory for your profile (on Windows, typically `%APPDATA%\Mozilla\Firefox\Profiles\...\extensions`).  Create a text file there named `snaplinks@snaplinks.mozdev.org` and in that file should be the path to your firefox build (`C:\code\WebExt\SnapLinks3\build\ff` on my machine).
 
 **Note:** It's a good idea to keep a copy of that file elsewhere, sometimes FireFox will delete it under some conditions, especially when first being put in place.  Once you put that file in place start (or restart) FireFox and go to your addons and enable the extension.  If it is not showing, then it probably deleted that proxy file; in that case close FireFox and try again.
 
@@ -98,12 +101,21 @@ If you have any questions or trouble getting things up and running, please feel 
 
 
 
-[FF-DevEd]: https://www.mozilla.org/en-US/firefox/developer/
-[MozBeta]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/
+
+
+
+
+
+
+
+[MozBeta]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/versions/beta
 [MozRelease]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/
+[ChromeBeta]: #
 [ChromeRelease]: #
 [FF16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_16x16.png
+[FF48]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_48x48.png
 [CH16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/chrome/chrome_16x16.png
+[CH48]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/chrome/chrome_48x48.png
 [IntroPage]: http://cpriest.github.io/SnapLinksPlus/welcome
 [Gitter-Lobby]: https://gitter.im/SnapLinks/Lobby
 [Issues-Open]: https://github.com/cpriest/SnapLinksPlus/issues?q=is%3Aissue+is%3Aopen+sort%3Acomments-desc
@@ -113,3 +125,6 @@ If you have any questions or trouble getting things up and running, please feel 
 [Issues-New]: https://github.com/cpriest/SnapLinksPlus/issues/new
 [ForkIcon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
 [ForkRepo]: https://github.com/cpriest/SnapLinksPlus#fork-destination-box
+
+
+[MDN-Ext-Anatomy]: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Anatomy_of_a_WebExtension

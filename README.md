@@ -25,8 +25,8 @@ The reasons behind this are simple, [electrolysis](https://wiki.mozilla.org/Elec
 
 |   **Channel**    |    ![FireFox][FF48]    | ![Chrome][CH48] |
 |:----------------:|:----------------------:|:---------------:|
-| Release / Stable | [Download][MozRelease] | *Coming Soon*   |
-|  Beta / Latest   |     *Coming Soon*      |  *Coming Soon*  |
+| Release / Stable | [Download][MozRelease] |  *Coming Soon*  |
+|  Beta / Latest   |  [Download][MozBeta]   |  *Coming Soon*  |
 
 Choose either Release or Beta channels for your browser and click the download link.
 
@@ -63,7 +63,13 @@ Please see the [Contributing](Contributing.md) document.
 
 
 
-[MozBeta]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/
+
+
+
+
+
+
+[MozBeta]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/versions/beta
 [MozRelease]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/
 [ChromeBeta]: #
 [ChromeRelease]: #
@@ -80,3 +86,6 @@ Please see the [Contributing](Contributing.md) document.
 [Issues-New]: https://github.com/cpriest/SnapLinksPlus/issues/new
 [ForkIcon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
 [ForkRepo]: https://github.com/cpriest/SnapLinksPlus#fork-destination-box
+
+
+[MDN-Ext-Anatomy]: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Anatomy_of_a_WebExtension

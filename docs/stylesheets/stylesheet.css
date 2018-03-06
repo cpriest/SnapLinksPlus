@@ -116,15 +116,15 @@ header > h2, header > h2 a  {
 	margin-bottom: 25px;
 }
 a.button {
-	display:               block;
-	float:                 left;
+	display:               inline-block;
+	/*float:                 left;*/
 	width:                 179px;
 	padding:               0px;
-	margin-right:          14px;
 	font-size:             15px;
 	font-weight:           bold;
 	line-height:           25px;
-	color:                 #303030;
+	color: #303030;
+	margin: 5px 15px 5px 0px;
 	background:            #FDFDFD; /* Old browsers */
 	background:            -moz-linear-gradient(top, #FDFDFD 0%, #F2F2F2 100%); /* FF3.6+ */
 	background:            -webkit-gradient(linear, left top, left bottom, color-stop(0%, #FDFDFD), color-stop(100%, #F2F2F2)); /* Chrome,Safari4+ */
@@ -163,10 +163,13 @@ a.button span {
 	padding: 12px 8px 12px 50px;
 }
 #install-firefox span {
-	background: transparent url(../images/firefox32.png) 12px 50% no-repeat;
+	background: transparent url(https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_32x32.png) 12px 50% no-repeat;
+}
+#install-firefox-beta span {
+	background: transparent url(https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/archive/firefox-developer-edition_35-56/firefox-developer-edition_35-56_32x32.png) 12px 50% no-repeat;
 }
 #install-chrome span {
-	background: transparent url(../images/chrome32.png) 12px 50% no-repeat;
+	background: transparent url(https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/chrome/chrome_32x32.png) 12px 50% no-repeat;
 }
 #download-zip span {
 	background: transparent url(../images/zip-icon.png) 12px 50% no-repeat;
