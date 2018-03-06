@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="MarkdownExportedFiles">
-    <htmlFiles />
+    <htmlFiles>
+      <exportedFile path="$PROJECT_DIR$/build/Markdown/Contributing.html" settingsVersion="ED6B5AAF-7D7EAB99" />
+      <exportedFile path="$PROJECT_DIR$/build/Markdown/ReleaseNotes.html" settingsVersion="ED6B5AAF-7D7EAB99" />
+      <exportedFile path="$PROJECT_DIR$/build/Markdown/DevNotes.html" settingsVersion="ED6B5AAF-7D7EAB99" />
+      <exportedFile path="$PROJECT_DIR$/build/Markdown/README.html" settingsVersion="ED6B5AAF-7D7EAB99" />
+    </htmlFiles>
     <imageFiles />
     <otherFiles />
   </component>
