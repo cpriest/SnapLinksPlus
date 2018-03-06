@@ -1,6 +1,7 @@
-v3.1.2 - Not Yet Released
-=========================
+v3.1.2b1 - Released 3/6/2018
+============================
  - Added ability to control which modifier keys and which mouse button is used for activation
+ - Fixed issues with scrolling/selection in scrolled sub-frames
  - Fixed issues with chrome
  - Fixed an issue with radio button selection
  - Fixed an issue with checkboxes
