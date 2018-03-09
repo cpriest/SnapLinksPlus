@@ -23,10 +23,10 @@ The reasons behind this are simple, [electrolysis](https://wiki.mozilla.org/Elec
 &nbsp;
 # Installing
 
-|   **Channel**    |    ![FireFox][FF48]    | ![Chrome][CH48] |
-|:----------------:|:----------------------:|:---------------:|
-| Release / Stable | [Download][MozRelease] |  *Coming Soon*  |
-|  Beta / Latest   |  [Download][MozBeta]   |  *Coming Soon*  |
+|   **Channel**    |   ![FireFox][FF48]    |    ![Chrome][CH48]    |
+|:----------------:|:---------------------:|:---------------------:|
+| Release / Stable | [Install][MozRelease] |     *Coming Soon*     |
+|  Beta / Latest   |  [Install][MozBeta]   | [Install][ChromeBeta] |
 
 Choose either Release or Beta channels for your browser and click the download link.
 
@@ -71,7 +71,7 @@ Please see the [Contributing](Contributing.md) document.
 
 [MozBeta]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/versions/beta
 [MozRelease]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/
-[ChromeBeta]: #
+[ChromeBeta]: https://chrome.google.com/webstore/detail/snap-links-beta/ikglmligndmabebhnicldebpekldnabm?authuser=1
 [ChromeRelease]: #
 [FF16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_16x16.png
 [FF48]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_48x48.png

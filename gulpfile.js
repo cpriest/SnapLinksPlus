@@ -45,6 +45,15 @@ const Chrome = {
 	}
 };
 
+const ChromeBeta = {
+	SecureDataPath: './insecure/Chrome',
+	BuildPath:      './build/chrome_beta',
+	BuildData:      {
+		ChromeBeta: true,
+		quad_version: PackageData.version.replace(/[^\d.]+/g, '.')
+	}
+};
+
 const FireFox = {
 	BuildPath: './build/ff',
 	BuildData: {
@@ -121,7 +130,7 @@ gulp.task('lib', ['clean'], () =>
 
 gulp.task('build:tmp', Array.from(TaskGlobs.keys()));
 
-gulp.task('build', ['chrome', 'ff']);
+gulp.task('build', ['chrome', 'ff', 'chrome_beta']);
 
 gulp.task('default', ['build'], () => {
 	// gulp.watch(SourceFiles, watchOpts, ['src']);
@@ -176,6 +185,38 @@ gulp.task('chrome:package', ['chrome'], () => {
 
 	npx(`crx pack ${Chrome.BuildPath} -o ./artifacts/SnapLinks-${Chrome.BuildData.quad_version}.crx -p ${SigningFilepath}`);
 });
+
+/**
+ *        Chrome Beta Building Tasks
+ */
+
+gulp.task('chrome_beta', ['build:tmp'], (cb) =>
+	sequence(
+		'chrome_beta:clean',
+		'chrome_beta:copy-tmp',
+		'chrome_beta:manifest',
+		cb
+	)
+);
+
+gulp.task('chrome_beta:clean', () => del(ChromeBeta.BuildPath));
+gulp.task('chrome_beta:copy-tmp', () =>
+	gulp.src('./build/tmp/**')
+		.pipe(gulp.dest(ChromeBeta.BuildPath))
+);
+
+gulp.task('chrome_beta:manifest', () =>
+	gulp.src('src/templates/manifest.hbs')
+		.pipe(
+			hb()
+				.data('./package.json')
+				.data(ChromeBeta.BuildData)
+		)
+		.pipe(rename({
+			extname: '.json',
+		}))
+		.pipe(gulp.dest(ChromeBeta.BuildPath))
+);
 
 
 /**
