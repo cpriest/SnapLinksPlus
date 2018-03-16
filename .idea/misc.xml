@@ -1,14 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="IdProvider" IDEtalkID="F9493D3840C0A2625B8B7C6E0DAE36DC" />
+  <component name="Behat">
+    <behat_settings>
+      <BehatSettings />
+    </behat_settings>
+  </component>
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
   </component>
-  <component name="ProjectResources">
-    <xml-schema-version>XMLSchema_1_1</xml-schema-version>
+  <component name="PhpUnit">
+    <phpunit_settings>
+      <PhpUnitSettings />
+    </phpunit_settings>
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="1.8" project-jdk-type="JavaSDK" />
+  <component name="SvnConfiguration">
+    <configuration>C:\Users\Clint\AppData\Roaming\Subversion</configuration>
+    <option name="runUnderTerminal" value="true" />
+    <option name="sshConnectionType" value="PRIVATE_KEY" />
+    <option name="sshExecutablePath" value="vsh" />
+    <option name="sshPrivateKeyPath" value="c:\sync\ssh\cpriest\cpriest1-rsa" />
+  </component>
   <component name="UnicodeBrowser">
-    <option name="fontName" value="Agency FB" />
+    <option name="fontName" value="Fira Code Light" />
+  </component>
+  <component name="UpsourceProjectSettings">
+    <option name="disableSslValidation" value="true" />
+    <option name="upsourceUrl" value="https://upsource.resultsgeneration.com" />
+  </component>
+  <component name="VagrantProjectSettings">
+    <option name="instanceFolder" value="" />
+    <option name="provider" value="" />
   </component>
 </project>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JavaScriptLibraryMappings">
-    <file url="PROJECT" libraries="{@types/del, @types/gulp, @types/gulp-util, @types/html-entities, @types/merge-stream, @types/run-sequence, Generated files, SnapLinks3/node_modules, chrome-DefinitelyTyped, es6-promise-DefinitelyTyped}" />
-    <includedPredefinedLibrary name="Node.js Core" />
+    <excludedPredefinedLibrary name="SnapLinks3/node_modules" />
   </component>
 </project>
