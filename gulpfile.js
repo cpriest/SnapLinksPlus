@@ -72,7 +72,6 @@ const TaskGlobs = new Map(),
 		SpecialGlobs = new Map();
 
 TaskGlobs.set('src', [
-	'src/**/*.es6',
 	'src/**/*.js',
 
 	'!**/*Test*',

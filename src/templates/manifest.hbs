@@ -4,10 +4,14 @@
 {{#Firefox}}	{{! Needs 1.2.3-beta1 or 1.2.3 format }}
 	"version":                  "{{package.version}}",
 {{/Firefox}}
-{{#Chrome}}		{{! Needs 1.2.3.1 for version, accepts anything for version_name }}
+{{#Chrome}}        {{! Needs 1.2.3.1 for version, accepts anything for version_name }}
 	"version":                  "{{quad_version}}",
-	"version_name":				"{{package.version}}",
+	"version_name":                "{{package.version}}",
 {{/Chrome}}
+{{#ChromeBeta}}        {{! Needs 1.2.3.1 for version, accepts anything for version_name }}
+	"version":                  "{{quad_version}}",
+	"version_name":             "{{package.version}}",
+{{/ChromeBeta}}
 	"author":                   "{{package.author}}",
 	"description":				"{{package.description}}",
 	"homepage_url":				"{{package.homepage}}",
@@ -15,7 +19,8 @@
 	"minimum_chrome_version": 	"51",
 
 	"permissions":	[
-		"storage"
+		"storage",
+		"notifications"
 	],
 
 	"icons": {
@@ -41,8 +46,8 @@
 		"scripts": [
 			"src/lib/browser-polyfill.min.js",
 			"src/lib/Configs.js",
-			"src/globals.es6",
-			"src/background-scripts/background.es6"
+			"src/globals.js",
+			"src/background-scripts/background.js"
 		]
 	},
 
@@ -59,15 +64,15 @@
 				"src/lib/Configs.js",
 				"src/lib/csp.min.js",
 				"src/lib/transducers.js",
-				"src/globals.es6",
-				"src/CSP.es6",
-				"src/content-scripts/Utility.es6",
-				"src/content-scripts/SelectionRect.es6",
-				"src/content-scripts/ElementIndexer.es6",
-				"src/content-scripts/SvgOverlay.es6",
-				"src/content-scripts/CategorizedCollection.es6",
-				"src/content-scripts/ActionMgr.es6",
-				"src/content-scripts/SnapLinks.es6"
+				"src/globals.js",
+				"src/CSP.js",
+				"src/content-scripts/Utility.js",
+				"src/content-scripts/SelectionRect.js",
+				"src/content-scripts/ElementIndexer.js",
+				"src/content-scripts/SvgOverlay.js",
+				"src/content-scripts/CategorizedCollection.js",
+				"src/content-scripts/ActionMgr.js",
+				"src/content-scripts/SnapLinks.js"
 			]
 		}
 	],

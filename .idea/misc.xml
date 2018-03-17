@@ -8,11 +8,6 @@
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
   </component>
-  <component name="PhpUnit">
-    <phpunit_settings>
-      <PhpUnitSettings />
-    </phpunit_settings>
-  </component>
   <component name="SvnConfiguration">
     <configuration>C:\Users\Clint\AppData\Roaming\Subversion</configuration>
     <option name="runUnderTerminal" value="true" />
