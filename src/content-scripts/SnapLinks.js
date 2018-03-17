@@ -43,7 +43,7 @@ class EventHandler {
 	}
 
 	/**
-	 * @param {MouseEvent} e
+	 * @param {HTMLInputElement} e
 	 */
 	onMouseDown(e) {
 		/* Static use of no-modifiers down and right mouse button down */
@@ -55,6 +55,11 @@ class EventHandler {
 				e.preventDefault();
 				e.stopPropagation();
 				browser.runtime.sendMessage({ Action: RELOAD_EXTENSION });
+			} else if(e.mods == SHIFT + ALT && e.buttons == RMB) {
+				this.StopNextContextMenu();
+				e.preventDefault();
+				e.stopPropagation();
+				browser.runtime.sendMessage({ Action: BACKGROUND_TEST });
 			}
 		}
 		if(e.mods == Prefs.ActivateModifiers && e.buttons == Prefs.ActivateMouseButton) {

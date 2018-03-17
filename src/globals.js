@@ -29,7 +29,8 @@ const LMB = 1,	// Left Mouse Button
 	  MMB = 4;	// Middle Mouse Button
 
 // Actions
-const RELOAD_EXTENSION  = 'ReloadExtension';
+const BACKGROUND_TEST = 'BackgroundTest';
+const RELOAD_EXTENSION = 'ReloadExtension';
 const OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
 
 let isChrome  = location.protocol === 'chrome-extenson:',
