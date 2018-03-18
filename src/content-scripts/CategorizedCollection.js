@@ -113,7 +113,7 @@ class CategorizedCollection {
 		}
 
 		//noinspection JSBitwiseOperatorUsage
-		if(!(LastModifierKeys & ALT)) {
+		if(!(LastModifierKeys & ALT) && !Prefs.DisableFontWeightFiltering) {
 			if(this.Links.length)
 				[this.Links, this.FilteredLinks] = this.FilterByFontScore(this.Links);
 

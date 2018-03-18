@@ -56,6 +56,8 @@ const DefaultPrefs = {
 	ActivateModifiers:   NONE,
 	ActivateMouseButton: RMB,
 
+	DisableFontWeightFiltering: false,
+
 	DevMode:                false,
 	Dev_Log_ActionMessages: true,
 	Dev_Skip_AllActions:    true,
