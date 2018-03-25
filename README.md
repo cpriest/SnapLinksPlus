@@ -8,7 +8,8 @@
 &nbsp;
 ## News
 
-* 2018-02-28 - **Beta** Release v3.1.2b1 &nbsp; [![Firefox Beta][FF16]][MozBeta] &nbsp; [![Chrome][CH16]][ChromeRelease]
+* 2018-03-16 - **Beta** Release v3.1.2b2 &nbsp; [![Firefox Beta][FF16]][MozBeta] &nbsp; [![Chrome][CH16]][ChromeBeta]
+* 2018-02-28 - **Beta** Release v3.1.2b1 &nbsp; [![Firefox Beta][FF16]][MozBeta] &nbsp; [![Chrome][CH16]][ChromeBeta]
 * New Website Online: [Snap Links 3](http://cpriest.github.io/SnapLinksPlus/)
 
 &nbsp;
@@ -25,7 +26,7 @@ The reasons behind this are simple, [electrolysis](https://wiki.mozilla.org/Elec
 
 |   **Channel**    |   ![FireFox][FF48]    |    ![Chrome][CH48]    |
 |:----------------:|:---------------------:|:---------------------:|
-| Release / Stable | [Install][MozRelease] | [Install][ChromeBeta] |
+| Release / Stable | [Install][MozRelease] | [Install][ChromeRelease] |
 |  Beta / Latest   |  [Install][MozBeta]   | [Install][ChromeBeta] |
 
 Choose either Release or Beta channels for your browser and click the download link.
