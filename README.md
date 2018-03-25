@@ -69,10 +69,10 @@ Please see the [Contributing](Contributing.md) document.
 
 
 
-[MozBeta]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/versions/beta
+[MozBeta]: https://addons.mozilla.org/firefox/downloads/file/894992/snap_links_plus-3.1.2b2-an+fx.xpi?src=devhub
 [MozRelease]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/
 [ChromeBeta]: https://chrome.google.com/webstore/detail/snap-links-beta/ikglmligndmabebhnicldebpekldnabm?authuser=1
-[ChromeRelease]: #
+[ChromeRelease]: https://chrome.google.com/webstore/detail/snap-links-beta/ikglmligndmabebhnicldebpekldnabm?authuser=1
 [FF16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_16x16.png
 [FF48]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_48x48.png
 [CH16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/chrome/chrome_16x16.png
