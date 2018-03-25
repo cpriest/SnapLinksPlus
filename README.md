@@ -25,7 +25,7 @@ The reasons behind this are simple, [electrolysis](https://wiki.mozilla.org/Elec
 
 |   **Channel**    |   ![FireFox][FF48]    |    ![Chrome][CH48]    |
 |:----------------:|:---------------------:|:---------------------:|
-| Release / Stable | [Install][MozRelease] |     *Coming Soon*     |
+| Release / Stable | [Install][MozRelease] | [Install][ChromeBeta] |
 |  Beta / Latest   |  [Install][MozBeta]   | [Install][ChromeBeta] |
 
 Choose either Release or Beta channels for your browser and click the download link.
