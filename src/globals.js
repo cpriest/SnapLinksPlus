@@ -59,8 +59,8 @@ const DefaultPrefs = {
 	DisableFontWeightFiltering: false,
 
 	DevMode:                false,
-	Dev_Log_ActionMessages: true,
-	Dev_Skip_AllActions:    true,
+	Dev_Log_ActionMessages: false,
+	Dev_Skip_AllActions:    false,
 
 
 	Debug_Measure_IndexingSpeed:     false,
@@ -76,6 +76,9 @@ const DefaultPrefs = {
 // Configurations
 let Prefs = new Configs(DefaultPrefs);
 Prefs.loaded.then((aValues) => {
+	Prefs.DevMode = false;
+	Prefs.Dev_Log_ActionMessages = false;
+	Prefs.Dev_Skip_AllActions = false;
 	// if(data.Dev.Enabled)
 	// 	Object.assign(data.HighlightStyles, data.Dev.HighlightStyles);
 });
