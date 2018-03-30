@@ -22,13 +22,15 @@ const del  = require('del').sync;
 const cp   = require('child_process');
 // const sourcemaps = require('gulp-sourcemaps');
 const hb   = require('gulp-hb');
-const fs   = require('fs');
+const fs = require('fs');
+const run = require('gulp-run-command').default;
 
 const gutil  = require('gulp-util');
 const rename = require('gulp-rename');
 const merge  = require('merge-stream');
 
 const sequence = require('run-sequence');
+
 
 let execDefaultOpts = {
 	stdio: 'inherit',
@@ -64,8 +66,9 @@ const FireFox = {
 const WebExtCommand = `web-ext -s ${FireFox.BuildPath} -a ./artifacts`;
 
 /** Wrapper for child_process.spawnSync */
-function npx(cmd, options = execDefaultOpts) {
-	return cp.spawnSync('npx.cmd', ['-c', cmd], options);
+function exec(cmd, options = execDefaultOpts) {
+	// console.log(cmd);
+	return cp.spawnSync('cmd.exe', ['/A', '/D', '/C', cmd], options);
 }
 
 const TaskGlobs = new Map(),
@@ -94,7 +97,8 @@ TaskGlobs.set('res', [
 ]);
 
 SpecialGlobs.set('manifest', [
-	'src/templates/*.hbs'
+	'src/templates/*.hbs',
+	'package.json'
 ]);
 
 const watchOpts = {
@@ -250,8 +254,8 @@ gulp.task('ff:manifest', () =>
 		.pipe(gulp.dest(FireFox.BuildPath))
 );
 
-gulp.task('ff:package', ['firefox'], (cb) => {
-	npx(WebExtCommand + ' build --overwrite-dest');
+gulp.task('ff:package', ['ff'], (cb) => {
+	exec(WebExtCommand + ' build --overwrite-dest');
 	cb();
 });
 
@@ -269,11 +273,11 @@ gulp.task('ff:sign', ['ff:package'], (cb) => {
 	}
 
 	let SecureData = JSON.parse(fs.readFileSync(SecureDataFilepath));
-	npx(`${WebExtCommand} sign --api-key ${SecureData.jwt_issuer} --api-secret ${SecureData.jwt_secret}`);
+	exec(`${WebExtCommand} sign --api-key ${SecureData.jwt_issuer} --api-secret ${SecureData.jwt_secret}`);
 	cb();
 });
 
 gulp.task('ff:lint', ['ff'], (cb) => {
-	npx(`${WebExtCommand} lint`);
+	exec(`${WebExtCommand} lint`);
 	cb();
 });
