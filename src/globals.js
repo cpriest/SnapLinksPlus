@@ -51,7 +51,8 @@ const DefaultPrefs = {
 	HighlightStyles_ObscuredPoint: 'fill: rgba(255,0,0,.80);',
 	HighlightStyles_ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
 
-	SwitchFocusToNewTab: true,
+	OpenTabsAtEndOfTabBar: false,
+  SwitchFocusToNewTab: false,
 	ShowNumberOfLinks:   true,
 	ActivateModifiers:   NONE,
 	ActivateMouseButton: RMB,
