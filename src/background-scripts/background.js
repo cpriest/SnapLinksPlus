@@ -26,7 +26,7 @@
  * @param respond function
  */
 function onMessage(msg, sender, respond) {
-	switch(msg.Action) {
+  switch(msg.Action) {    
 		case BACKGROUND_TEST:
 			// let p = browser.notifications.create({
 			// 	'type':		'basic',
@@ -42,6 +42,11 @@ function onMessage(msg, sender, respond) {
 			break;
 		case OPEN_URLS_IN_TABS:
 			Prefs.loaded.then(async () => {
+        
+				let tabsAll = await browser.tabs.query({
+          currentWindow: true
+				});        
+       
 				let tabs = await browser.tabs.query({
 					active       : true,
 					currentWindow: true
@@ -55,7 +60,7 @@ function onMessage(msg, sender, respond) {
 					let props = {
 						url:			url,
 						active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
-						index:		tabs[0].index + 1,
+						index:		Prefs.OpenTabsAtEndOfTabBar ? tabsAll.length : tabs[0].index + 1, // Open tabs at the end of the tab bar
 						// openerTabId: tabs[0].id,
 					};
 					if(isFirefox)
