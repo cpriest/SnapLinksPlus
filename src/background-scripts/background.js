@@ -44,7 +44,7 @@ function onMessage(msg, sender, respond) {
 			Prefs.loaded.then(async () => {
         
 				let tabsAll = await browser.tabs.query({
-          currentWindow: true
+					currentWindow: true
 				});        
        
 				let tabs = await browser.tabs.query({
