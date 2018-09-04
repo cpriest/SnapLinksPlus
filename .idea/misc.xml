@@ -18,10 +18,6 @@
   <component name="UnicodeBrowser">
     <option name="fontName" value="Fira Code Light" />
   </component>
-  <component name="UpsourceProjectSettings">
-    <option name="disableSslValidation" value="true" />
-    <option name="upsourceUrl" value="https://upsource.resultsgeneration.com" />
-  </component>
   <component name="VagrantProjectSettings">
     <option name="instanceFolder" value="" />
     <option name="provider" value="" />
