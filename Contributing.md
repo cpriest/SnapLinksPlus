@@ -73,7 +73,7 @@ By default, gulp will build the web extension in your project directory under bu
 
 **Firefox**
 
-You'll need to be using [Firefox Developer][FF-DevEd] edition or newer, and set your *xpinstall.signatures.required* to true in *about:config*.
+You'll need to be using [Firefox Developer][FF-DevEd] edition, and set your *xpinstall.signatures.required* to false in *about:config*.
 
 There are a number of methods for loading the extension into firefox, I prefer to use is with a *proxy file*.
 
@@ -128,3 +128,4 @@ If you have any questions or trouble getting things up and running, please feel 
 
 
 [MDN-Ext-Anatomy]: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Anatomy_of_a_WebExtension
+[FF-DevEd]: https://www.mozilla.org/firefox/developer/
