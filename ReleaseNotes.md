@@ -1,3 +1,7 @@
+v3.1.3 - Released 9/12/2018
+===========================
+ - Added ability to open new tabs always at the end of tab bar
+
 v3.1.2b1 - Released 3/6/2018
 ============================
  - Added ability to control which modifier keys and which mouse button is used for activation
@@ -12,8 +16,7 @@ v3.1.2b1 - Released 3/6/2018
 v3.1.1.3 - Released Dec 16, 2016
 ================================
  - Proper culling of obscured elements (hidden behind overlays...)
-    - Ensure performance is good
-
+ - Ensure performance is good
 
 v3.1.0.4 - Released Nov 15th, 2016
 ===================================
@@ -29,17 +32,17 @@ v3.1.0.4 - Released Nov 15th, 2016
  - Can now lasso radio buttons, selects the first radio of each group
  - Document Size Changes are now detected properly
  - "Greatest Size of Text" is now used for Links / Javascript Links
-   - This can be bypassed by holding down alt while dragging
+ - This can be bypassed by holding down alt while dragging
  - New tabs will open to the right of the current tab
  - New tabs will be opened in document element order
  - The first tab by document order opened will also become active
  - Added website and new welcome page with introduction on how to use SnapLinks v3
  - Contributions from AstrodogX
-     - Now skipping elements that are not visible
-     - Copy Links To Clipboard by Holding down ctrl while releasing the selection
-     - Count of selected elements appears
+ - Now skipping elements that are not visible
+ - Copy Links To Clipboard by Holding down ctrl while releasing the selection
+ - Count of selected elements appears
  - Contributions from Phyxion
-     - Tireless testing on a wide variety of websites, **thank you!**
+ - Tireless testing on a wide variety of websites, **thank you!**
 
 v3.0.0b2
 ========
