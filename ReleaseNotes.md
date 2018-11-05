@@ -1,3 +1,7 @@
+v3.1.4 - Released 11/05/2018
+============================
+ - Fixed a coloring issue of the label on some websites.
+
 v3.1.3 - Released 9/12/2018
 ===========================
  - Added ability to open new tabs always at the end of tab bar

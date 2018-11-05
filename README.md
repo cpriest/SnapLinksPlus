@@ -8,8 +8,9 @@
 &nbsp;
 ## News
 
-* 2018-03-16 - **Beta** Release v3.1.2b2 &nbsp; [![Firefox Beta][FF16]][MozBeta] &nbsp; [![Chrome][CH16]][ChromeBeta]
-* 2018-02-28 - **Beta** Release v3.1.2b1 &nbsp; [![Firefox Beta][FF16]][MozBeta] &nbsp; [![Chrome][CH16]][ChromeBeta]
+
+* 2018-11-05 - A special thank you to the contributors to the project, more pull requests welcome.
+* 2018-11-05 - Release v3.1.4 [![Firefox][FF16]][MozRelease] &nbsp; [![Chrome][CH16]][ChromeRelease]
 * New Website Online: [Snap Links 3](http://cpriest.github.io/SnapLinksPlus/)
 
 &nbsp;
@@ -24,26 +25,8 @@ The reasons behind this are simple, [electrolysis](https://wiki.mozilla.org/Elec
 &nbsp;
 # Installing
 
-|   **Channel**    |   ![FireFox][FF48]    |    ![Chrome][CH48]    |
-|:----------------:|:---------------------:|:---------------------:|
-| Release / Stable | [Install][MozRelease] | [Install][ChromeRelease] |
-|  Beta / Latest   |  [Install][MozBeta]   | [Install][ChromeBeta] |
-
-Choose either Release or Beta channels for your browser and click the download link.
-
-**Note:** The beta channels will have as their last beta release the same as the released version.
-
-&nbsp;
-### Snap Links v2 Features
-
-[Snap Links Plus](https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/) is a Firefox addon that lets you draw a lasso around links, checkboxes and other on-screen elements and open them in new tabs as  well as other actions:
-
-* Open in New Tabs
-* Open in New Windows
-* Open Tabs in New Window
-* Bookmark All
-* Download All
-* Copy to Clipboard
+| [![FireFox][FF48]][MozRelease] | [![Chrome][CH48]][ChromeRelease] |
+|:------------------------------:|:------------------------------:|
 
 &nbsp;
 ## Contributing
@@ -60,6 +43,16 @@ Please see the [Contributing](Contributing.md) document.
     **Usage, features, help with programming**; we do our best to answer anything we can.
 
 
+### Snap Links v2 Features
+
+Snap Links Plus is a Firefox addon that lets you draw a lasso around links, checkboxes and other on-screen elements and open them in new tabs as  well as other actions:
+
+* Open in New Tabs
+* Open in New Windows
+* Open Tabs in New Window
+* Bookmark All
+* Download All
+* Copy to Clipboard
 
 
 
@@ -70,7 +63,8 @@ Please see the [Contributing](Contributing.md) document.
 
 
 
-[MozBeta]: https://addons.mozilla.org/firefox/downloads/file/894992/snap_links_plus-3.1.2b2-an+fx.xpi?src=devhub
+
+[MozBeta]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/versions/beta
 [MozRelease]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/
 [ChromeBeta]: https://chrome.google.com/webstore/detail/snap-links-beta/ikglmligndmabebhnicldebpekldnabm?authuser=1
 [ChromeRelease]: https://chrome.google.com/webstore/detail/snap-links-beta/ikglmligndmabebhnicldebpekldnabm?authuser=1
@@ -90,3 +84,4 @@ Please see the [Contributing](Contributing.md) document.
 
 
 [MDN-Ext-Anatomy]: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Anatomy_of_a_WebExtension
+[FF-DevEd]: https://www.mozilla.org/firefox/developer/

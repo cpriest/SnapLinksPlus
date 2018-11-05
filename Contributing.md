@@ -111,7 +111,7 @@ If you have any questions or trouble getting things up and running, please feel 
 [MozBeta]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/versions/beta
 [MozRelease]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/
 [ChromeBeta]: https://chrome.google.com/webstore/detail/snap-links-beta/ikglmligndmabebhnicldebpekldnabm?authuser=1
-[ChromeRelease]: #
+[ChromeRelease]: https://chrome.google.com/webstore/detail/snap-links-beta/ikglmligndmabebhnicldebpekldnabm?authuser=1
 [FF16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_16x16.png
 [FF48]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_48x48.png
 [CH16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/chrome/chrome_16x16.png
