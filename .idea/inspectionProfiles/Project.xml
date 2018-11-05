@@ -1,0 +1,331 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project" />
+    <inspection_tool class="Annotator" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="ArrayTypeOfParameterByDefaultValueInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="AutoloadingIssuesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Processes" level="WARNING" enabled="false" />
+      <scope name="Page Handlers" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="BashGloballyRegisteredVariable" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CallableInLoopTerminationConditionInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ClassOverridesFieldOfSuperClassInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CssInvalidElementInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="CssOverwrittenProperties" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CssRedundantUnit" enabled="false" level="INFO" enabled_by_default="false" />
+    <inspection_tool class="CssUnitlessNumber" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CssUnknownTarget" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="CssUnusedSymbolInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="DegradedSwitchInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="DisconnectedForeachInstructionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="SUGGEST_USING_CLONE" value="true" />
+    </inspection_tool>
+    <inspection_tool class="DuplicatePropertyInspection" enabled="false" level="No Severity" enabled_by_default="false">
+      <option name="CURRENT_FILE" value="false" />
+      <option name="MODULE_WITH_DEPENDENCIES" value="false" />
+      <option name="CHECK_DUPLICATE_VALUES" value="false" />
+      <option name="CHECK_DUPLICATE_KEYS" value="false" />
+      <option name="CHECK_DUPLICATE_KEYS_WITH_DIFFERENT_VALUES" value="false" />
+    </inspection_tool>
+    <inspection_tool class="FileFunctionMissUseInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="FilePutContentsMissUseInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ForeachInvariantsInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="ForgottenDebugOutputInspection" enabled="false" level="ERROR" enabled_by_default="false">
+      <option name="configuration">
+        <list>
+          <option value="\Codeception\Util\Debug::debug" />
+          <option value="\Codeception\Util\Debug::pause" />
+          <option value="\Symfony\Component\Debug\Debug::enable" />
+          <option value="\Symfony\Component\Debug\DebugClassLoader::enable" />
+          <option value="\Symfony\Component\Debug\ErrorHandler::register" />
+          <option value="\Symfony\Component\Debug\ExceptionHandler::register" />
+          <option value="\Zend\Debug\Debug::dump" />
+          <option value="\Zend\Di\Display\Console::export" />
+          <option value="debug_print_backtrace" />
+          <option value="debug_zval_dump" />
+          <option value="error_log" />
+          <option value="phpinfo" />
+          <option value="print_r" />
+          <option value="var_dump" />
+          <option value="var_export" />
+        </list>
+      </option>
+      <option name="migratedIntoUserSpace" value="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlFormInputWithoutLabel" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="INFO" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="9">
+            <item index="0" class="java.lang.String" itemvalue="jsclass" />
+            <item index="1" class="java.lang.String" itemvalue="objectid" />
+            <item index="2" class="java.lang.String" itemvalue="status" />
+            <item index="3" class="java.lang.String" itemvalue="datarow" />
+            <item index="4" class="java.lang.String" itemvalue="ancestor" />
+            <item index="5" class="java.lang.String" itemvalue="filename" />
+            <item index="6" class="java.lang.String" itemvalue="uploadurl" />
+            <item index="7" class="java.lang.String" itemvalue="name" />
+            <item index="8" class="java.lang.String" itemvalue="bordercolor" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="17">
+            <item index="0" class="java.lang.String" itemvalue="nobr" />
+            <item index="1" class="java.lang.String" itemvalue="noembed" />
+            <item index="2" class="java.lang.String" itemvalue="comment" />
+            <item index="3" class="java.lang.String" itemvalue="noscript" />
+            <item index="4" class="java.lang.String" itemvalue="embed" />
+            <item index="5" class="java.lang.String" itemvalue="script" />
+            <item index="6" class="java.lang.String" itemvalue="status" />
+            <item index="7" class="java.lang.String" itemvalue="importcount" />
+            <item index="8" class="java.lang.String" itemvalue="todo" />
+            <item index="9" class="java.lang.String" itemvalue="controls" />
+            <item index="10" class="java.lang.String" itemvalue="div" />
+            <item index="11" class="java.lang.String" itemvalue="juicy-ace-editor" />
+            <item index="12" class="java.lang.String" itemvalue="ace-editor" />
+            <item index="13" class="java.lang.String" itemvalue="xterminal" />
+            <item index="14" class="java.lang.String" itemvalue="x-terminal" />
+            <item index="15" class="java.lang.String" itemvalue="xterm-pane" />
+            <item index="16" class="java.lang.String" itemvalue="ace-xterm" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlUnknownTarget" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="IfConditionalsWithoutCurvyBracketsInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="InheritDocInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="JSCheckFunctionSignatures" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="myCheckGuessedTypes" value="true" />
+    </inspection_tool>
+    <inspection_tool class="JSConstructorReturnsPrimitive" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="JSEqualityComparisonWithCoercion" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="JSLastCommaInObjectLiteral" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="JSMethodCanBeStatic" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="JSNonStrictModeUsed" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="JSUndefinedPropertyAssignment" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="JSUnnecessarySemicolon" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="JSUnresolvedVariable" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="myStrictlyCheckGlobalDefinitions" value="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUnusedLocalSymbols" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myIgnoreUnusedFunctionParameters" value="true" />
+    </inspection_tool>
+    <inspection_tool class="JSValidateTypes" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="JsonStandardCompliance" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="JSON5 Files" level="ERROR" enabled="false">
+        <option name="myWarnAboutComments" value="false" />
+      </scope>
+    </inspection_tool>
+    <inspection_tool class="LongInheritanceChainInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="LoopWhichDoesNotLoopInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="LowerAccessLevelInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="MagicMethodsValidityInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="MissingOrEmptyGroupStatementInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="MkdirRaceConditionInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="MoreThanThreeArgumentsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="limit" value="5" />
+    </inspection_tool>
+    <inspection_tool class="NestedPositiveIfStatementsInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="NestedTernaryOperatorInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="NotOptimalIfConditionsInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="NullPointerExceptionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PhpClassNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Tests" level="WARNING" enabled="true">
+        <option name="m_regex" value="(RG_(DB_)?|myProcess_|i|my|pk|api)?[A-Z][A-Za-z\d]*" />
+        <option name="m_minLength" value="3" />
+        <option name="m_maxLength" value="32" />
+      </scope>
+      <scope name="Page Handlers" level="WARNING" enabled="false">
+        <option name="m_regex" value="(|my|pk)?[A-Z][A-Za-z\d]*|Page_[A-Za-z_]*" />
+        <option name="m_maxLength" value="48" />
+      </scope>
+      <option name="m_regex" value="(myProcess_|i|my|pk|api)?[A-Z][A-Za-z\d]*" />
+      <option name="m_minLength" value="3" />
+      <option name="m_maxLength" value="32" />
+    </inspection_tool>
+    <inspection_tool class="PhpConstantNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="m_regex" value="(gd|gf|pk)?[A-Z][A-z_\d]*|[A-Z][A-Z_\d]*" />
+      <option name="m_minLength" value="3" />
+      <option name="m_maxLength" value="48" />
+    </inspection_tool>
+    <inspection_tool class="PhpDeprecationInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpDivisionByZeroInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpDocMissingReturnTagInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="SKIP_ON_EMPTY_PHPDOC" value="false" />
+    </inspection_tool>
+    <inspection_tool class="PhpDocMissingThrowsInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpDocSignatureInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpFunctionNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="esp Code Scope" level="WARNING" enabled="true">
+        <option name="m_regex" value="(pk)?[A-Z][A-Za-z\d_]*" />
+        <option name="m_minLength" value="3" />
+        <option name="m_maxLength" value="48" />
+      </scope>
+      <option name="m_regex" value=".*" />
+      <option name="m_minLength" value="3" />
+      <option name="m_maxLength" value="48" />
+    </inspection_tool>
+    <inspection_tool class="PhpIncludeInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PhpInconsistentReturnPointsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Page Handlers" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="PhpMethodNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Tests" level="WARNING" enabled="true">
+        <option name="m_regex" value="(test|get|set|tear|on|_)?[A-Z][A-Za-z\d_]*|jsonSerialize|[a-z]+" />
+        <option name="m_minLength" value="3" />
+        <option name="m_maxLength" value="48" />
+      </scope>
+      <option name="m_regex" value="(on|offset|dbo|_)?[A-Z][A-Za-z\d_]*|jsonSerialize|[a-z]+" />
+      <option name="m_minLength" value="3" />
+      <option name="m_maxLength" value="48" />
+    </inspection_tool>
+    <inspection_tool class="PhpMethodOrClassCallIsNotCaseSensitiveInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpMissingDocCommentInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="CHECK_FIELD" value="true" />
+      <option name="SKIP_EMPTY_FUNCTION" value="false" />
+      <option name="SKIP_EMPTY_METHOD" value="false" />
+    </inspection_tool>
+    <inspection_tool class="PhpMissingParentCallMagicInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpMultipleClassesDeclarationsInOneFile" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpPropertyNamingConventionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="m_regex" value="^(t|tbl|db|obj|pk)?[A-Z][A-Za-z\d_]*|[a-z]+$" />
+      <option name="m_minLength" value="2" />
+      <option name="m_maxLength" value="32" />
+    </inspection_tool>
+    <inspection_tool class="PhpSignatureMismatchDuringInheritanceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PhpStatementHasEmptyBodyInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpTraditionalSyntaxArrayLiteralInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpUndefinedCallbackInspection" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="PhpUndefinedClassConstantInspection" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="PhpUndefinedClassInspection" enabled="true" level="ERROR" enabled_by_default="true">
+      <option name="DONT_REPORT_MULTI_RESOLVE" value="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUndefinedConstantInspection" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="PhpUndefinedFieldInspection" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="PhpUndefinedFunctionInspection" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="PhpUndefinedGotoLabelInspection" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="PhpUndefinedMethodInspection" enabled="true" level="ERROR" enabled_by_default="true">
+      <option name="DOWNGRADE_SEVERITY" value="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUndefinedNamespaceInspection" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="PhpUndefinedVariableInspection" enabled="true" level="ERROR" enabled_by_default="true">
+      <option name="IGNORE_INCLUDE" value="false" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnhandledExceptionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PhpUnnecessaryFullyQualifiedNameInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpUnusedLocalVariableInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Page Handlers" level="WARNING" enabled="true" />
+      <option name="ENABLE_IN_FILE_SCOPE" value="true" />
+      <option name="DONT_REPORT_INSIDE_LIST" value="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnusedParameterInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="Page Handlers" level="WEAK WARNING" enabled="true">
+        <option name="DONT_REPORT_ABSTRACT_CLASS" value="true" />
+        <option name="DONT_REPORT_ANONYMOUS" value="true" />
+        <option name="DONT_REPORT_PARAMETERS_COUNT_ACCESS" value="true" />
+      </scope>
+      <option name="DONT_REPORT_ABSTRACT_CLASS" value="true" />
+      <option name="DONT_REPORT_ANONYMOUS" value="true" />
+      <option name="DONT_REPORT_PARAMETERS_COUNT_ACCESS" value="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpVariableNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="m_regex" value="^((t|tbl|db|obj|sql)?[A-Z][A-Za-z\d_]*|[a-z]{1,4}|_)$" />
+      <option name="m_minLength" value="1" />
+      <option name="m_maxLength" value="32" />
+    </inspection_tool>
+    <inspection_tool class="PhpVoidFunctionResultUsedInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PropertyCanBeStaticInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PropertyInitializationFlawsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="REPORT_DEFAULTS_FLAWS" value="false" />
+    </inspection_tool>
+    <inspection_tool class="ReferenceLink" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="ReferenceMismatchInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="SSBasedInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ScandirUsageInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="SecurityAdvisoriesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="optionConfiguration">
+        <list>
+          <option value="behat/behat" />
+          <option value="brianium/paratest" />
+          <option value="codeception/codeception" />
+          <option value="codedungeon/phpunit-result-printer" />
+          <option value="composer/composer" />
+          <option value="filp/whoops" />
+          <option value="friendsofphp/php-cs-fixer" />
+          <option value="humbug/humbug" />
+          <option value="infection/infection" />
+          <option value="jakub-onderka/php-parallel-lint" />
+          <option value="johnkary/phpunit-speedtrap" />
+          <option value="mikey179/vfsStream" />
+          <option value="mockery/mockery" />
+          <option value="mybuilder/phpunit-accelerator" />
+          <option value="orchestra/testbench" />
+          <option value="pdepend/pdepend" />
+          <option value="phan/phan" />
+          <option value="phing/phing" />
+          <option value="phpmd/phpmd" />
+          <option value="phpro/grumphp" />
+          <option value="phpspec/phpspec" />
+          <option value="phpspec/prophecy" />
+          <option value="phpstan/phpstan" />
+          <option value="phpunit/dbunit" />
+          <option value="phpunit/phpcov" />
+          <option value="phpunit/phpunit" />
+          <option value="phpunit/phpunit-selenium" />
+          <option value="povils/phpmnd" />
+          <option value="roave/security-advisories" />
+          <option value="satooshi/php-coveralls" />
+          <option value="sebastian/phpcpd" />
+          <option value="slevomat/coding-standard" />
+          <option value="spatie/phpunit-watcher" />
+          <option value="squizlabs/php_codesniffer" />
+          <option value="sstalle/php7cc" />
+          <option value="symfony/debug" />
+          <option value="symfony/maker-bundle" />
+          <option value="symfony/phpunit-bridge" />
+          <option value="symfony/var-dumper" />
+          <option value="vimeo/psalm" />
+          <option value="wimg/php-compatibility" />
+          <option value="yiisoft/yii2-debug" />
+          <option value="yiisoft/yii2-gii" />
+          <option value="zendframework/zend-debug" />
+          <option value="zendframework/zend-test" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="SenselessCommaInArrayDefinitionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="SpellCheckingInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="esp Code Scope" level="TYPO" enabled="true">
+        <option name="processCode" value="true" />
+        <option name="processLiterals" value="false" />
+        <option name="processComments" value="true" />
+      </scope>
+      <option name="processCode" value="true" />
+      <option name="processLiterals" value="false" />
+      <option name="processComments" value="true" />
+    </inspection_tool>
+    <inspection_tool class="SqlIdentifierInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="SqlResolveInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="SuspiciousAssignmentsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="ThrowRawExceptionInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="TrailingSpacesInProperty" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="TypeUnsafeArraySearchInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="TypeUnsafeComparisonInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="TypesCastingWithFunctionsInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="UnNecessaryDoubleQuotesInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="UnSafeIsSetOverArrayInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="UnnecessaryParenthesesInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="UnusedConstructorDependenciesInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="UnusedProperty" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="W3CssValidation" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myCssVersion" value="css3" />
+      <option name="myIgnoreVendorSpecificProperties" value="true" />
+    </inspection_tool>
+  </profile>
+</component>
