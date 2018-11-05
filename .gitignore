@@ -1,5 +1,6 @@
 /.idea/shelf
 /.idea/workspace.xml
+/.idea/dbnavigator.xml
 .idea/SnapLinks3.time
 /insecure/
 /local/
@@ -7,8 +8,8 @@
 
 /vendor/
 /composer.lock
-/package-lock.json
 /artifacts/
 /node_modules/
 *.swp
 npm-debug.log*
+*.log

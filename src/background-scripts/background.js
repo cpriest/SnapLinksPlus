@@ -26,7 +26,7 @@
  * @param respond function
  */
 function onMessage(msg, sender, respond) {
-  switch(msg.Action) {    
+	switch(msg.Action) {
 		case BACKGROUND_TEST:
 			// let p = browser.notifications.create({
 			// 	'type':		'basic',
@@ -42,14 +42,14 @@ function onMessage(msg, sender, respond) {
 			break;
 		case OPEN_URLS_IN_TABS:
 			Prefs.loaded.then(async () => {
-        
+
 				let tabsAll = await browser.tabs.query({
-					currentWindow: true
-				});        
-       
+					currentWindow: true,
+				});
+
 				let tabs = await browser.tabs.query({
-					active       : true,
-					currentWindow: true
+					active:			true,
+					currentWindow: true,
 				});
 				if(!tabs.length)
 					return;
@@ -58,9 +58,9 @@ function onMessage(msg, sender, respond) {
 				// Reverse the url order so that we are opening in the correct order
 				for(let url of msg.tUrls.reverse()) {
 					let props = {
-						url:			url,
+						url:	url,
 						active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
-						index:		Prefs.OpenTabsAtEndOfTabBar ? tabsAll.length : tabs[0].index + 1, // Open tabs at the end of the tab bar
+						index:	Prefs.OpenTabsAtEndOfTabBar ? tabsAll.length : tabs[0].index + 1, // Open tabs at the end of the tab bar
 						// openerTabId: tabs[0].id,
 					};
 					if(isFirefox)
@@ -88,13 +88,13 @@ async function CheckInstallation() {
 		if(!item || !item.LastInstalledVersion) {
 			// New installation
 			browser.tabs.create({
-				url:		'http://cpriest.github.io/SnapLinksPlus/welcome.html',
+				url:	'http://cpriest.github.io/SnapLinksPlus/welcome.html',
 				active: true,
 			});
 		} else if(item.LastInstalledVersion != manifest.version) {
 			// Update/Upgrade
 			browser.tabs.create({
-				url:		'http://cpriest.github.io/SnapLinksPlus/updated.html',
+				url:	'http://cpriest.github.io/SnapLinksPlus/updated.html',
 				active: true,
 			});
 		}

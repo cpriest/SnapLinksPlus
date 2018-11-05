@@ -23,11 +23,11 @@ const cp   = require('child_process');
 // const sourcemaps = require('gulp-sourcemaps');
 const hb   = require('gulp-hb');
 const fs = require('fs');
-const run = require('gulp-run-command').default;
+// const run = require('gulp-run-command').default;
 
-const gutil  = require('gulp-util');
+// const gutil  = require('gulp-util');
 const rename = require('gulp-rename');
-const merge  = require('merge-stream');
+// const merge  = require('merge-stream');
 
 const sequence = require('run-sequence');
 
@@ -186,7 +186,7 @@ gulp.task('chrome:package', ['chrome'], () => {
 	if(!fs.existsSync(SigningFilepath))
 		return console.error('Unable to pack Chrome extension, signing PEM file not available.');
 
-	npx(`crx pack ${Chrome.BuildPath} -o ./artifacts/SnapLinks-${Chrome.BuildData.quad_version}.crx -p ${SigningFilepath}`);
+	exec(`crx pack ${Chrome.BuildPath} -o ./artifacts/SnapLinks-${Chrome.BuildData.quad_version}.crx -p ${SigningFilepath}`);
 });
 
 /**

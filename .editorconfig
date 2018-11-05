@@ -6,11 +6,15 @@ insert_final_newline=true
 indent_style=tab
 tab_width=4
 
-[{*.yaml,*.yml}]
+[.editorconfig]
+indent_style = space
+indent_size = 4
+
+[{*.yml, *.yaml}]
 indent_style=space
 indent_size=2
 
-[{*.md,*.mkd,*.markdown}]
+[{*.mkd, *.markdown, *.md}]
 indent_style=space
 indent_size=4
 
