@@ -39,7 +39,7 @@ let execDefaultOpts = {
 const PackageData = JSON.parse(fs.readFileSync('./package.json'));
 
 const Chrome = {
-	SecureDataPath: './insecure/Chrome',
+	ArtifactsPath:	'./artifacts/chrome',
 	BuildPath     : './build/chrome',
 	BuildData     : {
 		Chrome      : true,
@@ -47,23 +47,13 @@ const Chrome = {
 	}
 };
 
-const ChromeBeta = {
-	SecureDataPath: './insecure/Chrome',
-	BuildPath:      './build/chrome_beta',
-	BuildData:      {
-		ChromeBeta: true,
-		quad_version: PackageData.version.replace(/[^\d.]+/g, '.')
-	}
-};
-
 const FireFox = {
-	BuildPath: './build/ff',
-	BuildData: {
+	ArtifactsPath: './artifacts/ff',
+	BuildPath:     './build/ff',
+	BuildData:     {
 		Firefox: true,
 	}
 };
-
-const WebExtCommand = `web-ext -s ${FireFox.BuildPath} -a ./artifacts`;
 
 /** Wrapper for child_process.spawnSync */
 function exec(cmd, options = execDefaultOpts) {
@@ -91,9 +81,7 @@ TaskGlobs.set('ui', [
 	'src/**/*.htm*',
 ]);
 TaskGlobs.set('res', [
-	'res/**',
-
-	'!res/Screenshot*'
+	'res/**/*Logo*.png',
 ]);
 
 SpecialGlobs.set('manifest', [
@@ -133,7 +121,7 @@ gulp.task('lib', ['clean'], () =>
 
 gulp.task('build:tmp', Array.from(TaskGlobs.keys()));
 
-gulp.task('build', ['chrome', 'ff', 'chrome_beta']);
+gulp.task('build', ['chrome', 'ff']);
 
 gulp.task('default', ['build'], () => {
 	// gulp.watch(SourceFiles, watchOpts, ['src']);
@@ -149,9 +137,13 @@ gulp.task('watch', ['build'], (cb) => {
 	});
 });
 
-/**
- *        Chrome Building Tasks
- */
+
+let webext = (cmd, data) => `web-ext ${cmd} -s ${data.BuildPath} -a ${data.ArtifactsPath} -o`;
+
+
+/*************************************************************************************************
+ *   Chrome Building Tasks
+ ************************************************************************************************/
 gulp.task('chrome', ['build:tmp'], (cb) =>
 	sequence(
 		'chrome:clean',
@@ -181,50 +173,13 @@ gulp.task('chrome:manifest', () =>
 );
 
 gulp.task('chrome:package', ['chrome'], () => {
-	const SigningFilepath = `${Chrome.SecureDataPath}/ChromeExtension.pem`;
-
-	if(!fs.existsSync(SigningFilepath))
-		return console.error('Unable to pack Chrome extension, signing PEM file not available.');
-
-	exec(`crx pack ${Chrome.BuildPath} -o ./artifacts/SnapLinks-${Chrome.BuildData.quad_version}.crx -p ${SigningFilepath}`);
+	exec(webext('build', Chrome));
 });
 
-/**
- *        Chrome Beta Building Tasks
- */
 
-gulp.task('chrome_beta', ['build:tmp'], (cb) =>
-	sequence(
-		'chrome_beta:clean',
-		'chrome_beta:copy-tmp',
-		'chrome_beta:manifest',
-		cb
-	)
-);
-
-gulp.task('chrome_beta:clean', () => del(ChromeBeta.BuildPath));
-gulp.task('chrome_beta:copy-tmp', () =>
-	gulp.src('./build/tmp/**')
-		.pipe(gulp.dest(ChromeBeta.BuildPath))
-);
-
-gulp.task('chrome_beta:manifest', () =>
-	gulp.src('src/templates/manifest.hbs')
-		.pipe(
-			hb()
-				.data('./package.json')
-				.data(ChromeBeta.BuildData)
-		)
-		.pipe(rename({
-			extname: '.json',
-		}))
-		.pipe(gulp.dest(ChromeBeta.BuildPath))
-);
-
-
-/**
+/*************************************************************************************************
  *        Firefox Building Tasks
- */
+ ************************************************************************************************/
 
 gulp.task('ff', ['build:tmp'], (cb) =>
 	sequence(
@@ -255,14 +210,12 @@ gulp.task('ff:manifest', () =>
 );
 
 gulp.task('ff:package', ['ff'], (cb) => {
-	exec(WebExtCommand + ' build --overwrite-dest');
+	exec(webext('build', FireFox));
 	cb();
 });
 
 /**
  * NOTE: Using the web-ext sign will automatically upload for submission to AMO
- *
- * NOTE: To upload to the **BETA Channel**, the version string needs to match /(a|alpha|b|beta)\d+$/
  */
 gulp.task('ff:sign', ['ff:package'], (cb) => {
 	let SecureDataFilepath = './insecure/Firefox/api-key.json';
@@ -273,11 +226,11 @@ gulp.task('ff:sign', ['ff:package'], (cb) => {
 	}
 
 	let SecureData = JSON.parse(fs.readFileSync(SecureDataFilepath));
-	exec(`${WebExtCommand} sign --api-key ${SecureData.jwt_issuer} --api-secret ${SecureData.jwt_secret}`);
+	exec(webext(`sign --api-key ${SecureData.jwt_issuer} --api-secret ${SecureData.jwt_secret}`, FireFox));
 	cb();
 });
 
 gulp.task('ff:lint', ['ff'], (cb) => {
-	exec(`${WebExtCommand} lint`);
+	exec(webext('lint', FireFox));
 	cb();
 });
