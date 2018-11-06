@@ -1,4 +1,10 @@
 # Next Minor Release (3.1.1)
+ - **js-csp Update**:
+   - Write some jest tests which test the CSP functionality as-is
+   - Update js-csp and re-test
+   - Build tests into gulp task runner
+   - Setup Jest tests in Circle-CI
+
  - **Bugs**
     - Escape Key on https://thirteenag.github.io/wfp is not being stopped
 

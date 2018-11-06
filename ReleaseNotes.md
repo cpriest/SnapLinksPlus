@@ -1,6 +1,6 @@
 v3.1.4 - Released 11/05/2018
 ============================
- - Fixed a coloring issue of the label on some websites.
+ - Fixed a coloring issue of the label on some websites
 
 v3.1.3 - Released 9/12/2018
 ===========================
