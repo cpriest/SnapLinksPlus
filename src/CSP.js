@@ -15,7 +15,7 @@
  */
 'use strict';
 
-const csp = require('js-csp');
+const csp = window.csp || require('js-csp');
 
 class PubSubHandler {
 	constructor() {
@@ -103,4 +103,6 @@ function listen(elem, type, ch) {
 	});
 }
 
-module.exports = { pub, sub, csp, go, listen };
+if(typeof module != 'undefined') {
+	module.exports = { pub, sub, csp, go, listen };
+}
