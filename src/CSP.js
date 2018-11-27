@@ -13,7 +13,9 @@
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-"use strict";
+'use strict';
+
+const csp = require('js-csp');
 
 class PubSubHandler {
 	constructor() {
@@ -61,12 +63,15 @@ class PubSubHandler {
 			},
 			get enabled() { return enabled; },
 
-			set enabled(x) { enabled = x; return this; },
+			set enabled(x) {
+				enabled = x;
+				return this;
+			},
 
 		};
 
-		go(function*(val) {
-			while((val = yield SubscriberChannel) != csp.CLOSED){
+		go(function* (val) {
+			while((val = yield SubscriberChannel) != csp.CLOSED) {
 				if(enabled) {
 //					console.log('sub->go() val=%o', val);					// #DevCode
 					handler(val.topic, val.data, Subscription);
@@ -88,12 +93,14 @@ let sub    = PubSub.sub.bind(PubSub);
 let { go } = csp;
 
 // Imports from transducers
-let { compose, map } = transducers;
+// let { compose, map } = require('transducers');
 
 // Utility functions for use with js-csp and transducers.js
 
 function listen(elem, type, ch) {
 	elem.addEventListener(type, e => {
 		csp.putAsync(ch, e);
-	})
+	});
 }
+
+module.exports = { pub, sub, csp, go, listen };

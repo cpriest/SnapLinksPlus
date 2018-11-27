@@ -33,6 +33,10 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
+"@types/jest@^23.3.9":
+  version "23.3.9"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.9.tgz#c16b55186ee73ae65e001fbee69d392c51337ad1"
+
 "@types/node@*":
   version "10.12.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.2.tgz#d77f9faa027cadad9c912cd47f4f8b07b0fb0864"
@@ -5730,6 +5734,10 @@ tr46@^1.0.1:
   resolved "https://registry.yarnpkg.com/tr46/-/tr46-1.0.1.tgz#a8b13fd6bfd2489519674ccde55ba3693b706d09"
   dependencies:
     punycode "^2.1.0"
+
+transducers@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/transducers/-/transducers-0.0.3.tgz#2ae207e782b1c147e19ca6525ddb35ac58d2d411"
 
 traverse@0.4.x:
   version "0.4.6"
