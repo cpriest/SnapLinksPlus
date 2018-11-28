@@ -15,7 +15,8 @@
  */
 'use strict';
 
-const csp = window.csp || require('js-csp');
+// In Firefox, this is the sandbox, node needs to require(), this works in Chrome as well.
+const csp = this.csp || require('js-csp');
 
 class PubSubHandler {
 	constructor() {

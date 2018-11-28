@@ -77,11 +77,8 @@ const DefaultPrefs = {
 // Configurations
 let Prefs = new Configs(DefaultPrefs);
 Prefs.loaded.then((aValues) => {
-	Prefs.DevMode = false;
-	Prefs.Dev_Log_ActionMessages = false;
-	Prefs.Dev_Skip_AllActions = false;
-	// if(data.Dev.Enabled)
-	// 	Object.assign(data.HighlightStyles, data.Dev.HighlightStyles);
+//	if(Prefs.DevMode)
+//		Object.assign(Prefs.HighlightStyles, data.Dev.HighlightStyles);
 });
 
 // Pub-Sub Events

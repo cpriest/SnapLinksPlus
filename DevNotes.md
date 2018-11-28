@@ -53,14 +53,7 @@
  - Externalize CSS Styles
  - Compiler/minimizer for production build?
  - docElem is a sandboxed global, replace document.documentElement references with docElem
- - Update phing (if js-csp/transducers.js work out)
-    - js-csp
-        - npm install
-        - copy csp.min.js to src/lib
-    - transducers.js
-        - download/install (npm?)
-        - copy transducers.js to src/lib
-- Refactor ElemDocRects / RectMapper to ElemCache/ElemCacher (to reflect new font-size cache functionality)
+ - Refactor ElemDocRects / RectMapper to ElemCache/ElemCacher (to reflect new font-size cache functionality)
 
 # Test
  -

@@ -5735,10 +5735,6 @@ tr46@^1.0.1:
   dependencies:
     punycode "^2.1.0"
 
-transducers@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/transducers/-/transducers-0.0.3.tgz#2ae207e782b1c147e19ca6525ddb35ac58d2d411"
-
 traverse@0.4.x:
   version "0.4.6"
   resolved "https://registry.yarnpkg.com/traverse/-/traverse-0.4.6.tgz#d04b2280e4c792a5815429ef7b8b60c64c9ccc34"
@@ -6008,9 +6004,9 @@ web-ext@^2.4.0:
     yargs "6.6.0"
     zip-dir "1.0.2"
 
-webextension-polyfill@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/webextension-polyfill/-/webextension-polyfill-0.2.1.tgz#cdfc9126033039f1713553157d35beff1d4d6f4a"
+webextension-polyfill@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/webextension-polyfill/-/webextension-polyfill-0.3.1.tgz#fab2aed917a713a5d8221e41febad81c5d0b080f"
 
 webidl-conversions@^4.0.2:
   version "4.0.2"

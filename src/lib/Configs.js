@@ -88,11 +88,11 @@ class Configs {
 	}
 
 	log(aMessage, ...aArgs) {
-		// aMessage = `Prefs => ${aMessage}`;
-		// if(typeof log === 'function')
-		// 	log(aMessage, ...aArgs);
-		// else
-		// 	console.log(aMessage, ...aArgs);
+//		 aMessage = `Prefs => ${aMessage}`;
+//		 if(typeof log === 'function')
+//		 	log(aMessage, ...aArgs);
+//		 else
+//		 	console.log(aMessage, ...aArgs);
 	}
 
 	load() {
