@@ -64,6 +64,10 @@ function exec(cmd, options = execDefaultOpts) {
 const TaskGlobs = new Map(),
 		SpecialGlobs = new Map();
 
+TaskGlobs.set('root', [
+	'LICENSE',
+]);
+
 TaskGlobs.set('src', [
 	'src/**/*.js',
 
@@ -76,6 +80,7 @@ TaskGlobs.set('src', [
 
 TaskGlobs.set('lib', [
 	'node_modules/webextension-polyfill/dist/browser-polyfill.min.js',
+	'node_modules/js-csp/build/csp.min.js'
 ]);
 TaskGlobs.set('ui', [
 	'src/**/*.htm*',
@@ -98,6 +103,11 @@ const watchOpts = {
  */
 
 gulp.task('clean', () => del(['./build/tmp']));
+
+gulp.task('root', ['clean'], () =>
+	gulp.src(TaskGlobs.get('root'))
+		.pipe(gulp.dest('./build/tmp'))
+);
 
 gulp.task('src', ['clean'], () =>
 	gulp.src(TaskGlobs.get('src'))

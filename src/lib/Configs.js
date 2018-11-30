@@ -1,19 +1,4 @@
 /*
- * Copyright (c) 2016-2018 Clint Priest
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-/*
  *	This code is a modification of webextensions-lib-configs which contains this license:
  *		license: The MIT License, Copyright (c) 2016 YUKI "Piro" Hiroshi
  *		original:
@@ -30,14 +15,14 @@ class Configs {
 		this.default = aDefaults;
 		this.loaded  = this.load();
 
-		return this._ = new Proxy(this,  {
+		return this._ = new Proxy(this, {
 			get: (tgt, key, obj) => {
 				this.log(`get(${key})`);
 				if(key in this)
 					return this[key];
 				if(!(key in this.default))
 					throw `Prefs.${key} cannot be retrieved, not present in this.default`;
-				return this.lastValues[key]
+				return this.lastValues[key];
 			},
 			set: (tgt, key, value, obj) => {
 				this.log(`set(${key}, %o)`, value);
@@ -51,7 +36,7 @@ class Configs {
 				}
 
 				return true;
-			}
+			},
 		});
 	}
 
@@ -88,11 +73,11 @@ class Configs {
 	}
 
 	log(aMessage, ...aArgs) {
-//		 aMessage = `Prefs => ${aMessage}`;
-//		 if(typeof log === 'function')
-//		 	log(aMessage, ...aArgs);
-//		 else
-//		 	console.log(aMessage, ...aArgs);
+//		aMessage = `Prefs => ${aMessage}`;
+//		if(typeof log === 'function')
+//			log(aMessage, ...aArgs);
+//		else
+//			console.log(aMessage, ...aArgs);
 	}
 
 	load() {
@@ -191,39 +176,25 @@ class Configs {
 		});
 	}
 
-	broadcast(aMessage) {
-		let promises = [];
+	async broadcast(msg) {
+		let results = [];
 
-		if(chrome.runtime) {
-			promises.push(new Promise((aResolve, aReject) => {
-				chrome.runtime.sendMessage(aMessage, (aResult) => {
-					aResolve([aResult]);
-				});
-			}));
-		}
+		if(chrome.runtime)
+			results.push(await browser.runtime.sendMessage(msg));
 
 		if(chrome.tabs) {
-			promises.push(new Promise((aResolve, aReject) => {
-				chrome.tabs.query({}, (aTabs) => {
-					let promises = aTabs.map(
-						(aTab) => new Promise((aResolve, aReject) => {
-							chrome.tabs.sendMessage(aTab.id, aMessage, null, aResolve);
-						}),
-					);
-					Promise.all(promises)
-						.then(aResolve);
-				});
-			}));
+			results.push(...
+				await Promise.all(
+					(await browser.tabs.query({}))
+						.map(async (tab) =>
+							await browser.tabs.sendMessage(tab.id, msg, null)
+								.catch(r => r)
+						)
+				)
+			);
 		}
 
-		return Promise.all(promises)
-			.then((aResultSets) => {
-				let flattenResults = [];
-				aResultSets.forEach((aResults) => {
-					flattenResults = flattenResults.concat(aResults);
-				});
-				return flattenResults;
-			});
+		return results;
 	}
 
 	notifyUpdated(aKey) {
