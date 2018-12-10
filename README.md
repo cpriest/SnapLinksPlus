@@ -8,9 +8,9 @@
 &nbsp;
 ## News
 
-
+* 2018-12-10 - Release v3.1.5 [![Firefox][FF16]][MozRelease] &nbsp; [![Chrome][CH16]][ChromeRelease]
 * 2018-11-05 - A special thank you to the contributors to the project, more pull requests welcome.
-* 2018-11-05 - Release v3.1.4 [![Firefox][FF16]][MozRelease] &nbsp; [![Chrome][CH16]][ChromeRelease]
+* 2018-11-05 - Release v3.1.4
 * New Website Online: [Snap Links 3](http://cpriest.github.io/SnapLinksPlus/)
 
 &nbsp;
@@ -60,13 +60,7 @@ Snap Links Plus is a Firefox addon that lets you draw a lasso around links, chec
 
 
 
-
-
-
-
-[MozBeta]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/versions/beta
 [MozRelease]: https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/
-[ChromeBeta]: https://chrome.google.com/webstore/detail/snap-links-beta/ikglmligndmabebhnicldebpekldnabm?authuser=1
 [ChromeRelease]: https://chrome.google.com/webstore/detail/snap-links-beta/ikglmligndmabebhnicldebpekldnabm?authuser=1
 [FF16]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_16x16.png
 [FF48]: https://cdnjs.cloudflare.com/ajax/libs/browser-logos/45.3.0/firefox/firefox_48x48.png
@@ -81,7 +75,6 @@ Snap Links Plus is a Firefox addon that lets you draw a lasso around links, chec
 [Issues-New]: https://github.com/cpriest/SnapLinksPlus/issues/new
 [ForkIcon]: https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/svg/repo-forked.svg
 [ForkRepo]: https://github.com/cpriest/SnapLinksPlus#fork-destination-box
-
 
 [MDN-Ext-Anatomy]: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Anatomy_of_a_WebExtension
 [FF-DevEd]: https://www.mozilla.org/firefox/developer/

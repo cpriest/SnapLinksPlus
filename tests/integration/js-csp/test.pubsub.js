@@ -2,6 +2,8 @@
 
 let { pub, sub, csp, go } = require('../../../src/CSP');
 
+const yieldTime = 25;
+
 // Creates and Returns a new spy
 let MI7 = ($topic, $data, $undef) => jest.fn(
 	(topic, data, subscription) => {
@@ -26,7 +28,7 @@ test('Publish Single Message - Received', (done) => {
 		sub($topic, $spy);
 		pub($topic, $data);
 
-		yield csp.timeout(0);
+		yield csp.timeout(yieldTime);
 
 		expect($spy.mock.calls.length)
 			.toBe(1);
@@ -45,7 +47,7 @@ test('Publish to Multiple Subscribers', (done) => {
 		sub($topic, $spy2);
 		pub($topic, $data);
 
-		yield csp.timeout(0);
+		yield csp.timeout(yieldTime);
 
 		expect($spy1.mock.calls.length)
 			.toBe(1);
@@ -64,11 +66,11 @@ test('Unsubscribe Works', (done) => {
 		let $sub = sub($topic, $spy);
 		pub($topic, $data);
 
-		yield csp.timeout(0);
+		yield csp.timeout(yieldTime);
 
 		$sub.unsub();
 		pub($topic, $data);
-		yield csp.timeout(0);
+		yield csp.timeout(yieldTime);
 
 		expect($spy.mock.calls.length)
 			.toBe(1);
@@ -87,15 +89,15 @@ test('Multiple Pub/Sub Unsub Works', (done) => {
 			$sub2 = sub($topic, $spy2);
 
 		pub($topic, $data);
-		yield csp.timeout(0);
+		yield csp.timeout(yieldTime);
 
 		$sub1.unsub();
 		pub($topic, $data);
-		yield csp.timeout(0);
+		yield csp.timeout(yieldTime);
 
 		$sub2.unsub();
 		pub($topic, $data);
-		yield csp.timeout(0);
+		yield csp.timeout(yieldTime);
 
 		expect($spy1.mock.calls.length)
 			.toBe(1);
