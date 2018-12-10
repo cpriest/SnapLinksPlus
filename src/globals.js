@@ -1,36 +1,20 @@
-/*
- * Copyright (c) 2016-2018 Clint Priest
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-
 'use strict';
 
 let docElem = document.documentElement;
 
 const NONE  = 0,
-	  CTRL  = 1,
-	  ALT   = 2,
-	  SHIFT = 4;
+		CTRL	= 1,
+		ALT	= 2,
+		SHIFT = 4;
 
 //  (MouseEvent.buttons bitfield)
 const LMB = 1,	// Left Mouse Button
-	  RMB = 2,	// Right Mouse Button
-	  MMB = 4;	// Middle Mouse Button
+		RMB = 2,	// Right Mouse Button
+		MMB = 4;	// Middle Mouse Button
 
 // Actions
-const BACKGROUND_TEST = 'BackgroundTest';
-const RELOAD_EXTENSION = 'ReloadExtension';
+const BACKGROUND_TEST		= 'BackgroundTest';
+const RELOAD_EXTENSION		= 'ReloadExtension';
 const OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
 
 let isChrome  = location.protocol === 'chrome-extenson:',
@@ -52,10 +36,10 @@ const DefaultPrefs = {
 	HighlightStyles_ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
 
 	OpenTabsAtEndOfTabBar: false,
-	SwitchFocusToNewTab: false,		// Needed/referenced anywhere?
-	ShowNumberOfLinks:   true,
-	ActivateModifiers:   NONE,
-	ActivateMouseButton: RMB,
+	SwitchFocusToNewTab:	false,		// Needed/referenced anywhere?
+	ShowNumberOfLinks:		true,
+	ActivateModifiers:		NONE,
+	ActivateMouseButton:	RMB,
 
 	DisableFontWeightFiltering: false,
 
@@ -86,9 +70,9 @@ Prefs.loaded.then((aValues) => {
 
 // Publisher: EventHandler
 const DragRectChanged         = 'DragRectChanged',
-	  DragCompleted           = 'DragCompleted';
+		DragCompleted				= 'DragCompleted';
 const DocSizeChanged          = 'DocSizeChanged',
-	  ElementPositionsChanged = 'ElementPositionsChanged';
+		ElementPositionsChanged = 'ElementPositionsChanged';
 
 // Publisher: SelectionRect
 const ContainerElementCreated = 'ContainerElementCreated';
@@ -112,3 +96,20 @@ function $(css) {
 function Tracking(el) {
 	return false && el && el.tagName == 'A' && el.href == 'https://eggcave.com/click/2194270';
 }
+
+console.json = (arg) => {return JSON.parse(JSON.stringify(arg));};
+
+Function.prototype.wrap = function wrap(wrapper) {
+	let wrapped = this;
+	return wrapper.bind(undefined, (...args) => wrapped(...args));
+};
+
+function ReturnArg0Wrapper(wrapped, ...args) {
+	wrapped(...args);
+	return args[0];
+}
+
+console.log	= console.log.wrap(ReturnArg0Wrapper);
+console.info	= console.info.wrap(ReturnArg0Wrapper);
+console.error = console.error.wrap(ReturnArg0Wrapper);
+console.warn	= console.warn.wrap(ReturnArg0Wrapper);

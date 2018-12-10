@@ -1,41 +1,42 @@
 {
-	"name":             "snaplinks3",
-	"FullName":         "Snap Links",
-	"version":          "3.1.4",
-	"description":      "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
-	"author":           "Clint Priest",
-	"license":          "MIT",
-	"homepage":         "https://cpriest.github.com/SnapLinksPlus",
-	"repository":       "https://github.com/cpriest/SnapLinksPlus",
-	"private":          true,
-	"preferGlobal":     false,
-	"dependencies":     {
+	"name":				"snaplinks3",
+	"FullName":			"Snap Links",
+	"version":			"3.1.4",
+	"description":		"Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
+	"author":			"Clint Priest",
+	"license":			"MIT",
+	"homepage":			"https://cpriest.github.com/SnapLinksPlus",
+	"repository":		"https://github.com/cpriest/SnapLinksPlus",
+	"private":			true,
+	"preferGlobal":		false,
+	"dependencies":		{
 		"js-csp": "0.7.0"
 	},
-	"devDependencies":  {
-		"@types/jest":           "^23.3.9",
-		"crx":                   "^3.2.1",
-		"del":                   "^3.0.0",
-		"gulp":                  "^3.9.1",
-		"gulp-hb":               "^6.0.2",
-		"gulp-install":          "^1.1.0",
-		"gulp-rename":           "^1.2.2",
-		"gulp-replace":          "^0.6.1",
-		"gulp-run-command":      "0.0.9",
-		"gulp-shell":            "^0.6.5",
-		"gulp-sourcemaps":       "^2.6.4",
-		"gulp-util":             "^3.0.7",
-		"gulp-zip":              "^4.1.0",
-		"merge-stream":          "^1.0.1",
-		"run-sequence":          "^2.2.1",
-		"web-ext":               "^2.4.0",
+	"devDependencies":	{
+		"@types/jest":				"^23.3.9",
+		"crx":						"^3.2.1",
+		"del":						"^3.0.0",
+		"gulp":						"~4",
+		"gulp-hb":					"^6.0.2",
+		"gulp-install":				"^1.1.0",
+		"gulp-rename":				"^1.2.2",
+		"gulp-replace":				"^0.6.1",
+		"gulp-run-command":			"0.0.9",
+		"gulp-shell":				"^0.6.5",
+		"gulp-sourcemaps":			"^2.6.4",
+		"gulp-util":				"^3.0.7",
+		"gulp-zip":					"^4.1.0",
+		"merge-stream":				"^1.0.1",
+		"run-sequence":				"^2.2.1",
+		"web-ext":					"^2.4.0",
 		"webextension-polyfill": "^0.3.1"
 	},
-	"scripts":          {
+	"scripts":			{
 		"build": "gulp",
-		"test":  "jest"
+		"test":		"jest"
 	},
 	"peerDependencies": {
+		"gulp": "4",
 		"jest": "^23.6.0"
 	}
 }
