@@ -1,18 +1,18 @@
 {
-	"name":            "snaplinks3",
-	"FullName":        "Snap Links",
+	"name":				"snaplinks3",
+	"FullName":			"Snap Links",
 	"version":			"3.1.5",
-	"description":     "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
-	"author":          "Clint Priest",
-	"license":         "MIT",
-	"homepage":        "https://cpriest.github.com/SnapLinksPlus",
-	"repository":      "https://github.com/cpriest/SnapLinksPlus",
-	"private":         true,
-	"preferGlobal":    false,
-	"dependencies":    {
+	"description":		"Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
+	"author":			"Clint Priest",
+	"license":			"MIT",
+	"homepage":			"https://cpriest.github.com/SnapLinksPlus",
+	"repository":		"https://github.com/cpriest/SnapLinksPlus",
+	"private":			true,
+	"preferGlobal":		false,
+	"dependencies":		{
 		"js-csp": "^1.0.1"
 	},
-	"devDependencies": {
+	"devDependencies":  {
 		"@types/jest":				"^23.3.9",
 		"crx":						"^3.2.1",
 		"del":						"^3.0.0",
@@ -28,7 +28,7 @@
 		"gulp-zip":					"^4.1.0",
 		"merge-stream":				"^1.0.1",
 		"run-sequence":				"^2.2.1",
-		"web-ext":					"^2.4.0",
+		"web-ext":					"^2.9.2",
 		"webextension-polyfill": "^0.3.1"
 	},
 	"scripts":			{
@@ -36,7 +36,8 @@
 		"test":		"jest"
 	},
 	"peerDependencies": {
-		"gulp": "4",
-		"jest": "^23.6.0"
+		"@babel/core": "^7",
+		"gulp":        "4",
+		"jest":        "^23.6.0"
 	}
 }

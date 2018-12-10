@@ -44,8 +44,8 @@ function exec(cmd, options = execDefaultOpts) {
 	return cp.spawn('cmd.exe', ['/A', '/D', '/C', cmd], options);
 }
 
-const TaskGlobs		= new Map(),
-		SpecialGlobs = new Map();
+const TaskGlobs	= new Map(),
+	  SpecialGlobs = new Map();
 
 TaskGlobs.set('', [
 	'LICENSE',
@@ -98,7 +98,7 @@ function buildTmp() {
 	);
 }
 
-let webext = (cmd, data) => `web-ext ${cmd} -s ${data.BuildPath} -a ${data.ArtifactsPath} -o`;
+let webext = (cmd, data) => `web-ext ${cmd} -s ${data.BuildPath} -a ${data.ArtifactsPath} `;
 
 function buildFor({ BuildPath, BuildData }) {
 	del(BuildPath);
@@ -125,9 +125,14 @@ function buildFor({ BuildPath, BuildData }) {
 
 function buildChrome() { return buildFor(Chrome); }
 
-gulp.task('chrome:package', series(buildChrome, () => {
-	return exec(webext('build', Chrome));
-}));
+let PackageChrome = series(buildChrome, () => {
+	return exec(webext('build --overwrite-dest', Chrome));
+});
+
+let PublishChrome = series(PackageChrome, (done) => {
+	console.warn('Chrome Publishing is not yet supported.');
+	done();
+});
 
 /*************************************************************************************************
  *        Firefox Building Tasks
@@ -136,13 +141,13 @@ gulp.task('chrome:package', series(buildChrome, () => {
 function buildFirefox() { return buildFor(FireFox); }
 
 let PackageFirefox = series(buildFirefox, () => {
-	return exec(webext('build', FireFox));
+	return exec(webext('build --overwrite-dest', FireFox));
 });
 
 /**
  * NOTE: Using the web-ext sign will automatically upload for submission to AMO
  */
-let SignFirefox = series(PackageFirefox, () => {
+let PublishFirefox = series(PackageFirefox, () => {
 	let SecureDataFilepath = './insecure/Firefox/api-key.json';
 
 	if(!fs.existsSync(SecureDataFilepath)) {
@@ -162,7 +167,19 @@ let LintFirefox = series(buildFirefox, () => {
  *  Main Build Tasks
  ************************************************************************************************/
 
-module.exports.default = series(
-	buildTmp,
-	parallel(buildChrome, buildFirefox)
-);
+module.exports = {
+	default: series(
+		buildTmp,
+		parallel(buildChrome, buildFirefox)
+	),
+
+	package: series(
+		buildTmp,
+		parallel(PackageFirefox, PackageChrome)
+	),
+
+	publish: series(
+		buildTmp,
+		parallel(PublishFirefox, PublishChrome)
+	)
+};
