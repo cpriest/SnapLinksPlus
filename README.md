@@ -2,7 +2,7 @@
 
 ## [Contributing](Contributing.md) &bull; [Tutorial][IntroPage] & [Getting Help](#getting-help) &bull; [Reporting Issues](Contributing.md#reporting-bugs)
 
-* [Release Notes](ReleaseNotes.md) &bull; [Dev Notes](DevNotes.md) &bull; [Roadmap / Plans][Milestones]
+* [Release Notes](ReleaseNotes.md) &bull; [Release History](History.md) &bull; [Dev Notes](DevNotes.md) &bull; [Roadmap / Plans][Milestones]
 * **Open Issues:** [Enhancements][Issues-Enh] &bull; [Bugs][Issues-Bugs] &bull; [All][Issues-Open]
 
 &nbsp;
