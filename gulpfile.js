@@ -79,7 +79,9 @@ SpecialGlobs.set('manifest', [
 ]);
 
 const watchOpts = {
-	debounceDelay: 2000
+	delay:         500,
+	ignoreInitial: false,
+
 };
 
 /**
@@ -167,11 +169,29 @@ let LintFirefox = series(buildFirefox, () => {
  *  Main Build Tasks
  ************************************************************************************************/
 
+let buildAll = series(
+	buildTmp,
+	parallel(buildChrome, buildFirefox)
+);
+
+function watch() {
+	function building(done) {
+		console.log('\nFiles Changed, building...');
+		done();
+	}
+
+	let WatchGlobs = Array.from(TaskGlobs.values())
+		.flat();
+	gulp.watch(WatchGlobs,
+		watchOpts,
+		series(building, buildAll));
+}
+
 module.exports = {
-	default: series(
-		buildTmp,
-		parallel(buildChrome, buildFirefox)
-	),
+
+	default: buildAll,
+
+	watch: watch,
 
 	package: series(
 		buildTmp,

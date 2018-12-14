@@ -84,6 +84,7 @@ class CategorizedCollection {
 		this.FilteredClickable = [];
 		this.Checkboxes        = [];
 		this.RadioButtons      = [];
+		this.Unknown           = [];
 
 		for(let elem of tElems) {
 			switch(elem.tagName) {
@@ -109,6 +110,14 @@ class CategorizedCollection {
 							break;
 					}
 					break;
+				case 'BUTTON':
+					this.Clickable.push(elem);
+					break;
+				default:
+					if(Prefs.DevMode) {
+						this.Unknown.push(elem);
+					}
+					break;
 			}
 		}
 
@@ -129,6 +138,10 @@ class CategorizedCollection {
 				this.GreatestType = t;
 				GreatestCount     = c;
 			}
+		}
+		if(Prefs.DevMode && this.Unknown.length) {
+			console.log('Didn\'t know what to do with %d elements:', this.Unknown.length);
+			console.log(this.Unknown);
 		}
 	}
 

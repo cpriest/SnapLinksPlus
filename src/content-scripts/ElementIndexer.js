@@ -94,12 +94,12 @@ let ElemDocRects = new (
 
 			switch(elem.tagName) {
 				case 'A':
-					// If an anchor has no innerText except white-space and has an IMG child, just use the IMG
-					if(elem.innerText.trim() === '' && elem.childElementCount == 1 && elem.firstElementChild.tagName == 'IMG') {
+					// If an anchor has no innerText except white-space and has an IMG || SVG child, just use the IMG
+					if(elem.innerText.trim() === '' && elem.childElementCount == 1 && elem.firstElementChild.tagName in ['IMG', 'SVG']) {
 						Rects = Array.from(elem.firstElementChild.getClientRects());
 					} else {
 						// Otherwise, include all IMG elements within the <A>
-						Array.from(elem.querySelectorAll('IMG'))
+						Array.from(elem.querySelectorAll('IMG, SVG'))
 							.forEach(
 								/** @param {Element} elem */
 								(elem) =>
@@ -118,6 +118,7 @@ let ElemDocRects = new (
 					}
 					break;
 			}
+
 			return Rects.map(function(rect) {
 					return new Rect(rect.top + offset.y, rect.left + offset.x,
 						rect.bottom + offset.y, rect.right + offset.x);
@@ -205,16 +206,19 @@ let ElemIndex = new class ElementIndexer {
 			return this._Elements;
 
 		this._Elements = new Set(document.querySelectorAll(
-			'A[href]:not([href=""]), ' +
-			'INPUT[type="button"], ' +
-			'INPUT[type="submit"], ' +
-			'INPUT[type="reset"], ' +
-			'INPUT[type="checkbox"], ' +
-			'INPUT[type="radio"]',
+			[
+				'A[href]:not([href=""])',
+				'INPUT[type="button"]',
+				'INPUT[type="submit"]',
+				'INPUT[type="reset"]',
+				'INPUT[type="checkbox"]',
+				'INPUT[type="radio"]',
+				'BUTTON',
+			].join(', ')
 		));
 
-		let rr,	offset = { x: window.scrollX, y: window.scrollY },
-			Pruned = 0;
+		let rr, offset = { x: window.scrollX, y: window.scrollY },
+			Pruned     = 0;
 
 		if(Prefs.Debug_Measure_IndexingSpeed)
 			rr = new RateReporter(`Pruned \${Count} of ${this._Elements.size} Queried Elements in \${Elapsed} (\${PerSecond})`);
@@ -274,13 +278,19 @@ let ElemIndex = new class ElementIndexer {
 			let topIdx = Math.floor(br.top * Buckets / docHeight),
 				botIdx = Math.floor(br.bottom * Buckets / docHeight);
 
+			// Allow out of bounds by one bucket for slightly mis-positioned elements.
+			if(topIdx == -1)
+				topIdx = 0;
+			if(botIdx == Buckets)
+				botIdx = Buckets - 1;
+
 			if(Prefs.DevMode && Tracking(elem)) {
 				console.log('Track[Indexer]: %o\n\t%o', elem,
 					{
 						'Buckets.top/bottom/max': `${topIdx}, ${botIdx}, ${Prefs.IndexBuckets}`,
-						'BoundingRect':          { top: br.top, bottom: br.bottom },
-						'Window.scrollY':        scrollY,
-						'Document.scrollHeight': docHeight,
+						'BoundingRect':           { top: br.top, bottom: br.bottom },
+						'Window.scrollY':         scrollY,
+						'Document.scrollHeight':  docHeight,
 					});
 			}
 

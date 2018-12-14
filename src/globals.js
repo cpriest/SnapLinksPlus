@@ -94,7 +94,7 @@ function $(css) {
  * @param {HTMLElement} el
  */
 function Tracking(el) {
-	return false && el && el.tagName == 'A' && el.href == 'https://eggcave.com/click/2194270';
+	return false && el && el.SnapTracker;
 }
 
 console.json = (arg) => {return JSON.parse(JSON.stringify(arg));};
