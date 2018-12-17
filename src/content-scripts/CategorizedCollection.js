@@ -107,7 +107,7 @@ class CategorizedCollection {
 	/**
 	 * Identifies elements that match certain tag names
 	 *
-	 * @param {Clickable} elem    The element being checked
+	 * @param {ClickableElement} elem    The element being checked
 	 *
 	 * @return {boolean} True if element was handled
 	 */
@@ -145,7 +145,7 @@ class CategorizedCollection {
 	/**
 	 * Identifies elements that match certain element attributes
 	 *
-	 * @param {Clickable} elem    The element being checked
+	 * @param {ClickableElement} elem    The element being checked
 	 *
 	 * @return {boolean} True if element was handled
 	 */

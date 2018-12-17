@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * @typedef {{x: number, y: number}}    Point
+ * @typedef {HTMLAnchorElement|Element|HTMLInputElement}    ClickableElement
+ */
+
 let docElem = document.documentElement;
 
 const NONE  = 0,

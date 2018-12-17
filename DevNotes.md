@@ -1,16 +1,11 @@
-# Next Minor Release (3.1.1)
- - **js-csp Update**:
-   - Write some jest tests which test the CSP functionality as-is
-   - Update js-csp and re-test
-   - Build tests into gulp task runner
-   - Setup Jest tests in Circle-CI
+# Next Minor Release
 
- - **Bugs**
-    - Escape Key on https://thirteenag.github.io/wfp is not being stopped
+ - **Tickets / Ideas**
+   - #114
+   - Key modifiers while in drag (but not mouse moving)
+   - Escape Key on https://thirteenag.github.io/wfp is not being stopped
 
  - **Features**
-    - Add &lt;button> as clickable type
-    - Signing of beta versions for wider testing
 
  - **Test, issue?**
     - Possible improvement to obscured element detection:
@@ -24,7 +19,7 @@
  -  **Todo**
     - Switch this._onKeyUp = ... .bind() to this.onKeyUp = ... .bind()
 
-# Next Major Release (3.2.0)
+# Next Major Release
  - **Bugs**
     -
 
@@ -40,8 +35,7 @@
 
 # Plans
  - Create Updated Plugin Page
- - Setup site using Jekyll
- - Add Options GUI
+ - Setup site using docsify
  - Better handling of label placement (separate from sizing rect, above &lt;SVG> Element)
  - Highlight "greatest of types" elements differently than elements which do not meet the greatest of.
     eg: 3 Buttons and 1 Anchor lassoed, the 3 Buttons would be highlighted in green vs the Anchor being highlighted in grey

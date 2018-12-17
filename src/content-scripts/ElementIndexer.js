@@ -1,10 +1,5 @@
 'use strict';
 
-/**
- * @typedef {{x: number, y: number}}    Point
- * @typedef {HTMLAnchorElement|Element|HTMLInputElement}    ClickableElement
- */
-
 let ElemDocRects = new (
 	/**
 	 * This class provides for a cached WeakMap of {Element} to
