@@ -1,20 +1,9 @@
-/*
- * Copyright (c) 2016-2018 Clint Priest
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-
 'use strict';
+
+/**
+ * @typedef {{x: number, y: number}}    Point
+ * @typedef {HTMLAnchorElement|Element|HTMLInputElement}    ClickableElement
+ */
 
 let ElemDocRects = new (
 	/**
@@ -82,10 +71,10 @@ let ElemDocRects = new (
 		 *    this uses the built-in .getClientRects() and additionally compensates for 'block' elements which it would appear is not
 		 *    handled appropriately for our needs by Mozilla or the standard
 		 *
-		 * @param {Element|HTMLInputElement}    elem        The element to get the client rects for
-		 * @param {object}                        offset        An object with x, y parameters.  Used to offset the results of getClientRect() to make them documentRects.
+		 * @param {ClickableElement}    elem     The element to get the client rects for
+		 * @param {object}              offset   An object with x, y parameters.  Used to offset the results of getClientRect() to make them documentRects.
 		 *
-		 * @return
+		 * @return {DOMRect[]}
 		 **/
 		GetElementRects(elem, offset) {
 			offset = offset || { x: 0, y: 0 };
@@ -94,18 +83,13 @@ let ElemDocRects = new (
 
 			switch(elem.tagName) {
 				case 'A':
-					// If an anchor has no innerText except white-space and has an IMG || SVG child, just use the IMG
-					if(elem.innerText.trim() === '' && elem.childElementCount == 1 && elem.firstElementChild.tagName in ['IMG', 'SVG']) {
-						Rects = Array.from(elem.firstElementChild.getClientRects());
-					} else {
-						// Otherwise, include all IMG elements within the <A>
-						Array.from(elem.querySelectorAll('IMG, SVG'))
-							.forEach(
-								/** @param {Element} elem */
-								(elem) =>
-									Rects = Rects.concat(Array.from(elem.getClientRects())),
-							);
-					}
+					// Include all IMG,SVG elements within the <A>
+					Array.from(elem.querySelectorAll('IMG, SVG'))
+						.forEach(
+							/** @param {Element} innerElem */
+							(innerElem) =>
+								Rects = Rects.concat(Array.from(innerElem.getClientRects()))
+						);
 					break;
 				case 'INPUT':
 					if(['checkbox', 'radio'].indexOf(elem.type) !== -1) {
@@ -126,6 +110,23 @@ let ElemDocRects = new (
 				.filter((rect) => {
 					return rect.width !== 0 && rect.height !== 0;
 				});
+		}
+
+		/**
+		 * Gets the sum of offsetTop/Left through offsetParent chain
+		 *
+		 * @param {HTMLHtmlElement}    elem    The element to calculate the document offset
+		 *
+		 * @return {Point}
+		 */
+		GetElementOffset(elem) {
+			let offset = { x: 0, y: 0 };
+			while(elem) {
+				offset.x += elem.offsetLeft;
+				offset.y += elem.offsetTop;
+				elem = elem.offsetParent;
+			}
+			return offset;
 		}
 
 		/**
@@ -214,9 +215,15 @@ let ElemIndex = new class ElementIndexer {
 				'INPUT[type="checkbox"]',
 				'INPUT[type="radio"]',
 				'BUTTON',
+				'*[aria-checked]',
+				'*[role="checkbox"]',
+				'*[role="button"]',
+				'*[role="link"]',
+				'*[role="radio"]',
 			].join(', ')
 		));
 
+//		console.log($('STYLE').map((elem) => elem.innerText));
 		let rr, offset = { x: window.scrollX, y: window.scrollY },
 			Pruned     = 0;
 

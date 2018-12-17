@@ -3,18 +3,18 @@
 let docElem = document.documentElement;
 
 const NONE  = 0,
-		CTRL	= 1,
-		ALT	= 2,
-		SHIFT = 4;
+	  CTRL  = 1,
+	  ALT   = 2,
+	  SHIFT = 4;
 
 //  (MouseEvent.buttons bitfield)
 const LMB = 1,	// Left Mouse Button
-		RMB = 2,	// Right Mouse Button
-		MMB = 4;	// Middle Mouse Button
+	  RMB = 2,	// Right Mouse Button
+	  MMB = 4;	// Middle Mouse Button
 
 // Actions
-const BACKGROUND_TEST		= 'BackgroundTest';
-const RELOAD_EXTENSION		= 'ReloadExtension';
+const BACKGROUND_TEST   = 'BackgroundTest';
+const RELOAD_EXTENSION  = 'ReloadExtension';
 const OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
 
 let isChrome  = location.protocol === 'chrome-extenson:',
@@ -36,10 +36,10 @@ const DefaultPrefs = {
 	HighlightStyles_ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
 
 	OpenTabsAtEndOfTabBar: false,
-	SwitchFocusToNewTab:	false,		// Needed/referenced anywhere?
-	ShowNumberOfLinks:		true,
-	ActivateModifiers:		NONE,
-	ActivateMouseButton:	RMB,
+	SwitchFocusToNewTab:   false,		// Needed/referenced anywhere?
+	ShowNumberOfLinks:     true,
+	ActivateModifiers:     NONE,
+	ActivateMouseButton:   RMB,
 
 	DisableFontWeightFiltering: false,
 
@@ -70,9 +70,9 @@ Prefs.loaded.then((aValues) => {
 
 // Publisher: EventHandler
 const DragRectChanged         = 'DragRectChanged',
-		DragCompleted				= 'DragCompleted';
+	  DragCompleted           = 'DragCompleted';
 const DocSizeChanged          = 'DocSizeChanged',
-		ElementPositionsChanged = 'ElementPositionsChanged';
+	  ElementPositionsChanged = 'ElementPositionsChanged';
 
 // Publisher: SelectionRect
 const ContainerElementCreated = 'ContainerElementCreated';
@@ -109,7 +109,7 @@ function ReturnArg0Wrapper(wrapped, ...args) {
 	return args[0];
 }
 
-console.log	= console.log.wrap(ReturnArg0Wrapper);
-console.info	= console.info.wrap(ReturnArg0Wrapper);
+console.log   = console.log.wrap(ReturnArg0Wrapper);
+console.info  = console.info.wrap(ReturnArg0Wrapper);
 console.error = console.error.wrap(ReturnArg0Wrapper);
-console.warn	= console.warn.wrap(ReturnArg0Wrapper);
+console.warn  = console.warn.wrap(ReturnArg0Wrapper);

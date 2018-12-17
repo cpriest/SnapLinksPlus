@@ -1,20 +1,4 @@
-/*
- * Copyright (c) 2016-2018 Clint Priest
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-
-"use strict";
+'use strict';
 
 const CT_LINKS        = 'Links',
 	  CT_CLICKABLE    = 'Clickable',
@@ -26,7 +10,7 @@ const CT_LINKS        = 'Links',
  *
  * @property {string}                GreatestType    The CT_* constant representing the greatest number of elements among the categories
  *
- * @property {Element[]}	         Links           The A elements in the collection
+ * @property {Element[]}             Links           The A elements in the collection
  * @property {HTMLInputElement[]}    Buttons         The INPUT elements in the collection that are buttons
  * @property {HTMLInputElement[]}    Checkboxes      The INPUT elements in the collection that are checkboxes
  * @property {HTMLInputElement[]}    RadioButtons    The INPUT elements in the collection that are radio buttons
@@ -87,38 +71,13 @@ class CategorizedCollection {
 		this.Unknown           = [];
 
 		for(let elem of tElems) {
-			switch(elem.tagName) {
-				case 'A':
-					if(elem.href.length === 0 || elem.href.substr(0, 11) == 'javascript:')
-						this.Clickable.push(elem);
-					else
-						this.Links.push(elem);
-					break;
-				case 'INPUT':
-					/** @var {HTMLInputElement} [elem] */
-					switch(elem.type.toLowerCase()) {
-						case 'submit':
-						case 'reset':
-						case 'button':
-							this.Clickable.push(elem);
-							break;
-						case 'checkbox':
-							this.Checkboxes.push(elem);
-							break;
-						case 'radio':
-							this.RadioButtons.push(elem);
-							break;
-					}
-					break;
-				case 'BUTTON':
-					this.Clickable.push(elem);
-					break;
-				default:
-					if(Prefs.DevMode) {
-						this.Unknown.push(elem);
-					}
-					break;
-			}
+			if(this.CategorizeByTag(elem))
+				continue;
+			if(this.CategorizeByAttributes(elem))
+				continue;
+
+			if(Prefs.DevMode)
+				this.Unknown.push(elem);
 		}
 
 		//noinspection JSBitwiseOperatorUsage
@@ -133,7 +92,7 @@ class CategorizedCollection {
 		// Pre-calculate greatest count of categorized elements
 		let GreatestCount = 0;
 
-		for(let [ t, c ] of this.Counts) {
+		for(let [t, c] of this.Counts) {
 			if(c > GreatestCount) {
 				this.GreatestType = t;
 				GreatestCount     = c;
@@ -143,6 +102,75 @@ class CategorizedCollection {
 			console.log('Didn\'t know what to do with %d elements:', this.Unknown.length);
 			console.log(this.Unknown);
 		}
+	}
+
+	/**
+	 * Identifies elements that match certain tag names
+	 *
+	 * @param {Clickable} elem    The element being checked
+	 *
+	 * @return {boolean} True if element was handled
+	 */
+	CategorizeByTag(elem) {
+		switch(elem.tagName) {
+			case 'A':
+				if(elem.href.length === 0 || elem.href.substr(0, 11) == 'javascript:')
+					this.Clickable.push(elem);
+				else
+					this.Links.push(elem);
+				return true;
+			case 'INPUT':
+				/** @var {HTMLInputElement} [elem] */
+				switch(elem.type.toLowerCase()) {
+					case 'submit':
+					case 'reset':
+					case 'button':
+						this.Clickable.push(elem);
+						return true;
+					case 'checkbox':
+						this.Checkboxes.push(elem);
+						return true;
+					case 'radio':
+						this.RadioButtons.push(elem);
+						return true;
+				}
+				break;
+			case 'BUTTON':
+				this.Clickable.push(elem);
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Identifies elements that match certain element attributes
+	 *
+	 * @param {Clickable} elem    The element being checked
+	 *
+	 * @return {boolean} True if element was handled
+	 */
+	CategorizeByAttributes(elem) {
+		if(elem.hasAttribute('aria-checked')) {
+			this.Checkboxes.push(elem);
+			return true;
+		}
+
+		let role = (elem.getAttribute('role') || '').toLowerCase();
+		switch(role) {
+			case 'checkbox':
+				this.Checkboxes.push(elem);
+				return true;
+			case 'button':
+				this.Clickable.push(elem);
+				return true;
+			case 'link':
+				this.Links.push(elem);
+				return true;
+			case 'radio':
+				this.RadioButtons.push(elem);
+				return true;
+		}
+		return false;
 	}
 
 	/**
@@ -160,10 +188,11 @@ class CategorizedCollection {
 				acc[Score].push(elem);
 				return acc;
 			}, {});
-		let HighScore   = Object.keys(ScoredElems)
-								.sort()
-								.reverse()
-								.shift();
+
+		let HighScore = Object.keys(ScoredElems)
+			.sort()
+			.reverse()
+			.shift();
 
 		let HighScoreElems = ScoredElems[HighScore];
 		delete ScoredElems[HighScore];

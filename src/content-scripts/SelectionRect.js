@@ -23,7 +23,6 @@
  * @property {number} right     The normalized right coordinate of the Rect
  * @property {number} width     The width of the Rect
  * @property {number} height    The height of the Rect
- * @implements {Rect}
  */
 class Rect {
 	/**
