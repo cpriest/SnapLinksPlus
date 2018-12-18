@@ -70,7 +70,8 @@ TaskGlobs.set('src/lib', [
 ]);
 
 TaskGlobs.set('res', [
-	'res/**/*Logo*.png',
+	'res/**/*.png',
+	'!res/Marketing/*.png',
 ]);
 
 SpecialGlobs.set('manifest', [
@@ -161,6 +162,7 @@ let PublishFirefox = series(PackageFirefox, () => {
 	return exec(webext(`sign --api-key ${SecureData.jwt_issuer} --api-secret ${SecureData.jwt_secret}`, FireFox));
 });
 
+//noinspection JSUnusedLocalSymbols
 let LintFirefox = series(buildFirefox, () => {
 	return exec(webext('lint', FireFox));
 });

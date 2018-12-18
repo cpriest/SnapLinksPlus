@@ -1,15 +1,13 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
-    <option name="myName" value="Project" />
+    <option name="myName" value="Project (From Standard)" />
     <inspection_tool class="Annotator" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="ArrayTypeOfParameterByDefaultValueInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="AutoloadingIssuesInspection" enabled="true" level="WARNING" enabled_by_default="true">
-      <scope name="Processes" level="WARNING" enabled="false" />
       <scope name="Page Handlers" level="WARNING" enabled="false" />
     </inspection_tool>
     <inspection_tool class="BashGloballyRegisteredVariable" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="CallableInLoopTerminationConditionInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ClassOverridesFieldOfSuperClassInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="CssInvalidElementInspection" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="CssOverwrittenProperties" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="CssRedundantUnit" enabled="false" level="INFO" enabled_by_default="false" />
@@ -27,6 +25,7 @@
       <option name="CHECK_DUPLICATE_KEYS" value="false" />
       <option name="CHECK_DUPLICATE_KEYS_WITH_DIFFERENT_VALUES" value="false" />
     </inspection_tool>
+    <inspection_tool class="ES6ModulesDependencies" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="FileFunctionMissUseInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="FilePutContentsMissUseInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ForeachInvariantsInspection" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -122,7 +121,6 @@
         <option name="myWarnAboutComments" value="false" />
       </scope>
     </inspection_tool>
-    <inspection_tool class="LongInheritanceChainInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="LoopWhichDoesNotLoopInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="LowerAccessLevelInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="MagicMethodsValidityInspection" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -175,6 +173,7 @@
     <inspection_tool class="PhpInconsistentReturnPointsInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <scope name="Page Handlers" level="WARNING" enabled="false" />
     </inspection_tool>
+    <inspection_tool class="PhpInternalEntityUsedInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpMethodNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <scope name="Tests" level="WARNING" enabled="true">
         <option name="m_regex" value="(test|get|set|tear|on|_)?[A-Z][A-Za-z\d_]*|jsonSerialize|[a-z]+" />
@@ -193,15 +192,19 @@
     </inspection_tool>
     <inspection_tool class="PhpMissingParentCallMagicInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpMultipleClassesDeclarationsInOneFile" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpNonCanonicalElementsOrderInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpPropertyNamingConventionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
-      <option name="m_regex" value="^(t|tbl|db|obj|pk)?[A-Z][A-Za-z\d_]*|[a-z]+$" />
+      <option name="m_regex" value="^(t|tbl|db|on|obj|pk)?[A-Z][A-Za-z\d_]*|[a-z]+$" />
       <option name="m_minLength" value="2" />
       <option name="m_maxLength" value="32" />
     </inspection_tool>
     <inspection_tool class="PhpSignatureMismatchDuringInheritanceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="PhpStatementHasEmptyBodyInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpTraditionalSyntaxArrayLiteralInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpUndefinedCallbackInspection" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="PhpUndefinedCallbackInspection" enabled="true" level="ERROR" enabled_by_default="true">
+      <option name="DONT_REPORT_EXISTS_CALLBACKS" value="false" />
+      <option name="DONT_REPORT_AMBIGUITY" value="false" />
+    </inspection_tool>
     <inspection_tool class="PhpUndefinedClassConstantInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedClassInspection" enabled="true" level="ERROR" enabled_by_default="true">
       <option name="DONT_REPORT_MULTI_RESOLVE" value="true" />
@@ -210,9 +213,7 @@
     <inspection_tool class="PhpUndefinedFieldInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedFunctionInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedGotoLabelInspection" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="PhpUndefinedMethodInspection" enabled="true" level="ERROR" enabled_by_default="true">
-      <option name="DOWNGRADE_SEVERITY" value="true" />
-    </inspection_tool>
+    <inspection_tool class="PhpUndefinedMethodInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedNamespaceInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedVariableInspection" enabled="true" level="ERROR" enabled_by_default="true">
       <option name="IGNORE_INCLUDE" value="false" />
@@ -226,9 +227,8 @@
     </inspection_tool>
     <inspection_tool class="PhpUnusedParameterInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <scope name="Page Handlers" level="WEAK WARNING" enabled="true">
-        <option name="DONT_REPORT_ABSTRACT_CLASS" value="true" />
+        <option name="DONT_REPORT_OVERRIDE" value="false" />
         <option name="DONT_REPORT_ANONYMOUS" value="true" />
-        <option name="DONT_REPORT_PARAMETERS_COUNT_ACCESS" value="true" />
       </scope>
       <option name="DONT_REPORT_ABSTRACT_CLASS" value="true" />
       <option name="DONT_REPORT_ANONYMOUS" value="true" />
@@ -241,9 +241,6 @@
     </inspection_tool>
     <inspection_tool class="PhpVoidFunctionResultUsedInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="PropertyCanBeStaticInspection" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="PropertyInitializationFlawsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
-      <option name="REPORT_DEFAULTS_FLAWS" value="false" />
-    </inspection_tool>
     <inspection_tool class="ReferenceLink" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ReferenceMismatchInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="SSBasedInspection" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -300,12 +297,7 @@
       </option>
     </inspection_tool>
     <inspection_tool class="SenselessCommaInArrayDefinitionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="SpellCheckingInspection" enabled="true" level="WARNING" enabled_by_default="true">
-      <scope name="esp Code Scope" level="TYPO" enabled="true">
-        <option name="processCode" value="true" />
-        <option name="processLiterals" value="false" />
-        <option name="processComments" value="true" />
-      </scope>
+    <inspection_tool class="SpellCheckingInspection" enabled="true" level="TYPO" enabled_by_default="true">
       <option name="processCode" value="true" />
       <option name="processLiterals" value="false" />
       <option name="processComments" value="true" />
