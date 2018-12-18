@@ -52,6 +52,8 @@ const DefaultPrefs = {
 	Dev_Log_ActionMessages: false,
 	Dev_Skip_AllActions:    false,
 
+	NewTabDelayMS: 50,	// ms
+	ClickDelayMS:  50,   // ms
 
 	Debug_Measure_IndexingSpeed:     false,
 	Debug_Measure_SearchSpeed:       false,
@@ -91,6 +93,17 @@ const ElementsSelected = 'ElementsSelected';
  */
 function $(css) {
 	return Array.from(document.documentElement.querySelectorAll(css));
+}
+
+/**
+ * Returns a promise that resolves in [ms]
+ * @param {Number}    ms    The milliseconds to wait
+ * @return {Promise}
+ */
+function sleep(ms) {
+	if(ms <= 0)
+		return Promise.resolve(0);
+	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**

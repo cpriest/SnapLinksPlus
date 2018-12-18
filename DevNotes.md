@@ -1,7 +1,6 @@
 # Next Minor Release
 
  - **Tickets / Ideas**
-   - #114
    - Key modifiers while in drag (but not mouse moving)
    - Escape Key on https://thirteenag.github.io/wfp is not being stopped
 

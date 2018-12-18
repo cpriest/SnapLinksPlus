@@ -51,6 +51,7 @@ function onMessage(msg, sender, respond) {
 						props.cookieStoreId = tabs[0].cookieStoreId;
 
 					browser.tabs.create(props);
+					await sleep(Prefs.NewTabDelayMS);
 				}
 			});
 			break;

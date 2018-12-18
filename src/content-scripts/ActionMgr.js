@@ -52,8 +52,12 @@ let ActionHandler = new (
 					}
 					break;
 				case CT_CLICKABLE:
-					for(let Button of SelectedElements.Clickable)
-						Button.click();
+					(async () => {
+						for(let Button of SelectedElements.Clickable) {
+							Button.click();
+							await sleep(Prefs.ClickDelayMS);
+						}
+					})();
 					break;
 				case CT_CHECKBOXES:
 					// Determine majority checked/unchecked, prefers checking if counts are e
