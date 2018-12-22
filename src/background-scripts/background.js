@@ -1,5 +1,8 @@
 'use strict';
 
+let isFirefox = window.location.href.substr(0, 7) === 'firefox';
+let isChrome  = window.location.href.substr(0, 6) === 'chrome';
+
 /**
  * Log that we received the message.
  * Then display a notification. The notification contains the URL,
@@ -45,10 +48,13 @@ function onMessage(msg, sender, respond) {
 						url:	url,
 						active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
 						index:	Prefs.OpenTabsAtEndOfTabBar ? tabsAll.length : tabs[0].index + 1, // Open tabs at the end of the tab bar
-						// openerTabId: tabs[0].id,
 					};
-					if(isFirefox)
+					if(isFirefox) {
 						props.cookieStoreId = tabs[0].cookieStoreId;
+						if(Prefs.SetOwnershipTabID_FF)
+							props.openerTabId = tabs[0].id;
+
+					}
 
 					browser.tabs.create(props);
 					await sleep(Prefs.NewTabDelayMS);

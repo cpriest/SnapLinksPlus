@@ -108,7 +108,6 @@
       <option name="ALIAS_CASE" value="4" />
       <option name="TYPE_CASE" value="3" />
       <option name="QUOTE_IDENTIFIER" value="1" />
-      <option name="QUERY_EL_COMMA" value="0" />
       <option name="QUERY_TRUE_INDENT" value="false" />
       <option name="QUERY_ALIGN_ELEMENTS" value="false" />
       <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
@@ -132,6 +131,7 @@
       <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
       <option name="POST_OPT_WRAP_1" value="true" />
       <option name="POST_OPT_ALIGN" value="false" />
+      <option name="ROUTINE_ARG_COMMA" value="2" />
       <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
       <option name="IMP_COMMON_KEEP_BLANK_LINES_IN_CODE" value="3" />
       <option name="IMP_DECLARE_EL_WRAP" value="1" />

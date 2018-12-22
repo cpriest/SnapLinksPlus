@@ -55,7 +55,7 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="INFO" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="9">
+          <list size="10">
             <item index="0" class="java.lang.String" itemvalue="jsclass" />
             <item index="1" class="java.lang.String" itemvalue="objectid" />
             <item index="2" class="java.lang.String" itemvalue="status" />
@@ -65,6 +65,7 @@
             <item index="6" class="java.lang.String" itemvalue="uploadurl" />
             <item index="7" class="java.lang.String" itemvalue="name" />
             <item index="8" class="java.lang.String" itemvalue="bordercolor" />
+            <item index="9" class="java.lang.String" itemvalue="browsers" />
           </list>
         </value>
       </option>

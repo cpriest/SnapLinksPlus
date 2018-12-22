@@ -8,26 +8,28 @@
 	<script src="../lib/Options.js" type="application/javascript"></script>
 	<style>
 		BODY { width: 500px; }
-		LABEL { display: block; margin: 8px 4px 8px 0px; }
-		INPUT[type=checkbox] { margin: 0px 4px; vertical-align: -2px; }
+		LABEL { display: block; margin: 6px 4px 8px 0px; }
+		INPUT[type=checkbox] { margin: 0px 2px; vertical-align: -2px; }
 		INPUT[type=checkbox]:enabled { cursor: pointer; }
-		INPUT[type=text] { padding: 0px 2px;}
+		INPUT[type=text] { padding: 0px 2px; height: 20px; min-height: 0.5em;}
 		LABEL[title],
 		SELECT[title] { cursor: help;}
-		SUMMARY { font-weight: bold; }
+		/*noinspection CssUnusedSymbol*/
+		*.disabled { color: grey;}
+		SUMMARY { font-weight: bold; cursor: pointer; }
 		DETAILS { margin: 12px 0px; }
 		FIELDSET { width: fit-content; width: -moz-fit-content; padding-right: 15px; }
 		FIELDSET:disabled { color: grey; }
 		FIELDSET:disabled INPUT { cursor: not-allowed; }
 		IMG { vertical-align: text-top; }
-		IMG.Info { cursor: help; }
+		IMG.Info { cursor: help; margin-left: 5px; }
 		DIV > LABEL { display: inline-block; }
 	</style>
 	<title>SL3 Test Page</title>
 </head>
 <body>
 
-<p><span>Select Elements when I hold down</span>
+<span>Select Elements when I hold down</span>
 	<select id="ActivateModifiers" title="The modifier keys to hold down while using the mouse button to activate selecting elements.">
 		<option value="0">No Modifier</option>
 		<option value="1">Control</option>
@@ -45,60 +47,79 @@
 		<option value="2">Right Click</option>
 	</select>
 	<span>and Drag</span>
-</p>
-<label title="Open tabs at the end of the tab bar.">
-	<input id="OpenTabsAtEndOfTabBar" type="checkbox">Open tabs at end of tab bar
+
+<label title="Always open tabs at the end of the tab bar.">
+	<input id="OpenTabsAtEndOfTabBar" type="checkbox"> Open tabs at end of tab bar
 </label>
+
 <label title="Switch focus to the closest new tab when opening tabs.">
-	<input id="SwitchFocusToNewTab" type="checkbox">Switch focus to new tab
+	<input id="SwitchFocusToNewTab" type="checkbox"> Switch focus to new tab
 </label>
+
 <label title="Show the number of selected unique links as a label while selecting.">
-	<input id="ShowNumberOfLinks" type="checkbox">Show the number of selected links
+	<input id="ShowNumberOfLinks" type="checkbox"> Show the number of selected links
 </label>
+
 <details id="UI_AdvancedOptions_Section">
 	<summary>Advanced Settings</summary>
-	<p>
+
 		<label title="Ignore font weight of elements when filtering.
   &bull;  Holding alt while selecting disables filtering as well.">
-			<input id="DisableFontWeightFiltering" type="checkbox">Disable link filtering by font weight
-			<img class="Info" alt="Additional Info" src="../../res/Info16.png"
-				 title="Ignore font weight of elements when filtering.
-  &bull;  Holding alt while selecting disables filtering as well.">
+			<input id="DisableFontWeightFiltering" type="checkbox"> Disable link filtering by font weight
+			<img class="Info" alt="Additional Info" src="../../res/Info16.png" title="Holding alt while selecting disables filtering as well."/>
 		</label>
+
+	<label browsers="FireFox" title="This sets the opening tab id on newly opened tabs to maintain parent/child relationships between tabs.">
+		<input id="SetOwnershipTabID_FF" type="checkbox"> Set opening tab property for new tabs
+		<img class="Info" alt="Additional Info" src="../../res/Info16.png" title="This affects tab closing behavior, compatibility with TreeStyleTabs."/>
+		<img class="Info" alt="Firefox Only" src="../../res/FireFox16.png" title="This only works in FireFox."/>
+		</label>
+
 		<label title="Wait this many milliseconds between each new tab that is opened.">
 			Delay between new tabs: <input type="text" size="2" id="NewTabDelayMS"> ms
 		</label>
+
 		<label title="Wait this many milliseconds between each element being clicked.">
 			Delay between clicks on elements: <input type="text" size="2" id="ClickDelayMS"> ms
 		</label>
-	</p>
+
 	<details id="UI_DevOptions_Section">
 		<summary>Developer Options</summary>
+
 		<label title="Enable development mode features, usually for debugging issues.">
-			<input id="DevMode" type="checkbox">Enable Dev Mode
+			<input id="DevMode" type="checkbox"> Enable Dev Mode
 		</label>
+
 		<fieldset id="DevMode_Options">
+
 			<label title="Log details about actions to console.">
-				<input id="Dev_Log_ActionMessages" type="checkbox">Log Action Messages
+				<input id="Dev_Log_ActionMessages" type="checkbox"> Log Action Messages
 			</label>
+
 			<label title="Logs elements whos coordinates are outside documents boundaries which are skipped during indexing.">
-				<input id="Debug_Log_OutOfBoundElements" type="checkbox">Log Out of Bound Elements
+				<input id="Debug_Log_OutOfBoundElements" type="checkbox"> Log Out of Bound Elements
 			</label>
+
 			<label title="Skip all actions upon activation, this disables all actions from operating.">
-				<input id="Dev_Skip_AllActions" type="checkbox">Skip Activation Actions
+				<input id="Dev_Skip_AllActions" type="checkbox"> Skip Activation Actions
 			</label>
+
 			<label title="Measure and report element indexing speed to console log (slows operation slightly).">
-				<input id="Debug_Measure_IndexingSpeed" type="checkbox">Measure Indexing Speed
+				<input id="Debug_Measure_IndexingSpeed" type="checkbox"> Measure Indexing Speed
 			</label>
+
 			<label title="Measure and report index search speed to console log (slows operation slightly).">
-				<input id="Debug_Measure_SearchSpeed" type="checkbox">Measure Search Speed
+				<input id="Debug_Measure_SearchSpeed" type="checkbox"> Measure Search Speed
 			</label>
+
 			<label title="Visually shows index boundaries on document while selecting.">
-				<input id="Debug_Show_IndexBoundaryMarkers" type="checkbox">Show Index Boundary Markers
+				<input id="Debug_Show_IndexBoundaryMarkers" type="checkbox"> Show Index Boundary Markers
 			</label>
+
 			<label title="Shows markers indicating the element index buckets">
-				<input id="Debug_Show_ObscuredMarks" type="checkbox">Show Obscured Element Marks
+				<input id="Debug_Show_ObscuredMarks" type="checkbox"> Show Obscured Element Marks
 			</label>
+
 		</fieldset>
 	</details>
 </details>

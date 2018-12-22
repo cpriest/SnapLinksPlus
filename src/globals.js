@@ -48,12 +48,14 @@ const DefaultPrefs = {
 
 	DisableFontWeightFiltering: false,
 
+	SetOwnershipTabID_FF: false,	// Whether or not to set tab.openerTabId in Firefox on tab creation
+
+	NewTabDelayMS: 50,	// The delay in ms between new tabs being opened
+	ClickDelayMS:  50,   // The delay in ms between clicks on elements
+
 	DevMode:                false,
 	Dev_Log_ActionMessages: false,
 	Dev_Skip_AllActions:    false,
-
-	NewTabDelayMS: 50,	// ms
-	ClickDelayMS:  50,   // ms
 
 	Debug_Measure_IndexingSpeed:     false,
 	Debug_Measure_SearchSpeed:       false,
@@ -87,12 +89,13 @@ const ContainerElementCreated = 'ContainerElementCreated';
 // Publisher: ElementIndexer
 const ElementsSelected = 'ElementsSelected';
 
+let $A = Array.from;
 /**
  * @param {string} css
  * @returns {Node[]}
  */
 function $(css) {
-	return Array.from(document.documentElement.querySelectorAll(css));
+	return $A(document.documentElement.querySelectorAll(css));
 }
 
 /**

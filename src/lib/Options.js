@@ -1,19 +1,4 @@
 /*
- * Copyright (c) 2016-2018 Clint Priest
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-/*
  *	This code is a modification of webextensions-lib-configs which contains this license:
  *		license: The MIT License, Copyright (c) 2016 YUKI "Piro" Hiroshi
  *		original:
@@ -23,6 +8,10 @@
 'use strict';
 
 class Options {
+	get IsChrome() { return window.location.href.substr(0, 6) === 'chrome'; }
+
+	get IsFireFox() { return window.location.href.substr(0, 7) === 'firefox'; }
+
 	constructor(aConfigs) {
 		this.UI_MISSING         = null;
 		this.UI_TYPE_UNKNOWN    = 0;
@@ -105,7 +94,7 @@ class Options {
 	}
 
 	bindToOpener(aKey) {
-		let node   = document.getElementById(aKey);
+		let node  = document.getElementById(aKey);
 		node.open = this.configs[aKey];
 		node.addEventListener('toggle', () => {
 			this.throttledUpdate(aKey, node.open);
@@ -117,6 +106,8 @@ class Options {
 
 		if(!this.configs || !this.configs.loaded)
 			throw new Error('you must give configs!');
+
+		this.ConfigureElements();
 
 		this.configs.loaded
 			.then(() => {
@@ -149,14 +140,15 @@ class Options {
 			})
 			.then(() => {
 				let devModeElem = $('#DevMode')[0],
-					devFieldset    = $('#DevMode_Options')[0];
+					devFieldset = $('#DevMode_Options')[0];
 
 				let UpdateCheckboxState = () => {
 					devFieldset.disabled = !devModeElem.checked;
 				};
 				devModeElem.addEventListener('change', UpdateCheckboxState);
 				UpdateCheckboxState();
-			}).then(() => {
+			})
+			.then(() => {
 				$('LABEL > INPUT[type=checkbox]')
 					.forEach((elem) => {
 						elem.addEventListener('change', (e) => {
@@ -164,6 +156,25 @@ class Options {
 						});
 					});
 			});
+	}
+
+	ConfigureElements() {
+		for(let elem of $A($('*[browsers]'))) {
+			let browsers = elem.getAttribute('browsers')
+				.toLowerCase();
+
+			console.log(elem, browsers);
+
+			if(this.IsChrome && browsers.includes('chrome'))
+				continue;
+			if(this.IsFireFox && browsers.includes('firefox'))
+				continue;
+
+			elem.classList.add('disabled');
+			for(let subElem of elem.querySelectorAll('input,select,button'))
+				subElem.setAttribute('disabled', true);
+
+		}
 	}
 }
 
