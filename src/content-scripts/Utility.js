@@ -92,14 +92,6 @@ class RateReporter {
 	}
 }
 
-/**
- * Converts an iterable element to an array.
- *
- * @param {Array|object|} iterable    Any iterable arrayLike object
- *
- * @return {Array}
- */
-function $A(iterable) { return Array.from(iterable); }
 
 /**
  * Adds a mods bitfield to an event based on ctrlKey, altKey and shiftKey states

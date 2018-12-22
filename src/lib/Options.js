@@ -163,8 +163,6 @@ class Options {
 			let browsers = elem.getAttribute('browsers')
 				.toLowerCase();
 
-			console.log(elem, browsers);
-
 			if(this.IsChrome && browsers.includes('chrome'))
 				continue;
 			if(this.IsFireFox && browsers.includes('firefox'))

@@ -65,7 +65,7 @@ TaskGlobs.set('src', [
 ]);
 
 TaskGlobs.set('src/lib', [
-	'node_modules/webextension-polyfill/dist/browser-polyfill.min.js',
+	'node_modules/webextension-polyfill/dist/browser-polyfill.js',
 	'node_modules/js-csp/dist/js-csp.min.js'
 ]);
 
