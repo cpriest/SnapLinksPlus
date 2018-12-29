@@ -1,3 +1,37 @@
+<style>
+.markdown-section header {
+	padding-bottom: 5px;
+	margin-top:     0 !important;
+}
+
+.markdown-section header > h1 {
+	margin: 0px !important;
+}
+.markdown-section header > h1 > a {
+	font-family:     'Chivo', 'Helvetica Neue', Helvetica, Arial, serif;
+	font-size:       48px;
+	font-weight:     900;
+	color:           #303030;
+	letter-spacing:  -3px;
+	vertical-align:  middle;
+	text-decoration: none;
+}
+.markdown-section header > h1 img {
+	margin-right:   5px;
+	vertical-align: sub;
+}
+
+.markdown-section header > h2, header > h2 a {
+	margin:         0px !important;
+	padding:        0px !important;
+	font-size:      24px;
+	font-weight:    normal;
+	line-height:    1.3;
+	color:          #808080;
+	letter-spacing: -1px;
+}
+</style>
+
 
 <div style="visibility: hidden; height: 0px width: 0px; position:  absolute; top: -150px;">
 

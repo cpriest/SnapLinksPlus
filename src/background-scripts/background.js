@@ -79,13 +79,13 @@ async function CheckInstallation() {
 		if(!item || !item.LastInstalledVersion) {
 			// New installation
 			browser.tabs.create({
-				url:	'http://cpriest.github.io/SnapLinksPlus/welcome.html',
+				url:    'https://cpriest.github.io/SnapLinksPlus/#/Tutorial',
 				active: true,
 			});
 		} else if(item.LastInstalledVersion != manifest.version) {
 			// Update/Upgrade
 			browser.tabs.create({
-				url:	'http://cpriest.github.io/SnapLinksPlus/updated.html',
+				url:    'https://cpriest.github.io/SnapLinksPlus/#/Updated',
 				active: true,
 			});
 		}
