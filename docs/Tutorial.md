@@ -24,8 +24,8 @@ and other "clickable" elements.
 
 [Google](http://www.google.com), [Wikipedia](http://wikipedia.com)
 
-  * Drag a selection around links to open them in new tab(s).
-  * Hold down the control key to copy links to the clipboard.
+  * To **open** both links in new tabs, drag a selection around the links.
+  * To **copy** both links to the clipboard, drag a selection around the links, and then hold down the `control` key.
 
 ## Checkboxes
 
