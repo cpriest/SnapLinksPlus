@@ -43,7 +43,7 @@ class EventHandler {
 	}
 
 	/**
-	 * @param {HTMLInputElement} e
+	 * @param {MouseEvent} e
 	 */
 	onMouseDown(e) {
 		/* Static use of no-modifiers down and right mouse button down */

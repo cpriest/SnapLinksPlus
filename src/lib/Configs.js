@@ -135,7 +135,11 @@ class Configs {
 	}
 
 	onMessage(aMessage, aSender, aRespond) {
+		if(!('type' in aMessage))
+			return;
+
 		this.log('onMessage: ' + aMessage.type, aMessage, aSender);
+
 		switch(aMessage.type) {
 			// server
 			case 'Configs:load':

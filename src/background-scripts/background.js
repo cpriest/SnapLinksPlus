@@ -1,8 +1,5 @@
 'use strict';
 
-let isFirefox = window.location.href.substr(0, 7) === 'firefox';
-let isChrome  = window.location.href.substr(0, 6) === 'chrome';
-
 /**
  * Log that we received the message.
  * Then display a notification. The notification contains the URL,
@@ -13,6 +10,9 @@ let isChrome  = window.location.href.substr(0, 6) === 'chrome';
  * @param respond function
  */
 function onMessage(msg, sender, respond) {
+	if(!('Action' in msg))
+		return;
+
 	switch(msg.Action) {
 		case BACKGROUND_TEST:
 			// let p = browser.notifications.create({

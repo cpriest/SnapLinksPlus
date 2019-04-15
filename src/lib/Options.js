@@ -8,9 +8,9 @@
 'use strict';
 
 class Options {
-	get IsChrome() { return window.location.href.substr(0, 6) === 'chrome'; }
+	get isChrome() { return window.location.protocol === 'chrome-extension:'; }
 
-	get IsFireFox() { return window.location.href.substr(0, 7) === 'firefox'; }
+	get isFireFox() { return window.location.protocol === 'moz-extension:'; }
 
 	constructor(aConfigs) {
 		this.UI_MISSING         = null;
@@ -163,9 +163,9 @@ class Options {
 			let browsers = elem.getAttribute('browsers')
 				.toLowerCase();
 
-			if(this.IsChrome && browsers.includes('chrome'))
+			if(this.isChrome && browsers.includes('chrome'))
 				continue;
-			if(this.IsFireFox && browsers.includes('firefox'))
+			if(this.isFireFox && browsers.includes('firefox'))
 				continue;
 
 			elem.classList.add('disabled');
