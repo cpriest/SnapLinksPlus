@@ -45,7 +45,7 @@
     <HTMLCodeStyleSettings>
       <option name="HTML_ENFORCE_QUOTES" value="true" />
     </HTMLCodeStyleSettings>
-    <JSCodeStyleSettings version="0">
+    <JSCodeStyleSettings version="1">
       <option name="FORCE_SEMICOLON_STYLE" value="true" />
       <option name="ALIGN_OBJECT_PROPERTIES" value="1" />
       <option name="ALIGN_VAR_STATEMENTS" value="2" />
@@ -53,7 +53,6 @@
       <option name="REFORMAT_C_STYLE_COMMENTS" value="true" />
       <option name="USE_DOUBLE_QUOTES" value="false" />
       <option name="FORCE_QUOTE_STYlE" value="true" />
-      <option name="ENFORCE_TRAILING_COMMA" value="WhenMultiline" />
       <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
       <option name="USE_CHAINED_CALLS_GROUP_INDENTS" value="true" />
     </JSCodeStyleSettings>
@@ -89,12 +88,12 @@
       <option name="PHPDOC_BLANK_LINE_BEFORE_TAGS" value="true" />
       <option name="PHPDOC_BLANK_LINES_AROUND_PARAMETERS" value="true" />
       <option name="PHPDOC_WRAP_LONG_LINES" value="true" />
-      <option name="PHPDOC_THROWS_CALL_TREE_ANALYSIS_DEPTH" value="0" />
       <option name="UPPER_CASE_NULL_CONST" value="true" />
       <option name="LOWER_CASE_BOOLEAN_CONST" value="true" />
       <option name="ELSE_IF_STYLE" value="SEPARATE" />
       <option name="FIELDS_DEFAULT_VISIBILITY" value="protected" />
       <option name="BLANK_LINE_BEFORE_RETURN_STATEMENT" value="true" />
+      <option name="BLANK_LINES_BEFORE_RETURN_STATEMENT" value="1" />
       <option name="KEEP_RPAREN_AND_LBRACE_ON_ONE_LINE" value="true" />
       <option name="SPACES_AROUND_VAR_WITHIN_BRACKETS" value="true" />
       <option name="ALIGN_CLASS_CONSTANTS" value="true" />
@@ -103,35 +102,33 @@
       <option name="SPACE_BEFORE_COLON_IN_RETURN_TYPE" value="true" />
       <option name="PLACE_PARENS_FOR_CONSTRUCTOR" value="1" />
     </PHPCodeStyleSettings>
-    <SqlCodeStyleSettings version="0">
-      <option name="myVersion" value="0" />
+    <SqlCodeStyleSettings version="2">
       <option name="ALIAS_CASE" value="4" />
+      <option name="KEYWORD_CASE" value="0" />
       <option name="TYPE_CASE" value="3" />
       <option name="QUOTE_IDENTIFIER" value="1" />
       <option name="QUERY_TRUE_INDENT" value="false" />
-      <option name="QUERY_ALIGN_ELEMENTS" value="false" />
-      <option name="QUERY_ALIGN_LINE_COMMENTS" value="false" />
-      <option name="INSERT_EL_COMMA" value="2" />
-      <option name="SET_EL_WRAP" value="0" />
-      <option name="SET_EL_COMMA" value="0" />
-      <option name="WITH_EL_WRAP" value="0" />
-      <option name="WITH_EL_COMMA" value="0" />
-      <option name="SELECT_EL_WRAP" value="3" />
-      <option name="SELECT_EL_COMMA" value="2" />
-      <option name="SELECT_ALIGN_AS" value="false" />
+      <option name="SUBQUERY_CONTENT" value="3" />
+      <option name="INSERT_INTO_NL" value="2" />
+      <option name="INSERT_EL_WRAP" value="2" />
+      <option name="INSERT_COLLAPSE_MULTI_ROW_VALUES" value="true" />
+      <option name="SET_EL_WRAP" value="2" />
+      <option name="WITH_EL_WRAP" value="2" />
+      <option name="WITH_ALIGN_AS" value="true" />
+      <option name="SELECT_EL_WRAP" value="2" />
       <option name="FROM_EL_WRAP" value="2" />
-      <option name="FROM_EL_COMMA" value="2" />
+      <option name="FROM_WRAP_JOIN_1" value="false" />
+      <option name="FROM_ALIGN_JOIN_TABLES" value="true" />
+      <option name="FROM_ALIGN_ALIASES" value="true" />
       <option name="FROM_PLACE_ON" value="10" />
-      <option name="WHERE_EL_WRAP" value="3" />
-      <option name="WHERE_EL_BOUND" value="2" />
+      <option name="WHERE_EL_WRAP" value="2" />
+      <option name="ORDER_EL_WRAP" value="2" />
       <option name="ORDER_EL_COMMA" value="2" />
+      <option name="ORDER_ALIGN_ASC_DESC" value="true" />
       <option name="TABLE_OPENING" value="1" />
       <option name="TABLE_CONTENT" value="2" />
       <option name="TABLE_CLOSING" value="3" />
-      <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
-      <option name="POST_OPT_WRAP_1" value="true" />
-      <option name="POST_OPT_ALIGN" value="false" />
-      <option name="ROUTINE_ARG_COMMA" value="2" />
+      <option name="VIEW_INDENT_QUERY" value="true" />
       <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
       <option name="IMP_COMMON_KEEP_BLANK_LINES_IN_CODE" value="3" />
       <option name="IMP_DECLARE_EL_WRAP" value="1" />
@@ -139,6 +136,8 @@
       <option name="CORTEGE_SPACE_BEFORE_L_PAREN" value="false" />
       <option name="EXPR_CASE_WHEN_WRAP" value="false" />
       <option name="EXPR_CASE_THEN_WRAP" value="true" />
+      <option name="EXPR_CASE_THEN_ALIGN" value="true" />
+      <option name="EXPR_CASE_END" value="1" />
       <option name="PRIMARY_KEY_NAME_TEMPLATE" value="{table}_{columns}_pk" />
       <option name="SUBQUERY_L_PAR_NL_INSIDE" value="true" />
       <option name="ALIGN_AS_IN_SELECT_STATEMENT" value="false" />
@@ -157,9 +156,6 @@
     <XML>
       <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
     </XML>
-    <tabFormat>
-      <option name="MODE" value="SkipSingleInlineSpaces" />
-    </tabFormat>
     <codeStyleSettings language="CSS">
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />
@@ -169,6 +165,14 @@
       <indentOptions>
         <option name="INDENT_SIZE" value="4" />
         <option name="CONTINUATION_INDENT_SIZE" value="8" />
+        <option name="TAB_SIZE" value="4" />
+        <option name="USE_TAB_CHARACTER" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="Cypher">
+      <indentOptions>
+        <option name="INDENT_SIZE" value="4" />
+        <option name="CONTINUATION_INDENT_SIZE" value="4" />
         <option name="TAB_SIZE" value="4" />
         <option name="USE_TAB_CHARACTER" value="true" />
       </indentOptions>
@@ -185,7 +189,7 @@
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="HTML">
-      <option name="WRAP_ON_TYPING" value="1" />
+      <option name="RIGHT_MARGIN" value="400" />
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />
       </indentOptions>
@@ -199,6 +203,8 @@
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="JavaScript">
+      <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="true" />
+      <option name="LINE_COMMENT_ADD_SPACE" value="false" />
       <option name="ALIGN_MULTILINE_BINARY_OPERATION" value="true" />
       <option name="ALIGN_MULTILINE_TERNARY_OPERATION" value="true" />
       <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
@@ -232,13 +238,14 @@
       <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
       <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
       <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="1" />
+      <option name="BLANK_LINES_BEFORE_PACKAGE" value="0" />
       <option name="BLANK_LINES_AFTER_PACKAGE" value="1" />
+      <option name="BLANK_LINES_BEFORE_IMPORTS" value="0" />
       <option name="BLANK_LINES_AROUND_FIELD" value="1" />
       <option name="CLASS_BRACE_STYLE" value="1" />
       <option name="METHOD_BRACE_STYLE" value="1" />
       <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
-      <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
-      <option name="ALIGN_MULTILINE_BINARY_OPERATION" value="true" />
+      <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
       <option name="ALIGN_MULTILINE_TERNARY_OPERATION" value="true" />
       <option name="ALIGN_MULTILINE_EXTENDS_LIST" value="true" />
       <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
@@ -249,11 +256,11 @@
       <option name="SPACE_BEFORE_CATCH_PARENTHESES" value="false" />
       <option name="SPACE_BEFORE_SWITCH_PARENTHESES" value="false" />
       <option name="CALL_PARAMETERS_WRAP" value="5" />
-      <option name="METHOD_PARAMETERS_WRAP" value="1" />
       <option name="METHOD_CALL_CHAIN_WRAP" value="5" />
+      <option name="PARENTHESES_EXPRESSION_LPAREN_WRAP" value="true" />
       <option name="BINARY_OPERATION_WRAP" value="1" />
       <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
-      <option name="TERNARY_OPERATION_WRAP" value="1" />
+      <option name="TERNARY_OPERATION_WRAP" value="2" />
       <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
       <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="true" />
       <option name="ARRAY_INITIALIZER_WRAP" value="1" />
@@ -348,12 +355,8 @@
     </codeStyleSettings>
     <codeStyleSettings language="SQL">
       <option name="KEEP_LINE_BREAKS" value="false" />
-      <option name="KEEP_FIRST_COLUMN_COMMENT" value="true" />
       <option name="KEEP_BLANK_LINES_IN_CODE" value="3" />
       <indentOptions>
-        <option name="INDENT_SIZE" value="4" />
-        <option name="CONTINUATION_INDENT_SIZE" value="8" />
-        <option name="TAB_SIZE" value="4" />
         <option name="USE_TAB_CHARACTER" value="true" />
       </indentOptions>
     </codeStyleSettings>
