@@ -1,5 +1,10 @@
 'use strict';
 
+/*
+
+ */
+
+
 let LastModifierKeys;
 
 /**
@@ -12,12 +17,12 @@ class EventHandler {
 	 * @constructor
 	 */
 	constructor() {
-		this.onMouseUp     = this.onMouseUp.bind(this);
-		this.onMouseMove   = this.onMouseMove.bind(this);
-		this.onContextMenu = this.onContextMenu.bind(this);
-		this.onKeyDown     = this.onKeyDown.bind(this);
-		this.onKeyUp       = this.onKeyUp.bind(this);
-		this.onMouseDown   = this.onMouseDown.bind(this);
+		this.onMouseUp         = this.onMouseUp.bind(this);
+		this.onMouseMove       = this.onMouseMove.bind(this);
+		this.onStopContextMenu = this.onStopContextMenu.bind(this);
+		this.onKeyDown         = this.onKeyDown.bind(this);
+		this.onKeyUp           = this.onKeyUp.bind(this);
+		this.onMouseDown       = this.onMouseDown.bind(this);
 
 		docElem.addEventListener('scroll', (e) => {
 			pub(ElementPositionsChanged, {});
@@ -29,27 +34,19 @@ class EventHandler {
 	 * @param {MouseEvent} e
 	 */
 	onMouseDown(e) {
-		/* Static use of no-modifiers down and right mouse button down */
-		e.mods = (e.ctrlKey) + (e.altKey << 1) + (e.shiftKey << 2);
+		e = AddModsToEvent(e);
 
 		if(Prefs.DevMode) {
 			if(e.mods == CTRL + ALT && e.buttons == RMB) {
 				this.StopNextContextMenu();
-				e.preventDefault();
-				e.stopPropagation();
 				browser.runtime.sendMessage({ Action: RELOAD_EXTENSION });
 			} else if(e.mods == SHIFT + ALT && e.buttons == RMB) {
 				this.StopNextContextMenu();
-				e.preventDefault();
-				e.stopPropagation();
 				browser.runtime.sendMessage({ Action: BACKGROUND_TEST });
 			}
 		}
-		if(e.mods == Prefs.ActivateModifiers && e.buttons == Prefs.ActivateMouseButton) {
+		if(e.mods == Prefs.ActivateModifiers && e.buttons == Prefs.ActivateMouseButton)
 			this.BeginDrag(e);
-			e.preventDefault();
-			e.stopPropagation();
-		}
 	}
 
 	/**
@@ -78,8 +75,6 @@ class EventHandler {
 				e.stop();
 				return;
 		}
-//		if(this.CurrentSelection.IsLargeEnoughToActivate())
-//			e.stop();
 	}
 
 	/**
@@ -95,9 +90,10 @@ class EventHandler {
 	/**
 	 * @param {MouseEvent} e
 	 */
-	onContextMenu(e) {
-		window.removeEventListener('contextmenu', this.onContextMenu, true);
-		e.preventDefault();
+	onStopContextMenu(e) {
+		e = AddModsToEvent(e);
+		window.removeEventListener('contextmenu', this.onStopContextMenu, true);
+		e.stop();
 	}
 
 	/**
@@ -112,9 +108,13 @@ class EventHandler {
 
 		this.LastMouseEvent = e;
 
-		// Chrome doesn't support/need set/releaseCapture
-		if(document.documentElement.setCapture)
-			document.documentElement.setCapture(true);
+		/**
+		 * @note: If this is still needed (was once needed for scrolling when outside the document view), checkout element.setPointerCapture
+		 *    As per https://developer.mozilla.org/en-US/docs/Web/API/Element/setCapture
+		 *    Leaving this here for now for notation, this was interfering with middle-clicking a link
+		 */
+//		if(document.documentElement.setCapture)
+//			document.documentElement.setCapture(true);
 
 		document.addEventListener('mouseup', this.onMouseUp, true);
 		document.addEventListener('mousemove', this.onMouseMove, true);
@@ -190,7 +190,6 @@ class EventHandler {
 				}
 				break;
 			case 'keydown':
-				this.StopNextContextMenu();
 				if(!(e.mods & SHIFT && e.key == 'Escape'))
 					pub(DragCompleted, { SelectedElements: [], e: e });
 				break;
@@ -202,15 +201,15 @@ class EventHandler {
 		document.removeEventListener('mousemove', this.onMouseMove, true);
 		document.removeEventListener('keydown', this.onKeyDown, true);
 
-		if(document.releaseCapture)
-			document.releaseCapture();
+//		if(document.releaseCapture)
+//			document.releaseCapture();
 	}
 
 	/**
 	 * Stops the next context menu from showing, will de-register its-self upon one cycle
 	 */
 	StopNextContextMenu() {
-		window.addEventListener('contextmenu', this.onContextMenu, true);
+		window.addEventListener('contextmenu', this.onStopContextMenu, true);
 	}
 }
 
