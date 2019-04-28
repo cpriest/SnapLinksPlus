@@ -12,13 +12,12 @@ class EventHandler {
 	 * @constructor
 	 */
 	constructor() {
-		this._onMouseUp     = this.onMouseUp.bind(this);
-		this._onMouseMove   = this.onMouseMove.bind(this);
-		this._onContextMenu = this.onContextMenu.bind(this);
-		this._onKeyDown     = this.onKeyDown.bind(this);
-		this._onKeyUp       = this.onKeyUp.bind(this);
-
-		this.onMouseDown = this.onMouseDown.bind(this);
+		this.onMouseUp     = this.onMouseUp.bind(this);
+		this.onMouseMove   = this.onMouseMove.bind(this);
+		this.onContextMenu = this.onContextMenu.bind(this);
+		this.onKeyDown     = this.onKeyDown.bind(this);
+		this.onKeyUp       = this.onKeyUp.bind(this);
+		this.onMouseDown   = this.onMouseDown.bind(this);
 
 		docElem.addEventListener('scroll', (e) => {
 			pub(ElementPositionsChanged, {});
@@ -58,7 +57,7 @@ class EventHandler {
 	 */
 	onMouseMove(e) {
 		this.LastMouseEvent = AddModsToEvent(e);
-		LastModifierKeys = e.mods;
+		LastModifierKeys    = e.mods;
 	}
 
 	/**
@@ -97,7 +96,7 @@ class EventHandler {
 	 * @param {MouseEvent} e
 	 */
 	onContextMenu(e) {
-		window.removeEventListener('contextmenu', this._onContextMenu, true);
+		window.removeEventListener('contextmenu', this.onContextMenu, true);
 		e.preventDefault();
 	}
 
@@ -117,10 +116,10 @@ class EventHandler {
 		if(document.documentElement.setCapture)
 			document.documentElement.setCapture(true);
 
-		document.addEventListener('mouseup', this._onMouseUp, true);
-		document.addEventListener('mousemove', this._onMouseMove, true);
-		document.addEventListener('keydown', this._onKeyDown, true);
-		document.addEventListener('keyup', this._onKeyUp, true);
+		document.addEventListener('mouseup', this.onMouseUp, true);
+		document.addEventListener('mousemove', this.onMouseMove, true);
+		document.addEventListener('keydown', this.onKeyDown, true);
+		document.addEventListener('keyup', this.onKeyUp, true);
 
 		sub(ElementsSelected, (topic, Elements) => {
 			this.SelectedElements = Elements;
@@ -140,20 +139,20 @@ class EventHandler {
 			pub(DocSizeChanged, this.docSize);
 		}
 
-		let [ clientWidth, clientHeight ] = GetClientDims();
+		let [clientWidth, clientHeight] = GetClientDims();
 
 		if(e) {
 			this.IntervalScrollOffset = {
 				x: e.clientX < 0
-					? e.clientX
-					: e.clientX > clientWidth
-					   ? e.clientX - clientWidth
-					   : 0,
+				   ? e.clientX
+				   : e.clientX > clientWidth
+					 ? e.clientX - clientWidth
+					 : 0,
 				y: e.clientY < 0
-					? e.clientY
-					: e.clientY > clientHeight
-					   ? e.clientY - clientHeight
-					   : 0,
+				   ? e.clientY
+				   : e.clientY > clientHeight
+					 ? e.clientY - clientHeight
+					 : 0,
 			};
 
 			this.MousePos = { clientX: e.clientX, clientY: e.clientY };
@@ -199,9 +198,9 @@ class EventHandler {
 
 		delete this.SelectedElements;
 
-		document.removeEventListener('mouseup', this._onMouseUp, true);
-		document.removeEventListener('mousemove', this._onMouseMove, true);
-		document.removeEventListener('keydown', this._onKeyDown, true);
+		document.removeEventListener('mouseup', this.onMouseUp, true);
+		document.removeEventListener('mousemove', this.onMouseMove, true);
+		document.removeEventListener('keydown', this.onKeyDown, true);
 
 		if(document.releaseCapture)
 			document.releaseCapture();
@@ -211,7 +210,7 @@ class EventHandler {
 	 * Stops the next context menu from showing, will de-register its-self upon one cycle
 	 */
 	StopNextContextMenu() {
-		window.addEventListener('contextmenu', this._onContextMenu, true);
+		window.addEventListener('contextmenu', this.onContextMenu, true);
 	}
 }
 
