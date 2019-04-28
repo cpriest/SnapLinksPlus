@@ -29,11 +29,8 @@ let ActionHandler = new (
 		 * @param {MouseEvent}             e                   The final event that completed activated the action
 		 */
 		ActUpon(SelectedElements, e) {
-			if(Prefs.DevMode) {
-				if(Prefs.Dev_Log_ActionMessages)
-					console.log('ActUpon(%s) - %o', SelectedElements.GreatestType, SelectedElements);
-				if(Prefs.Dev_Skip_AllActions)
-					return;
+			if(Prefs.DevMode && Prefs.Dev_Log_ActionMessages) {
+				console.log('ActUpon(%s) - %o', SelectedElements.GreatestType, SelectedElements);
 			}
 
 			switch(SelectedElements.GreatestType) {
@@ -42,17 +39,29 @@ let ActionHandler = new (
 					let links = Array.from(new Set(SelectedElements.Links.map((elem) => elem.href)));
 
 					if(e.ctrlKey) {
+						if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
+							console.log('Skipped Copying Links: %o', links);
+							break;
+						}
 						this.CopyToClipboard(links.join('\n'));
 					} else {
+						if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
+							console.log('Skipped Opening Links: %o', links);
+							break;
+						}
 						// For now we are simply going to create new tabs for the selected elements
 						browser.runtime.sendMessage({
 							Action: OPEN_URLS_IN_TABS,
-							tUrls : links,
+							tUrls:  links,
 						});
 					}
 					break;
 				case CT_CLICKABLE:
 					(async () => {
+						if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
+							console.log('Skipped Clicking: %o', SelectedElements.Clickable);
+							return;
+						}
 						for(let Button of SelectedElements.Clickable) {
 							Button.click();
 							await sleep(Prefs.ClickDelayMS);
@@ -65,15 +74,29 @@ let ActionHandler = new (
 						UncheckedCount = SelectedElements.Checkboxes.length - CheckedCount,
 						CheckElements  = UncheckedCount >= CheckedCount;
 
+					if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
+						console.log('Skipped Checkboxes: %o', SelectedElements.Checkboxes);
+						break;
+					}
 					SelectedElements.Checkboxes
 						.filter( (elem) => elem.checked != CheckElements)
 						.forEach( (elem) => elem.click());
 
 					break;
 				case CT_RADIOBUTTONS:
+					if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
+						console.log('Skipped Radio Buttons: %o', SelectedElements.RadioButtons);
+						break;
+					}
+
 					let GroupedByName = SelectedElements.RadioButtons.reduce((/** Map */ acc, elem) => {
 						return acc.set(elem.name, (acc.get(elem.name) || []).concat([elem]));
 					}, new Map());
+
+					if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
+						console.log('Skipped Radio Buttons: %o', GroupedByName);
+						break;
+					}
 
 					for(let [, tElems] of GroupedByName)
 						tElems[0].click();
