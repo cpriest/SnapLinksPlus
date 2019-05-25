@@ -1,4 +1,33 @@
 
+v3.1.6 / 2019-05-25
+===================
+
+  * 3.1.6 Release, updated files.
+  * Fixed issues relating to right-click & context menu. Fixes #253, #277
+  * Changed debug logging, if SkipAllActions is set, it will show what is skipped.
+  * Switched event handler binding to newer method.
+  * Added cookies permission to manifest as it is now needed to work with containers.
+  * Updated main license file.
+  * Removed last remaining copyright headers added by PhpStorm
+  * Some minor bug/warning messages fixed up. * Fixed an issue w/ the per-browser element functionality in Options.js * Fixed duplicate let declarations issue.
+  * Updates to PhpStorm files.
+  * Clearer instruction of tutorial (#275)
+  * Added updated.html redirect file.
+  * Added welcome.html redirect file.
+  * Tweaks to website, added Updated page * Updated internal links in addon
+  * Updated README.md to point at the website.
+  * Updated README.md to point at the website.
+  * Recreated website using docsify rather than straight HTML, much easier to maintain.
+  * Updated browser-polyfill and now use non-minified version (Fixes #233)
+  * Added configurable (per-browser) sections of options page * Added feature to enable setting openerTabId for FireFox (Fixes #221, #225, #123, #30)
+  * Added configurable delays for Links & Clicks, Fixes #144
+  * Moved some files around and removed additional copyright headers * Updated gulpfile for new file locations
+  * Added to test page and confirmed <a href="javascript:void(0);" onclick="..."> worked. Closes #240
+  * Added a number of additional clickable elements Fixes #242
+  * Adds BUTTON elements to list of Clickable elements * Elements which are slightly offscreen/out of bounds are now allowed to be put in the front/back buckets. (Some of #222) * Adds watching back into gulpfile.js
+  * Updates to publish 3.1.5
+  * Added History.md and reference from README.md
+
 v3.1.5 - 2018-12-10
 ===================
   * Updates for v3.1.5 release
