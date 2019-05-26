@@ -17,7 +17,7 @@ class Configs {
 
 		return this._ = new Proxy(this, {
 			get: (tgt, key, obj) => {
-				this.log(`get(${key})`);
+//				this.log(`get(${key})`);
 				if(key in this)
 					return this[key];
 				if(!(key in this.default))
@@ -25,7 +25,7 @@ class Configs {
 				return this.lastValues[key];
 			},
 			set: (tgt, key, value, obj) => {
-				this.log(`set(${key}, %o)`, value);
+//				this.log(`set(${key}, %o)`, value);
 				if(key in this)
 					this[key] = value;
 				else {
@@ -73,53 +73,52 @@ class Configs {
 	}
 
 	log(aMessage, ...aArgs) {
-//		aMessage = `Prefs => ${aMessage}`;
-//		if(typeof log === 'function')
-//			log(aMessage, ...aArgs);
-//		else
-//			console.log(aMessage, ...aArgs);
+//		aMessage = `${this.shouldUseStorage ? 'Server' : 'Client'} => Config => ${aMessage}`;
+//		console.log(aMessage, ...aArgs);
 	}
 
 	load() {
 		if('_promisedLoad' in this) {
 			if(this._promisedLoad) {
-				this.log('load => waiting to be loaded');
+//				this.log('load => waiting to be loaded');
 				return this._promisedLoad;
 			}
-			this.log('load => already loaded');
+//			this.log('load => already loaded');
 			return Promise.resolve(this.lastValues);
 		}
 
 		this.applyValues(this.default);
 		chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
-		// server mode
+		/** Server mode */
 		if(this.shouldUseStorage) {
-			this.log('load: try load from storage on  ' + location.href);
+//			this.log('load: try load from storage on ' + location.href);
 			chrome.storage.onChanged.addListener(this.onChanged.bind(this));
+
 			return this._promisedLoad = new Promise((aResolve, aReject) => {
 				try {
 					chrome.storage.local.get(this.default, (aValues) => {
 						aValues = aValues || this.default;
-						this.log('load: loaded for ' + location.origin, aValues);
+//						this.log('load: loaded for ' + location.origin, aValues);
 						this.applyValues(aValues);
 						this._promisedLoad = null;
 						aResolve(aValues);
 					});
 				} catch(e) {
-					this.log('load: failed', e);
+//					this.log('load: failed', e);
 					aReject(e);
 				}
 			});
 		}
-		// client mode
-		this.log('load: initialize promise on  ' + location.href);
+
+		/** Client mode */
+//		this.log('load: initialize promise on ' + location.href);
 		return this._promisedLoad = new Promise((aResolve, aReject) => {
 			chrome.runtime.sendMessage(
 				{ type: 'Configs:load' },
 				(aValues) => {
 					aValues = aValues || this.default;
-					this.log('load: responded', aValues);
+//					this.log('load: responded', aValues);
 					this.applyValues(aValues);
 					this._promisedLoad = null;
 					aResolve(aValues);
@@ -138,7 +137,7 @@ class Configs {
 		if(!('type' in aMessage))
 			return;
 
-		this.log('onMessage: ' + aMessage.type, aMessage, aSender);
+//		this.log('onMessage: ' + aMessage.type, aMessage, aSender);
 
 		switch(aMessage.type) {
 			// server
@@ -183,6 +182,8 @@ class Configs {
 	async broadcast(msg) {
 		let results = [];
 
+//		this.log('Broadcast', msg);
+
 		if(chrome.runtime)
 			results.push(await browser.runtime.sendMessage(msg));
 
@@ -197,6 +198,7 @@ class Configs {
 				)
 			);
 		}
+//		this.log('Broadcast Done', msg);
 
 		return results;
 	}
@@ -204,15 +206,15 @@ class Configs {
 	notifyUpdated(aKey) {
 		let value = this._[aKey];
 		if(this.shouldUseStorage) {
-			this.log('broadcast updated config: ' + aKey + ' = ' + value);
+//			this.log('broadcast updated config: ' + aKey + ' = ' + value);
 			try {
 				let updatedKey   = {};
 				updatedKey[aKey] = value;
 				chrome.storage.local.set(updatedKey, () => {
-					this.log('successfully saved', updatedKey);
+//					this.log('successfully saved', updatedKey);
 				});
 			} catch(e) {
-				this.log('save: failed', e);
+//				this.log('save: failed', e);
 			}
 			return this.broadcast({
 				type:  'Configs:updated',
@@ -220,7 +222,7 @@ class Configs {
 				value: value,
 			});
 		}
-		this.log('request to store config: ' + aKey + ' = ' + value);
+//		this.log('request to store config: ' + aKey + ' = ' + value);
 		return new Promise((aResolve, aReject) => {
 			chrome.runtime.sendMessage({
 					type:  'Configs:update',
