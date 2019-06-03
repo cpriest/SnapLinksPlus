@@ -1,10 +1,15 @@
 'use strict';
 
-/*
+/** @type {EventHandler}    Global handler for main routine */
+let SnapLinks;
 
- */
+/** @type {RectMapper}      Global reference to shared RectMapper cache*/
+let ElemDocRects;
 
+/** @type {SvgOverlayMgr}    Global reference to SvgOverlayMgr */
+let SvgOverlay;
 
+/** @type {Number}            The bitmask of modifier keys for the last mouse move event */
 let LastModifierKeys;
 
 /**
@@ -102,6 +107,8 @@ class EventHandler {
 	 * @param {MouseEvent} e
 	 */
 	BeginDrag(e) {
+		this.FirstInit();
+
 		this.CurrentSelection =
 			(this.CurrentSelection || new SelectionRect())
 				.SetOrigin(e.pageY, e.pageX);
@@ -116,12 +123,13 @@ class EventHandler {
 //		if(document.documentElement.setCapture)
 //			document.documentElement.setCapture(true);
 
+
 		document.addEventListener('mouseup', this.onMouseUp, true);
 		document.addEventListener('mousemove', this.onMouseMove, true);
 		document.addEventListener('keydown', this.onKeyDown, true);
 		document.addEventListener('keyup', this.onKeyUp, true);
 
-		sub(ElementsSelected, (topic, Elements) => {
+		sub(ElementsSelected, (Elements) => {
 			this.SelectedElements = Elements;
 		});
 
@@ -186,7 +194,7 @@ class EventHandler {
 					 * @note Perhaps a synchronous channel may work, something to try in the future
 					 **/
 					if(this.SelectedElements)
-						ActionHandler.ActUpon(this.SelectedElements, e);
+						this.ActionHandler.ActUpon(this.SelectedElements, e);
 				}
 				break;
 			case 'keydown':
@@ -211,6 +219,17 @@ class EventHandler {
 	StopNextContextMenu() {
 		window.addEventListener('contextmenu', this.onStopContextMenu, true);
 	}
+
+	FirstInit() {
+		if(this.ActionHandler)
+			return;
+		this.ActionHandler = new ActionMgr();
+		ElemDocRects       = new RectMapper();
+		this.ElemIndex     = new ElementIndexer();
+		SvgOverlay         = new SvgOverlayMgr();
+	}
 }
 
-let eh = new EventHandler();
+window.addEventListener('DOMContentLoaded', () => {
+	SnapLinks = new EventHandler();
+});

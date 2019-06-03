@@ -1,94 +1,51 @@
 'use strict';
 
-// In Firefox, this is the sandbox, node needs to require(), this works in Chrome as well.
-const csp = this.csp || require('js-csp');
+/** @typedef {{cancel: function():void, channel: String}} SubscriptionController
 
-class PubSubHandler {
-	constructor() {
-		this.Channel   = csp.chan();
-		this.Publisher = csp.operations.pub(this.Channel, msg => msg.topic);
-	}
+ /** @type {Object.<String,Array>} */
+let channels = {};
 
-	/**
-	 * Publish a message to listeners, the class name of the msg becomes the topic
-	 *
-	 * @param {string|int} topic
-	 * @param {object|null} data
-	 */
-	pub(topic, data) {
-//		console.log('pub: %s -> %o', topic, data);							// #DevCode
-		csp.putAsync(this.Channel, { topic: topic, data: data });
-	}
+/**
+ * @param {String} Chan  The channel to publish a message to
+ * @param {*} msg        The message payload
+ */
+function pub(Chan, msg) {
+	let chan = Chan.toLowerCase();
 
-	/**
-	 * Subscribe to messages of the given topic, messages of the given topic will call the handler
-	 *
-	 * @param {string|string[]} topics
-	 * @param {function} handler
-	 *
-	 * @returns {object} which has a single function of unsub() which cancels the subscription
-	 */
-	sub(topics, handler) {
-		let SubscriberChannel = csp.chan();
-
-		if(!(topics instanceof Array))
-			topics = [topics];
-
-//		console.log('sub: topics=%o', topics);								// #DevCode
-
-		for(let topic of topics)
-			csp.operations.pub.sub(this.Publisher, topic, SubscriberChannel);
-
-		let enabled = true;
-
-		let Subscription = {
-			unsub: () => {
-				for(let topic of topics)
-					csp.operations.pub.unsub(this.Publisher, topic, SubscriberChannel);
-				SubscriberChannel.close();
-			},
-			get enabled() { return enabled; },
-
-			set enabled(x) {
-				enabled = x;
-				return this;
-			},
-
-		};
-
-		go(function* (val) {
-			while((val = yield SubscriberChannel) != csp.CLOSED) {
-				if(enabled) {
-//					console.log('sub->go() val=%o', val);					// #DevCode
-					handler(val.topic, val.data, Subscription);
-				} else {
-//					console.log('sub->go(DISABLED) val=%o', val);			// #DevCode
-				}
-			}
-		});
-
-		return Subscription;
-	}
+	for(let handler of (channels[chan] || []))
+		handler(msg);
 }
 
-let PubSub = new PubSubHandler();
-let pub    = PubSub.pub.bind(PubSub);
-let sub    = PubSub.sub.bind(PubSub);
+/**
+ * @param {String} Chan                 The channel name to subscribe to
+ * @param {function(*):void} handler    The handler function to receive data being published
+ *
+ * @return SubscriptionController       An object which can be used to cancel the subscription
+ */
+function sub(Chan, handler) {
+	let chan = Chan.toLowerCase();
 
-// Imports from csp
-let { go } = csp;
+	if(channels[chan] === undefined)
+		channels[chan] = [];
 
-// Imports from transducers
-// let { compose, map } = require('transducers');
+	channels[chan].push(handler);
 
-// Utility functions for use with js-csp and transducers.js
+	return {
+		channel: Chan,
 
-function listen(elem, type, ch) {
-	elem.addEventListener(type, e => {
-		csp.putAsync(ch, e);
-	});
+		cancel: () => {
+			if((_ = channels[chan].indexOf(handler)) >= 0) {
+				channels[chan].splice(_, 1);
+				return true;
+			}
+
+			let e     = new Error(`Subscription handler not found in channel ${Chan}`);
+			e.handler = handler;
+			throw e;
+		}
+	};
 }
 
 if(typeof module != 'undefined') {
-	module.exports = { pub, sub, csp, go, listen };
+	module.exports = { pub, sub };
 }

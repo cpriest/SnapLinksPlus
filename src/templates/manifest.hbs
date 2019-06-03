@@ -15,10 +15,11 @@
 	"minimum_chrome_version": 	"51",
 
 	"permissions":	[
-"cookies",
+		"cookies",
 		"storage",
 		"notifications"
 	],
+
 	"optional_permissions": [
 	],
 
@@ -43,7 +44,9 @@
 {{/Chrome}}
 
 		"scripts": [
-"src/lib/browser-polyfill.js",
+			{{#Chrome}}
+				"src/lib/browser-polyfill.js",
+			{{/Chrome}}
 			"src/lib/Configs.js",
 			"src/globals.js",
 			"src/background-scripts/background.js"
@@ -59,18 +62,19 @@
 			"matches": [ "<all_urls>" ],
 
 			"js": [
-	"src/lib/browser-polyfill.js",
+				{{#Chrome}}
+					"src/lib/browser-polyfill.js",
+				{{/Chrome}}
 				"src/lib/Configs.js",
-	"src/lib/js-csp.min.js",
-				"src/globals.js",
 				"src/CSP.js",
+				"src/globals.js",
 				"src/content-scripts/Utility.js",
 				"src/content-scripts/SelectionRect.js",
 				"src/content-scripts/ElementIndexer.js",
 				"src/content-scripts/SvgOverlay.js",
 				"src/content-scripts/CategorizedCollection.js",
 				"src/content-scripts/ActionMgr.js",
-				"src/content-scripts/SnapLinks.js"
+				"src/content-scripts/EventHandler.js"
 			]
 		}
 	],

@@ -249,6 +249,9 @@
       <option name="m_maxLength" value="32" />
     </inspection_tool>
     <inspection_tool class="PhpVoidFunctionResultUsedInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="ProperNullCoalescingOperatorUsageInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ANALYZE_TYPES" value="false" />
+    </inspection_tool>
     <inspection_tool class="PropertyCanBeStaticInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ReferenceLink" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ReferenceMismatchInspection" enabled="false" level="WARNING" enabled_by_default="false" />

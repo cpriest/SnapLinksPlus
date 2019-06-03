@@ -7,6 +7,9 @@
 
 let docElem = document.documentElement;
 
+// General Purpose Variables
+let _, __;
+
 const NONE  = 0,
 	  CTRL  = 1,
 	  ALT   = 2,
@@ -69,10 +72,12 @@ const DefaultPrefs = {
 
 // Configurations
 let Prefs = new Configs(DefaultPrefs);
-Prefs.loaded.then((aValues) => {
-//	if(Prefs.DevMode)
-//		Object.assign(Prefs.HighlightStyles, data.Dev.HighlightStyles);
-});
+
+Prefs.loaded
+	.then((aValues) => {
+//		if(Prefs.DevMode)
+//			Object.assign(Prefs.HighlightStyles, data.Dev.HighlightStyles);
+	});
 
 // Pub-Sub Events
 ///////////////////
@@ -90,6 +95,7 @@ const ContainerElementCreated = 'ContainerElementCreated';
 const ElementsSelected = 'ElementsSelected';
 
 let $A = Array.from;
+
 /**
  * @param {string} css
  * @returns {Node[]}
@@ -118,7 +124,9 @@ function Tracking(el) {
 	return false && el && el.SnapTracker;
 }
 
-console.json = (arg) => {return JSON.parse(JSON.stringify(arg));};
+console.json = (arg) => {
+	return JSON.parse(JSON.stringify(arg));
+};
 
 Function.prototype.wrap = function wrap(wrapper) {
 	let wrapped = this;

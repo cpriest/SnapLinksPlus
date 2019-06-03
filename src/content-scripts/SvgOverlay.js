@@ -7,7 +7,7 @@
  *    To start with, it will just be to replace the elem.style.outline that's presently used and doesn't
  *    work correctly with elements which are clipped.
  */
-let SvgOverlay = new class SvgOverlayMgr {
+class SvgOverlayMgr {
 	/**
 	 * Creates the SvgOverlay Manager
 	 */
@@ -16,10 +16,10 @@ let SvgOverlay = new class SvgOverlayMgr {
 		this.HighlightedElements = [];
 		this.AvailableRects      = [];
 
-		sub(ContainerElementCreated, (topic, Container, Subscription) => {
+		let Subscription = sub(ContainerElementCreated, (Container) => {
 			this.Init(Container);
 
-			Subscription.unsub();
+			Subscription.cancel();
 		});
 
 	}
@@ -38,19 +38,19 @@ let SvgOverlay = new class SvgOverlayMgr {
 		`);
 		Container.appendChild(this.Overlay);
 
-		sub(DocSizeChanged, (topic, data, Subscription) => {
+		sub(DocSizeChanged, (data) => {
 			this.Reposition();
 		});
 
-		sub(ElementsSelected, (topic, Elements, Subscription) => {
+		sub(ElementsSelected, (Elements) => {
 			this.Highlight(Elements);
 		});
 
-		sub(DragCompleted, (topic, data, Subscription) => {
+		sub(DragCompleted, (data) => {
 			this.Hide();
 		});
 
-		sub(ElementPositionsChanged, () => {
+		sub(ElementPositionsChanged, (data) => {
 			this.Reposition();
 		});
 	}

@@ -180,11 +180,11 @@ class SelectionRect {
 
 		pub(ContainerElementCreated, this.elContainer);
 
-		sub(ElementsSelected, (topic, Elements, Subscription) => {
+		sub(ElementsSelected, (Elements) => {
 			this.SetCounter((new Set(Elements.Links.map((elem) => elem.href))).size);
 		});
 
-		sub(DragCompleted, () => {
+		sub(DragCompleted, (data) => {
 			this.Hide();
 		});
 	}
