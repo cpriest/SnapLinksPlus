@@ -23,8 +23,79 @@ class Options {
 		this.throttleTimers = {};
 		this.configs        = aConfigs;
 
-		this.onReady = this.onReady.bind(this);
-		document.addEventListener('DOMContentLoaded', this.onReady);
+		if(!this.configs || !this.configs.loaded)
+			throw new Error('No configuration given to Options');
+
+		this.Initialize();
+	}
+
+	Initialize() {
+		this.ConfigureElements();
+
+		this.configs.loaded
+			.then(() => {
+				Object.keys(this.configs.default)
+					.forEach((aKey) => {
+						switch(this.detectUIType(aKey)) {
+							case this.UI_TYPE_CHECKBOX:
+								this.bindToCheckbox(aKey);
+								break;
+
+							case this.UI_TYPE_TEXT_FIELD:
+								this.bindToTextField(aKey);
+								break;
+
+							case this.UI_TYPE_SELECT:
+								this.bindToSelect(aKey);
+								break;
+
+							case this.UI_TYPE_OPENER:
+								this.bindToOpener(aKey);
+								break;
+
+							case this.UI_MISSING:
+								return;
+
+							default:
+								throw new Error('unknown type UI element for ' + aKey);
+						}
+					});
+			})
+			.then(() => {
+				let devModeElem = $('#DevMode')[0],
+					devFieldset = $('#DevMode_Options')[0];
+
+				let UpdateCheckboxState = () => {
+					devFieldset.disabled = !devModeElem.checked;
+				};
+				devModeElem.addEventListener('change', UpdateCheckboxState);
+				UpdateCheckboxState();
+			})
+			.then(() => {
+				$('LABEL > INPUT[type=checkbox]')
+					.forEach((elem) => {
+						elem.addEventListener('change', (e) => {
+							console.log(e);
+						});
+					});
+			});
+	}
+
+	ConfigureElements() {
+		for(let elem of $A($('*[browsers]'))) {
+			let browsers = elem.getAttribute('browsers')
+				.toLowerCase();
+
+			if(this.isChrome && browsers.includes('chrome'))
+				continue;
+			if(this.isFireFox && browsers.includes('firefox'))
+				continue;
+
+			elem.classList.add('disabled');
+			for(let subElem of elem.querySelectorAll('input,select,button'))
+				subElem.setAttribute('disabled', true);
+
+		}
 	}
 
 	detectUIType(aKey) {
@@ -100,80 +171,8 @@ class Options {
 			this.throttledUpdate(aKey, node.open);
 		});
 	}
-
-	onReady() {
-		document.removeEventListener('DOMContentLoaded', this.onReady);
-
-		if(!this.configs || !this.configs.loaded)
-			throw new Error('you must give configs!');
-
-		this.ConfigureElements();
-
-		this.configs.loaded
-			.then(() => {
-				Object.keys(this.configs.default)
-					.forEach((aKey) => {
-						switch(this.detectUIType(aKey)) {
-							case this.UI_TYPE_CHECKBOX:
-								this.bindToCheckbox(aKey);
-								break;
-
-							case this.UI_TYPE_TEXT_FIELD:
-								this.bindToTextField(aKey);
-								break;
-
-							case this.UI_TYPE_SELECT:
-								this.bindToSelect(aKey);
-								break;
-
-							case this.UI_TYPE_OPENER:
-								this.bindToOpener(aKey);
-								break;
-
-							case this.UI_MISSING:
-								return;
-
-							default:
-								throw new Error('unknown type UI element for ' + aKey);
-						}
-					});
-			})
-			.then(() => {
-				let devModeElem = $('#DevMode')[0],
-					devFieldset = $('#DevMode_Options')[0];
-
-				let UpdateCheckboxState = () => {
-					devFieldset.disabled = !devModeElem.checked;
-				};
-				devModeElem.addEventListener('change', UpdateCheckboxState);
-				UpdateCheckboxState();
-			})
-			.then(() => {
-				$('LABEL > INPUT[type=checkbox]')
-					.forEach((elem) => {
-						elem.addEventListener('change', (e) => {
-							console.log(e);
-						});
-					});
-			});
-	}
-
-	ConfigureElements() {
-		for(let elem of $A($('*[browsers]'))) {
-			let browsers = elem.getAttribute('browsers')
-				.toLowerCase();
-
-			if(this.isChrome && browsers.includes('chrome'))
-				continue;
-			if(this.isFireFox && browsers.includes('firefox'))
-				continue;
-
-			elem.classList.add('disabled');
-			for(let subElem of elem.querySelectorAll('input,select,button'))
-				subElem.setAttribute('disabled', true);
-
-		}
-	}
 }
 
-new Options(Prefs);
+DOMReady.then((e) => {
+	new Options(Prefs);
+});

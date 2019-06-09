@@ -230,6 +230,6 @@ class EventHandler {
 	}
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+DOMReady.then(() => {
 	SnapLinks = new EventHandler();
 });

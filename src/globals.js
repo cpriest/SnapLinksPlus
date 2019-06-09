@@ -25,8 +25,8 @@ const BACKGROUND_TEST   = 'BackgroundTest';
 const RELOAD_EXTENSION  = 'ReloadExtension';
 const OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
 
-let isChrome  = location.protocol === 'chrome-extenson:',
-	isFirefox = location.protocol === 'moz-extension:';
+const isChrome  = location.protocol === 'chrome-extenson:',
+		isFirefox = location.protocol === 'moz-extension:';
 
 const DefaultPrefs = {
 	IndexBuckets: 10,
@@ -70,29 +70,34 @@ const DefaultPrefs = {
 	UI_DevOptions_Section:      false,
 };
 
-// Configurations
-let Prefs = new Configs(DefaultPrefs);
-
-Prefs.loaded
-	.then((aValues) => {
-//		if(Prefs.DevMode)
-//			Object.assign(Prefs.HighlightStyles, data.Dev.HighlightStyles);
-	});
-
 // Pub-Sub Events
 ///////////////////
 
 // Publisher: EventHandler
 const DragRectChanged         = 'DragRectChanged',
-	  DragCompleted           = 'DragCompleted';
+		DragCompleted           = 'DragCompleted';
 const DocSizeChanged          = 'DocSizeChanged',
-	  ElementPositionsChanged = 'ElementPositionsChanged';
+		ElementPositionsChanged = 'ElementPositionsChanged';
 
 // Publisher: SelectionRect
 const ContainerElementCreated = 'ContainerElementCreated';
 
 // Publisher: ElementIndexer
 const ElementsSelected = 'ElementsSelected';
+
+
+let DOMReady = new Promise((resolve, reject) => {
+	if(document.readyState !== 'loading')
+		resolve('already done loading');
+	else
+		window.addEventListener('DOMContentLoaded', resolve, { once: true, passive: true });
+});
+
+// Configurations
+let Prefs = DOMReady.then((...args) => {
+	Prefs = new Configs(DefaultPrefs);
+});
+
 
 let $A = Array.from;
 
@@ -121,6 +126,7 @@ function sleep(ms) {
  * @param {HTMLElement} el
  */
 function Tracking(el) {
+	//noinspection PointlessBooleanExpressionJS
 	return false && el && el.SnapTracker;
 }
 
