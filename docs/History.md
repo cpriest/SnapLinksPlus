@@ -1,3 +1,6 @@
+v3.1.7 / 2019-06-25
+===================
+  * Significant speed improvements & optimizations, especially with many tabs loaded / loading
 
 v3.1.6 / 2019-05-25
 ===================

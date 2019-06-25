@@ -2,7 +2,7 @@
 
  - **Tickets / Ideas**
    - Key modifiers while in drag (but not mouse moving)
-   - Escape Key on https://thirteenag.github.io/wfp is not being stopped
+   - Escape Key on <https://thirteenag.github.io/wfp> is not being stopped
 
  - **Features**
 
@@ -12,7 +12,7 @@
             rather than the middle point of the bounding rect, this catches cases where the bottom
             half of the element is obscured, but not all of it
 
-     - Consider: querySelectorAll('*:enabled') may give all elements of concern, even Elements which are divs but have an onclick() enabled or listened to.
+    - Consider: querySelectorAll('*:enabled') may give all elements of concern, even Elements which are divs but have an onclick() enabled or listened to.
 
 
  -  **Todo**
@@ -23,7 +23,6 @@
     -
 
  - **Features**
-    - Options GUI (minimal)
 
  - **Test, issue?**
     -
@@ -33,8 +32,6 @@
 
 
 # Plans
- - Create Updated Plugin Page
- - Setup site using docsify
  - Better handling of label placement (separate from sizing rect, above &lt;SVG> Element)
  - Highlight "greatest of types" elements differently than elements which do not meet the greatest of.
     eg: 3 Buttons and 1 Anchor lassoed, the 3 Buttons would be highlighted in green vs the Anchor being highlighted in grey
@@ -42,9 +39,7 @@
 
 # Todo / Ideas
  - Mutation Observer (clear DocElemRects, re-index if during drag)
- - Resolve all inspection errors
  - Externalize CSS Styles
- - Compiler/minimizer for production build?
  - docElem is a sandboxed global, replace document.documentElement references with docElem
  - Refactor ElemDocRects / RectMapper to ElemCache/ElemCacher (to reflect new font-size cache functionality)
 

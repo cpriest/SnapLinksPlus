@@ -33,10 +33,13 @@
 </style>
 
 <header>
-    <h1><a href="/SnapLinksPlus/"><img alt="Snap Links 3" height="36px" width="36px" src="images/SnapLinksLogo.png"></a><a href="/SnapLinksPlus/">Snap Links Updated</a></h1>
+    <h1><a href="/SnapLinksPlus/"><!--suppress CheckImageSize --><img alt="Snap Links 3" height="36px" width="36px" src="images/SnapLinksLogo.png"></a><a href="/SnapLinksPlus/">Snap Links Updated</a></h1>
     <h2>Snap Links was just updated with new features / bugfixes.</h2>
 </header>
 
+v3.1.7 / 2019-06-25
+===================
+  * Significant speed improvements & optimizations, especially with many tabs loaded / loading
 
 
 # Release Notes
