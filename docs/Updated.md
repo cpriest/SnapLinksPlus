@@ -37,11 +37,6 @@
     <h2>Snap Links was just updated with new features / bugfixes.</h2>
 </header>
 
-v3.1.7 / 2019-06-25
-===================
-  * Significant speed improvements & optimizations, especially with many tabs loaded / loading
-
-
 # Release Notes
 
 [History](History.md ':include')
