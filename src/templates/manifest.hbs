@@ -1,10 +1,10 @@
 {
 	"manifest_version":			2,
 	"name":						"{{package.FullName}}",
-{{#Firefox}}	{{! Needs 1.2.3-beta1 or 1.2.3 format }}
+{{#Firefox}}        {{! Needs 1.2.3-beta1 or 1.2.3 format }}
 	"version":                  "{{package.version}}",
 {{/Firefox}}
-{{#Chrome}}        {{! Needs 1.2.3.1 for version, accepts anything for version_name }}
+{{#Chrome}}            {{! Needs 1.2.3.1 for version, accepts anything for version_name }}
 	"version":                  "{{quad_version}}",
 	"version_name":             "{{package.version}}",
 {{/Chrome}}
@@ -47,7 +47,7 @@
 			{{#Chrome}}
 				"src/lib/browser-polyfill.js",
 			{{/Chrome}}
-			"src/lib/Configs.js",
+			"src/StoragePrefs.js",
 			"src/globals.js",
 			"src/background-scripts/background.js"
 		]
@@ -65,7 +65,7 @@
 				{{#Chrome}}
 					"src/lib/browser-polyfill.js",
 				{{/Chrome}}
-				"src/lib/Configs.js",
+				"src/StoragePrefs.js",
 				"src/CSP.js",
 				"src/globals.js",
 				"src/content-scripts/Utility.js",

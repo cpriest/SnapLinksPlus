@@ -86,18 +86,25 @@ const ContainerElementCreated = 'ContainerElementCreated';
 const ElementsSelected = 'ElementsSelected';
 
 
+/** @type StoragePrefs */
+let Prefs;
+
 let DOMReady = new Promise((resolve, reject) => {
+	function LoadPrefs() {
+		Prefs = new StoragePrefs(DefaultPrefs, {
+			Storage: 'sync'
+		});
+		Prefs.Ready
+			.then(() => {
+				resolve();
+			});
+	}
+
 	if(document.readyState !== 'loading')
-		resolve('already done loading');
-	else
-		window.addEventListener('DOMContentLoaded', resolve, { once: true, passive: true });
-});
+		return LoadPrefs();
 
-// Configurations
-let Prefs = DOMReady.then((...args) => {
-	Prefs = new Configs(DefaultPrefs);
+	return window.addEventListener('DOMContentLoaded', () => LoadPrefs(), { once: true, passive: true });
 });
-
 
 let $A = Array.from;
 

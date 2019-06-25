@@ -28,14 +28,13 @@ function onMessage(msg, sender, respond) {
 			browser.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			Prefs.loaded.then(async () => {
-
+			(async () => {
 				let tabsAll = await browser.tabs.query({
 					currentWindow: true,
 				});
 
 				let tabs = await browser.tabs.query({
-					active:			true,
+					active:        true,
 					currentWindow: true,
 				});
 				if(!tabs.length)
@@ -45,9 +44,9 @@ function onMessage(msg, sender, respond) {
 				// Reverse the url order so that we are opening in the correct order
 				for(let url of msg.tUrls.reverse()) {
 					let props = {
-						url:	url,
+						url:    url,
 						active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
-						index:	Prefs.OpenTabsAtEndOfTabBar ? tabsAll.length : tabs[0].index + 1, // Open tabs at the end of the tab bar
+						index:  Prefs.OpenTabsAtEndOfTabBar ? tabsAll.length : tabs[0].index + 1, // Open tabs at the end of the tab bar
 					};
 					if(isFirefox) {
 						props.cookieStoreId = tabs[0].cookieStoreId;
@@ -56,53 +55,57 @@ function onMessage(msg, sender, respond) {
 
 					}
 
+					//noinspection ES6MissingAwait
 					browser.tabs.create(props);
 					await sleep(Prefs.NewTabDelayMS);
 				}
-			});
+			})();
 			break;
 	}
 }
-
-browser.runtime.onMessage.addListener(onMessage);
-
 
 /**
  * Check storage.LastInstalledVersion to see if we're newly    installed or a new version or what
  */
 async function CheckInstallation() {
 	try {
-		let item = await browser.storage.local.get('LastInstalledVersion');
-
-		let manifest = browser.runtime.getManifest();
+		let Url,
+			item     = await browser.storage.local.get('LastInstalledVersion'),
+			manifest = browser.runtime.getManifest();
 
 		if(!item || !item.LastInstalledVersion) {
 			// New installation
-			browser.tabs.create({
-				url:    'https://cpriest.github.io/SnapLinksPlus/#/Tutorial',
-				active: true,
-			});
+			Url = 'https://cpriest.github.io/SnapLinksPlus/#/Tutorial';
 		} else if(item.LastInstalledVersion != manifest.version) {
 			// Update/Upgrade
+			Url = 'https://cpriest.github.io/SnapLinksPlus/#/Updated';
+		}
+
+		if(Url) {
+			//noinspection ES6MissingAwait
 			browser.tabs.create({
-				url:    'https://cpriest.github.io/SnapLinksPlus/#/Updated',
+				url:    Url,
 				active: true,
 			});
 		}
 
+		//noinspection ES6MissingAwait
 		browser.storage.local.set({ 'LastInstalledVersion': manifest.version });
 	} catch(e) {
 		console.error('Error while getting LastInstalledVersion: ', e);
 	}
 }
 
-setTimeout(() => {
+DOMReady.then(() => {
+	browser.runtime.onMessage.addListener(onMessage);
+
 	// noinspection JSIgnoredPromiseFromCall
-	CheckInstallation();
 	// let p = browser.notifications.create({
 	// 	'type':		'basic',
 	// 	'iconUrl':	browser.extension.getURL('res/SnapLinksLogo48.png'),
 	// 	'title':	"Test Notification Title",
 	// 	'message':	"Test Notification Content 4",
 	// });
-}, 1000);
+	//noinspection JSIgnoredPromiseFromCall
+	CheckInstallation();
+});

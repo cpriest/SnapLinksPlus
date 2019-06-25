@@ -12,7 +12,7 @@ class Options {
 
 	get isFireFox() { return window.location.protocol === 'moz-extension:'; }
 
-	constructor(aConfigs) {
+	constructor(Prefs) {
 		this.UI_MISSING         = null;
 		this.UI_TYPE_UNKNOWN    = 0;
 		this.UI_TYPE_TEXT_FIELD = 1;
@@ -21,9 +21,9 @@ class Options {
 		this.UI_TYPE_OPENER     = 4;
 
 		this.throttleTimers = {};
-		this.configs        = aConfigs;
+		this.prefs          = Prefs;
 
-		if(!this.configs || !this.configs.loaded)
+		if(!this.prefs || !this.prefs.Ready)
 			throw new Error('No configuration given to Options');
 
 		this.Initialize();
@@ -32,9 +32,9 @@ class Options {
 	Initialize() {
 		this.ConfigureElements();
 
-		this.configs.loaded
+		this.prefs.Ready
 			.then(() => {
-				Object.keys(this.configs.default)
+				Object.keys(this.prefs.Defaults)
 					.forEach((aKey) => {
 						switch(this.detectUIType(aKey)) {
 							case this.UI_TYPE_CHECKBOX:
@@ -70,14 +70,6 @@ class Options {
 				};
 				devModeElem.addEventListener('change', UpdateCheckboxState);
 				UpdateCheckboxState();
-			})
-			.then(() => {
-				$('LABEL > INPUT[type=checkbox]')
-					.forEach((elem) => {
-						elem.addEventListener('change', (e) => {
-							console.log(e);
-						});
-					});
 			});
 	}
 
@@ -133,13 +125,13 @@ class Options {
 			clearTimeout(this.throttleTimers[aKey]);
 		this.throttleTimers[aKey] = setTimeout(() => {
 			delete this.throttleTimers[aKey];
-			this.configs[aKey] = aValue;
+			this.prefs[aKey] = aValue;
 		}, 250);
 	}
 
 	bindToCheckbox(aKey) {
 		let node     = document.getElementById(aKey);
-		node.checked = this.configs[aKey];
+		node.checked = this.prefs[aKey];
 		node.addEventListener('change', () => {
 			this.throttledUpdate(aKey, node.checked);
 		});
@@ -147,7 +139,7 @@ class Options {
 
 	bindToTextField(aKey) {
 		let node   = document.getElementById(aKey);
-		node.value = this.configs[aKey];
+		node.value = this.prefs[aKey];
 		node.addEventListener('input', () => {
 			this.throttledUpdate(aKey, node.value);
 		});
@@ -155,7 +147,7 @@ class Options {
 
 	bindToSelect(aKey) {
 		let node   = document.getElementById(aKey);
-		node.value = this.configs[aKey];
+		node.value = this.prefs[aKey];
 		node.addEventListener('change', () => {
 			this.throttledUpdate(aKey, node.value);
 		});
@@ -166,7 +158,7 @@ class Options {
 
 	bindToOpener(aKey) {
 		let node  = document.getElementById(aKey);
-		node.open = this.configs[aKey];
+		node.open = this.prefs[aKey];
 		node.addEventListener('toggle', () => {
 			this.throttledUpdate(aKey, node.open);
 		});
