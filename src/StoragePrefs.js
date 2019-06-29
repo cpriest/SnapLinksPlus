@@ -1,5 +1,6 @@
 'use strict';
 
+/**  */
 /**
  * @readonly
  * @enum {string}
@@ -10,9 +11,10 @@ let Storage = [
 ];
 
 /**
- * @typedef {{Storage: {Storage}}}                            StorageOptions
- * @typedef {function({string} key, newValue, oldValue)}    StoragePrefsCallback
- * @typedef {{cancel: function()}}                            Cancelable
+ * @typedef {string|number|bigint|boolean|null|undefined|symbol}    primitive
+ * @typedef {{Storage: {Storage}}}                                  StorageOptions
+ * @typedef {function({string} key, newValue, oldValue)}            StoragePrefsCallback
+ * @typedef {{cancel: function()}}                                  Cancelable
  */
 
 /**
@@ -45,11 +47,11 @@ class StoragePrefs {
 					return console.error('StoragePrefs: browser.storage.get() rejected with: ', rej);
 
 				this.Values = res;
+				browser.storage.onChanged.addListener(this.onStorageChanged = this.onStorageChanged.bind(this));
 			});
 
 		return this._ = new Proxy(this, {
 			get: (tgt, key, obj) => {
-//				console.log(`StoragePrefs.get(${key})`);
 				if(key in this)
 					return this[key];
 				if(!(key in this.Defaults))
@@ -62,8 +64,8 @@ class StoragePrefs {
 
 				return this.Values[key] || this.Defaults[key];
 			},
-			set: (tgt, key, value, obj) => {
-//				console.log(`StoragePrefs.set(${key}, %o)`, value);
+
+			set: (tgt, key, value, receiver) => {
 				if(key in this || this[key])
 					this[key] = value;
 				else {
@@ -74,6 +76,9 @@ class StoragePrefs {
 						console.error(`StoragePrefs: Attempt to set '${key}' to '${value}' before initialized, use StoragePrefs.Ready promise, set ignored.`);
 						return true;
 					}
+
+					if(this.Values[key] == value)
+						return true;
 
 					let oldValue = this.Values[key];
 
@@ -89,14 +94,28 @@ class StoragePrefs {
 								return console.error(`StoragePrefs: browser.storage.set( { ${key}: '${value}' } ) rejected with: %o\n` +
 														`   oldValue restored to ${oldValue}`, rej);
 							}
-
-							this.NotifyUpdated(key, value, oldValue);
 						});
 				}
 
 				return true;
 			},
 		});
+	}
+
+	/**
+	 * Event listener for storage changes
+	 *
+	 * @param {{string: StorageChange}}    changes   This contains one property for each key that changed. The name of the property is the name of the key that changed,
+	 *                                     and its value is a storage.StorageChange object describing the change to that item.
+	 * @param {string}            area     The name of the storage area ("sync", "local" or "managed") to which the changes were made.
+	 */
+	onStorageChanged(changes, area) {
+		for(let [key, ch] of Object.entries(changes)) {
+			ch.oldValue = ch.oldValue || this.Values[key];
+
+			this.Values[key] = ch.newValue;
+			this.NotifyUpdated(key, ch.newValue, ch.oldValue);
+		}
 	}
 
 	/**
