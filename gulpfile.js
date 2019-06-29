@@ -14,7 +14,6 @@ const fs	= require('fs');
 const rename = require('gulp-rename');
 const merge	= require('merge-stream');
 
-
 let execDefaultOpts = {
 	stdio: 'inherit',
 };
@@ -37,6 +36,9 @@ const FireFox = {
 		Firefox: true,
 	}
 };
+
+/** This is passed to all handlebar builds */
+const GeneralBuildConfig = {};
 
 /** Wrapper for child_process.spawnSync */
 function exec(cmd, options = execDefaultOpts) {
@@ -110,8 +112,10 @@ function buildFor({ BuildPath, BuildData }) {
 		gulp.src('src/templates/manifest.hbs')
 			.pipe(
 				hb()
+					.helpers(require('handlebars-cond'))
 					.data('./package.json')
 					.data(BuildData)
+					.data(GeneralBuildConfig)
 			)
 			.pipe(rename({
 				extname: '.json',
@@ -175,6 +179,8 @@ let buildAll = series(
 );
 
 function watch() {
+	GeneralBuildConfig.Gulp = 'Watching';
+
 	function building(done) {
 		console.log('\nFiles Changed, building...');
 		done();
