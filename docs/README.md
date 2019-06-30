@@ -41,7 +41,7 @@
 
 <section id="downloads">
     <a href="https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/" id="install-firefox" class="button"><span>Add To Firefox</span></a>
-    <a href="https://chrome.google.com/webstore/detail/snap-links/fnhmmfdgnafclohgcmjjpnedfgmmapci" id="install-chrome" class="button"><span>Add To Chrome</span></a>
+    <a href="https://chrome.google.com/webstore/detail/snap-links/ikglmligndmabebhnicldebpekldnabm" id="install-chrome" class="button"><span>Add To Chrome</span></a>
     <!--<a href="https://github.com/cpriest/SnapLinksPlus" id="view-on-github" class="button"><span>View on GitHub</span></a>-->
 </section>
 
