@@ -53,20 +53,30 @@ class StoragePrefs {
 
 		return this._ = new Proxy(this, {
 			get: (tgt, key, obj) => {
-				if(key in this)
-					return this[key];
-				if(!(key in this.Defaults))
-					throw `StoragePrefs.${key} cannot be retrieved, not present in Defaults.`;
+				//noinspection UnnecessaryLocalVariableJS
+				let value = (() => {
+					if(key in this)
+						return this[key];
 
-				if(!this.Values) {
-					console.warn(`StoragePrefs: Attempt to get '${key}' before initialized, use StoragePrefs.Ready promise, returning default value.`);
-					return this.Defaults[key];
-				}
+					if(!(key in this.Defaults))
+						throw `StoragePrefs.${key} cannot be retrieved, not present in Defaults.`;
 
-				return this.Values[key] || this.Defaults[key];
+					if(!this.Values) {
+						console.warn(`StoragePrefs: Attempt to get '${key}' before initialized, use StoragePrefs.Ready promise, returning default value.`);
+						return this.Defaults[key];
+					}
+
+					return this.Values[key] || this.Defaults[key];
+				})();
+
+//				console.log(`StoragePrefs.%cget%c(%c${key}%c) = `, 'color: #00FF00', '', 'color: cyan;', '', value);
+
+				return value;
 			},
 
 			set: (tgt, key, value, receiver) => {
+//				console.log(`StoragePrefs.%cset%c(%c${key}%c, %o)`, 'color: red', '', 'color: cyan', '', value);
+
 				if(key in this || this[key])
 					this[key] = value;
 				else {
@@ -117,6 +127,8 @@ class StoragePrefs {
 		for(let [key, ch] of Object.entries(changes)) {
 			ch.newValue = ch.newValue || undefined;
 			ch.oldValue = ch.oldValue || this.Values[key];
+
+//			console.log(`onStorageChanged(, ${area}): ${key}: %o`, ch);
 
 			this.Values[key] = ch.newValue;
 			this.NotifyUpdated(key, ch.newValue, ch.oldValue);
