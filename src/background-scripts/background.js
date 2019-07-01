@@ -89,6 +89,15 @@ async function CheckInstallation() {
 			});
 		}
 
+		// Transition to sync storage for v3.1.7 upgrade
+		let local = await browser.storage.local.get();
+
+		if(Object.keys(local).length > 1) {
+			delete local.LastInstalledVersion;
+			await browser.storage.local.clear();
+			await browser.storage.sync.set(local);
+		}
+
 		//noinspection ES6MissingAwait
 		browser.storage.local.set({ 'LastInstalledVersion': manifest.version });
 	} catch(e) {

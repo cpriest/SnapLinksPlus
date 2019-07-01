@@ -34,6 +34,7 @@ class StoragePrefs {
 	constructor(Defaults, Options = { Storage: 'sync' }) {
 		this.Defaults = Defaults;
 
+		this.Options   = Options;
 		this.Observers = [];
 		this.Values    = undefined;
 
@@ -110,7 +111,11 @@ class StoragePrefs {
 	 * @param {string}            area     The name of the storage area ("sync", "local" or "managed") to which the changes were made.
 	 */
 	onStorageChanged(changes, area) {
+		if(area !== this.Options.Storage)
+			return;
+
 		for(let [key, ch] of Object.entries(changes)) {
+			ch.newValue = ch.newValue || undefined;
 			ch.oldValue = ch.oldValue || this.Values[key];
 
 			this.Values[key] = ch.newValue;
