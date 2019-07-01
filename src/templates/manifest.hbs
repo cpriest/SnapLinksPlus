@@ -2,34 +2,34 @@
 	"manifest_version":			2,
 	"name":						"{{package.FullName}}",
 {{#Firefox}}        {{! Needs 1.2.3-beta1 or 1.2.3 format }}
-	"version":                  "{{package.version}}",
+	"version":                "{{package.version}}",
 {{/Firefox}}
 {{#Chrome}}            {{! Needs 1.2.3.1 for version, accepts anything for version_name }}
-	"version":                  "{{quad_version}}",
-	"version_name":             "{{package.version}}",
+	"version":                "{{quad_version}}",
+	"version_name":           "{{package.version}}",
 {{/Chrome}}
-	"author":                   "{{package.author}}",
-	"description":				"{{package.description}}",
-	"homepage_url":				"{{package.homepage}}",
+	"author":                 "{{package.author}}",
+	"description":            "{{package.description}}",
+	"homepage_url":           "{{package.homepage}}",
 
-	"minimum_chrome_version": 	"51",
+	"minimum_chrome_version": "51",
 
-	"permissions":	[
+	"permissions":            [
 		"cookies",
 		"storage",
 		"notifications"
 	],
 
-	"optional_permissions": [
+	"optional_permissions":   [
 	],
 
-	"icons": {
+	"icons":                  {
 		"48":	"res/SnapLinksLogo48.png",
 		"128": "res/SnapLinksLogo128.png"
 	},
 
 {{#Firefox}}
-	"applications":	{
+		"applications":       {
 		"gecko": {
 			"id":				 	"snaplinks@snaplinks.mozdev.org",
 			"strict_min_version":	"50.0"
@@ -37,7 +37,7 @@
 	},
 {{/Firefox}}
 
-	"background": {
+	"background":             {
 
 {{#Chrome}}
 {{!		"persistent": false, }}
@@ -49,11 +49,29 @@
 			{{/Chrome}}
 			"src/StoragePrefs.js",
 			"src/globals.js",
+			{{#DevBuild}}
+				"src/background-scripts/DevBuild.js",
+			{{/DevBuild}}
 			"src/background-scripts/background.js"
 		]
 	},
-
-	"content_scripts": [
+	"commands":               {
+		{{#DevBuild}}
+			"dev-do-1": {
+				"suggested_key": {
+					"default": "Alt+X"
+				},
+				"description":   "Dev: Execute devFunc1()"
+			},
+			"dev-do-2": {
+				"suggested_key": {
+					"default": "Alt+C"
+				},
+				"description":   "Dev: Execute devFunc2()"
+			}
+		{{/DevBuild}}
+	},
+	"content_scripts":        [
 		{
 			"run_at": "document_end",
 			"match_about_blank": true,
@@ -68,6 +86,9 @@
 				"src/StoragePrefs.js",
 				"src/CSP.js",
 				"src/globals.js",
+				{{#DevBuild}}
+					"src/content-scripts/DevBuild.js",
+				{{/DevBuild}}
 				"src/content-scripts/Utility.js",
 				"src/content-scripts/SelectionRect.js",
 				"src/content-scripts/ElementIndexer.js",
@@ -78,7 +99,7 @@
 			]
 		}
 	],
-	"options_ui": {
+	"options_ui":             {
 		"page":			"src/html/options.html",
 		"chrome_style": true
 	}

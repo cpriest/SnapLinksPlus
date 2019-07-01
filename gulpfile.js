@@ -60,6 +60,7 @@ TaskGlobs.set('src', [
 	'!**/*JetBrains*',
 	'!**/*-compiled*',
 	'!**/*Playground*',
+	'!**/Dev*',
 
 	// ui
 	'src/**/*.htm*',
@@ -179,7 +180,13 @@ let buildAll = series(
 );
 
 function watch() {
-	GeneralBuildConfig.Gulp = 'Watching';
+	// Set DevBuild to true for 'gulp watch'
+	GeneralBuildConfig.DevBuild = true;
+
+	// Remove the '!**/Dev*' string from the src map for 'gulp watch'
+	let srcFiles = TaskGlobs.get('src');
+	srcFiles.splice(srcFiles.indexOf('!**/Dev*'), 1);
+	TaskGlobs.set('src', srcFiles);
 
 	function building(done) {
 		console.log('\nFiles Changed, building...');
