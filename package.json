@@ -11,7 +11,7 @@
 	"preferGlobal":     false,
 	"dependencies":     {},
 	"devDependencies":  {
-		"@types/jest":           "^23.3.9",
+		"@types/jest":           "^24.0.15",
 		"crx":                   "^3.2.1",
 		"del":                   "^3.0.0",
 		"gulp":                  "~4",
@@ -27,8 +27,8 @@
 		"handlebars-cond":       "^1.0.3",
 		"merge-stream":          "^1.0.1",
 		"run-sequence":          "^2.2.1",
-		"web-ext":               "^2.9.3",
-		"webextension-polyfill": "^0.3.1"
+		"web-ext":               "^3.1.0",
+		"webextension-polyfill": "^0.4.0"
 	},
 	"scripts":          {
 		"build": "gulp",

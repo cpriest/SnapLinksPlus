@@ -1,6 +1,7 @@
-v3.1.7 / 2019-06-25
+v3.1.7 / 2019-06-30
 ===================
   * Significant speed improvements & optimizations, especially with many tabs loaded / loading
+  * Transitioned from local storage to using browser sync storage
 
 v3.1.6 / 2019-05-25
 ===================
