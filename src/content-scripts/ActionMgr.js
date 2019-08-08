@@ -36,7 +36,7 @@ class ActionMgr {
 				// removing duplicates
 				let links = Array.from(new Set(SelectedElements.Links.map((elem) => elem.href)));
 
-				if(e.ctrlKey || Prefs.CopyLinksToClipboard) {
+				if ((e.ctrlKey && !(Prefs.CopyLinksToClipboard)) || (!(e.ctrlKey) && Prefs.CopyLinksToClipboard)) {
 					if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
 						console.log('Skipped Copying Links: %o', links);
 						break;
