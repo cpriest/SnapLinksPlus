@@ -1,3 +1,8 @@
+v3.1.8 / Unreleased
+===================
+  * DOM elements are now removed while Snap Links is not in use
+  
+
 v3.1.7 / 2019-06-30
 ===================
   * Significant speed improvements & optimizations, especially with many tabs loaded / loading
