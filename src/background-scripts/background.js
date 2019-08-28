@@ -41,12 +41,12 @@ function onMessage(msg, sender, respond) {
 					return;
 				let TabsLeft = msg.tUrls.length;
 
-				// Reverse the url order so that we are opening in the correct order
-				for(let url of msg.tUrls.reverse()) {
+				let nbOpened = 0;
+				for(let url of msg.tUrls) {
 					let props = {
 						url:    url,
 						active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
-						index:  Prefs.OpenTabsAtEndOfTabBar ? tabsAll.length : tabs[0].index + 1, // Open tabs at the end of the tab bar
+						index:  Prefs.OpenTabsAtEndOfTabBar ? tabsAll.length + nbOpened++ : tabs[0].index + 1 + nbOpened++, // Open tabs at the end of the tab bar
 					};
 					if(isFirefox) {
 						props.cookieStoreId = tabs[0].cookieStoreId;
