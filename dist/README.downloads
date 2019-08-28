@@ -1,8 +1,0 @@
-Project releases go in this directory.
-
-https://github.com/cpriest/SnapLinksPlus/tree/master/dist
-
-Note: These files are in .zip extensions however Mozilla and Chrome use different extensions (of zipped files).
- Should you need to download one of the zip files, change the extension as such:
- 	Firefox: .xpi
- 	Chrome:  .crx
