@@ -11,14 +11,14 @@ let docElem = document.documentElement;
 let _, __;
 
 const NONE  = 0,
-	  CTRL  = 1,
-	  ALT   = 2,
-	  SHIFT = 4;
+		CTRL  = 1,
+		ALT   = 2,
+		SHIFT = 4;
 
 //  (MouseEvent.buttons bitfield)
 const LMB = 1,	// Left Mouse Button
-	  RMB = 2,	// Right Mouse Button
-	  MMB = 4;	// Middle Mouse Button
+		RMB = 2,	// Right Mouse Button
+		MMB = 4;	// Middle Mouse Button
 
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest';
@@ -74,9 +74,10 @@ const DefaultPrefs = {
 ///////////////////
 
 // Publisher: EventHandler
-const DragRectChanged         = 'DragRectChanged',
-		DragCompleted           = 'DragCompleted';
-const DocSizeChanged          = 'DocSizeChanged',
+const DragRectChanged           = 'DragRectChanged',
+		DragCompleted             = 'DragCompleted',
+		DragStarted               = 'DragStarted';
+const DocSizeChanged            = 'DocSizeChanged',
 		ElementPositionsChanged = 'ElementPositionsChanged';
 
 // Publisher: SelectionRect

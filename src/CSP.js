@@ -17,10 +17,10 @@ function pub(Chan, msg) {
 }
 
 /**
- * @param {String} Chan                 The channel name to subscribe to
- * @param {function(*):void} handler    The handler function to receive data being published
+ * @param {String} Chan              The channel name to subscribe to
+ * @param {function(*):*} handler    The handler function to receive data being published
  *
- * @return SubscriptionController       An object which can be used to cancel the subscription
+ * @return SubscriptionController    An object which can be used to cancel the subscription
  */
 function sub(Chan, handler) {
 	let chan = Chan.toLowerCase();

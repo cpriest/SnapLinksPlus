@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /**
  * @property {number} top       The normalized top coordinate of the Rect
@@ -17,7 +17,7 @@ class Rect {
 	 * @param {number} bottom  The bottom coordinate
 	 * @param {number} right   The right coordinate
 	 */
-	constructor(top=0, left=0, bottom=0, right=0) {
+	constructor(top = 0, left = 0, bottom = 0, right = 0) {
 		[this.originTop, this.originLeft]              = [top, left];
 		[this.top, this.left, this.bottom, this.right] = [top, left, bottom, right];
 		this.CalculateProperties();
@@ -28,7 +28,7 @@ class Rect {
 	 * @param {number} left    The initial left coordinate (typically of the mousedown event)
 	 */
 	SetOrigin(top, left) {
-		this.originTop = top;
+		this.originTop  = top;
 		this.originLeft = left;
 
 		return this.CalculateProperties();
@@ -140,7 +140,7 @@ class SelectionRect {
 
 		//noinspection CssUnusedSymbol
 		document.head.appendChild(
-			CreateElement(`
+			this.StyleNode = CreateElement(`
 				<style>
 					.SnapLinksContainer :not([xyz]) {  }
 					.SnapLinksContainer .SnapLinksHighlighter { 
@@ -169,10 +169,10 @@ class SelectionRect {
 		document.body.appendChild(this.elContainer);
 
 		/* This adjusts the main containing element to position it at 0,0 no matter how it may be
-			offset by parent CSS.  This works better than body.marginLeft because that only
-			applies in the position is set
+		 offset by parent CSS.  This works better than body.marginLeft because that only
+		 applies in the position is set
 		 */
-		let rContainer = this.elContainer.getClientRects()[0];
+		let rContainer                    = this.elContainer.getClientRects()[0];
 		this.elContainer.style.marginLeft = `-${rContainer.left + window.scrollX}px`;
 		this.elContainer.style.marginTop  = `-${rContainer.top + window.scrollY}px`;
 
@@ -184,9 +184,8 @@ class SelectionRect {
 			this.SetCounter((new Set(Elements.Links.map((elem) => elem.href))).size);
 		});
 
-		sub(DragCompleted, (data) => {
-			this.Hide();
-		});
+		sub(DragStarted, data => this.InsertElements());
+		sub(DragCompleted, data => this.RemoveElements());
 	}
 
 	/**
@@ -220,16 +219,16 @@ class SelectionRect {
 			.SetBottomRight(bottom, right)
 			.ClipTo(dr);
 
-		if( width != this.dims.width || height != this.dims.height ) {
+		if(width != this.dims.width || height != this.dims.height) {
 			[this.elRect.style.top, this.elRect.style.left]     = [this.dims.top + 'px', this.dims.left + 'px'];
 			[this.elRect.style.height, this.elRect.style.width] = [this.dims.height + 'px', this.dims.width + 'px'];
 
 			if(this.IsLargeEnoughToActivate()) {
 				this.elContainer.style.display = '';
-				pub(DragRectChanged, { dims: this.dims, visible: true } );
+				pub(DragRectChanged, { dims: this.dims, visible: true });
 			} else {
 				this.elContainer.style.display = 'none';
-				pub(DragRectChanged, { dims: this.dims, visible: false} );
+				pub(DragRectChanged, { dims: this.dims, visible: false });
 			}
 		}
 
@@ -258,24 +257,24 @@ class SelectionRect {
 			inset = Prefs.SelectionLabel_CursorMargin + 'px';
 
 		let InvertedHorizontally = this.dims.originLeft != this.dims.left,
-			InvertedVertically = this.dims.originTop != this.dims.top;
+			InvertedVertically   = this.dims.originTop != this.dims.top;
 
 		[style.right, style.left] =
 			!InvertedHorizontally
-				? [inset, '']
-				: ['', inset];
+			? [inset, '']
+			: ['', inset];
 		[style.bottom, style.top] =
 			!InvertedVertically
-				? [inset, '']
-				: ['', inset];
+			? [inset, '']
+			: ['', inset];
 
 		// move slightly to the right for not to be blocked by mouse pointer
 		if(InvertedHorizontally && InvertedVertically)
 			style.left = (Prefs.SelectionLabel_CursorMargin + 16) + 'px';
 
 		style.display = Prefs.ShowNumberOfLinks
-			? ''
-			: 'none';
+						? ''
+						: 'none';
 
 		return this;
 	}
@@ -290,13 +289,29 @@ class SelectionRect {
 	}
 
 	/**
-	 * Called to indicate it's consumer is no longer using it, SetOrigin() will show the container again
+	 * Called on DragStarted, inserts DOM elements to begin drag operations
 	 *
-	 * @returns {SelectionRect}
+	 * @returns {this}
 	 */
-	Hide() {
-		this.dims                      = new Rect();
+	InsertElements() {
+		document.head.appendChild(this.StyleNode);
+		document.body.appendChild(this.elContainer);
+
+		return this;
+	}
+
+	/**
+	 * Called on DragCompleted.  Removes the elements from the DOM and resets internals
+	 *
+	 * @returns {this}
+	 */
+	RemoveElements() {
+		this.dims = new Rect();
+
 		this.elContainer.style.display = 'none';
+
+		this.elContainer.remove();
+		this.StyleNode.remove();
 
 		return this;
 	}

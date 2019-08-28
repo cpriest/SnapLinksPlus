@@ -108,10 +108,7 @@ class EventHandler {
 	 */
 	BeginDrag(e) {
 		this.FirstInit();
-
-		this.CurrentSelection =
-			(this.CurrentSelection || new SelectionRect())
-				.SetOrigin(e.pageY, e.pageX);
+		this.CurrentSelection.SetOrigin(e.pageY, e.pageX);
 
 		this.LastMouseEvent = e;
 
@@ -123,11 +120,12 @@ class EventHandler {
 //		if(document.documentElement.setCapture)
 //			document.documentElement.setCapture(true);
 
-
 		document.addEventListener('mouseup', this.onMouseUp, true);
 		document.addEventListener('mousemove', this.onMouseMove, true);
 		document.addEventListener('keydown', this.onKeyDown, true);
 		document.addEventListener('keyup', this.onKeyUp, true);
+
+		pub(DragStarted, {});
 
 		sub(ElementsSelected, (Elements) => {
 			this.SelectedElements = Elements;
@@ -195,7 +193,8 @@ class EventHandler {
 					 **/
 					if(this.SelectedElements)
 						this.ActionHandler.ActUpon(this.SelectedElements, e);
-				}
+				} else
+					pub(DragCompleted, { SelectedElements: [], e: e });
 				break;
 			case 'keydown':
 				if(!(e.mods & SHIFT && e.key == 'Escape'))
@@ -223,10 +222,13 @@ class EventHandler {
 	FirstInit() {
 		if(this.ActionHandler)
 			return;
+
 		this.ActionHandler = new ActionMgr();
 		ElemDocRects       = new RectMapper();
 		this.ElemIndex     = new ElementIndexer();
 		SvgOverlay         = new SvgOverlayMgr();
+
+		this.CurrentSelection = new SelectionRect();
 	}
 }
 
