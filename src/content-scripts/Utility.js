@@ -100,10 +100,16 @@ function AddModsToEvent(e) {
 function GetClientDims() {
 	let clientHeight = docElem.clientHeight,
 		clientWidth  = docElem.clientWidth;
-
+	// To handle some websites (#288)
+	if(clientHeight == 0) {
+		clientHeight = window.innerHeight - 12; // -12 allows to scroll
+	}
+	if(clientWidth == 0) {
+		clientWidth  = window.innerWidth - 12; // -12 allows to scroll
+	}
 	if(document.documentElement.clientHeight > window.innerHeight) {
 		clientHeight = document.body.clientHeight;
 		clientWidth  = document.body.clientWidth;
 	}
-	return [ clientWidth, clientHeight ];
+	return [clientWidth, clientHeight];
 }
