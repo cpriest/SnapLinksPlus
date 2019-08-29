@@ -32,8 +32,7 @@ const DefaultPrefs = {
 	IndexBuckets: 10,
 	ScrollRate:   8,
 
-	Activation_MinX: 5,
-	Activation_MinY: 5,
+	Activation_Min: 5,
 
 	SelectionLabel_CursorMargin: 2,
 

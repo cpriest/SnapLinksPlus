@@ -143,12 +143,12 @@ class SelectionRect {
 			this.StyleNode = CreateElement(`
 				<style>
 					.SnapLinksContainer :not([xyz]) {  }
-					.SnapLinksContainer .SnapLinksHighlighter { 
-						all: initial; overflow: visible; 
-						position: absolute; top: 0px; left: 0px; width: 10px; height: 10px;  
+					.SnapLinksContainer .SnapLinksHighlighter {
+						all: initial; overflow: visible;
+						position: absolute; top: 0px; left: 0px; width: 10px; height: 10px;
 					}
-					.SnapLinksContainer { 
-						pointer-events: none; z-index: 999999;  
+					.SnapLinksContainer {
+						pointer-events: none; z-index: 999999;
 						position: absolute; top: 0px; left: 0px; margin: 0px; padding: 0px; height: 0px; width: 0px; }
 					.SnapLinksContainer > .SL_SelectionRect { outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1; }
 					.SL_SelectionRect > .SL_SelectionLabel { position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap; color: #000000; }
@@ -212,7 +212,7 @@ class SelectionRect {
 		let dr = (new DocRect(document))
 			.Expand(-2, -2);
 
-		let { width, height } = this.dims;
+		let {width, height} = this.dims;
 
 		/* Based on current fixed style */
 		this.dims
@@ -285,7 +285,7 @@ class SelectionRect {
 	 * @returns {boolean}
 	 */
 	IsLargeEnoughToActivate() {
-		return this.dims.width > Prefs.Activation_MinX || this.dims.height > Prefs.Activation_MinY;
+		return this.dims.width > Prefs.Activation_Min || this.dims.height > Prefs.Activation_Min;
 	}
 
 	/**
