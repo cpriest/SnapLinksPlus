@@ -55,7 +55,8 @@ const DefaultPrefs = {
 	NewTabDelayMS: 50,	// The delay in ms between new tabs being opened
 	ClickDelayMS:  50,   // The delay in ms between clicks on elements
 
-	DevMode:                false,
+	DevMode: false,
+
 	Dev_Log_ActionMessages: false,
 	Dev_Skip_AllActions:    false,
 

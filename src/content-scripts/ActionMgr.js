@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 class ActionMgr {
 	constructor() {
@@ -7,17 +7,90 @@ class ActionMgr {
 	/**
 	 * Copies the given text to the clipboard
 	 *
-	 * @param {string} text
+	 * @param {string[]} links
 	 */
-	CopyToClipboard(text) {
-		const input          = document.createElement('textarea');
+	CopyToClipboard(links) {
+		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+			return console.log('Skipped Copying Links: %o', links);
+
+		const input = document.createElement('textarea');
+
 		input.style.position = 'fixed';
 		input.style.opacity  = '0';
-		input.value          = text;
+		input.value          = links.join('\n');
+
 		document.body.appendChild(input);
 		input.select();
+
 		document.execCommand('Copy');
 		document.body.removeChild(input);
+	}
+
+	/**
+	 * Opens the set of links in new tabs
+	 *
+	 * @param {string[]} links
+	 */
+	OpenUrlsInTabs(links) {
+		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+			return console.log('Skipped Opening Links: %o', links);
+
+		// For now we are simply going to create new tabs for the selected elements
+		browser.runtime.sendMessage({
+			Action: OPEN_URLS_IN_TABS,
+			tUrls:  links,
+		});
+	}
+
+	/**
+	 * Selects the first radio button per group
+	 *
+	 * @param {HTMLInputElement[]} RadioButtons
+	 */
+	SelectRadioButton(RadioButtons) {
+		let GroupedByName = RadioButtons.reduce((/** Map */ acc, elem) => {
+			return acc.set(elem.name, (acc.get(elem.name) || []).concat([elem]));
+		}, new Map());
+
+		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+			return console.log('Skipped Radio Buttons: %o', GroupedByName);
+
+		for(let [, tElems] of GroupedByName)
+			tElems[0].click();
+	}
+
+	/**
+	 * Clicks the collection of elements
+	 *
+	 * @param {HTMLElement[]} Clickable
+	 */
+	async ClickElements(Clickable) {
+		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+			return console.log('Skipped Clicking: %o', Clickable);
+
+		for(let elem of Clickable) {
+			elem.click();
+			await sleep(Prefs.ClickDelayMS);
+		}
+	}
+
+	/**
+	 * Toggles the collection of checkboxes by inverse majority
+	 *
+	 * @param {HTMLInputElement[]} Checkboxes
+	 */
+	ToggleCheckboxes(Checkboxes) {
+		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+			return console.log('Skipped Checkboxes: %o', Checkboxes);
+
+		// Determine majority checked/unchecked, prefers checking if counts are e
+		let CheckedCount   = Checkboxes.reduce((acc, elem) => acc + elem.checked, 0),
+			UncheckedCount = Checkboxes.length - CheckedCount,
+			CheckElements  = UncheckedCount >= CheckedCount;
+
+		Checkboxes
+			.filter(elem => elem.checked != CheckElements)
+			.forEach(elem => elem.click());
 	}
 
 	/**
@@ -27,77 +100,38 @@ class ActionMgr {
 	 * @param {MouseEvent}             e                   The final event that completed activated the action
 	 */
 	ActUpon(SelectedElements, e) {
-		if(Prefs.DevMode && Prefs.Dev_Log_ActionMessages) {
+		if(Prefs.DevMode && Prefs.Dev_Log_ActionMessages)
 			console.log('ActUpon(%s) - %o', SelectedElements.GreatestType, SelectedElements);
-		}
 
 		switch(SelectedElements.GreatestType) {
 			case CT_LINKS:
-				// removing duplicates
-				let links = Array.from(new Set(SelectedElements.Links.map((elem) => elem.href)));
+				// Remove duplicates by HREF
+				let links = Array.from(
+					new Set(
+						SelectedElements
+							.Links
+							.map(elem => elem.getAttribute('href'))
+					)
+				);
 
-				if(e.ctrlKey) {
-					if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
-						console.log('Skipped Copying Links: %o', links);
-						break;
-					}
-					this.CopyToClipboard(links.join('\n'));
-				} else {
-					if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
-						console.log('Skipped Opening Links: %o', links);
-						break;
-					}
-					// For now we are simply going to create new tabs for the selected elements
-					browser.runtime.sendMessage({
-						Action: OPEN_URLS_IN_TABS,
-						tUrls:  links,
-					});
-				}
+				if(e.ctrlKey)
+					this.CopyToClipboard(links);
+				else
+					this.OpenUrlsInTabs(links);
+
 				break;
+
 			case CT_CLICKABLE:
-				(async () => {
-					if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
-						console.log('Skipped Clicking: %o', SelectedElements.Clickable);
-						return;
-					}
-					for(let Button of SelectedElements.Clickable) {
-						Button.click();
-						await sleep(Prefs.ClickDelayMS);
-					}
-				})();
+				this.ClickElements(SelectedElements.Clickable)
+					.then();	// Returns a promise, ignored.
 				break;
+
 			case CT_CHECKBOXES:
-				// Determine majority checked/unchecked, prefers checking if counts are e
-				let CheckedCount   = SelectedElements.Checkboxes.reduce((acc, elem) => acc + elem.checked, 0),
-					UncheckedCount = SelectedElements.Checkboxes.length - CheckedCount,
-					CheckElements  = UncheckedCount >= CheckedCount;
-
-				if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
-					console.log('Skipped Checkboxes: %o', SelectedElements.Checkboxes);
-					break;
-				}
-				SelectedElements.Checkboxes
-					.filter( (elem) => elem.checked != CheckElements)
-					.forEach( (elem) => elem.click());
-
+				this.ToggleCheckboxes(SelectedElements.Checkboxes);
 				break;
+
 			case CT_RADIOBUTTONS:
-				if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
-					console.log('Skipped Radio Buttons: %o', SelectedElements.RadioButtons);
-					break;
-				}
-
-				let GroupedByName = SelectedElements.RadioButtons.reduce((/** Map */ acc, elem) => {
-					return acc.set(elem.name, (acc.get(elem.name) || []).concat([elem]));
-				}, new Map());
-
-				if(Prefs.DevMode && Prefs.Dev_Skip_AllActions) {
-					console.log('Skipped Radio Buttons: %o', GroupedByName);
-					break;
-				}
-
-				for(let [, tElems] of GroupedByName)
-					tElems[0].click();
+				this.SelectRadioButton(SelectedElements.RadioButtons);
 				break;
 		}
 	}
