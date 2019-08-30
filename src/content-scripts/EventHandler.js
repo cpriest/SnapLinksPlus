@@ -146,18 +146,10 @@ class EventHandler {
 	onMouseMoveInterval() {
 		let e = this.LastMouseEvent;
 
-		let docHeight = docElem.scrollHeight;
-		// To handle some websites (#288)
-		if(docHeight == 0) {
-			docHeight = Math.max(
-				document.body.scrollHeight, docElem.scrollHeight,
-				document.body.offsetHeight, docElem.offsetHeight,
-				document.body.clientHeight, docElem.clientHeight
-			);
-    }
+		let [docWidth, docHeight] = GetDocumentDims();
 
-    if(!this.docSize || this.docSize.x != docElem.scrollWidth || this.docSize.y != docHeight) {
-			this.docSize = {x: docElem.scrollWidth, y: docHeight};
+    if(!this.docSize || this.docSize.x != docWidth || this.docSize.y != docHeight) {
+			this.docSize = {x: docWidth, y: docHeight};
     }
 
 		let [clientWidth, clientHeight] = GetClientDims();

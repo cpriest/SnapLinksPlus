@@ -339,15 +339,7 @@ class ElementIndexer {
 		if(Prefs.Debug_Measure_SearchSpeed)
 			rr = new RateReporter('Found ${Count} Elements in ${Elapsed} (${PerSecond})');
 
-			let docHeight = document.documentElement.scrollHeight;
-			// To handle some websites (#288)
-			if(docHeight == 0) {
-				docHeight = Math.max(
-					document.body.scrollHeight, document.documentElement.scrollHeight,
-					document.body.offsetHeight, document.documentElement.offsetHeight,
-					document.body.clientHeight, document.documentElement.clientHeight
-				);
-			}
+			let [docWidth, docHeight] = GetDocumentDims();
 			let Buckets = Prefs.IndexBuckets,
 			FirstBucket = Math.floor(sel.top * Buckets / docHeight),
 			LastBucket  = Math.floor(sel.bottom * Buckets / docHeight),
