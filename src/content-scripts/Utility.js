@@ -122,10 +122,6 @@ function GetClientDims() {
  * @returns {[number,number]}
  */
 function GetDocumentDims() {
-	let clientHeight = docElem.clientHeight,
-		clientWidth  = docElem.clientWidth;
-	// To handle some websites (#288)
-
 	let docHeight = docElem.scrollHeight,
 		docWidth  = docElem.scrollWidth;
 	// To handle some websites (#288)
