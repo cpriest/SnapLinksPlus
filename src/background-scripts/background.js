@@ -69,24 +69,20 @@ function onMessage(msg, sender, respond) {
  */
 async function CheckInstallation() {
 	try {
-		let Url,
-			item     = await browser.storage.local.get('LastInstalledVersion'),
+		let item     = await browser.storage.local.get('LastInstalledVersion'),
 			manifest = browser.runtime.getManifest();
 
 		if(!item || !item.LastInstalledVersion) {
 			// New installation
-			Url = 'https://cpriest.github.io/SnapLinksPlus/#/Tutorial';
-		} else if(item.LastInstalledVersion != manifest.version) {
-			// Update/Upgrade
-			Url = 'https://cpriest.github.io/SnapLinksPlus/#/Updated';
-		}
-
-		if(Url) {
-			//noinspection ES6MissingAwait
-			browser.tabs.create({
-				url:    Url,
+			Notify('Snap Links Installed', `Click for a quick tutorial on usage.`, id => browser.tabs.create({
+				url:    'https://cpriest.github.io/SnapLinksPlus/#/Tutorial',
 				active: true,
-			});
+			}));
+		} else if(item.LastInstalledVersion != manifest.version) {
+			Notify('Snap Links Updated', `Version ${manifest.version} is now installed.\n\nClick here for more information.`, id => browser.tabs.create({
+				url:    'https://cpriest.github.io/SnapLinksPlus/#/Updated',
+				active: true,
+			}));
 		}
 
 		// Transition to sync storage for v3.1.7 upgrade
@@ -103,6 +99,27 @@ async function CheckInstallation() {
 	} catch(e) {
 		console.error('Error while getting LastInstalledVersion: ', e);
 	}
+}
+
+function Notify(title, message, onClick) {
+	let NotifyID;
+
+	if(onClick)
+		browser.notifications.onClicked.addListener((...args) => onClick(...args));
+
+	browser.notifications.create(
+		'', {
+			type:    'basic',
+			title:   title,
+			iconUrl: 'res/SnapLinksLogo32.png',
+			message: message,
+//			buttons:        [
+//				{ title: 'Disable This Notification' }
+//			]
+		})
+		.then((res) => {
+			NotifyID = res;
+		});
 }
 
 DOMReady.then(() => {
