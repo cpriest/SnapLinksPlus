@@ -34,6 +34,7 @@ function sub(Chan, handler) {
 		channel: Chan,
 
 		cancel: () => {
+			let _;
 			if((_ = channels[chan].indexOf(handler)) >= 0) {
 				channels[chan].splice(_, 1);
 				return true;
