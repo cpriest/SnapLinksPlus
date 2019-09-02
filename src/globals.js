@@ -48,6 +48,8 @@ const DefaultPrefs = {
 	ActivateModifiers:     NONE,
 	ActivateMouseButton:   RMB,
 
+	ShowUpdateNotification: true,		// Controls whether version update notifications are shown
+
 	DisableFontWeightFiltering: false,
 
 	SetOwnershipTabID_FF: false,	// Whether or not to set tab.openerTabId in Firefox on tab creation

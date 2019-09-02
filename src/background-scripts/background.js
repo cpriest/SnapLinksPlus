@@ -72,17 +72,19 @@ async function CheckInstallation() {
 		let item     = await browser.storage.local.get('LastInstalledVersion'),
 			manifest = browser.runtime.getManifest();
 
-		if(!item || !item.LastInstalledVersion) {
-			// New installation
-			Notify('Snap Links Installed', `Click for a quick tutorial on usage.`, id => browser.tabs.create({
-				url:    'https://cpriest.github.io/SnapLinksPlus/#/Tutorial',
-				active: true,
-			}));
-		} else if(item.LastInstalledVersion != manifest.version) {
-			Notify('Snap Links Updated', `Version ${manifest.version} is now installed.\n\nClick here for more information.`, id => browser.tabs.create({
-				url:    'https://cpriest.github.io/SnapLinksPlus/#/Updated',
-				active: true,
-			}));
+		if(Prefs.ShowUpdateNotification) {
+			if(!item || !item.LastInstalledVersion) {
+				// New installation
+				Notify('Snap Links Installed', `Click for a quick tutorial on usage.`, id => browser.tabs.create({
+					url:    'https://cpriest.github.io/SnapLinksPlus/#/Tutorial',
+					active: true,
+				}));
+			} else if(item.LastInstalledVersion != manifest.version) {
+				Notify('Snap Links Updated', `Version ${manifest.version} is now installed.\n\nClick here for more information.`, id => browser.tabs.create({
+					url:    'https://cpriest.github.io/SnapLinksPlus/#/Updated',
+					active: true,
+				}));
+			}
 		}
 
 		// Transition to sync storage for v3.1.7 upgrade

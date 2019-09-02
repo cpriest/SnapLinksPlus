@@ -7,7 +7,7 @@
 	<script src="../globals.js" type="application/javascript"></script>
 	<script src="../lib/Options.js" type="application/javascript"></script>
 	<style>
-		BODY { width: 500px; }
+		BODY { }
 		LABEL { display: block; margin: 6px 4px 8px 0px; }
 		INPUT[type=checkbox] { margin: 0px 2px; vertical-align: -2px; }
 		INPUT[type=checkbox]:enabled { cursor: pointer; }
@@ -23,7 +23,12 @@
 		FIELDSET:disabled INPUT { cursor: not-allowed; }
 		IMG { vertical-align: text-top; }
 		IMG.Info { cursor: help; margin-left: 5px; }
-		DIV > LABEL { display: inline-block; }
+		DIV > LABEL { display: inline-block; width: auto; }
+
+		DIV.flex-list {
+			display:   flex;
+			flex-flow: column wrap;
+		}
 	</style>
 	<title>SnapLinks Options</title>
 </head>
@@ -52,17 +57,23 @@
 	<span>and Drag for <input type="text" size="2" id="Activation_Min"> pixels</span>
 </label>
 
-<label title="Always open tabs at the end of the tab bar.">
-	<input id="OpenTabsAtEndOfTabBar" type="checkbox"> Open tabs at end of tab bar
-</label>
+<div class="flex-list" style="height: 64px;">
+	<label title="Always open tabs at the end of the tab bar.">
+		<input id="OpenTabsAtEndOfTabBar" type="checkbox"> Open tabs at end of tab bar
+	</label>
 
-<label title="Switch focus to the closest new tab when opening tabs.">
-	<input id="SwitchFocusToNewTab" type="checkbox"> Switch focus to new tab
-</label>
+	<label title="Switch focus to the closest new tab when opening tabs.">
+		<input id="SwitchFocusToNewTab" type="checkbox"> Switch focus to new tab
+	</label>
 
-<label title="Show the number of selected unique links as a label while selecting.">
-	<input id="ShowNumberOfLinks" type="checkbox"> Show the number of selected links
-</label>
+	<label title="Show the number of selected unique links as a label while selecting.">
+		<input id="ShowNumberOfLinks" type="checkbox"> Show the number of selected links
+	</label>
+
+	<label title="Show a notification when an update has occurred.">
+		<input id="ShowUpdateNotification" type="checkbox"> Notify me when updates happen
+	</label>
+</div>
 
 <details id="UI_AdvancedOptions_Section">
 	<summary>Advanced Settings</summary>
