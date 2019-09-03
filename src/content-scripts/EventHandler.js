@@ -108,7 +108,13 @@ class EventHandler {
 	 */
 	BeginDrag(e) {
 		this.FirstInit();
-		this.CurrentSelection.SetOrigin(e.pageY, e.pageX);
+		let [clientWidth, clientHeight] = GetClientDims();
+		this.MousePos = { clientX: e.clientX, clientY: e.clientY };
+		this.CurrentSelection.SetOrigin(
+			window.scrollY + Math.min(this.MousePos.clientY, clientHeight),
+			window.scrollX + Math.min(this.MousePos.clientX, clientWidth)
+		);
+		// this.CurrentSelection.SetOrigin(e.pageY, e.pageX);
 
 		this.LastMouseEvent = e;
 
@@ -140,10 +146,11 @@ class EventHandler {
 	onMouseMoveInterval() {
 		let e = this.LastMouseEvent;
 
-		if(!this.docSize || this.docSize.x != docElem.scrollWidth || this.docSize.y != docElem.scrollHeight) {
-			this.docSize = { x: docElem.scrollWidth, y: docElem.scrollHeight };
-			pub(DocSizeChanged, this.docSize);
-		}
+		let [docWidth, docHeight] = GetDocumentDims();
+
+    if(!this.docSize || this.docSize.x != docWidth || this.docSize.y != docHeight) {
+			this.docSize = {x: docWidth, y: docHeight};
+    }
 
 		let [clientWidth, clientHeight] = GetClientDims();
 

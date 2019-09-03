@@ -245,9 +245,9 @@ class ElementIndexer {
 	 * Updates the index of this.Elements separated into N buckets for quickly paring down the elements to be checked for intersection of the selection rectangle
 	 */
 	UpdateIndex() {
-		let docHeight = docElem.scrollHeight,
-			Buckets   = Prefs.IndexBuckets,
-			offset    = { x: window.scrollX, y: window.scrollY },
+		let [docWidth, docHeight] = GetDocumentDims();
+		let	Buckets = Prefs.IndexBuckets,
+			offset  = {x: window.scrollX, y: window.scrollY},
 			rr;
 
 		this.ElemChecks = new Map();
@@ -339,8 +339,8 @@ class ElementIndexer {
 		if(Prefs.Debug_Measure_SearchSpeed)
 			rr = new RateReporter('Found ${Count} Elements in ${Elapsed} (${PerSecond})');
 
-		let docHeight   = document.documentElement.scrollHeight,
-			Buckets     = Prefs.IndexBuckets,
+			let [docWidth, docHeight] = GetDocumentDims();
+			let Buckets = Prefs.IndexBuckets,
 			FirstBucket = Math.floor(sel.top * Buckets / docHeight),
 			LastBucket  = Math.floor(sel.bottom * Buckets / docHeight),
 			offset      = { x: window.scrollX, y: window.scrollY },

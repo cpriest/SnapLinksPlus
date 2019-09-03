@@ -123,8 +123,9 @@ class Rect {
  */
 class DocRect extends Rect {
 	constructor(doc) {
-		let docElem = document.documentElement;
-		super(0, 0, docElem.scrollHeight, docElem.scrollWidth);
+    let docElem = document.documentElement;
+    let [docWidth, docHeight] = GetDocumentDims();
+    super(0, 0, docHeight, docWidth);
 	}
 }
 
