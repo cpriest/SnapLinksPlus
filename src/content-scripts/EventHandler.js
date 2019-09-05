@@ -1,5 +1,7 @@
 'use strict';
 
+/* exported SnapLinks, ElemDocRects, SvgOverlay, LastModifierKeys */
+
 /** @type {EventHandler}    Global handler for main routine */
 let SnapLinks;
 
@@ -78,7 +80,7 @@ class EventHandler {
 			case 'Escape':
 				this.EndDrag(e);
 				e.stop();
-				return;
+
 		}
 	}
 
@@ -200,8 +202,7 @@ class EventHandler {
 					 **/
 					if(this.SelectedElements)
 						this.ActionHandler.ActUpon(this.SelectedElements, e);
-				} else
-					pub(DragCompleted, { SelectedElements: [], e: e });
+				} else {pub(DragCompleted, { SelectedElements: [], e: e });}
 				break;
 			case 'keydown':
 				if(!(e.mods & SHIFT && e.key == 'Escape'))

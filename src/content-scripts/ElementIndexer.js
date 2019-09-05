@@ -1,5 +1,7 @@
 'use strict';
 
+/* exported RectMapper, ElementIndexer */
+
 /**
  * This class provides for a cached WeakMap of {Element} to
  * @property {WeakMap<Node,Rect[]>} ElemRects
@@ -88,8 +90,7 @@ class RectMapper {
 				break;
 			case 'INPUT':
 				if(['checkbox', 'radio'].indexOf(elem.type) !== -1) {
-					if(elem.parentElement.tagName == 'LABEL')
-						Rects = Rects.concat($A(elem.parentElement.getClientRects()));
+					if(elem.parentElement.tagName == 'LABEL') {Rects = Rects.concat($A(elem.parentElement.getClientRects()));}
 					else if(elem.id) {
 						for(let label of document.querySelectorAll('LABEL[for="' + elem.id + '"]'))
 							Rects = Rects.concat($A(label.getClientRects()));
@@ -179,9 +180,9 @@ class ElementIndexer {
 
 			this.LastDragDims = data.dims;
 
-			if(data.visible) {
+			if(data.visible)
 				pub(ElementsSelected, this.Search(this.LastDragDims));
-			}
+
 		});
 
 		sub(DragCompleted, (data) => {
@@ -361,7 +362,7 @@ class ElementIndexer {
 				let elemNotes = this.ElemChecks.get(elem) || {};
 
 				// If the element is obscured, remove it and move on (could be in multiple buckets)
-				if(true === elemNotes.Obscured) {
+				if(elemNotes.Obscured === true) {
 					this.BoundaryIndex[j].delete(elem);
 					continue;
 				}
@@ -416,4 +417,4 @@ class ElementIndexer {
 
 		return new CategorizedCollection(Matches);
 	}
-};
+}

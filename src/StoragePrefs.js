@@ -1,6 +1,7 @@
 'use strict';
 
-/**  */
+/* exported Storage, StoragePrefs */
+
 /**
  * @readonly
  * @enum {string}
@@ -77,8 +78,7 @@ class StoragePrefs {
 			set: (tgt, key, value, receiver) => {
 //				console.log(`StoragePrefs.%cset%c(%c${key}%c, %o)`, 'color: red', '', 'color: cyan', '', value);
 
-				if(key in this || this[key])
-					this[key] = value;
+				if(key in this || this[key]) {this[key] = value;}
 				else {
 					if(!(key in this.Defaults))
 						throw `StoragePrefs.${key} cannot be set to '${value}', not present Defaults.`;
@@ -165,7 +165,7 @@ class StoragePrefs {
 					return;
 
 				this.Observers.splice(idx, 1);
-			}
+			},
 		};
 	}
 }

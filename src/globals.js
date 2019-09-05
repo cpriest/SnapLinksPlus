@@ -4,10 +4,11 @@
  * @typedef {{x: number, y: number}}    Point
  * @typedef {HTMLAnchorElement|Element|HTMLInputElement}    ClickableElement
  */
-
+/* eslint-disable no-unused-vars */
 let docElem = document.documentElement;
 
 // General Purpose Variables
+/* global _, __, docElem*/
 let _, __;
 
 const NONE  = 0,
@@ -21,9 +22,9 @@ const LMB = 1,	// Left Mouse Button
 		MMB = 4;	// Middle Mouse Button
 
 // Actions
-const BACKGROUND_TEST   = 'BackgroundTest';
-const RELOAD_EXTENSION  = 'ReloadExtension';
-const OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
+const BACKGROUND_TEST   = 'BackgroundTest',
+		RELOAD_EXTENSION  = 'ReloadExtension',
+		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
 
 const isChrome  = location.protocol === 'chrome-extenson:',
 		isFirefox = location.protocol === 'moz-extension:';
@@ -95,7 +96,7 @@ let Prefs;
 let DOMReady = new Promise((resolve, reject) => {
 	function LoadPrefs() {
 		Prefs = new StoragePrefs(DefaultPrefs, {
-			Storage: 'sync'
+			Storage: 'sync',
 		});
 		Prefs.Ready
 			.then(() => {

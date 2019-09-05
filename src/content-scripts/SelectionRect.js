@@ -1,5 +1,7 @@
 'use strict';
 
+/* exported SelectionRect */
+
 /**
  * @property {number} top       The normalized top coordinate of the Rect
  * @property {number} left      The normalized left coordinate of the Rect
