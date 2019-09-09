@@ -202,7 +202,7 @@ class SvgOverlayMgr {
 	 * @param {string} selector    Any valid css selector
 	 */
 	Release(selector) {
-		this.Overlay &&
+		if(this.Overlay)
 			this.ReleaseRects(Array.from(this.Overlay.querySelectorAll(selector)));
 		return this;
 	}
