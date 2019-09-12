@@ -1,3 +1,4 @@
+/* eslint-disable */
 
 /**
  * My own property I add to an event which is a bitfield of the modifier keys

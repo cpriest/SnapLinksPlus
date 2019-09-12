@@ -43,10 +43,10 @@ function sub(Chan, handler) {
 			let e     = new Error(`Subscription handler not found in channel ${Chan}`);
 			e.handler = handler;
 			throw e;
-		}
+		},
 	};
 }
 
-if(typeof module != 'undefined') {
+if(typeof module != 'undefined')
 	module.exports = { pub, sub };
-}
+

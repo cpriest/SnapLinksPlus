@@ -26,8 +26,7 @@ class Configs {
 			},
 			set: (tgt, key, value, obj) => {
 //				this.log(`set(${key}, %o)`, value);
-				if(key in this)
-					this[key] = value;
+				if(key in this) {this[key] = value;}
 				else {
 					if(!(key in this.default))
 						throw `Prefs.${key} cannot be set to ${value}, not present in this.default`;

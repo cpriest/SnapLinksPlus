@@ -104,8 +104,6 @@ async function CheckInstallation() {
 }
 
 function Notify(title, message, onClick) {
-	let NotifyID;
-
 	if(onClick)
 		browser.notifications.onClicked.addListener((...args) => onClick(...args));
 
@@ -119,9 +117,7 @@ function Notify(title, message, onClick) {
 //				{ title: 'Disable This Notification' }
 //			]
 		})
-		.then((res) => {
-			NotifyID = res;
-		});
+		.then((res) => { });
 }
 
 DOMReady.then(() => {

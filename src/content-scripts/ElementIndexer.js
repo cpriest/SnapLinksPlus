@@ -1,5 +1,7 @@
 'use strict';
 
+/* exported RectMapper, ElementIndexer */
+
 /**
  * This class provides for a cached WeakMap of {Element} to
  * @property {WeakMap<Node,Rect[]>} ElemRects
@@ -88,8 +90,7 @@ class RectMapper {
 				break;
 			case 'INPUT':
 				if(['checkbox', 'radio'].indexOf(elem.type) !== -1) {
-					if(elem.parentElement.tagName == 'LABEL')
-						Rects = Rects.concat($A(elem.parentElement.getClientRects()));
+					if(elem.parentElement.tagName == 'LABEL') {Rects = Rects.concat($A(elem.parentElement.getClientRects()));}
 					else if(elem.id) {
 						for(let label of document.querySelectorAll('LABEL[for="' + elem.id + '"]'))
 							Rects = Rects.concat($A(label.getClientRects()));
@@ -98,10 +99,10 @@ class RectMapper {
 				break;
 		}
 
-		return Rects.map(function(rect) {
-				return new Rect(rect.top + offset.y, rect.left + offset.x,
-					rect.bottom + offset.y, rect.right + offset.x);
-			})
+		return Rects.map((rect) =>
+				new Rect(rect.top + offset.y, rect.left + offset.x,
+					rect.bottom + offset.y, rect.right + offset.x)
+			)
 			.filter((rect) => {
 				return rect.width !== 0 && rect.height !== 0;
 			});
@@ -179,9 +180,9 @@ class ElementIndexer {
 
 			this.LastDragDims = data.dims;
 
-			if(data.visible) {
+			if(data.visible)
 				pub(ElementsSelected, this.Search(this.LastDragDims));
-			}
+
 		});
 
 		sub(DragCompleted, (data) => {
@@ -245,9 +246,9 @@ class ElementIndexer {
 	 * Updates the index of this.Elements separated into N buckets for quickly paring down the elements to be checked for intersection of the selection rectangle
 	 */
 	UpdateIndex() {
-		let [docWidth, docHeight] = GetDocumentDims();
-		let	Buckets = Prefs.IndexBuckets,
-			offset  = {x: window.scrollX, y: window.scrollY},
+		let [, docHeight] = GetDocumentDims();
+		let Buckets       = Prefs.IndexBuckets,
+			offset        = { x: window.scrollX, y: window.scrollY },
 			rr;
 
 		this.ElemChecks = new Map();
@@ -305,7 +306,8 @@ class ElementIndexer {
 			for(let j = topIdx; j <= botIdx; j++)
 				this.BoundaryIndex[j].add(elem);
 		}
-		rr && rr.report(this.Elements.size);
+		if(rr)
+			rr.report(this.Elements.size);
 	}
 
 	/**
@@ -339,13 +341,13 @@ class ElementIndexer {
 		if(Prefs.Debug_Measure_SearchSpeed)
 			rr = new RateReporter('Found ${Count} Elements in ${Elapsed} (${PerSecond})');
 
-			let [docWidth, docHeight] = GetDocumentDims();
-			let Buckets = Prefs.IndexBuckets,
-			FirstBucket = Math.floor(sel.top * Buckets / docHeight),
-			LastBucket  = Math.floor(sel.bottom * Buckets / docHeight),
-			offset      = { x: window.scrollX, y: window.scrollY },
-			Matches     = new Set(),
-			NonMatches  = new Set();
+		let [, docHeight] = GetDocumentDims();
+		let Buckets       = Prefs.IndexBuckets,
+			FirstBucket   = Math.floor(sel.top * Buckets / docHeight),
+			LastBucket    = Math.floor(sel.bottom * Buckets / docHeight),
+			offset        = { x: window.scrollX, y: window.scrollY },
+			Matches       = new Set(),
+			NonMatches    = new Set();
 
 		let [clientWidth, clientHeight] = GetClientDims();
 		let elContainer                 = document.querySelector('DIV.SnapLinksContainer');
@@ -361,7 +363,7 @@ class ElementIndexer {
 				let elemNotes = this.ElemChecks.get(elem) || {};
 
 				// If the element is obscured, remove it and move on (could be in multiple buckets)
-				if(true === elemNotes.Obscured) {
+				if(elemNotes.Obscured === true) {
 					this.BoundaryIndex[j].delete(elem);
 					continue;
 				}
@@ -416,4 +418,4 @@ class ElementIndexer {
 
 		return new CategorizedCollection(Matches);
 	}
-};
+}

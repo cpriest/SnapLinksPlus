@@ -1,18 +1,18 @@
 'use strict';
 
-browser.commands.onCommand.addListener(function(command) {
+browser.commands.onCommand.addListener((command) => {
 	switch(command) {
 		case 'dev-do-1':
-			return dev_do1();
+			return DevDo1();
 		case 'dev-do-2':
-			return dev_do2();
+			return DevDo2();
 	}
 });
 
-function dev_do1() {
+function DevDo1() {
 	console.log('dev-do-1');
 }
 
-function dev_do2() {
+function DevDo2() {
 	console.log('dev-do-2');
 }

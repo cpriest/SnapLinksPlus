@@ -1,5 +1,7 @@
 'use strict';
 
+/* exported SelectionRect */
+
 /**
  * @property {number} top       The normalized top coordinate of the Rect
  * @property {number} left      The normalized left coordinate of the Rect
@@ -123,9 +125,8 @@ class Rect {
  */
 class DocRect extends Rect {
 	constructor(doc) {
-    let docElem = document.documentElement;
-    let [docWidth, docHeight] = GetDocumentDims();
-    super(0, 0, docHeight, docWidth);
+		let [docWidth, docHeight] = GetDocumentDims();
+		super(0, 0, docHeight, docWidth);
 	}
 }
 
@@ -151,8 +152,13 @@ class SelectionRect {
 					.SnapLinksContainer {
 						pointer-events: none; z-index: 999999;
 						position: absolute; top: 0px; left: 0px; margin: 0px; padding: 0px; height: 0px; width: 0px; }
-					.SnapLinksContainer > .SL_SelectionRect { outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1; }
-					.SL_SelectionRect > .SL_SelectionLabel { position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; font: normal 12px Verdana; white-space: nowrap; color: #000000; }
+					.SnapLinksContainer > .SL_SelectionRect { 
+						outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1;	
+					}
+					.SL_SelectionRect > .SL_SelectionLabel { 
+						position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px;	
+						font: normal 12px Verdana; white-space: nowrap; color: #000000;	
+					}
 				</style>
 			`)
 		);
@@ -213,7 +219,7 @@ class SelectionRect {
 		let dr = (new DocRect(document))
 			.Expand(-2, -2);
 
-		let {width, height} = this.dims;
+		let { width, height } = this.dims;
 
 		/* Based on current fixed style */
 		this.dims

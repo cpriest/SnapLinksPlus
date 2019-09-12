@@ -1,5 +1,7 @@
 'use strict';
 
+/* exported ActionMgr */
+
 class ActionMgr {
 	constructor() {
 	}

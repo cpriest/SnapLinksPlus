@@ -1,5 +1,8 @@
 "use strict";
 
+
+/* exported CreateElement, dir, RateReporter, AddModsToEvent, GetClientDims */
+
 /**
  * Handy shortcut for creating an element or element tree
  *
