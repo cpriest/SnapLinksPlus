@@ -13,10 +13,11 @@
 	"private":         true,
 	"preferGlobal":    false,
 	"devDependencies": {
+		"@babel/core":           "^7",
 		"@types/jest":           "^24.0.15",
-		"crx":                   "^3.2.1",
+		"crx":                   "^5.0.1",
 		"del":                   "^3.0.0",
-		"eslint":                "^6.3.0",
+		"eslint":                "^6.4.0",
 		"eslint-config-jquery":  "^2.0.0",
 		"eslint-plugin-import":  "^2.18.2",
 		"gulp":                  "4",
@@ -30,15 +31,16 @@
 		"gulp-util":             "^3.0.7",
 		"gulp-zip":              "^4.1.0",
 		"handlebars-cond":       "^1.0.3",
+		"jest":                  "^24.9.0",
 		"merge-stream":          "^1.0.1",
 		"run-sequence":          "^2.2.1",
 		"web-ext":               "^3.1.0",
-		"webextension-polyfill": "^0.4.0",
-		"@babel/core":           "^7",
-		"jest":                  "^23.6.0"
+		"webextension-polyfill": "^0.4.0"
 	},
 	"scripts":         {
-		"build": "gulp",
-		"test":  "jest"
+		"lint":     "eslint src/",
+		"lint-fix": "eslint --fix src/",
+		"test":     "jest",
+		"build":    "gulp"
 	}
 }
