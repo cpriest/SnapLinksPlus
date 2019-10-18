@@ -12,18 +12,18 @@ class ActionMgr {
 	 * @param {string[]} links
 	 */
 	CopyToClipboard(links) {
-		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
-			return console.log('Skipped Copying Links: %o', links);
-		
-			let joinedLinks = links.join('\n');
-		
-        	navigator.clipboard.writeText(joinedLinks).then(function() {
-			/* clipboard successfully set */
-			}, function() {
-				/* clipboard write failed */
-			});
+	    if (Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+	        return console.log('Skipped Copying Links: %o', links);
+
+	    let joinedLinks = links.join('\n');
+
+	    navigator.clipboard.writeText(joinedLinks)
+	    .then(function () {
+	        /* clipboard successfully set */
+	    }, function () {
+	        /* clipboard write failed */
+	    });
 	}
-	
 	
 
 
@@ -115,8 +115,8 @@ class ActionMgr {
 					)
 				);
 
-				if((e.ctrlKey && Prefs.DefaultAction == '1' ) || ( !(e.ctrlKey) &&  Prefs.DefaultAction == '2'))
-					this.CopyToClipboard(links);
+				if ((e.ctrlKey && Prefs.DefaultAction == '1') || (!(e.ctrlKey) && Prefs.DefaultAction == '2'))
+				    this.CopyToClipboard(links);
 				else
 					this.OpenUrlsInTabs(links);
 
