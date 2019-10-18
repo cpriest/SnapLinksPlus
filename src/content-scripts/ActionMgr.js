@@ -115,7 +115,7 @@ class ActionMgr {
 					)
 				);
 
-				if((e.ctrlKey && Prefs.DefaultAction == '1' ) || (Prefs.DefaultAction == '2'))
+				if((e.ctrlKey && Prefs.DefaultAction == '1' ) || ( !(e.ctrlKey) &&  Prefs.DefaultAction == '2'))
 					this.CopyToClipboard(links);
 				else
 					this.OpenUrlsInTabs(links);
