@@ -24,9 +24,6 @@ class ActionMgr {
 	        /* clipboard write failed */
 	    });
 	}
-	
-
-
 	/**
 	 * Opens the set of links in new tabs
 	 *
