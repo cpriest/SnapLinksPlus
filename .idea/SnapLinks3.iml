@@ -6,6 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/artifacts" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/eslint" />
       <excludeFolder url="file://$MODULE_DIR$/insecure" />
       <excludeFolder url="file://$MODULE_DIR$/local" />
     </content>

@@ -18,5 +18,6 @@ module.exports = {
 		'no-nested-ternary':           'off',
 		'no-mixed-spaces-and-tabs':    ['error', 'smart-tabs'],
 		'operator-linebreak':          ['error', 'after', { 'overrides': { '?': 'before', ':': 'before' } }],
+		'no-trailing-spaces':          ['warning', { 'skipBlankLines': true }],
 	},
 };
