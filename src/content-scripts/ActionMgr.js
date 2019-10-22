@@ -12,18 +12,22 @@ class ActionMgr {
 	 * @param {string[]} links
 	 */
 	CopyToClipboard(links) {
-	    if (Prefs.DevMode && Prefs.Dev_Skip_AllActions)
-	        return console.log('Skipped Copying Links: %o', links);
+		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+			return console.log('Skipped Copying Links: %o', links);
 
-	    let joinedLinks = links.join('\n');
+		const input = document.createElement('textarea');
 
-	    navigator.clipboard.writeText(joinedLinks)
-	    .then(function () {
-	        /* clipboard successfully set */
-	    }, function () {
-	        /* clipboard write failed */
-	    });
+		input.style.position = 'fixed';
+		input.style.opacity  = '0';
+		input.value          = links.join('\n');
+
+		document.body.appendChild(input);
+		input.select();
+
+		document.execCommand('Copy');
+		document.body.removeChild(input);
 	}
+
 	/**
 	 * Opens the set of links in new tabs
 	 *
@@ -112,7 +116,7 @@ class ActionMgr {
 					)
 				);
 
-				if ((e.ctrlKey && Prefs.DefaultAction == '1') || (!(e.ctrlKey) && Prefs.DefaultAction == '2'))
+				if ((e.ctrlKey && (Prefs.DefaultAction == OPEN_LINKS) || (!(e.ctrlKey) && Prefs.DefaultAction == COPY_LINKS))
 				    this.CopyToClipboard(links);
 				else
 					this.OpenUrlsInTabs(links);
