@@ -21,6 +21,10 @@ const LMB = 1,	// Left Mouse Button
 		RMB = 2,	// Right Mouse Button
 		MMB = 4;	// Middle Mouse Button
 
+//  Default Action
+const OPEN_LINKS = 1,	// Open links
+		COPY_LINKS = 2;	// Copy links
+
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest',
 		RELOAD_EXTENSION  = 'ReloadExtension',
@@ -44,6 +48,7 @@ const DefaultPrefs = {
 	HighlightStyles_ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
 
 	OpenTabsAtEndOfTabBar: false,
+	DefaultAction: OPEN_LINKS,
 	SwitchFocusToNewTab:   false,		// Needed/referenced anywhere?
 	ShowNumberOfLinks:     true,
 	ActivateModifiers:     NONE,
