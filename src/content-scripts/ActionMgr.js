@@ -116,7 +116,7 @@ class ActionMgr {
 					)
 				);
 
-				if ((e.ctrlKey && (Prefs.DefaultAction == OPEN_LINKS) || (!(e.ctrlKey) && Prefs.DefaultAction == COPY_LINKS))
+				if ((e.ctrlKey && Prefs.DefaultAction == OPEN_LINKS) || (!(e.ctrlKey) && Prefs.DefaultAction == COPY_LINKS))
 				    this.CopyToClipboard(links);
 				else
 					this.OpenUrlsInTabs(links);
