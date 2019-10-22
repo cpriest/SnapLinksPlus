@@ -1,5 +1,7 @@
 'use strict';
 
+/* global require */
+
 const gulp                 = require('gulp');
 const { series, parallel } = gulp;
 
@@ -68,7 +70,6 @@ TaskGlobs.set('src', [
 
 TaskGlobs.set('src/lib', [
 	'node_modules/webextension-polyfill/dist/browser-polyfill.js',
-	'node_modules/proxy-deep/index.js',
 ]);
 
 TaskGlobs.set('res', [
