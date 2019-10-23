@@ -48,7 +48,7 @@ const DefaultPrefs = {
 	HighlightStyles_ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
 
 	OpenTabsAtEndOfTabBar: false,
-	DefaultAction: OPEN_LINKS,
+	DefaultAction:         OPEN_LINKS,
 	SwitchFocusToNewTab:   false,		// Needed/referenced anywhere?
 	ShowNumberOfLinks:     true,
 	ActivateModifiers:     NONE,
