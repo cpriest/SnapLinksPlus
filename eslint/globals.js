@@ -38,6 +38,8 @@ module.exports = {
 		'BACKGROUND_TEST':         'readonly',
 		'RELOAD_EXTENSION':        'readonly',
 		'OPEN_URLS_IN_TABS':       'readonly',
+		'OPEN_LINKS':              'readonly',
+		'COPY_LINKS':              'readonly',
 		'isChrome':                'readonly',
 		'isFirefox':               'readonly',
 		'DragRectChanged':         'readonly',
