@@ -118,6 +118,9 @@ describe('OverlayProxy Set', () => {
 		ap.Dev.Skip.Actions = false;
 
 		expect(ap.Dev.Skip.Actions)
+			.toBe(false);
+
+		expect(ap.Dev.Skip.Actions)
 			.toBe(over.Dev.Skip.Actions);
 
 		expect(base.Dev.Skip.Actions)
@@ -246,10 +249,6 @@ describe('OverlayProxy other handlers', () => {
 	});
 
 });
-//describe('Final check on base layer', () => {
-//	test('Should never modify base layer, all changes are on overlay, base is immutable', () => {
-//	});
-//});
 
 afterAll(() => {
 	expect(JSON.stringify(base))
