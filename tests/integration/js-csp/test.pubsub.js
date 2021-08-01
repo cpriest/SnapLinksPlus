@@ -1,5 +1,7 @@
 'use strict';
 
+/* global jest, test, expect, require */
+
 let { pub, sub } = require('../../../src/CSP');
 
 // Creates and Returns a new spy
