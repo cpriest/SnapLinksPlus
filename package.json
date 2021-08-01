@@ -5,7 +5,7 @@
 	"description":     "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
 	"author":          "Clint Priest <snaplinks-git@rxv.me>",
 	"license":         "MIT",
-	"homepage":        "https://cpriest.github.com/SnapLinksPlus",
+	"homepage":        "https://cpriest.github.io/SnapLinksPlus",
 	"repository":      "https://github.com/cpriest/SnapLinksPlus",
 	"contributors":    [
 		"Rémi Garcia"
