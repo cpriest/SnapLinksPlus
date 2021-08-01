@@ -14,4 +14,4 @@
 npm-debug.log*
 *.log
 /.idea/markdown-navigator-enh.xml
-/.idea/sonarlint/issuestore/index.pb
+/.idea/sonarlint/issuestore/
