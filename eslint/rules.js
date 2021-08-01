@@ -13,8 +13,22 @@ module.exports = {
 		'brace-style':                 'off',
 		'max-len':                     ['error', 180, 4, { 'ignoreUrls': true }],
 		'eqeqeq':                      'off',
-		'key-spacing':                 ['error', { 'multiLine': { 'align': 'value' } }],
-		'comma-dangle':                ['error', 'always-multiline'],
+		'key-spacing': ['error', {
+			'singleLine': {
+				'mode': 'strict',
+			},
+			'multiLine': {
+				'mode': 'minimum',
+				'align': 'value'
+			}
+		}],
+		"comma-dangle": ["error", {
+			"arrays":    "always-multiline",
+			"objects":   "always-multiline",
+			"imports":   "always-multiline",
+			"exports":   "always-multiline",
+			"functions": "only-multiline"
+		}],
 		'no-nested-ternary':           'off',
 		'no-mixed-spaces-and-tabs':    ['error', 'smart-tabs'],
 		'operator-linebreak':          ['error', 'after', { 'overrides': { '?': 'before', ':': 'before' } }],
