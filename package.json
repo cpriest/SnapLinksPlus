@@ -34,8 +34,8 @@
 		"jest":                  "^24.9.0",
 		"merge-stream":          "^1.0.1",
 		"run-sequence":          "^2.2.1",
-		"web-ext":               "^3.2.0",
-		"webextension-polyfill": "^0.4.0"
+		"web-ext":               "^6.2.0",
+		"webextension-polyfill": "^0.8.0"
 	},
 	"scripts":         {
 		"lint":     "eslint src/",
