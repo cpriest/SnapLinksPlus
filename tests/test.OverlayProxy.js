@@ -55,9 +55,6 @@ function inspect(arg) {
 	}));
 }
 
-self.inspect    = inspect;
-self.inspectAll = inspectAll;
-
 /**
  *  - Get
  *    - Should return base value if no overlay value

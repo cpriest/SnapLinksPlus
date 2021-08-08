@@ -17,23 +17,19 @@ const data = {
 
 const ap = new OpenProxy(data);
 
-test('OpenProxy returns deep value', async (done) => {
+test('OpenProxy returns deep value', async () => {
 	expect(ap.a.b.c)
 		.toBe(data.a.b.c);
 	expect(ap.a.b1.length)
 		.toBe(data.a.b1.length);
 	expect(ap.a.b1[1])
 		.toBe(data.a.b1[1]);
-
-	done();
 });
 
-test('OpenProxy returns new object', async (done) => {
+test('OpenProxy returns new object', async () => {
 	expect(ap.a1)
 		.not
 		.toBeUndefined();
-
-	done();
 });
 
 describe('Set new deep value and retrieve', () => {
