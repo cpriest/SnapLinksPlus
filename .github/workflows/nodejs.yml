@@ -19,7 +19,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: yarn install, build, and test
         run: |
-          yarn add
+          yarn
           yarn lint
           yarn test
           yarn build
