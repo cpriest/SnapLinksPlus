@@ -38,9 +38,10 @@
 		"webextension-polyfill": "^0.8.0"
 	},
 	"scripts": {
-		"lint": "eslint src/",
+		"lint":     "eslint src/",
 		"lint-fix": "eslint --fix src/",
-		"test": "jest",
-		"build": "gulp"
+		"test":     "jest",
+		"build":    "gulp",
+		"run-ff":   "web-ext --config=.webext-ff.js run"
 	}
 }
