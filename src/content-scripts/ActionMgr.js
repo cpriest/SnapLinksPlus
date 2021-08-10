@@ -116,6 +116,7 @@ class ActionMgr {
 					)
 				);
 
+				/** TODO: This should be cleaned up, not easily grokkable what this is meaning */
 				if ((e.ctrlKey && Prefs.DefaultAction == OPEN_LINKS) || (!(e.ctrlKey) && Prefs.DefaultAction == COPY_LINKS))
 				    this.CopyToClipboard(links);
 				else

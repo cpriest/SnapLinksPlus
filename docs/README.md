@@ -33,7 +33,7 @@
 </style>
 
 
-<div style="visibility: hidden; height: 0px width: 0px; position:  absolute; top: -150px;">
+<div style="visibility: hidden; height: 0px; width: 0px; position:  absolute; top: -150px;">
 
 # About
 
