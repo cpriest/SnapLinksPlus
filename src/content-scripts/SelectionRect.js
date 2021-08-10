@@ -211,7 +211,7 @@ class SelectionRect {
 	 * Set the bottom right of the rect, really the current mouse coordinates
 	 *
 	 * @param {number} bottom        The bottom coordinate of the rect to set
-	 * @param {number} right        The right coordinate of the rect to set
+	 * @param {number} right         The right coordinate of the rect to set
 	 *
 	 * @returns {SelectionRect}
 	 */
