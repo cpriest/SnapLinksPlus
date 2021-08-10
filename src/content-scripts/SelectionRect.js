@@ -219,7 +219,7 @@ class SelectionRect {
 		let dr = (new DocRect(document))
 			.Expand(-2, -2);
 
-		let {width, height} = this.dims;
+		let { width, height } = this.dims;
 
 		/* Based on current fixed style */
 		this.dims
