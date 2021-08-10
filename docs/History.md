@@ -1,3 +1,20 @@
+v3.1.8 / 2021-08-10
+===================
+  * DOM elements are now removed while Snap Links is not in use
+  * Added option to keep preferences local or to sync between browsers
+  * Updated minimum Firefox Version to 58.0
+  * Fixed broken link in about:addons from package manifest
+  * Fixed the order that tabs are opened in to be consistent with the order they are on the page -Rémi Garcia
+  * Added selection of default action between Open Links or Copy Links, holding ctrl selects the opposite -Michele Pezza
+
+### Backend Notes
+  * Added Continuous Integration, Testing & Code Linting
+  * Added Dependabot Configuration for Security Patches
+  * Updated all project dependencies
+
+### Internal Notes
+  * Added Deep/Open/Overlay Proxy objects & tests PR#338
+
 v3.1.7 / 2019-06-30
 ===================
   * Significant speed improvements & optimizations, especially with many tabs loaded / loading

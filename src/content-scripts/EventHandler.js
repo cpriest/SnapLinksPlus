@@ -1,5 +1,7 @@
 'use strict';
 
+/* exported SnapLinks, ElemDocRects, SvgOverlay, LastModifierKeys */
+
 /** @type {EventHandler}    Global handler for main routine */
 let SnapLinks;
 
@@ -78,7 +80,7 @@ class EventHandler {
 			case 'Escape':
 				this.EndDrag(e);
 				e.stop();
-				return;
+
 		}
 	}
 
@@ -108,7 +110,13 @@ class EventHandler {
 	 */
 	BeginDrag(e) {
 		this.FirstInit();
-		this.CurrentSelection.SetOrigin(e.pageY, e.pageX);
+		let [clientWidth, clientHeight] = GetClientDims();
+		this.MousePos = { clientX: e.clientX, clientY: e.clientY };
+		this.CurrentSelection.SetOrigin(
+			window.scrollY + Math.min(this.MousePos.clientY, clientHeight),
+			window.scrollX + Math.min(this.MousePos.clientX, clientWidth)
+		);
+		// this.CurrentSelection.SetOrigin(e.pageY, e.pageX);
 
 		this.LastMouseEvent = e;
 
@@ -140,25 +148,26 @@ class EventHandler {
 	onMouseMoveInterval() {
 		let e = this.LastMouseEvent;
 
-		if(!this.docSize || this.docSize.x != docElem.scrollWidth || this.docSize.y != docElem.scrollHeight) {
-			this.docSize = { x: docElem.scrollWidth, y: docElem.scrollHeight };
-			pub(DocSizeChanged, this.docSize);
-		}
+		let [docWidth, docHeight] = GetDocumentDims();
+
+    if(!this.docSize || this.docSize.x != docWidth || this.docSize.y != docHeight) {
+		this.docSize = { x: docWidth, y: docHeight };
+	}
 
 		let [clientWidth, clientHeight] = GetClientDims();
 
 		if(e) {
 			this.IntervalScrollOffset = {
 				x: e.clientX < 0
-				   ? e.clientX
-				   : e.clientX > clientWidth
-					 ? e.clientX - clientWidth
-					 : 0,
+					? e.clientX
+					: e.clientX > clientWidth
+						? e.clientX - clientWidth
+						: 0,
 				y: e.clientY < 0
-				   ? e.clientY
-				   : e.clientY > clientHeight
-					 ? e.clientY - clientHeight
-					 : 0,
+					? e.clientY
+					: e.clientY > clientHeight
+						? e.clientY - clientHeight
+						: 0,
 			};
 
 			this.MousePos = { clientX: e.clientX, clientY: e.clientY };
@@ -193,8 +202,7 @@ class EventHandler {
 					 **/
 					if(this.SelectedElements)
 						this.ActionHandler.ActUpon(this.SelectedElements, e);
-				} else
-					pub(DragCompleted, { SelectedElements: [], e: e });
+				} else {pub(DragCompleted, { SelectedElements: [], e: e });}
 				break;
 			case 'keydown':
 				if(!(e.mods & SHIFT && e.key == 'Escape'))

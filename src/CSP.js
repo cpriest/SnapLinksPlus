@@ -34,6 +34,7 @@ function sub(Chan, handler) {
 		channel: Chan,
 
 		cancel: () => {
+			let _;
 			if((_ = channels[chan].indexOf(handler)) >= 0) {
 				channels[chan].splice(_, 1);
 				return true;
@@ -42,10 +43,9 @@ function sub(Chan, handler) {
 			let e     = new Error(`Subscription handler not found in channel ${Chan}`);
 			e.handler = handler;
 			throw e;
-		}
+		},
 	};
 }
 
-if(typeof module != 'undefined') {
+if(typeof module != 'undefined')
 	module.exports = { pub, sub };
-}

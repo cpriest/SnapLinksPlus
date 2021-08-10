@@ -13,3 +13,5 @@
 *.swp
 npm-debug.log*
 *.log
+/.idea/markdown-navigator-enh.xml
+/.idea/sonarlint/issuestore/

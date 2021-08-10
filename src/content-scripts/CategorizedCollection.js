@@ -1,23 +1,25 @@
 'use strict';
 
+/* exported CategorizedCollection */
+
 const CT_LINKS        = 'Links',
-	  CT_CLICKABLE    = 'Clickable',
-	  CT_CHECKBOXES   = 'Checkboxes',
-	  CT_RADIOBUTTONS = 'Radio Buttons';
+		CT_CLICKABLE    = 'Clickable',
+		CT_CHECKBOXES   = 'Checkboxes',
+		CT_RADIOBUTTONS = 'Radio Buttons';
 
 /**
  * This class categorizes a collection of selected elements and provide utilities around the collection of {Element}s
  *
- * @property {string}                GreatestType    The CT_* constant representing the greatest number of elements among the categories
+ * @property {string}				GreatestType	The CT_* constant representing the greatest number of elements among the categories
  *
- * @property {Element[]}             Links           The A elements in the collection
- * @property {HTMLInputElement[]}    Buttons         The INPUT elements in the collection that are buttons
- * @property {HTMLInputElement[]}    Checkboxes      The INPUT elements in the collection that are checkboxes
- * @property {HTMLInputElement[]}    RadioButtons    The INPUT elements in the collection that are radio buttons
+ * @property {Element[]}			 Links			The A elements in the collection
+ * @property {HTMLInputElement[]}	Buttons		 The INPUT elements in the collection that are buttons
+ * @property {HTMLInputElement[]}	Checkboxes		The INPUT elements in the collection that are checkboxes
+ * @property {HTMLInputElement[]}	RadioButtons	The INPUT elements in the collection that are radio buttons
  */
 class CategorizedCollection {
 	/**
-	 * @param {Element[]|Set} tElems    The elements to categorize
+	 * @param {Element[]|Set} tElems	The elements to categorize
 	 */
 	constructor(tElems = []) {
 		if(!tElems || !tElems[Symbol.iterator])
@@ -59,7 +61,7 @@ class CategorizedCollection {
 	 *
 	 * @private
 	 *
-	 * @param {Element[]} tElems    The elements to categorize
+	 * @param {Element[]} tElems	The elements to categorize
 	 */
 	CategorizeMatches(tElems) {
 		this.Links             = [];
@@ -107,7 +109,7 @@ class CategorizedCollection {
 	/**
 	 * Identifies elements that match certain tag names
 	 *
-	 * @param {ClickableElement} elem    The element being checked
+	 * @param {ClickableElement} elem	The element being checked
 	 *
 	 * @return {boolean} True if element was handled
 	 */
@@ -145,7 +147,7 @@ class CategorizedCollection {
 	/**
 	 * Identifies elements that match certain element attributes
 	 *
-	 * @param {ClickableElement} elem    The element being checked
+	 * @param {ClickableElement} elem	The element being checked
 	 *
 	 * @return {boolean} True if element was handled
 	 */
@@ -178,7 +180,7 @@ class CategorizedCollection {
 	 *
 	 * @param {Element[]} Elements
 	 *
-	 * @return {[ Element[], Element[] ]}        [ GreatestScoreElements, FilteredElements ]
+	 * @return {[ Element[], Element[] ]}		[ GreatestScoreElements, FilteredElements ]
 	 */
 	FilterByFontScore(Elements) {
 		let ScoredElems = Elements

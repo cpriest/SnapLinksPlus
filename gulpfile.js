@@ -1,18 +1,20 @@
 'use strict';
 
-const gulp					= require('gulp');
+/* global require */
+
+const gulp                 = require('gulp');
 const { series, parallel } = gulp;
 
 // const babel      = require('gulp-babel');
 const del = require('del').sync;
-const cp	= require('child_process');
+const cp  = require('child_process');
 // const sourcemaps = require('gulp-sourcemaps');
-const hb	= require('gulp-hb');
-const fs	= require('fs');
+const hb  = require('gulp-hb');
+const fs  = require('fs');
 
 // const gutil  = require('gulp-util');
 const rename = require('gulp-rename');
-const merge	= require('merge-stream');
+const merge  = require('merge-stream');
 
 let execDefaultOpts = {
 	stdio: 'inherit',
@@ -22,19 +24,19 @@ const PackageData = JSON.parse(fs.readFileSync('./package.json'));
 
 const Chrome = {
 	ArtifactsPath: './artifacts/chrome',
-	BuildPath:		'./build/chrome',
-	BuildData:		{
-		Chrome:			true,
-		quad_version: PackageData.version.replace(/[^\d.]+/g, '.')
-	}
+	BuildPath:     './build/chrome',
+	BuildData:     {
+		Chrome:       true,
+		quad_version: PackageData.version.replace(/[^\d.]+/g, '.'),
+	},
 };
 
 const FireFox = {
 	ArtifactsPath: './artifacts/ff',
-	BuildPath:		'./build/ff',
-	BuildData:		{
+	BuildPath:     './build/ff',
+	BuildData:     {
 		Firefox: true,
-	}
+	},
 };
 
 /** This is passed to all handlebar builds */
@@ -46,8 +48,8 @@ function exec(cmd, options = execDefaultOpts) {
 	return cp.spawn('cmd.exe', ['/A', '/D', '/C', cmd], options);
 }
 
-const TaskGlobs	= new Map(),
-	  SpecialGlobs = new Map();
+const TaskGlobs    = new Map(),
+		SpecialGlobs = new Map();
 
 TaskGlobs.set('', [
 	'LICENSE',
@@ -77,7 +79,7 @@ TaskGlobs.set('res', [
 
 SpecialGlobs.set('manifest', [
 	'src/templates/*.hbs',
-	'package.json'
+	'package.json',
 ]);
 
 const watchOpts = {
@@ -214,5 +216,5 @@ module.exports = {
 	publish: series(
 		buildTmp,
 		parallel(PublishFirefox, PublishChrome)
-	)
+	),
 };

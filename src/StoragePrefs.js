@@ -1,6 +1,7 @@
 'use strict';
 
-/**  */
+/* exported Storage, StoragePrefs */
+
 /**
  * @readonly
  * @enum {string}
@@ -11,10 +12,10 @@ let Storage = [
 ];
 
 /**
- * @typedef {string|number|bigint|boolean|null|undefined|symbol}    primitive
- * @typedef {{Storage: {Storage}}}                                  StorageOptions
- * @typedef {function({string} key, newValue, oldValue)}            StoragePrefsCallback
- * @typedef {{cancel: function()}}                                  Cancelable
+ * @typedef {string|number|bigint|boolean|null|undefined|symbol}  primitive
+ * @typedef {{Storage: {Storage}}}                                StorageOptions
+ * @typedef function({string} key, newValue, oldValue)            StoragePrefsCallback
+ * @typedef {{cancel: function()}}                                Cancelable
  */
 
 /**
@@ -59,7 +60,7 @@ class StoragePrefs {
 						return this[key];
 
 					if(!(key in this.Defaults))
-						throw `StoragePrefs.${key} cannot be retrieved, not present in Defaults.`;
+						throw new Error(`StoragePrefs.${key} cannot be retrieved, not present in Defaults.`);
 
 					if(!this.Values) {
 						console.warn(`StoragePrefs: Attempt to get '${key}' before initialized, use StoragePrefs.Ready promise, returning default value.`);
@@ -77,11 +78,9 @@ class StoragePrefs {
 			set: (tgt, key, value, receiver) => {
 //				console.log(`StoragePrefs.%cset%c(%c${key}%c, %o)`, 'color: red', '', 'color: cyan', '', value);
 
-				if(key in this || this[key])
-					this[key] = value;
-				else {
+				if(key in this || this[key]) {this[key] = value;} else {
 					if(!(key in this.Defaults))
-						throw `StoragePrefs.${key} cannot be set to '${value}', not present Defaults.`;
+						throw new Error(`StoragePrefs.${key} cannot be set to '${value}', not present Defaults.`);
 
 					if(!this.Values) {
 						console.error(`StoragePrefs: Attempt to set '${key}' to '${value}' before initialized, use StoragePrefs.Ready promise, set ignored.`);
@@ -121,7 +120,7 @@ class StoragePrefs {
 	 * @param {string}            area     The name of the storage area ("sync", "local" or "managed") to which the changes were made.
 	 */
 	onStorageChanged(changes, area) {
-		if(area !== this.Options.Storage)
+		if(area != this.Options.Storage)
 			return;
 
 		for(let [key, ch] of Object.entries(changes)) {
@@ -165,7 +164,7 @@ class StoragePrefs {
 					return;
 
 				this.Observers.splice(idx, 1);
-			}
+			},
 		};
 	}
 }

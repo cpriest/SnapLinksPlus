@@ -4,10 +4,11 @@
  * @typedef {{x: number, y: number}}    Point
  * @typedef {HTMLAnchorElement|Element|HTMLInputElement}    ClickableElement
  */
-
+/* eslint-disable no-unused-vars */
 let docElem = document.documentElement;
 
 // General Purpose Variables
+/* global _, __, docElem*/
 let _, __;
 
 const NONE  = 0,
@@ -20,10 +21,14 @@ const LMB = 1,	// Left Mouse Button
 		RMB = 2,	// Right Mouse Button
 		MMB = 4;	// Middle Mouse Button
 
+//  Default Action
+const OPEN_LINKS = 1,	// Open links
+		COPY_LINKS = 2;	// Copy links
+
 // Actions
-const BACKGROUND_TEST   = 'BackgroundTest';
-const RELOAD_EXTENSION  = 'ReloadExtension';
-const OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
+const BACKGROUND_TEST   = 'BackgroundTest',
+		RELOAD_EXTENSION  = 'ReloadExtension',
+		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
 
 const isChrome  = location.protocol === 'chrome-extenson:',
 		isFirefox = location.protocol === 'moz-extension:';
@@ -43,10 +48,13 @@ const DefaultPrefs = {
 	HighlightStyles_ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
 
 	OpenTabsAtEndOfTabBar: false,
+	DefaultAction:         OPEN_LINKS,
 	SwitchFocusToNewTab:   false,		// Needed/referenced anywhere?
 	ShowNumberOfLinks:     true,
 	ActivateModifiers:     NONE,
 	ActivateMouseButton:   RMB,
+
+	ShowUpdateNotification: true,		// Controls whether version update notifications are shown
 
 	DisableFontWeightFiltering: false,
 
@@ -55,7 +63,8 @@ const DefaultPrefs = {
 	NewTabDelayMS: 50,	// The delay in ms between new tabs being opened
 	ClickDelayMS:  50,   // The delay in ms between clicks on elements
 
-	DevMode:                false,
+	DevMode: false,
+
 	Dev_Log_ActionMessages: false,
 	Dev_Skip_AllActions:    false,
 
@@ -92,7 +101,7 @@ let Prefs;
 let DOMReady = new Promise((resolve, reject) => {
 	function LoadPrefs() {
 		Prefs = new StoragePrefs(DefaultPrefs, {
-			Storage: 'sync'
+			Storage: 'sync',
 		});
 		Prefs.Ready
 			.then(() => {

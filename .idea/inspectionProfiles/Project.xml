@@ -28,6 +28,7 @@
       <option name="CHECK_DUPLICATE_KEYS" value="false" />
       <option name="CHECK_DUPLICATE_KEYS_WITH_DIFFERENT_VALUES" value="false" />
     </inspection_tool>
+    <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="FileFunctionMissUseInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="FilePutContentsMissUseInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ForeachInvariantsInspection" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -153,6 +154,7 @@
       <option name="m_minLength" value="3" />
       <option name="m_maxLength" value="32" />
     </inspection_tool>
+    <inspection_tool class="PhpCompoundNamespaceDepthInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpConstantNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_regex" value="(gd|gf|pk)?[A-Z][A-z_\d]*|[A-Z][A-Z_\d]*" />
       <option name="m_minLength" value="2" />
@@ -178,6 +180,7 @@
       <scope name="Page Handlers" level="WARNING" enabled="false" />
     </inspection_tool>
     <inspection_tool class="PhpInternalEntityUsedInspection" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="PhpLongTypeFormInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpMethodNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <scope name="Tests" level="WARNING" enabled="true">
         <option name="m_regex" value="(test|get|set|tear|on|_|[a-z]{2})?[A-Z][A-Za-z\d_]*|jsonSerialize|[a-z]+" />
@@ -197,13 +200,17 @@
       <option name="SKIP_EMPTY_METHOD" value="false" />
     </inspection_tool>
     <inspection_tool class="PhpMissingParentCallMagicInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpMissingVisibilityInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpModifierOrderInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpMultipleClassesDeclarationsInOneFile" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpNewClassMissingParameterListInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpNonCanonicalElementsOrderInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpPropertyNamingConventionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="m_regex" value="^(t|tbl|db|on|obj|pk)?[A-Z][A-Za-z\d_]*|[a-z]+$" />
       <option name="m_minLength" value="2" />
       <option name="m_maxLength" value="32" />
     </inspection_tool>
+    <inspection_tool class="PhpSeparateElseIfInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpStatementHasEmptyBodyInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpTraditionalSyntaxArrayLiteralInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedCallbackInspection" enabled="true" level="ERROR" enabled_by_default="true">
@@ -243,6 +250,7 @@
       <option name="DONT_REPORT_ANONYMOUS" value="true" />
       <option name="DONT_REPORT_PARAMETERS_COUNT_ACCESS" value="true" />
     </inspection_tool>
+    <inspection_tool class="PhpVarUsageInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpVariableNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_regex" value="^((t|tbl|db|obj|sql)?[A-Z][A-Za-z\d_]*|[a-z]{1,4}|_)$" />
       <option name="m_minLength" value="1" />
@@ -261,17 +269,20 @@
     <inspection_tool class="SecurityAdvisoriesInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="optionConfiguration">
         <list>
+          <option value="barryvdh/laravel-debugbar" />
           <option value="behat/behat" />
           <option value="brianium/paratest" />
           <option value="codeception/codeception" />
           <option value="codedungeon/phpunit-result-printer" />
           <option value="composer/composer" />
+          <option value="doctrine/coding-standard" />
           <option value="filp/whoops" />
           <option value="friendsofphp/php-cs-fixer" />
           <option value="humbug/humbug" />
           <option value="infection/infection" />
           <option value="jakub-onderka/php-parallel-lint" />
           <option value="johnkary/phpunit-speedtrap" />
+          <option value="kalessil/production-dependencies-guard" />
           <option value="mikey179/vfsStream" />
           <option value="mockery/mockery" />
           <option value="mybuilder/phpunit-accelerator" />
@@ -279,6 +290,7 @@
           <option value="pdepend/pdepend" />
           <option value="phan/phan" />
           <option value="phing/phing" />
+          <option value="phpcompatibility/php-compatibility" />
           <option value="phpmd/phpmd" />
           <option value="phpro/grumphp" />
           <option value="phpspec/phpspec" />
@@ -302,8 +314,11 @@
           <option value="symfony/var-dumper" />
           <option value="vimeo/psalm" />
           <option value="wimg/php-compatibility" />
+          <option value="wp-coding-standards/wpcs" />
+          <option value="yiisoft/yii2-coding-standards" />
           <option value="yiisoft/yii2-debug" />
           <option value="yiisoft/yii2-gii" />
+          <option value="zendframework/zend-coding-standard" />
           <option value="zendframework/zend-debug" />
           <option value="zendframework/zend-test" />
         </list>
@@ -317,7 +332,6 @@
     </inspection_tool>
     <inspection_tool class="SqlIdentifierInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="SqlResolveInspection" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="StandardJS" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="SuspiciousAssignmentsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ThrowRawExceptionInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="TrailingSpacesInProperty" enabled="false" level="WARNING" enabled_by_default="false" />

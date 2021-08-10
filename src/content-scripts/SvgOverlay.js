@@ -1,5 +1,7 @@
 'use strict';
 
+/* exported SvgOverlayMgr */
+
 /**
  * This class is intended to manage a transparent element sized to overlay the entire document and
  *    used to highlight elements in various ways.
@@ -200,8 +202,8 @@ class SvgOverlayMgr {
 	 * @param {string} selector    Any valid css selector
 	 */
 	Release(selector) {
-		this.Overlay &&
+		if(this.Overlay)
 			this.ReleaseRects(Array.from(this.Overlay.querySelectorAll(selector)));
 		return this;
 	}
-};
+}

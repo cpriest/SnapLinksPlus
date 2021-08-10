@@ -1,5 +1,8 @@
 "use strict";
 
+
+/* exported CreateElement, dir, RateReporter, AddModsToEvent, GetClientDims */
+
 /**
  * Handy shortcut for creating an element or element tree
  *
@@ -100,10 +103,44 @@ function AddModsToEvent(e) {
 function GetClientDims() {
 	let clientHeight = docElem.clientHeight,
 		clientWidth  = docElem.clientWidth;
-
-	if(document.documentElement.clientHeight > window.innerHeight) {
+	// To handle some websites (#288)
+	if(clientHeight == 0) {
+		clientHeight = window.innerHeight - 12; // -12 allows to scroll
+	}
+	if(clientWidth == 0) {
+		clientWidth  = window.innerWidth - 12; // -12 allows to scroll
+	}
+	if(docElem.clientHeight > window.innerHeight) {
 		clientHeight = document.body.clientHeight;
+	}
+	if(docElem.clientWidth > window.innerWidth) {
 		clientWidth  = document.body.clientWidth;
 	}
-	return [ clientWidth, clientHeight ];
+	return [clientWidth, clientHeight];
+}
+
+/**
+ * Returns the document dimensions, adjusting for various situations
+ *
+ * @returns {[number,number]}
+ */
+function GetDocumentDims() {
+	let docHeight = docElem.scrollHeight,
+		docWidth  = docElem.scrollWidth;
+	// To handle some websites (#288)
+	if(docHeight == 0) {
+		docHeight = Math.max(
+			document.body.scrollHeight, docElem.scrollHeight,
+			document.body.offsetHeight, docElem.offsetHeight,
+			document.body.clientHeight, docElem.clientHeight
+		);
+	}
+	if(docWidth == 0) {
+		docWidth = Math.max(
+			document.body.scrollWidth, docElem.scrollWidth,
+			document.body.offsetWidth, docElem.offsetWidth,
+			document.body.clientWidth, docElem.clientWidth
+		);
+	}
+	return [docWidth, docHeight];
 }
