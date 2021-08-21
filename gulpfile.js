@@ -89,7 +89,7 @@ const watchOpts = {
 };
 
 /**
- *        General Building Tasks
+ *  General Building Tasks
  */
 
 function buildTmp() {
@@ -195,11 +195,22 @@ function watch() {
 		done();
 	}
 
+	function built(done) {
+		fs.writeFileSync('./build/build.json', JSON.stringify({
+			buildVersion: PackageData.version,
+			buildTime:    Date.now()
+								.toString(),
+		}));
+		done();
+	}
+
 	let WatchGlobs = Array.from(TaskGlobs.values())
 		.flat();
+
 	gulp.watch(WatchGlobs,
 		watchOpts,
-		series(building, buildAll));
+		series(building, buildAll, built));
+	exec('yarn run-ff');
 }
 
 module.exports = {
