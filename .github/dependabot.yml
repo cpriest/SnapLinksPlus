@@ -5,10 +5,11 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
     # Raise pull requests for version updates
     # to npm against the `dev` branch
     target-branch: "dev"
     # Labels on pull requests for security and version updates
     labels:
-      - "npm dependencies"
+      - "dependencies"
