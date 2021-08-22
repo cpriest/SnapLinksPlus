@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Snap Links Plus selection issue</title>
+	<meta charset="UTF-8">
+	<style>
+		body {
+			margin: 50px;
+		}
+		body p {
+			white-space: pre-line;
+			line-height: 1.5;
+		}
+		.link_box {
+			display:  inline-block;
+			position: relative;
+			/* border: 1px solid black; */
+		}
+		.link_box a {
+			display:     block;
+			line-height: 1.5;
+		}
+		.target {
+			width:            25px;
+			height:           25px;
+			border-radius:    50%;
+			display:          flex;
+			position:         absolute;
+			justify-content:  center;
+			align-items:      center;
+			background-color: red;
+			color:            white;
+			font-family:      sans-serif;
+			font-weight:      normal;
+			text-align:       center;
+			cursor:           default;
+		}
+		.targetA {
+			left: 40px;
+			top:  -40px;
+		}
+		.targetB {
+			left: 40px;
+			top:  110px;
+		}
+		.targetC {
+			left: 80px;
+			top:  110px;
+		}
+		.targetD {
+			left: 0px;
+			top:  110px;
+		}
+	</style>
+</head>
+<body>
+<div class="link_box">
+	<div class="target targetA">A</div>
+	<div class="target targetB">B</div>
+	<div class="target targetC">C</div>
+	<div class="target targetD">D</div>
+	<a href="https://github.com/cpriest/SnapLinksPlus/issues/308">Issue #308</a>
+	<a href="https://cpriest.github.io/SnapLinksPlus/#/">github.io</a>
+	<a href="https://github.com/cpriest/SnapLinksPlus">github.com</a>
+	<a href="https://addons.mozilla.org/en-US/firefox/addon/snaplinksplus/">addons.mozilla.org</a>
+</div>
+<p>
+
+	To reproduce this issue, follow these steps:
+
+	1) Make sure Snap Links Plus (SLP) is configured to display the number of links selected.
+	2) Double-click on word "issue" above and press Ctrl-C so clipboard content is known for subsequent comparison.
+	3) Position pointer on "A".
+	4) Initiate selection (e.g., Ctrl &amp; Alt + Left Click)
+	5) Move pointer to "B".
+	6) Move pointer to "C".
+	7) Move pointer to "D".
+	8) SLP should show 4 links selected.
+	9) Complete selection - release mouse button and keys.
+	10) Paste clipboard. Should be the word "issue", instead of the links that were selected.
+</p>
+</body>
+</html>
