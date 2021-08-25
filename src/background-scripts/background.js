@@ -65,7 +65,7 @@ function onMessage(msg, sender, respond) {
 }
 
 /**
- * Check storage.LastInstalledVersion to see if we're newly    installed or a new version or what
+ * Check storage.LastInstalledVersion to see if we're newly installed or a new version or what
  */
 async function CheckInstallation() {
 	try {
@@ -87,13 +87,15 @@ async function CheckInstallation() {
 			}
 		}
 
-		// Transition to sync storage for v3.1.7 upgrade
-		let local = await browser.storage.local.get();
+		if(item.LastInstalledVersion.localeCompare('3.1.7', undefined, { numeric: true }) < 0) {
+			// Transition to sync storage for v3.1.7 upgrade
+			let local = await browser.storage.local.get();
 
-		if(Object.keys(local).length > 1) {
-			delete local.LastInstalledVersion;
-			await browser.storage.local.clear();
-			await browser.storage.sync.set(local);
+			if(Object.keys(local).length > 1) {
+				delete local.LastInstalledVersion;
+				await browser.storage.local.clear();
+				await browser.storage.sync.set(local);
+			}
 		}
 
 		//noinspection ES6MissingAwait

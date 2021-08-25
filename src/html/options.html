@@ -66,10 +66,22 @@
 	<span>press CTRL after selection to modify default action</span>
 </label>
 
+<label>
+	Open Tabs
+	<select id="OpenTabs">
+		<option title="Always open tabs at the end of the tab bar."
+				value="OpenTabsAtEnd">at End of Tab Bar
+		</option>
+		<option title="Always open each tab to the right of the current tab."
+				value="OpenTabsToRight">to the Right of Active Tab
+		</option>
+		<option title="This means tabs open to the right of the current tab or last opened tab until you switch tabs."
+				value="OpenTabsNaturally">the same way middle-clicking a link does
+		</option>
+	</select>
+</label>
+
 <div class="flex-list" style="height: 64px;">
-	<label title="Always open tabs at the end of the tab bar.">
-		<input id="OpenTabsAtEndOfTabBar" type="checkbox"> Open tabs at end of tab bar
-	</label>
 
 	<label title="Switch focus to the closest new tab when opening tabs.">
 		<input id="SwitchFocusToNewTab" type="checkbox"> Switch focus to new tab
@@ -120,7 +132,7 @@
 		</label>
 
 		<fieldset id="DevMode_Options">
-
+			<legend>Developer Mode Options</legend>
 			<label title="Log details about actions to console.">
 				<input id="Dev_Log_ActionMessages" type="checkbox"> Log Action Messages
 			</label>
