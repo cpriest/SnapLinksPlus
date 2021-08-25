@@ -28,39 +28,55 @@ function onMessage(msg, sender, respond) {
 			browser.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			(async () => {
-				let tabsAll = await browser.tabs.query({
-					currentWindow: true,
-				});
-
-				let tabs = await browser.tabs.query({
-					active:        true,
-					currentWindow: true,
-				});
-				if(!tabs.length)
-					return;
-				let TabsLeft = msg.tUrls.length;
-
-				let nbOpened = 0;
-				for(let url of msg.tUrls) {
-					let props = {
-						url:    url,
-						active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
-						index:  (Prefs.OpenTabsAtEndOfTabBar ? tabsAll.length : tabs[0].index + 1) + nbOpened++, // Open tabs at the end of the tab bar
-					};
-					if(isFirefox) {
-						props.cookieStoreId = tabs[0].cookieStoreId;
-						if(Prefs.SetOwnershipTabID_FF)
-							props.openerTabId = tabs[0].id;
-
-					}
-
-					//noinspection ES6MissingAwait
-					browser.tabs.create(props);
-					await sleep(Prefs.NewTabDelayMS);
-				}
-			})();
+			OpenUrlsInTabs(msg.tUrls);
 			break;
+	}
+}
+
+/**
+ * @param {string[]} urls
+ * @return {Promise<void>}
+ */
+async function OpenUrlsInTabs(urls) {
+	let tabsAll = await browser.tabs.query({
+		currentWindow: true,
+	});
+
+	let tabs = await browser.tabs.query({
+		active:        true,
+		currentWindow: true,
+	});
+	if(!tabs.length)
+		return;
+	let TabsLeft = urls.length;
+
+	let nbOpened = 0;
+	for(let url of urls) {
+		let props = {
+			url:    url,
+			active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
+		};
+		switch(Prefs.OpenTabs) {
+			case TABS_OPEN_END:
+				props.index = tabsAll.length + nbOpened++;
+				break;
+			case TABS_OPEN_RIGHT:
+				props.index = tabs[0].index + 1 + nbOpened++;
+				break;
+			case TABS_OPEN_NATURAL:
+
+				break;
+		}
+		if(isFirefox) {
+			props.cookieStoreId = tabs[0].cookieStoreId;
+			if(Prefs.SetOwnershipTabID_FF)
+				props.openerTabId = tabs[0].id;
+
+		}
+
+		//noinspection ES6MissingAwait
+		browser.tabs.create(props);
+		await sleep(Prefs.NewTabDelayMS);
 	}
 }
 
@@ -110,16 +126,16 @@ function Notify(title, message, onClick) {
 		browser.notifications.onClicked.addListener((...args) => onClick(...args));
 
 	browser.notifications.create(
-		'', {
-			type:    'basic',
-			title:   title,
-			iconUrl: 'res/SnapLinksLogo32.png',
-			message: message,
-//			buttons:        [
-//				{ title: 'Disable This Notification' }
-//			]
-		})
-		.then((res) => { });
+			'', {
+				type:    'basic',
+				title:   title,
+				iconUrl: 'res/SnapLinksLogo32.png',
+				message: message,
+//				buttons:        [
+//					{ title: 'Disable This Notification' }
+//				]
+			})
+		.then(r => {});
 }
 
 DOMReady.then(() => {
