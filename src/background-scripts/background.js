@@ -38,40 +38,43 @@ function onMessage(msg, sender, respond) {
  * @return {Promise<void>}
  */
 async function OpenUrlsInTabs(urls) {
-	let tabsAll = await browser.tabs.query({
-		currentWindow: true,
-	});
-
 	let tabs = await browser.tabs.query({
-		active:        true,
 		currentWindow: true,
 	});
-	if(!tabs.length)
-		return;
-	let TabsLeft = urls.length;
 
-	let nbOpened = 0;
+	let activeTab = (async () => {
+		let tabs = await browser.tabs.query({
+			active:        true,
+			currentWindow: true,
+		});
+		if(!tabs.length)
+			return;
+		return tabs[0];
+	})();
+
+	let tabsLeft   = urls.length,
+		tabsOpened = 0;
+
 	for(let url of urls) {
 		let props = {
 			url:    url,
-			active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
+			active: Prefs.SwitchFocusToNewTab ? (--tabsLeft) === 0 : false,	// Activate the last tab to be opened
 		};
 		switch(Prefs.OpenTabs) {
 			case TABS_OPEN_END:
-				props.index = tabsAll.length + nbOpened++;
+				props.index = tabs.length + tabsOpened++;
 				break;
 			case TABS_OPEN_RIGHT:
-				props.index = tabs[0].index + 1 + nbOpened++;
+				props.index = activeTab.index + 1 + tabsOpened++;
 				break;
 			case TABS_OPEN_NATURAL:
 
 				break;
 		}
 		if(isFirefox) {
-			props.cookieStoreId = tabs[0].cookieStoreId;
+			props.cookieStoreId = activeTab.cookieStoreId;
 			if(Prefs.SetOwnershipTabID_FF)
-				props.openerTabId = tabs[0].id;
-
+				props.openerTabId = activeTab.id;
 		}
 
 		//noinspection ES6MissingAwait
