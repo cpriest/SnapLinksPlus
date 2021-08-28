@@ -3,9 +3,6 @@
 /* exported ActionMgr */
 
 class ActionMgr {
-	constructor() {
-	}
-
 	/**
 	 * Copies the given text to the clipboard
 	 *
@@ -15,17 +12,7 @@ class ActionMgr {
 		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
 			return console.log('Skipped Copying Links: %o', links);
 
-		const input = document.createElement('textarea');
-
-		input.style.position = 'fixed';
-		input.style.opacity  = '0';
-		input.value          = links.join('\n');
-
-		document.body.appendChild(input);
-		input.select();
-
-		document.execCommand('Copy');
-		document.body.removeChild(input);
+		navigator.clipboard.writeText(links.join('\n'));
 	}
 
 	/**

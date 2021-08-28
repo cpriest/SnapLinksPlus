@@ -1,11 +1,12 @@
 module.exports = {
 	sourceDir: './build/ff/',
-	run:       {
+	run: {
 		firefoxProfile:         `${__dirname}/local/SnapLinksDev`,
 		profileCreateIfMissing: true,
 		keepProfileChanges:     true,
 		reload:                 true,
 		startUrl:               [`file://${__dirname}/test/test_links.html`],
+		watchFile:              [`${__dirname}\\build\\build.json`],
 		firefox:                'firefoxdeveloperedition'
 	},
 };

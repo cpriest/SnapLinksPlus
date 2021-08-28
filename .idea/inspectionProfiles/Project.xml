@@ -21,13 +21,13 @@
     <inspection_tool class="DisconnectedForeachInstructionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="SUGGEST_USING_CLONE" value="true" />
     </inspection_tool>
-    <inspection_tool class="DuplicatePropertyInspection" enabled="false" level="No Severity" enabled_by_default="false">
+    <inspection_tool class="DuplicatePropertyInspection" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="CURRENT_FILE" value="false" />
-      <option name="MODULE_WITH_DEPENDENCIES" value="false" />
       <option name="CHECK_DUPLICATE_VALUES" value="false" />
       <option name="CHECK_DUPLICATE_KEYS" value="false" />
       <option name="CHECK_DUPLICATE_KEYS_WITH_DIFFERENT_VALUES" value="false" />
     </inspection_tool>
+    <inspection_tool class="EditorConfigNoMatchingFiles" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="FileFunctionMissUseInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="FilePutContentsMissUseInspection" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -108,8 +108,8 @@
     <inspection_tool class="JSCheckFunctionSignatures" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="myCheckGuessedTypes" value="true" />
     </inspection_tool>
-    <inspection_tool class="JSConstructorReturnsPrimitive" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="JSEqualityComparisonWithCoercion" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="JSIgnoredPromiseFromCall" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="JSLastCommaInObjectLiteral" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="JSMethodCanBeStatic" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="JSNonStrictModeUsed" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -141,14 +141,14 @@
     <inspection_tool class="NotOptimalIfConditionsInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="NullPointerExceptionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="PhpClassNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Page Handlers" level="WARNING" enabled="false">
+        <option name="m_regex" value="(|my|pk)?[A-Z][A-Za-z\d]*|Page_[A-Za-z_]*" />
+        <option name="m_maxLength" value="48" />
+      </scope>
       <scope name="Tests" level="WARNING" enabled="true">
         <option name="m_regex" value="(RG_(DB_)?|myProcess_|i|my|pk|api)?[A-Z][A-Za-z\d]*" />
         <option name="m_minLength" value="3" />
         <option name="m_maxLength" value="32" />
-      </scope>
-      <scope name="Page Handlers" level="WARNING" enabled="false">
-        <option name="m_regex" value="(|my|pk)?[A-Z][A-Za-z\d]*|Page_[A-Za-z_]*" />
-        <option name="m_maxLength" value="48" />
       </scope>
       <option name="m_regex" value="(myProcess_|i|my|pk|api)?[A-Z][A-Za-z\d]*" />
       <option name="m_minLength" value="3" />
@@ -196,13 +196,10 @@
       <option name="CHECK_CONSTANT" value="true" />
       <option name="CHECK_FIELD" value="true" />
       <option name="CHECK_CLASS_CONSTANT" value="true" />
-      <option name="SKIP_EMPTY_FUNCTION" value="false" />
-      <option name="SKIP_EMPTY_METHOD" value="false" />
     </inspection_tool>
     <inspection_tool class="PhpMissingParentCallMagicInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpMissingVisibilityInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpModifierOrderInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpMultipleClassesDeclarationsInOneFile" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpNewClassMissingParameterListInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpNonCanonicalElementsOrderInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpPropertyNamingConventionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
@@ -217,25 +214,18 @@
       <option name="DONT_REPORT_EXISTS_CALLBACKS" value="false" />
       <option name="DONT_REPORT_AMBIGUITY" value="false" />
     </inspection_tool>
-    <inspection_tool class="PhpUndefinedClassConstantInspection" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="PhpUndefinedClassInspection" enabled="true" level="ERROR" enabled_by_default="true">
-      <option name="DONT_REPORT_MULTI_RESOLVE" value="true" />
-    </inspection_tool>
+    <inspection_tool class="PhpUndefinedClassInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedConstantInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedFieldInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedFunctionInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedGotoLabelInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedMethodInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpUndefinedNamespaceInspection" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="PhpUndefinedVariableInspection" enabled="true" level="ERROR" enabled_by_default="true">
-      <option name="IGNORE_INCLUDE" value="false" />
-    </inspection_tool>
     <inspection_tool class="PhpUnhandledExceptionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="PhpUnitTestsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="SUGGEST_TO_USE_ASSERTSAME" value="true" />
     </inspection_tool>
     <inspection_tool class="PhpUnused" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpUnusedAliasInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpUnusedLocalVariableInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <scope name="Page Handlers" level="WARNING" enabled="true" />
       <option name="ENABLE_IN_FILE_SCOPE" value="true" />

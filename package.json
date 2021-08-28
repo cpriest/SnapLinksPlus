@@ -1,7 +1,7 @@
 {
 	"name":            "snaplinks3",
 	"FullName":        "Snap Links",
-	"version":         "3.1.8",
+	"version":         "3.1.9",
 	"description":     "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
 	"author":          "Clint Priest <snaplinks-git@rxv.me>",
 	"license":         "MIT",
@@ -19,7 +19,7 @@
 		"del":                   "^6.0.0",
 		"eslint":                "^7.32.0",
 		"eslint-config-jquery":  "^3.0.0",
-		"eslint-plugin-import":  "^2.24.0",
+		"eslint-plugin-import":  "^2.24.1",
 		"gulp":                  "4",
 		"gulp-hb":               "^8.0.0",
 		"gulp-install":          "^1.1.0",

@@ -30,6 +30,10 @@ const BACKGROUND_TEST   = 'BackgroundTest',
 		RELOAD_EXTENSION  = 'ReloadExtension',
 		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
 
+const TABS_OPEN_END     = 'OpenTabsAtEnd',
+		TABS_OPEN_RIGHT   = 'OpenTabsToRight',
+		TABS_OPEN_NATURAL = 'OpenTabsNaturally';	// Like Firefox Middle-Click behaves
+
 const isChrome  = location.protocol === 'chrome-extenson:',
 		isFirefox = location.protocol === 'moz-extension:';
 
@@ -47,12 +51,12 @@ const DefaultPrefs = {
 	HighlightStyles_ObscuredPoint: 'fill: rgba(255,0,0,.80);',
 	HighlightStyles_ObscuredRect:  'fill: rgba(127,127,127,.10); stroke: rgba(127,127,127,.60); stroke-width: 1px;',
 
-	OpenTabsAtEndOfTabBar: false,
-	DefaultAction:         OPEN_LINKS,
-	SwitchFocusToNewTab:   false,		// Needed/referenced anywhere?
-	ShowNumberOfLinks:     true,
-	ActivateModifiers:     NONE,
-	ActivateMouseButton:   RMB,
+	OpenTabs:            TABS_OPEN_NATURAL,
+	DefaultAction:       OPEN_LINKS,
+	SwitchFocusToNewTab: true,
+	ShowNumberOfLinks:   true,
+	ActivateModifiers:   NONE,
+	ActivateMouseButton: RMB,
 
 	ShowUpdateNotification: true,		// Controls whether version update notifications are shown
 
@@ -99,12 +103,23 @@ const ElementsSelected = 'ElementsSelected';
 let Prefs;
 
 let DOMReady = new Promise((resolve, reject) => {
+	// Translates previous preference settings to newer settings
+	function MigratePrefs() {
+		// 3.1.9 Release
+		DefaultPrefs.OpenTabsAtEndOfTabBar = false;
+		if(Prefs.OpenTabsAtEndOfTabBar) {
+			Prefs.OpenTabsAtEndOfTabBar = undefined;
+			Prefs.OpenTabs              = TABS_OPEN_END;
+		}
+	}
+
 	function LoadPrefs() {
 		Prefs = new StoragePrefs(DefaultPrefs, {
 			Storage: 'sync',
 		});
 		Prefs.Ready
 			.then(() => {
+				MigratePrefs();
 				resolve();
 			});
 	}

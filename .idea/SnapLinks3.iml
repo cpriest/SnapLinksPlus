@@ -15,5 +15,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="docsify" level="application" />
     <orderEntry type="library" name="@types/firefox-webext-browser" level="application" />
+    <orderEntry type="library" name="@types/firefox-webext-browser" level="application" />
   </component>
 </module>

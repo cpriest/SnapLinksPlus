@@ -28,13 +28,7 @@ class RectMapper {
 	 * @returns {Rect[]}
 	 */
 	get(elem, offset) {
-		let Rects = this.ElemRects.get(elem);
-		if(Rects)
-			return Rects;
-
-		Rects = this.GetElementRects(elem, offset);
-		this.ElemRects.set(elem, Rects);
-		return Rects;
+		return this.GetElementRects(elem, offset);
 	}
 
 	/**

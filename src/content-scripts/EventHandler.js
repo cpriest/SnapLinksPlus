@@ -47,13 +47,17 @@ class EventHandler {
 			if(e.mods == CTRL + ALT && e.buttons == RMB) {
 				this.StopNextContextMenu();
 				browser.runtime.sendMessage({ Action: RELOAD_EXTENSION });
+				e.preventDefault();
 			} else if(e.mods == SHIFT + ALT && e.buttons == RMB) {
 				this.StopNextContextMenu();
 				browser.runtime.sendMessage({ Action: BACKGROUND_TEST });
+				e.preventDefault();
 			}
 		}
-		if(e.mods == Prefs.ActivateModifiers && e.buttons == Prefs.ActivateMouseButton)
+		if(e.mods == Prefs.ActivateModifiers && e.buttons == Prefs.ActivateMouseButton) {
 			this.BeginDrag(e);
+			e.preventDefault();
+		}
 	}
 
 	/**
@@ -76,11 +80,9 @@ class EventHandler {
 	 */
 	onKeyDown(e) {
 		e = AddModsToEvent(e);
-		switch(e.key) {
-			case 'Escape':
-				this.EndDrag(e);
-				e.stop();
-
+		if(e.key == 'Escape') {
+			this.EndDrag(e);
+			e.stop();
 		}
 	}
 

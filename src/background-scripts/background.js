@@ -1,5 +1,7 @@
 'use strict';
 
+let TabStacks = new Map();
+
 /**
  * Log that we received the message.
  * Then display a notification. The notification contains the URL,
@@ -28,44 +30,79 @@ function onMessage(msg, sender, respond) {
 			browser.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			(async () => {
-				let tabsAll = await browser.tabs.query({
-					currentWindow: true,
-				});
-
-				let tabs = await browser.tabs.query({
-					active:        true,
-					currentWindow: true,
-				});
-				if(!tabs.length)
-					return;
-				let TabsLeft = msg.tUrls.length;
-
-				let nbOpened = 0;
-				for(let url of msg.tUrls) {
-					let props = {
-						url:    url,
-						active: Prefs.SwitchFocusToNewTab ? (--TabsLeft) === 0 : false,	// Activate the last tab to be opened
-						index:  (Prefs.OpenTabsAtEndOfTabBar ? tabsAll.length : tabs[0].index + 1) + nbOpened++, // Open tabs at the end of the tab bar
-					};
-					if(isFirefox) {
-						props.cookieStoreId = tabs[0].cookieStoreId;
-						if(Prefs.SetOwnershipTabID_FF)
-							props.openerTabId = tabs[0].id;
-
-					}
-
-					//noinspection ES6MissingAwait
-					browser.tabs.create(props);
-					await sleep(Prefs.NewTabDelayMS);
-				}
-			})();
+			OpenUrlsInTabs(msg.tUrls);
 			break;
 	}
 }
 
 /**
- * Check storage.LastInstalledVersion to see if we're newly    installed or a new version or what
+ * @param {string[]} urls
+ * @return {Promise<void>}
+ */
+async function OpenUrlsInTabs(urls) {
+	let activeTab = await browser.tabs.query({
+		active:        true,
+		currentWindow: true,
+	})[0];
+
+	let tabsLeft   = urls.length,
+		tabsOpened = 0,
+		startIndex,
+		tabStack   = TabStacks.get(activeTab.id) || [];
+
+	switch(Prefs.OpenTabs) {
+		case TABS_OPEN_END:
+			let openTabs = await browser.tabs.query({
+				currentWindow: true,
+			});
+			startIndex   = openTabs.length;
+			break;
+		case TABS_OPEN_RIGHT:
+			startIndex = activeTab.index + 1;
+			break;
+		case TABS_OPEN_NATURAL:
+			/* Naturally means similar to Firefox does with middle-click on a URL as of 2021-08-27
+			 *
+			 *	This means each opening tab keeps track of the tabs it has opened, and opens new links
+			 * 	to the right of the further tab last opened
+			 */
+			let resolvedTab = await tabStack.reduce(async (memo, tabId) => {
+				try {
+					if(await memo)
+						return memo;
+				} catch(error) { /* ignored */ }
+				try { return browser.tabs.get(tabId); } catch(error) { /* ignored */ }
+
+				return memo;
+			}, undefined);
+
+			startIndex = (resolvedTab?.index || activeTab.index) + 1;
+			break;
+	}
+
+	for(let url of urls) {
+		let props = {
+			url:    url,
+			active: Prefs.SwitchFocusToNewTab ? (--tabsLeft) === 0 : false,	// Activate the last tab to be opened
+			index:  startIndex + tabsOpened++,
+		};
+
+		if(isFirefox) {
+			props.cookieStoreId = activeTab.cookieStoreId;
+			if(Prefs.SetOwnershipTabID_FF)
+				props.openerTabId = activeTab.id;
+		}
+
+		let newTab = await browser.tabs.create(props);
+		tabStack.unshift(newTab.id);
+
+		await sleep(Prefs.NewTabDelayMS);
+	}
+	TabStacks.set(activeTab.id, tabStack);
+}
+
+/**
+ * Check storage.LastInstalledVersion to see if we're newly installed or a new version or what
  */
 async function CheckInstallation() {
 	try {
@@ -87,13 +124,15 @@ async function CheckInstallation() {
 			}
 		}
 
-		// Transition to sync storage for v3.1.7 upgrade
-		let local = await browser.storage.local.get();
+		if(item.LastInstalledVersion.localeCompare('3.1.7', undefined, { numeric: true }) < 0) {
+			// Transition to sync storage for v3.1.7 upgrade
+			let local = await browser.storage.local.get();
 
-		if(Object.keys(local).length > 1) {
-			delete local.LastInstalledVersion;
-			await browser.storage.local.clear();
-			await browser.storage.sync.set(local);
+			if(Object.keys(local).length > 1) {
+				delete local.LastInstalledVersion;
+				await browser.storage.local.clear();
+				await browser.storage.sync.set(local);
+			}
 		}
 
 		//noinspection ES6MissingAwait
@@ -107,29 +146,32 @@ function Notify(title, message, onClick) {
 	if(onClick)
 		browser.notifications.onClicked.addListener((...args) => onClick(...args));
 
-	browser.notifications.create(
-		'', {
+	browser.notifications.create('', {
 			type:    'basic',
 			title:   title,
 			iconUrl: 'res/SnapLinksLogo32.png',
 			message: message,
-//			buttons:        [
-//				{ title: 'Disable This Notification' }
-//			]
+//			buttons: [
+//				{ title: 'Disable This Notification' },
+//			],
 		})
-		.then((res) => { });
+		.then(r => {});
 }
 
 DOMReady.then(() => {
 	browser.runtime.onMessage.addListener(onMessage);
 
+	if(Prefs.DevMode)
+		console.log('Snap Links reloaded');
+
 	// noinspection JSIgnoredPromiseFromCall
-	// let p = browser.notifications.create({
-	// 	'type':		'basic',
-	// 	'iconUrl':	browser.extension.getURL('res/SnapLinksLogo48.png'),
-	// 	'title':	"Test Notification Title",
-	// 	'message':	"Test Notification Content 4",
-	// });
+//	browser.notifications.create({
+//		'type':         'basic',
+//		'iconUrl':      browser.extension.getURL('res/SnapLinksLogo48.png'),
+//		'title':        'Test Notification Title',
+//		'message':      'Test Notification Content 4',
+//		contextMessage: 'Context Message',
+//	});
 	//noinspection JSIgnoredPromiseFromCall
 	CheckInstallation();
 });

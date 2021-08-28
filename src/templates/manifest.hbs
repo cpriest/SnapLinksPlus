@@ -17,22 +17,23 @@
 	"permissions":            [
 		"cookies",
 		"storage",
-		"notifications"
+		"notifications",
+		"clipboardWrite"
 	],
 
 	"optional_permissions":   [
 	],
 
 	"icons":                  {
-		"48":	"res/SnapLinksLogo48.png",
+		"48":  "res/SnapLinksLogo48.png",
 		"128": "res/SnapLinksLogo128.png"
 	},
 
 {{#Firefox}}
-		"applications": {
+		"applications":       {
 			"gecko": {
 				"id":                 "snaplinks@snaplinks.mozdev.org",
-				"strict_min_version": "58.0"
+				"strict_min_version": "63.0"
 			}
 		},
 {{/Firefox}}

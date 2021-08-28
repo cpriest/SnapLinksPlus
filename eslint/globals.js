@@ -55,5 +55,8 @@ module.exports = {
 		'Tracking':                'readonly',
 		'$':                       'readonly',
 		'docElem':                 'readonly',
+		'TABS_OPEN_END':           'readonly',
+		'TABS_OPEN_RIGHT':         'readonly',
+		'TABS_OPEN_NATURAL':       'readonly',
 	},
 };
