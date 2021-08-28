@@ -1,3 +1,9 @@
+v3.1.9 / 2021-08-28
+===================
+  * Added new tab opening option to open tabs like Firefox does
+  * Switch to using clipboard API, more clipboard operations will work with this method
+  * No longer caching element rects which will fix some issues for some oddball websites
+
 v3.1.8 / 2021-08-10
 ===================
   * DOM elements are now removed while Snap Links is not in use
