@@ -146,29 +146,32 @@ function Notify(title, message, onClick) {
 	if(onClick)
 		browser.notifications.onClicked.addListener((...args) => onClick(...args));
 
-	browser.notifications.create(
-			'', {
-				type:    'basic',
-				title:   title,
-				iconUrl: 'res/SnapLinksLogo32.png',
-				message: message,
-//				buttons:        [
-//					{ title: 'Disable This Notification' }
-//				]
-			})
+	browser.notifications.create('', {
+			type:    'basic',
+			title:   title,
+			iconUrl: 'res/SnapLinksLogo32.png',
+			message: message,
+//			buttons: [
+//				{ title: 'Disable This Notification' },
+//			],
+		})
 		.then(r => {});
 }
 
 DOMReady.then(() => {
 	browser.runtime.onMessage.addListener(onMessage);
 
+	if(Prefs.DevMode)
+		console.log('Snap Links reloaded');
+
 	// noinspection JSIgnoredPromiseFromCall
-	// let p = browser.notifications.create({
-	// 	'type':		'basic',
-	// 	'iconUrl':	browser.extension.getURL('res/SnapLinksLogo48.png'),
-	// 	'title':	"Test Notification Title",
-	// 	'message':	"Test Notification Content 4",
-	// });
+//	browser.notifications.create({
+//		'type':         'basic',
+//		'iconUrl':      browser.extension.getURL('res/SnapLinksLogo48.png'),
+//		'title':        'Test Notification Title',
+//		'message':      'Test Notification Content 4',
+//		contextMessage: 'Context Message',
+//	});
 	//noinspection JSIgnoredPromiseFromCall
 	CheckInstallation();
 });
