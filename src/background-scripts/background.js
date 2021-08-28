@@ -1,6 +1,6 @@
 'use strict';
 
-let allTabStacks = new Map();
+let TabStacks = new Map();
 
 /**
  * Log that we received the message.
@@ -40,10 +40,6 @@ function onMessage(msg, sender, respond) {
  * @return {Promise<void>}
  */
 async function OpenUrlsInTabs(urls) {
-	let tabs = await browser.tabs.query({
-		currentWindow: true,
-	});
-
 	let activeTab = await browser.tabs.query({
 		active:        true,
 		currentWindow: true,
@@ -51,44 +47,37 @@ async function OpenUrlsInTabs(urls) {
 
 	let tabsLeft   = urls.length,
 		tabsOpened = 0,
-		startIndex;
+		startIndex,
+		tabStack   = TabStacks.get(activeTab.id) || [];
 
 	switch(Prefs.OpenTabs) {
 		case TABS_OPEN_END:
-			startIndex = tabs.length;
+			let openTabs = await browser.tabs.query({
+				currentWindow: true,
+			});
+			startIndex   = openTabs.length;
 			break;
 		case TABS_OPEN_RIGHT:
 			startIndex = activeTab.index + 1;
 			break;
 		case TABS_OPEN_NATURAL:
-			/* Naturally means like Firefox does with middle-click on a URL as of 2021-08-27
+			/* Naturally means similar to Firefox does with middle-click on a URL as of 2021-08-27
 			 *
-			 *	 This means if you are on Tab A with a Tab B & C open, such as [A] B C and then:
-			 *	 * You middle click 2 links							-> [A] A.1 A.2      B      C
-			 *	 * You switch to tab B and middle click 1 link		->  A  A.1 A.2     [B] B.1 C
-			 *	 * You switch back to tab A and middle-click 1 link	-> [A] A.3 A.1 A.2 [B] B.1 C
-			 *
-			 *	 This means "open at end of {current stack}" where {current stack} means the last opened tab
-			 *	 from the current tab with the stack clearing upon changing tabs.
+			 *	This means each opening tab keeps track of the tabs it has opened, and opens new links
+			 * 	to the right of the further tab last opened
 			 */
+			let resolvedTab = await tabStack.reduce(async (memo, tabId) => {
+				try {
+					if(await memo)
+						return memo;
+				} catch(error) { /* ignored */ }
+				try { return browser.tabs.get(tabId); } catch(error) { /* ignored */ }
 
-			break;
-	}
-
-	let tabStack = allTabStacks.get(activeTab.id) || [];
-
-	let resolvedTab = await tabStack.reduce(async (memo, tabId) => {
-		try {
-			if(await memo)
 				return memo;
-		} catch(error) { /* ignored */ }
-		try { return browser.tabs.get(tabId); } catch(error) { /* ignored */ }
+			}, undefined);
 
-		return memo;
-	}, undefined);
-
-	if(Prefs.OpenTabs == TABS_OPEN_NATURAL) {
-		startIndex = (resolvedTab?.index || activeTab.index) + 1;
+			startIndex = (resolvedTab?.index || activeTab.index) + 1;
+			break;
 	}
 
 	for(let url of urls) {
@@ -105,15 +94,11 @@ async function OpenUrlsInTabs(urls) {
 		}
 
 		let newTab = await browser.tabs.create(props);
-
-		if(Prefs.OpenTabs == TABS_OPEN_NATURAL) {
-			tabStack.unshift(newTab.id);
-		}
+		tabStack.unshift(newTab.id);
 
 		await sleep(Prefs.NewTabDelayMS);
 	}
-	if(Prefs.OpenTabs == TABS_OPEN_NATURAL)
-		allTabStacks.set(activeTab.id, tabStack);
+	TabStacks.set(activeTab.id, tabStack);
 }
 
 /**
