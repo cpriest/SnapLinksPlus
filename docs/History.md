@@ -1,3 +1,7 @@
+v3.1.10 / 2021-09-02
+====================
+  * Hotfix release to fix a production bug
+
 v3.1.9 / 2021-08-28
 ===================
   * Added new tab opening option to open tabs like Firefox does
