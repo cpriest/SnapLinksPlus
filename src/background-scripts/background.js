@@ -40,10 +40,10 @@ function onMessage(msg, sender, respond) {
  * @return {Promise<void>}
  */
 async function OpenUrlsInTabs(urls) {
-	let activeTab = await browser.tabs.query({
+	let activeTab = (await browser.tabs.query({
 		active:        true,
 		currentWindow: true,
-	})[0];
+	}))[0];
 
 	let tabsLeft   = urls.length,
 		tabsOpened = 0,
