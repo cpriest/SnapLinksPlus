@@ -66,15 +66,18 @@ async function OpenUrlsInTabs(urls) {
 			 *	This means each opening tab keeps track of the tabs it has opened, and opens new links
 			 * 	to the right of the further tab last opened
 			 */
-			let resolvedTab = await tabStack.reduce(async (memo, tabId) => {
-				try {
-					if(await memo)
-						return memo;
-				} catch(error) { /* ignored */ }
-				try { return browser.tabs.get(tabId); } catch(error) { /* ignored */ }
+			let resolvedTab;
 
-				return memo;
-			}, undefined);
+			for(let tabId of Array.from(tabStack)) {
+				try {
+					//noinspection JSCheckFunctionSignatures
+					resolvedTab = await browser.tabs.get(tabId);
+					break;
+				} catch(error) {
+					// Tab is no longer available, take it off the stack
+					tabStack.shift();
+				}
+			}
 
 			startIndex = (resolvedTab?.index || activeTab.index) + 1;
 			break;
