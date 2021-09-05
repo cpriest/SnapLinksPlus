@@ -37,6 +37,7 @@ const TABS_OPEN_END     = 'OpenTabsAtEnd',
 const isChrome  = location.protocol === 'chrome-extenson:',
 		isFirefox = location.protocol === 'moz-extension:';
 
+/** @prototype DefaultPrefs */
 const DefaultPrefs = {
 	IndexBuckets: 10,
 	ScrollRate:   8,
@@ -99,7 +100,7 @@ const ContainerElementCreated = 'ContainerElementCreated';
 const ElementsSelected = 'ElementsSelected';
 
 
-/** @type StoragePrefs */
+/** @var DefaultPrefs */
 let Prefs;
 
 let DOMReady = new Promise((resolve, reject) => {
