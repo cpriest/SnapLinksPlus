@@ -126,7 +126,6 @@ async function CheckInstallation() {
 				}));
 			}
 		}
-
 		if(item.LastInstalledVersion.localeCompare('3.1.7', undefined, { numeric: true }) < 0) {
 			// Transition to sync storage for v3.1.7 upgrade
 			let local = await browser.storage.local.get();
@@ -161,11 +160,15 @@ function Notify(title, message, onClick) {
 		.then(r => {});
 }
 
+browser.runtime.onInstalled.addListener((e) => {
+	CheckInstallation();
+});
+
 DOMReady.then(() => {
 	browser.runtime.onMessage.addListener(onMessage);
 
 	if(Prefs.DevMode)
-		console.log('Snap Links reloaded');
+		console.log('Snap Links reloaded %s', (new Date()).toLocaleString());
 
 	// noinspection JSIgnoredPromiseFromCall
 //	browser.notifications.create({
@@ -176,5 +179,4 @@ DOMReady.then(() => {
 //		contextMessage: 'Context Message',
 //	});
 	//noinspection JSIgnoredPromiseFromCall
-	CheckInstallation();
 });
