@@ -107,11 +107,13 @@ let DOMReady = new Promise((resolve, reject) => {
 	// Translates previous preference settings to newer settings
 	function MigratePrefs() {
 		// 3.1.9 Release
-		DefaultPrefs.OpenTabsAtEndOfTabBar = false;
-		if(Prefs.OpenTabsAtEndOfTabBar) {
-			Prefs.OpenTabsAtEndOfTabBar = undefined;
-			Prefs.OpenTabs              = TABS_OPEN_END;
-		}
+		try {
+			// If OpenTabsAtEndOfTabBar is true, delete it and set OpenTabs
+			if(Prefs.OpenTabsAtEndOfTabBar) {
+				Prefs.OpenTabsAtEndOfTabBar = undefined;
+				Prefs.OpenTabs              = TABS_OPEN_END;
+			}
+		} catch(e) { /* ignore (OpenTabsAtEndOfTabBar was default) */ }
 	}
 
 	function LoadPrefs() {
