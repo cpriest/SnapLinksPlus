@@ -43,12 +43,14 @@ class StoragePrefs {
 						? browser.storage.local
 						: browser.storage.sync;
 
+//		console.log(Options.Storage);
 		(this.Ready = this.storage.get())
 			.then((res, rej) => {
 				if(rej)
 					return console.error('StoragePrefs: browser.storage.get() rejected with: ', rej);
 
 				this.Values = res;
+//				console.log('storage.get(), Values = ', this.Values);
 				browser.storage.onChanged.addListener(this.onStorageChanged = this.onStorageChanged.bind(this));
 			});
 
@@ -67,7 +69,10 @@ class StoragePrefs {
 						return this.Defaults[key];
 					}
 
-					return this.Values[key] || this.Defaults[key];
+					if(this.Values[key] !== undefined)
+						return this.Values[key];
+
+					return this.Defaults[key];
 				})();
 
 //				console.log(`StoragePrefs.%cget%c(%c${key}%c) = `, 'color: #00FF00', '', 'color: cyan;', '', value);
@@ -104,6 +109,7 @@ class StoragePrefs {
 								return console.error(`StoragePrefs: browser.storage.set( { ${key}: '${value}' } ) rejected with: %o\n` +
 														`   oldValue restored to ${oldValue}`, rej);
 							}
+//							console.log('storage.set(%s) = ', key, value);
 						});
 				}
 
@@ -124,10 +130,10 @@ class StoragePrefs {
 			return;
 
 		for(let [key, ch] of Object.entries(changes)) {
-			ch.newValue = ch.newValue || undefined;
+			ch.newValue = ch.newValue || ch.newValue;
 			ch.oldValue = ch.oldValue || this.Values[key];
 
-//			console.log(`onStorageChanged(, ${area}): ${key}: %o`, ch);
+//			console.log(`onStorageChanged(${area}.${key}) = %o`, ch);
 
 			this.Values[key] = ch.newValue;
 			this.NotifyUpdated(key, ch.newValue, ch.oldValue);
