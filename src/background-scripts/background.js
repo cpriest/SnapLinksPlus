@@ -134,8 +134,8 @@ async function CheckInstallation() {
 			let local = await browser.storage.local.get();
 
 			if(Object.keys(local).length > 1) {
-				delete local.LastInstalledVersion;
-				await browser.storage.local.clear();
+				local.LastInstalledVersion = manifest.version;
+				local.StorageAPI           = 'sync';
 				await browser.storage.sync.set(local);
 			}
 		}
