@@ -112,6 +112,9 @@ async function CheckInstallation() {
 		let item     = await browser.storage.local.get('LastInstalledVersion'),
 			manifest = browser.runtime.getManifest();
 
+		//noinspection ES6MissingAwait
+		browser.storage.local.set({ 'LastInstalledVersion': manifest.version });
+
 		if(Prefs.ShowUpdateNotification) {
 			if(!item || !item.LastInstalledVersion) {
 				// New installation
@@ -136,9 +139,6 @@ async function CheckInstallation() {
 				await browser.storage.sync.set(local);
 			}
 		}
-
-		//noinspection ES6MissingAwait
-		browser.storage.local.set({ 'LastInstalledVersion': manifest.version });
 	} catch(e) {
 		console.error('Error while getting LastInstalledVersion: ', e);
 	}
