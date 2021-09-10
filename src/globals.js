@@ -68,6 +68,8 @@ const DefaultPrefs = {
 	NewTabDelayMS: 50,	// The delay in ms between new tabs being opened
 	ClickDelayMS:  50,   // The delay in ms between clicks on elements
 
+	StorageAPI: 'sync',
+
 	DevMode: false,
 
 	Dev_Log_ActionMessages: false,
@@ -118,7 +120,7 @@ let DOMReady = new Promise((resolve, reject) => {
 
 	function LoadPrefs() {
 		Prefs = new StoragePrefs(DefaultPrefs, {
-			Storage: 'sync',
+			StorageAPI: 'auto',
 		});
 		Prefs.Ready
 			.then(() => {

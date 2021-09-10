@@ -161,7 +161,9 @@ function Notify(title, message, onClick) {
 }
 
 browser.runtime.onInstalled.addListener((e) => {
-	CheckInstallation();
+	Prefs.Ready.then(() => {
+		CheckInstallation();
+	});
 });
 
 DOMReady.then(() => {
