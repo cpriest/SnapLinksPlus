@@ -37,6 +37,7 @@ const TABS_OPEN_END     = 'OpenTabsAtEnd',
 const isChrome  = location.protocol === 'chrome-extenson:',
 		isFirefox = location.protocol === 'moz-extension:';
 
+/** @prototype DefaultPrefs */
 const DefaultPrefs = {
 	IndexBuckets: 10,
 	ScrollRate:   8,
@@ -66,6 +67,8 @@ const DefaultPrefs = {
 
 	NewTabDelayMS: 50,	// The delay in ms between new tabs being opened
 	ClickDelayMS:  50,   // The delay in ms between clicks on elements
+
+	StorageAPI: 'sync',
 
 	DevMode: false,
 
@@ -99,23 +102,25 @@ const ContainerElementCreated = 'ContainerElementCreated';
 const ElementsSelected = 'ElementsSelected';
 
 
-/** @type StoragePrefs */
+/** @var DefaultPrefs */
 let Prefs;
 
 let DOMReady = new Promise((resolve, reject) => {
 	// Translates previous preference settings to newer settings
 	function MigratePrefs() {
 		// 3.1.9 Release
-		DefaultPrefs.OpenTabsAtEndOfTabBar = false;
-		if(Prefs.OpenTabsAtEndOfTabBar) {
-			Prefs.OpenTabsAtEndOfTabBar = undefined;
-			Prefs.OpenTabs              = TABS_OPEN_END;
-		}
+		try {
+			// If OpenTabsAtEndOfTabBar is true, delete it and set OpenTabs
+			if(Prefs.OpenTabsAtEndOfTabBar) {
+				Prefs.OpenTabsAtEndOfTabBar = undefined;
+				Prefs.OpenTabs              = TABS_OPEN_END;
+			}
+		} catch(e) { /* ignore (OpenTabsAtEndOfTabBar was default) */ }
 	}
 
 	function LoadPrefs() {
 		Prefs = new StoragePrefs(DefaultPrefs, {
-			Storage: 'sync',
+			StorageAPI: 'auto',
 		});
 		Prefs.Ready
 			.then(() => {

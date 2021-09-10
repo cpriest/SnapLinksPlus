@@ -66,15 +66,18 @@ async function OpenUrlsInTabs(urls) {
 			 *	This means each opening tab keeps track of the tabs it has opened, and opens new links
 			 * 	to the right of the further tab last opened
 			 */
-			let resolvedTab = await tabStack.reduce(async (memo, tabId) => {
-				try {
-					if(await memo)
-						return memo;
-				} catch(error) { /* ignored */ }
-				try { return browser.tabs.get(tabId); } catch(error) { /* ignored */ }
+			let resolvedTab;
 
-				return memo;
-			}, undefined);
+			for(let tabId of Array.from(tabStack)) {
+				try {
+					//noinspection JSCheckFunctionSignatures
+					resolvedTab = await browser.tabs.get(tabId);
+					break;
+				} catch(error) {
+					// Tab is no longer available, take it off the stack
+					tabStack.shift();
+				}
+			}
 
 			startIndex = (resolvedTab?.index || activeTab.index) + 1;
 			break;
@@ -109,6 +112,9 @@ async function CheckInstallation() {
 		let item     = await browser.storage.local.get('LastInstalledVersion'),
 			manifest = browser.runtime.getManifest();
 
+		//noinspection ES6MissingAwait
+		browser.storage.local.set({ 'LastInstalledVersion': manifest.version });
+
 		if(Prefs.ShowUpdateNotification) {
 			if(!item || !item.LastInstalledVersion) {
 				// New installation
@@ -123,20 +129,16 @@ async function CheckInstallation() {
 				}));
 			}
 		}
-
 		if(item.LastInstalledVersion.localeCompare('3.1.7', undefined, { numeric: true }) < 0) {
 			// Transition to sync storage for v3.1.7 upgrade
 			let local = await browser.storage.local.get();
 
 			if(Object.keys(local).length > 1) {
-				delete local.LastInstalledVersion;
-				await browser.storage.local.clear();
+				local.LastInstalledVersion = manifest.version;
+				local.StorageAPI           = 'sync';
 				await browser.storage.sync.set(local);
 			}
 		}
-
-		//noinspection ES6MissingAwait
-		browser.storage.local.set({ 'LastInstalledVersion': manifest.version });
 	} catch(e) {
 		console.error('Error while getting LastInstalledVersion: ', e);
 	}
@@ -158,11 +160,17 @@ function Notify(title, message, onClick) {
 		.then(r => {});
 }
 
+browser.runtime.onInstalled.addListener((e) => {
+	Prefs.Ready.then(() => {
+		CheckInstallation();
+	});
+});
+
 DOMReady.then(() => {
 	browser.runtime.onMessage.addListener(onMessage);
 
 	if(Prefs.DevMode)
-		console.log('Snap Links reloaded');
+		console.log('Snap Links reloaded %s', (new Date()).toLocaleString());
 
 	// noinspection JSIgnoredPromiseFromCall
 //	browser.notifications.create({
@@ -173,5 +181,4 @@ DOMReady.then(() => {
 //		contextMessage: 'Context Message',
 //	});
 	//noinspection JSIgnoredPromiseFromCall
-	CheckInstallation();
 });

@@ -204,13 +204,12 @@ function watch() {
 		done();
 	}
 
-	let WatchGlobs = Array.from(TaskGlobs.values())
+	let WatchGlobs = Array.from([...TaskGlobs.values(), ...SpecialGlobs.values()])
 		.flat();
 
 	gulp.watch(WatchGlobs,
 		watchOpts,
 		series(building, buildAll, built));
-	exec('yarn run-ff');
 }
 
 module.exports = {

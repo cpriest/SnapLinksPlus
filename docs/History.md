@@ -1,3 +1,10 @@
+v3.1.11 / 2021-09-10
+====================
+  * Thorough walk through and testing of recent changes to fix the failures of the last 2 releases (sorry folks)
+  * Reworked the way StoragePrefs work to work properly with sync/local storage, required significant changes
+    to support it working properly and transitioning settings from sync to local or back.  Tested and works
+    well now.
+
 v3.1.10 / 2021-09-02
 ====================
   * Hotfix release to fix a production bug
