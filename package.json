@@ -43,5 +43,8 @@
 		"test":     "jest",
 		"build":    "gulp",
 		"run-ff":   "web-ext --config=.webext-ff.js run"
+	},
+	"dependencies":    {
+		"lit-element": "^2.5.1"
 	}
 }
