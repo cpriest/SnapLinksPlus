@@ -5254,9 +5254,9 @@ lines-and-columns@^1.1.6:
   integrity sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
 
 lit-element@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/lit-element/-/lit-element-3.0.0.tgz#0e9e64ddbc3dd6a8da4d6fbfadbc070a54cf0597"
-  integrity sha512-oPqRhhBBhs+AlI62QLwtWQNU/bNK/h2L1jI3IDroqZubo6XVAkyNy2dW3CRfjij8mrNlY7wULOfyyKKOnfEePA==
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/lit-element/-/lit-element-3.0.1.tgz#3c545af17d8a46268bc1dd5623a47486e6ff76f4"
+  integrity sha512-vs9uybH9ORyK49CFjoNGN85HM9h5bmisU4TQ63phe/+GYlwvY/3SIFYKdjV6xNvzz8v2MnVC+9+QOkPqh+Q3Ew==
   dependencies:
     "@lit/reactive-element" "^1.0.0"
     lit-html "^2.0.0"
