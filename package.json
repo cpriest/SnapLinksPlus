@@ -31,7 +31,7 @@
 		"gulp-util":             "^3.0.7",
 		"gulp-zip":              "^5.1.0",
 		"handlebars-cond":       "^1.0.3",
-		"jest":                  "^27.0.6",
+		"jest":                  "^28.0.3",
 		"merge-stream":          "^2.0.0",
 		"run-sequence":          "^2.2.1",
 		"web-ext":               "^6.4.0",
