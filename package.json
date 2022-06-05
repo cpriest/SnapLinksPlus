@@ -14,7 +14,7 @@
 	"preferGlobal":    false,
 	"devDependencies": {
 		"@babel/core":           "^7.15.0",
-		"@types/jest":           "^27.0.1",
+		"@types/jest":           "^28.1.1",
 		"crx":                   "^5.0.1",
 		"del":                   "^6.0.0",
 		"eslint":                "^8.5.0",
