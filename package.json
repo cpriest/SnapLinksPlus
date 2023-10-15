@@ -45,6 +45,6 @@
 		"run-ff":   "web-ext --config=.webext-ff.js run"
 	},
 	"dependencies":    {
-		"lit-element": "^3.0.0"
+		"lit-element": "^4.0.0"
 	}
 }
