@@ -638,9 +638,6 @@
       <option name="USE_CHAINED_CALLS_GROUP_INDENTS" value="true" />
       <option name="IMPORT_USE_NODE_RESOLUTION" value="GLOBAL" />
     </TypeScriptCodeStyleSettings>
-    <tabFormat>
-      <option name="MODE" value="IndentationOnly" />
-    </tabFormat>
     <codeStyleSettings language="CSS">
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />

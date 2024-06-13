@@ -15,3 +15,13 @@ npm-debug.log*
 *.log
 /.idea/markdown-navigator-enh.xml
 /.idea/sonarlint/issuestore/
+yarn.lock
+/.idea/dataSources/3e796fba-61e6-43e7-a7d9-6097fbeee3a3.xml
+/.idea/dataSources/5f3d330f-cfd3-4758-bf0f-fa8670bb4a4d.xml
+/.idea/dataSources/6b61615c-6e4f-42a8-9c96-bd33b4aa4572.xml
+/.idea/dataSources/5759bd73-25d2-4199-983d-99912a9f0b8e.xml
+/.idea/dataSources/a5c6777d-d034-40e8-9da8-c71acb796895.xml
+/.idea/dataSources/c5d508e8-d544-4ae2-8ea3-74e69d420923.xml
+/.idea/dataSources/f6d0d12d-6e58-41d9-8276-86024fc08f36.xml
+/.idea/dataSources/f52445c1-e86a-4ff7-a261-e80384b21567.xml
+/.idea/GitLink.xml
