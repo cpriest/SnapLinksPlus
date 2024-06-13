@@ -7,9 +7,9 @@ updates:
     schedule:
       interval: "weekly"
       day: "sunday"
-    # Raise pull requests for version updates
-    # to npm against the `dev` branch
-    target-branch: "dev"
-    # Labels on pull requests for security and version updates
+    target-branch: dev
+    versioning-strategy: increase-if-necessary
+    allow:
+      - dependency-type: "direct"
     labels:
       - "dependencies"
