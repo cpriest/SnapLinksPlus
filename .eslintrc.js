@@ -8,8 +8,10 @@ module.exports = {
 		'ecmaVersion':  2020,
 		'sourceType':   'script',
 		'ecmaFeatures': {
-			'impliedStrict': true,
 		},
+	},
+	'rules': {
+		'template-curly-spacing': 0,
 	},
 	'extends':       ['jquery', './eslint/index.js'],
 };
