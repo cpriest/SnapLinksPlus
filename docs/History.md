@@ -1,3 +1,9 @@
+v3.1.12 / 2024-09-10
+====================
+
+* Updated dependencies
+* Fixed an issue with whatever YouTube is now doing with document heights
+
 v3.1.11 / 2021-09-10
 ====================
   * Thorough walk through and testing of recent changes to fix the failures of the last 2 releases (sorry folks)

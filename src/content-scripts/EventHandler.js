@@ -152,11 +152,12 @@ class EventHandler {
 
 		let [docWidth, docHeight] = GetDocumentDims();
 
-    if(!this.docSize || this.docSize.x != docWidth || this.docSize.y != docHeight) {
-		this.docSize = { x: docWidth, y: docHeight };
-	}
+		if(!this.docSize || this.docSize.x != docWidth || this.docSize.y != docHeight) {
+			this.docSize = { x: docWidth, y: docHeight };
+		}
 
 		let [clientWidth, clientHeight] = GetClientDims();
+		console.log(clientWidth, clientHeight);
 
 		if(e) {
 			this.IntervalScrollOffset = {
