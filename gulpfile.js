@@ -45,7 +45,8 @@ const GeneralBuildConfig = {};
 /** Wrapper for child_process.spawnSync */
 function exec(cmd, options = execDefaultOpts) {
 	// console.log(cmd);
-	return cp.spawn('cmd.exe', ['/A', '/D', '/C', cmd], options);
+//	return cp.spawn('cmd.exe', ['/A', '/D', '/C', cmd], options);
+	return cp.spawn('bash', ['-c', '--', cmd], options);
 }
 
 const TaskGlobs    = new Map(),
@@ -104,7 +105,7 @@ function buildTmp() {
 	);
 }
 
-let webext = (cmd, data) => `web-ext ${cmd} -s ${data.BuildPath} -a ${data.ArtifactsPath} `;
+let webext = (cmd, data) => `yarn run web-ext ${cmd} -s ${data.BuildPath} -a ${data.ArtifactsPath} `;
 
 function buildFor({ BuildPath, BuildData }) {
 	del(BuildPath);
@@ -164,7 +165,7 @@ let PublishFirefox = series(PackageFirefox, () => {
 	}
 
 	let SecureData = JSON.parse(fs.readFileSync(SecureDataFilepath));
-	return exec(webext(`sign --api-key ${SecureData.jwt_issuer} --api-secret ${SecureData.jwt_secret}`, FireFox));
+	return exec(webext(`sign --channel listed --api-key ${SecureData.jwt_issuer} --api-secret ${SecureData.jwt_secret}`, FireFox));
 });
 
 //noinspection JSUnusedLocalSymbols
