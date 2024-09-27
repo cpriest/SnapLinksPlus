@@ -157,7 +157,6 @@ class EventHandler {
 		}
 
 		let [clientWidth, clientHeight] = GetClientDims();
-		console.log(clientWidth, clientHeight);
 
 		if(e) {
 			this.IntervalScrollOffset = {
@@ -190,6 +189,7 @@ class EventHandler {
 	 * @param {MouseEvent|KeyboardEvent} e
 	 */
 	EndDrag(e) {
+		//noinspection JSVoidFunctionReturnValueUsed
 		this.mmTimer = clearInterval(this.mmTimer);
 
 		switch(e.type) {
