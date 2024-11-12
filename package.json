@@ -1,7 +1,7 @@
 {
 	"name" :           "snaplinks3",
 	"FullName" :       "Snap Links",
-	"version" :        "3.1.12",
+	"version" : "3.1.14",
 	"description" :    "Select multiple links, checkboxes and other elements and act on them such as open them in new tabs or check/un-check them.",
 	"author" :         "Clint Priest <snaplinks-git@rxv.me>",
 	"license" :        "MIT",
