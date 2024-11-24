@@ -85,9 +85,10 @@ async function OpenUrlsInTabs(urls) {
 
 	for(let url of urls) {
 		let props = {
-			url:    url,
-			active: Prefs.SwitchFocusToNewTab ? (--tabsLeft) === 0 : false,	// Activate the last tab to be opened
-			index:  startIndex + tabsOpened++,
+			url:      url,
+			active:   Prefs.SwitchFocusToNewTab ? (--tabsLeft) === 0 : false,	// Activate the last tab to be opened
+			index:    startIndex + tabsOpened++,
+			windowId: activeTab.windowId,
 		};
 
 		if(isFirefox) {
