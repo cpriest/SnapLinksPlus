@@ -12,7 +12,10 @@ class ActionMgr {
 		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
 			return console.log('Skipped Copying Links: %o', links);
 
-		navigator.clipboard.writeText(links.join('\r\n'));
+		browser.runtime.sendMessage({
+			Action: COPY_TO_CLIPBOARD,
+			tUrls:  links,
+		});
 	}
 
 	/**
