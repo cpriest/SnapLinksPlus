@@ -32,7 +32,19 @@ function onMessage(msg, sender, respond) {
 		case OPEN_URLS_IN_TABS:
 			OpenUrlsInTabs(msg.tUrls);
 			break;
+		case COPY_TO_CLIPBOARD:
+			CopyToClipboard(msg.tUrls);
+			break;
 	}
+}
+
+/**
+ * @param {string[]} urls
+ * @return {Promise<void>}
+ */
+async function CopyToClipboard(urls) {
+	let platformInfo = await browser.runtime.getPlatformInfo();
+	navigator.clipboard.writeText(urls.join(platformInfo.os === chrome.runtime.PlatformOs.WIN ? '\r\n' : '\n'));
 }
 
 /**
