@@ -28,7 +28,8 @@ const OPEN_LINKS = 1,	// Open links
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest',
 		RELOAD_EXTENSION  = 'ReloadExtension',
-		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs';
+		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs',
+		COPY_TO_CLIPBOARD = 'CopyToClipboard';
 
 const TABS_OPEN_END     = 'OpenTabsAtEnd',
 		TABS_OPEN_RIGHT   = 'OpenTabsToRight',
