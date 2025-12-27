@@ -1,4 +1,4 @@
-v3.1.15 / 2025-12-27
+v3.1.16 / 2025-12-27
 ====================
 * Fixes link opening behavior to open serially when from multiple actions (@DanKaplanSES)
 
