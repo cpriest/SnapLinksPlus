@@ -1,5 +1,6 @@
 'use strict';
 
+let openUrlsPromiseChain = Promise.resolve();
 let TabStacks = new Map();
 
 /**
@@ -30,7 +31,12 @@ function onMessage(msg, sender, respond) {
 			browser.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			OpenUrlsInTabs(msg.tUrls);
+			openUrlsPromiseChain = openUrlsPromiseChain.then(() => {
+				return OpenUrlsInTabs(msg.tUrls);
+			});
+			break;
+		case COPY_TO_CLIPBOARD:
+			CopyToClipboard(msg.tUrls);
 			break;
 		case COPY_TO_CLIPBOARD:
 			CopyToClipboard(msg.tUrls);
