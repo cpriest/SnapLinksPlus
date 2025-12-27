@@ -6,20 +6,11 @@ const gulp                 = require('gulp');
 const { series, parallel } = gulp;
 
 // const babel      = require('gulp-babel');
+const del = require('del').sync;
 const cp  = require('child_process');
 // const sourcemaps = require('gulp-sourcemaps');
 const hb  = require('gulp-hb');
 const fs  = require('fs');
-
-// Dynamic import for ESM-only del package
-let deleteAsync;
-const getDelete = async () => {
-	if (!deleteAsync) {
-		const delModule = await import('del');
-		deleteAsync = delModule.deleteSync;
-	}
-	return deleteAsync;
-};
 
 // const gutil  = require('gulp-util');
 const rename = require('gulp-rename');
@@ -102,8 +93,7 @@ const watchOpts = {
  *  General Building Tasks
  */
 
-async function buildTmp() {
-	const del = await getDelete();
+function buildTmp() {
 	del(['./build/tmp']);
 
 	return merge(...
@@ -117,8 +107,7 @@ async function buildTmp() {
 
 let webext = (cmd, data) => `yarn run web-ext ${cmd} -s ${data.BuildPath} -a ${data.ArtifactsPath} `;
 
-async function buildFor({ BuildPath, BuildData }) {
-	const del = await getDelete();
+function buildFor({ BuildPath, BuildData }) {
 	del(BuildPath);
 
 	return merge(
