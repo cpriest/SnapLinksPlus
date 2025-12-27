@@ -38,6 +38,9 @@ function onMessage(msg, sender, respond) {
 		case COPY_TO_CLIPBOARD:
 			CopyToClipboard(msg.tUrls);
 			break;
+		case COPY_TO_CLIPBOARD:
+			CopyToClipboard(msg.tUrls);
+			break;
 	}
 }
 
