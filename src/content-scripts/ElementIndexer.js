@@ -84,7 +84,8 @@ class RectMapper {
 				break;
 			case 'INPUT':
 				if(['checkbox', 'radio'].indexOf(elem.type) !== -1) {
-					if(elem.parentElement.tagName == 'LABEL') {Rects = Rects.concat($A(elem.parentElement.getClientRects()));}
+					let closestLabel = elem.closest('LABEL');
+					if(closestLabel) {Rects = Rects.concat($A(closestLabel.getClientRects()));}
 					else if(elem.id) {
 						for(let label of document.querySelectorAll('LABEL[for="' + elem.id + '"]'))
 							Rects = Rects.concat($A(label.getClientRects()));
