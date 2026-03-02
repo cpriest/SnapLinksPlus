@@ -113,6 +113,8 @@ async function OpenUrlsInTabs(urls) {
 			props.cookieStoreId = activeTab.cookieStoreId;
 			if(Prefs.SetOwnershipTabID_FF)
 				props.openerTabId = activeTab.id;
+			if(Prefs.NewTabsOpenUnloaded)
+				props.discarded = true;
 		}
 
 		let newTab = await browser.tabs.create(props);

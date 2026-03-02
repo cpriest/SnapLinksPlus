@@ -55,6 +55,7 @@ const DefaultPrefs = {
 
 	OpenTabs:            TABS_OPEN_NATURAL,
 	DefaultAction:       OPEN_LINKS,
+	NewTabsOpenUnloaded: false,
 	SwitchFocusToNewTab: true,
 	ShowNumberOfLinks:   true,
 	ActivateModifiers:   NONE,
