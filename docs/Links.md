@@ -14,7 +14,7 @@
 
 [>>SnapLinksLogo]: images/SnapLinksLogo.png
 
-[MDN-Ext-Anatomy]: https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Anatomy_of_a_WebExtension
+[MDN-Ext-Anatomy]: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Anatomy_of_a_WebExtension
 [FF-DevEd]: https://www.mozilla.org/firefox/developer/
 
 [>>Welcome]: README.md
