@@ -94,7 +94,7 @@ Please see the [Contributing][>>Contributing] document for more information.
 
 ## Background on Snap Links 3
 
-Snap Links Plus is being re-written from the ground up to be a [Web Extension](https://developer.mozilla.org/en-US/Add-ons/WebExtensions).
+Snap Links Plus is being re-written from the ground up to be a [Web Extension](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions).
 
 This means some legacy features may no longer exist while other new features are written.
 
