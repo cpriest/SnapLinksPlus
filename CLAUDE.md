@@ -1,135 +1,97 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Snap Links Plus: a Manifest V2 WebExtension (Firefox primary, Chrome secondary). The user drags a lasso with a mouse button (default RMB); links, checkboxes, radio buttons and clickable elements inside it are highlighted, then acted on (open in tabs, copy, toggle, click).
 
-## Project Overview
+**Status: maintenance mode.** Inherited project. Prefer small, surgical bug fixes over refactors or new features. Do not "modernize" (MV3, modules, bundlers) unless asked.
 
-Snap Links Plus is a browser extension (Firefox & Chrome) that allows users to lasso links, checkboxes, and other elements on web pages to perform batch actions. Built using WebExtension APIs with a content script architecture.
-
-## Build System
-
-The project uses **Gulp** as its build system with Handlebars templates for generating browser-specific manifests.
-
-### Common Commands
+## Commands
 
 ```bash
-# Build for both Firefox and Chrome
-npm run build
-# or
-gulp
-
-# Watch mode (auto-rebuilds on file changes, includes Dev* files)
-gulp watch
-
-# Run Firefox with extension loaded
-npm run run-ff
-
-# Lint JavaScript
-npm run lint
-
-# Fix lint issues automatically
+npm test            # jest, ~1s, tests/ only
+npm run lint        # eslint src/ (currently clean; keep it that way)
 npm run lint-fix
-
-# Run tests
-npm test
+npm run build       # gulp: build/ff/ and build/chrome/
+npx gulp watch      # DevBuild: includes Dev* files, rebuilds on change
+npx gulp package    # also zips via web-ext into artifacts/
+npm run run-ff      # web-ext run against build/ff (config: .webext-ff.cjs)
 ```
 
-### Build Process
+- `gulp publish` signs and uploads to AMO using `insecure/Firefox/api-key.json` (gitignored). Never run it unprompted.
+- `.webext-ff.cjs` is Windows-flavored (`firefoxdeveloperedition`, backslash watch path, profile `SnapLinksDev`); adjust locally, don't commit machine-specific edits.
+- `gulpfile.js` `webext()` shells out to `yarn run web-ext`, and CI (`.github/workflows/nodejs.yml`) uses `yarn`, while day-to-day work uses npm. `yarn.lock` is gitignored.
 
-1. `buildTmp()` - Copies source files to `./build/tmp/` (excludes test files, JetBrains files, Dev files, Playground files)
-2. `buildChrome()` / `buildFirefox()` - Copies from tmp to browser-specific build directory and generates manifest.json from Handlebars template
-3. Output directories:
-   - Chrome: `./build/chrome/`
-   - Firefox: `./build/ff/`
-   - Artifacts: `./artifacts/chrome/` and `./artifacts/ff/`
+## Build pipeline
 
-### Browser-Specific Building
+1. `buildTmp`: copies `src/**/*.js|htm*` and `res/**/*.png` into `build/tmp/`, plus `webextension-polyfill` to `src/lib/`. Excludes `*Test*`, `*JetBrains*`, `*-compiled*`, `*Playground*`, `Dev*`.
+2. `buildFor`: copies tmp to `build/ff` or `build/chrome` and renders `src/templates/manifest.hbs` (Handlebars with `{{#Firefox}}`, `{{#Chrome}}`, `{{#DevBuild}}`).
+3. `gulp watch` removes the `!**/Dev*` exclusion and sets `DevBuild`, which adds `DevBuild.js` files and the `dev-do-*` commands to the manifest.
 
-The manifest template (`src/templates/manifest.hbs`) uses Handlebars conditionals (`{{#Chrome}}`, `{{#Firefox}}`, `{{#DevBuild}}`) to generate browser-specific configurations. Chrome requires a `browser-polyfill.js` for WebExtension API compatibility.
+**Adding or reordering a source file means editing `manifest.hbs`.** Scripts are plain globals loaded in a fixed order (no imports). A script that uses a symbol from another must load after it. The same list governs content scripts, the background page, and `src/html/options.html` (which has its own `<script>` tags).
 
-**Important:** The `!**/Dev*` exclusion in gulpfile.js is removed for `gulp watch`, allowing development-only files to be included in watch builds.
+Version lives only in `package.json`. Chrome gets a derived 4-part `version`. The Firefox gecko block (`strict_min_version` 142.0, `data_collection_permissions: none`) is deliberate; see `CONTEXT-GRAPH.md`.
 
 ## Architecture
 
-### Content Script Architecture
+### Load order (content scripts, every frame, `<all_urls>`, `document_end`)
 
-The extension uses a **content script** architecture that runs in every web page. Content scripts are loaded in this order (see `src/templates/manifest.hbs`):
+`browser-polyfill` (Chrome) → `StoragePrefs` → `CSP` → `globals` → `[DevBuild]` → `Utility` → `SelectionRect` → `ElementIndexer` → `SvgOverlay` → `CategorizedCollection` → `ActionMgr` → `EventHandler`
 
-1. `browser-polyfill.js` (Chrome only)
-2. `StoragePrefs.js` - Preference management with sync/local storage
-3. `CSP.js` - Custom Pub/Sub system for inter-component communication
-4. `globals.js` - Global constants, default preferences, and utilities
-5. `Utility.js` - Helper functions
-6. `SelectionRect.js` - Visual selection rectangle rendering
-7. `ElementIndexer.js` - Spatial indexing of DOM elements
-8. `SvgOverlay.js` - SVG overlay management for visual feedback
-9. `CategorizedCollection.js` - Grouping selected elements by type
-10. `ActionMgr.js` - Handles actions on selected elements
-11. `EventHandler.js` - Main event coordination (mousedown, mousemove, etc.)
+Background page: polyfill (Chrome) → `StoragePrefs` → `globals` → `[DevBuild]` → `background.js`. The background reuses `globals.js` for constants and `Prefs`.
 
-### Background Script
+### Drag lifecycle (`src/content-scripts/EventHandler.js`)
 
-Located in `src/background-scripts/background.js`, handles:
-- Opening URLs in tabs with configurable behavior (TABS_OPEN_END, TABS_OPEN_RIGHT, TABS_OPEN_NATURAL)
-- Clipboard operations
-- Extension reload (DevMode only)
+1. `mousedown` (capture) matches `Prefs.ActivateModifiers` + `ActivateMouseButton` → `BeginDrag`. `FirstInit` lazily builds `ActionMgr`, `RectMapper` (`ElemDocRects`), `ElementIndexer`, `SvgOverlayMgr`, `SelectionRect`.
+2. A 30 ms interval (`onMouseMoveInterval`) autoscrolls and calls `SelectionRect.SetBottomRight`, which publishes `DragRectChanged`.
+3. `ElementIndexer` builds a bucketed vertical index on first change (`UpdateIndex`), then `Search(rect)` returns a `CategorizedCollection` and publishes `ElementsSelected`. `SvgOverlayMgr` highlights them.
+4. `mouseup` → `EndDrag` → publishes `DragCompleted` → **calls `ActionMgr.ActUpon` directly**, not via pub/sub. This is deliberate: browsers reject clipboard/tab/click actions outside a short-lived user-event handler.
+5. `Escape` cancels. The next context menu is suppressed after a successful drag (`StopNextContextMenu`).
 
-### Pub/Sub Event System (CSP.js)
+### Files
 
-Components communicate via a lightweight publish/subscribe system defined in `CSP.js`:
+| File | Role |
+|---|---|
+| `src/CSP.js` | `pub(channel, msg)` / `sub(channel, fn)` (channel names lowercased; `sub` returns `{cancel}`). Also exports for jest. |
+| `src/globals.js` | Constants, `DefaultPrefs`, channel names, `Prefs`, `DOMReady`, `MigratePrefs()`, misc helpers. Also monkey-patches `console.*` (they return arg 0) and `Function.prototype.wrap`. |
+| `src/StoragePrefs.js` | Proxy over `browser.storage` (sync, falling back to local) layered on defaults; `onChanged()` observers. Reading an unknown key throws. |
+| `src/DeepProxy.js` | Generic proxy helper, tested in `tests/`. |
+| `ElementIndexer.js` | `RectMapper` (cached per-element document rects; A includes inner IMG/SVG, checkbox/radio includes labels; font-size/weight score cache) and `ElementIndexer` (bucket index, obscured-element check via `document.elementFromPoint` on the rect midpoint). |
+| `CategorizedCollection.js` | Buckets elements into Links / Clickable / Checkboxes / RadioButtons; `GreatestType` picks the action. |
+| `ActionMgr.js` | Acts on the greatest category. Links go to background via `runtime.sendMessage`. |
+| `SelectionRect.js` | `Rect`/`DocRect` geometry and the lasso DOM (`DIV.SnapLinksContainer`, counter label). |
+| `SvgOverlay.js` | SVG highlight layer; styles come from `Prefs.HighlightStyles_*`. |
+| `background.js` | Messages: `OpenUrlsInTabs` (serialized on a promise chain; `TABS_OPEN_*` placement), `CopyToClipboard`, `ReloadExtension` (dev), install/update notifications, storage migration at 3.1.7. |
+| `src/lib/Options.js`, `src/html/options.html` | Options page, driven by `DefaultPrefs` keys. |
 
-- `pub(channel, message)` - Publish message to channel
-- `sub(channel, handler)` - Subscribe to channel, returns cancellation controller
+### Preferences
 
-**Key channels** (defined in `globals.js`):
-- `DragRectChanged`, `DragCompleted`, `DragStarted` - Published by EventHandler
-- `DocSizeChanged`, `ElementPositionsChanged` - Document layout changes
-- `ContainerElementCreated` - Published by SelectionRect
-- `ElementsSelected` - Published by ElementIndexer
+Add a setting by putting a default in `DefaultPrefs` (`globals.js`), then a control in `options.html`. Rename or remove one by adding a step to `MigratePrefs()`. The 3.1.9 `OpenTabsAtEndOfTabBar` → `OpenTabs` migration is the model. `Dev_*` and `Debug_*` prefs are developer toggles and only act with `Prefs.DevMode`.
 
-### Global State
+## Conventions
 
-Key globals defined in `globals.js`:
-- `Prefs` - StoragePrefs instance with all user preferences
-- `DOMReady` - Promise that resolves when prefs are loaded
-- Mouse button constants: `LMB`, `RMB`, `MMB`
-- Modifier key constants: `NONE`, `CTRL`, `ALT`, `SHIFT`
-- Action constants: `OPEN_URLS_IN_TABS`, `COPY_TO_CLIPBOARD`, `RELOAD_EXTENSION`
-
-Global references in `EventHandler.js`:
-- `SnapLinks` - The main EventHandler instance
-- `ElemDocRects` - RectMapper cache for element positions
-- `SvgOverlay` - SvgOverlayMgr for visual overlays
-- `LastModifierKeys` - Bitmask of last modifier keys pressed
-
-### Preference Management
-
-`StoragePrefs.js` provides a reactive preference system that:
-- Overlays browser storage (sync or local) on top of defaults
-- Auto-detects storage API availability (falls back from sync to local)
-- Provides `onChanged()` callbacks for preference updates
-- Preference migrations handled in `globals.js` via `MigratePrefs()`
-
-## Code Conventions
-
-- All JavaScript is ES6+ (`ecmaVersion: 2020`)
-- Uses jQuery ESLint config extended with custom rules in `./eslint/index.js`
-- JSDoc type annotations used throughout (see `@typedef` in globals.js)
-- Strict mode (`'use strict';`) in all files
-- Global variables `_` and `__` reserved for general purpose use
-- Uses WebExtension Polyfill for Chrome compatibility (`webextension-polyfill` package)
+- Plain ES2020 scripts, `'use strict'`, **tabs** (width 4), LF, max line 200. Style details live in `.editorconfig` and `eslint/` (jQuery ruleset plus custom rules/globals).
+- New cross-file globals must be added to `eslint/globals.js` and given a `/* exported X */` or `/* global X */` comment, or lint fails.
+- `_` and `__` are reserved throwaway globals. `docElem` is `document.documentElement` (sandboxed-global cleanup is an open todo in `DevNotes.md`).
+- Class methods are PascalCase in older code, camelCase in event handlers. Match the file you're in.
+- JSDoc types throughout. Keep them accurate.
+- Lines tagged `// #DevCode` are debug leftovers. Leave them alone.
 
 ## Testing
 
-- Jest for unit tests (config: `jest.config.js`)
-- Tests located in `./tests/` directory
-- Manual test HTML files in `./test/` directory (e.g., `test_links.html`)
-- Integration tests in `./tests/integration/`
+- Jest (`tests/**/*.js`, default node environment, no DOM). Covers only the pure pieces: `CSP`, `DeepProxy` (plus its Open/Overlay variants).
+- Nothing automated covers lasso, indexing, or actions. Verify those manually with the fixtures in `test/` (`test_links.html`, `issue308.htm`, `iframe_*.htm`, `overlapped_range.html`) using `npx gulp watch` + `npm run run-ff`, or by loading `build/ff` / `build/chrome` unpacked.
+- For a bug fix in DOM-touching code, add a fixture page to `test/` when practical. For logic that can be extracted as pure functions, add a jest test first.
 
-## Development Notes
+## Gotchas
 
-- `DevNotes.md` contains active feature plans, bugs, and todos
-- DevMode features (Ctrl+Alt+RMB to reload extension) only available in watch builds
-- Selection uses spatial indexing with configurable buckets (`IndexBuckets` pref)
-- Element visibility detection checks for obscured elements
-- SVG-based visual feedback system for selection and highlights
+- Runs in **every frame** of every page; be wary of anything heavy at load, and of global name collisions with page scripts (content scripts share an isolated world, but the extension's own files share one scope).
+- Obscured-element detection samples only the rect midpoint; partly covered elements can be mis-classified (known idea in `DevNotes.md`).
+- `globals.js` has `isChrome`/`isFirefox` based on `location.protocol`. `isChrome` is misspelled (`'chrome-extenson:'`) and never true. Fix before relying on it.
+- `background.js` has a duplicated `case COPY_TO_CLIPBOARD`, and `src/lib/Configs.js` and `ElementIndexer.IsVisible` are unused. Safe cleanups, but unrelated to most fixes.
+- `artifacts/`, `build/`, `insecure/`, `local/` are gitignored. `dist/` holds old release files, not build output. Never commit secrets from `insecure/`.
+
+## Where else to look
+
+- `DevNotes.md`: open bugs, ideas, and deferred features.
+- `CONTEXT-GRAPH.md`: recorded decisions and lessons (manifest, web-ext, ESLint/Babel upgrades).
+- `docs/` (GitHub Pages site: `History.md`, `Tutorial.md`, `Contributing.md`, `Updated.md`): user-facing docs; update `History.md` for user-visible changes.
+- Issues: <https://github.com/cpriest/SnapLinksPlus/issues>
