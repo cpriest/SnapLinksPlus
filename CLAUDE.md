@@ -85,7 +85,8 @@ Add a setting by putting a default in `DefaultPrefs` (`globals.js`), then a cont
   - Both return `run(expr)`, which evaluates in the scripts' scope to reach top-level `let`/`class` bindings (`run('Rect')`, `run('Prefs = {...}')`). Globals owned by unloaded files (`ElemDocRects`, `LastModifierKeys`, `SvgOverlay`) are passed in `declare`.
 - `test.Build.js` runs `gulp` and checks both manifests, referenced files, and byte-identical PNGs. It rewrites `build/`, so don't run it during `gulp watch`.
 - `test.EventHandler.js` drives all content scripts with synthetic mouse events (drag, Escape, modifiers, autoscroll, actions), and is the best place to reproduce a lasso bug. jsdom has no real layout, so visual correctness (highlight placement, clipping, real hit-testing) still needs the manual check.
-- Not covered: the options page (`Options.js`). Verify layout-dependent behavior manually with the fixtures in `test/` (`test_links.html`, `issue308.htm`, `iframe_*.htm`, `overlapped_range.html`) using `npx gulp watch` + `npm run run-ff`, or by loading `build/ff` / `build/chrome` unpacked.
+- `test.Options.js` loads the real `options.html` markup (URL set to `moz-extension://` via a docblock) and checks it against the code: every control id must be a `DefaultPrefs` key, select values must match the constants, and saves are throttled. Add a control to the page and this test tells you if the id is wrong.
+- Verify layout-dependent behavior manually with the fixtures in `test/` (`test_links.html`, `issue308.htm`, `iframe_*.htm`, `overlapped_range.html`) using `npx gulp watch` + `npm run run-ff`, or by loading `build/ff` / `build/chrome` unpacked.
 - `test.failing` marks a known bug. Remove `.failing` when you fix it.
 - For a bug fix, write the failing test first; for layout-dependent code add a fixture page to `test/`.
 
