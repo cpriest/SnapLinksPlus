@@ -136,21 +136,42 @@ describe('change notifications', () => {
 });
 
 describe('MigratePrefs (globals.js)', () => {
-	// KNOWN BUG: the OpenTabsAtEndOfTabBar → OpenTabs migration never runs.  The key is not in DefaultPrefs,
-	// so reading it throws, and MigratePrefs() swallows that exception.  Remove `.failing` once fixed.
-	test.failing('a stored OpenTabsAtEndOfTabBar=true becomes OpenTabs=TABS_OPEN_END', async () => {
-		let { run } = loadScripts(['StoragePrefs.js', 'globals.js'], makeBrowser({ sync: { OpenTabsAtEndOfTabBar: true } }));
+	const migrate = async (sync) => {
+		let loaded = loadScripts(['StoragePrefs.js', 'globals.js'], makeBrowser({ sync }));
+		await loaded.run('DOMReady');
+		return loaded;
+	};
 
-		await run('DOMReady');
+	test('a stored OpenTabsAtEndOfTabBar=true becomes OpenTabs=TABS_OPEN_END, and the legacy key is removed', async () => {
+		let { run, browser } = await migrate({ OpenTabsAtEndOfTabBar: true });
 
+		expect(browser.storage.sync.data).toEqual({ OpenTabs: run('TABS_OPEN_END') });
 		expect(run('Prefs.OpenTabs')).toBe(run('TABS_OPEN_END'));
 	});
 
-	test('with no legacy key stored, OpenTabs keeps its default', async () => {
-		let { run } = loadScripts(['StoragePrefs.js', 'globals.js']);
+	test('a stored OpenTabsAtEndOfTabBar=false is removed without changing OpenTabs', async () => {
+		let { run, browser } = await migrate({ OpenTabsAtEndOfTabBar: false });
+
+		expect(browser.storage.sync.data).toEqual({});
+		expect(run('Prefs.OpenTabs')).toBe(run('TABS_OPEN_NATURAL'));
+	});
+
+	test('with no legacy key stored, nothing is written and OpenTabs keeps its stored value', async () => {
+		let { run, browser } = await migrate({ OpenTabs: 'OpenTabsToRight' });
+
+		expect(browser.storage.sync.set).not.toHaveBeenCalled();
+		expect(browser.storage.sync.remove).not.toHaveBeenCalled();
+		expect(run('Prefs.OpenTabs')).toBe('OpenTabsToRight');
+	});
+
+	test('a failing migration is logged with context and does not leave DOMReady pending', async () => {
+		let browser = makeBrowser({ sync: { OpenTabsAtEndOfTabBar: true } });
+		browser.storage.sync.set.mockRejectedValue(new Error('quota exceeded'));
+		let { run } = loadScripts(['StoragePrefs.js', 'globals.js'], browser);
+		run('console.error = (...a) => { globalThis.__errors = (globalThis.__errors || []).concat(a); }');
 
 		await run('DOMReady');
 
-		expect(run('Prefs.OpenTabs')).toBe(run('TABS_OPEN_NATURAL'));
+		expect(run('globalThis.__errors')[0]).toMatch(/MigratePrefs\(\) failed.*quota exceeded/);
 	});
 });

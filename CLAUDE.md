@@ -77,19 +77,23 @@ Add a setting by putting a default in `DefaultPrefs` (`globals.js`), then a cont
 
 ## Testing
 
-- Jest (`tests/**/*.js`, node environment, no DOM). `tests/_support/` is the helper dir (excluded from test discovery).
-- The browser scripts are plain globals with no exports. `tests/_support/loadScripts.js` loads them into a `vm` context (in manifest order) with a mock `browser` (`makeBrowser()`), so tests need no source changes. `run('Rect')` reaches top-level `let`/`class` bindings.
-- Covered: `CSP`, `DeepProxy`, `Rect`, `ActionMgr`, `StoragePrefs`, `MigratePrefs`, and the gulp build output (`test.Build.js` runs `gulp` and checks both manifests, referenced files, and byte-identical PNGs; it rewrites `build/`, so don't run it during `gulp watch`).
-- Not covered: lasso, indexing, `CategorizedCollection`, `background.js` (all need a DOM or tab mocks; jsdom is not installed). Verify manually with the fixtures in `test/` (`test_links.html`, `issue308.htm`, `iframe_*.htm`, `overlapped_range.html`) using `npx gulp watch` + `npm run run-ff`, or by loading `build/ff` / `build/chrome` unpacked.
+- Jest (`tests/**/*.js`, node environment by default). `tests/_support/` is the helper dir (excluded from test discovery).
+- The browser scripts are plain globals with no exports, so tests load the real source with no changes to it:
+  - `loadScripts(files, browser?, globals?)` runs them in a `vm` context (manifest order) with a mock `browser` (`makeBrowser()`). Use for logic that needs no DOM: `Rect`, `ActionMgr`, `StoragePrefs`, `background.js`.
+  - `loadScriptsInDom(files, browser?, declare?)` runs them against jsdom; the test file needs a `@jest-environment jsdom` docblock. Use for `CategorizedCollection`, `ElementIndexer`/`RectMapper`. jsdom has no layout, so tests position elements by stubbing `getClientRects`, and `document.elementFromPoint`.
+  - Both return `run(expr)`, which evaluates in the scripts' scope to reach top-level `let`/`class` bindings (`run('Rect')`, `run('Prefs = {...}')`). Globals owned by unloaded files (`ElemDocRects`, `LastModifierKeys`, `SvgOverlay`) are passed in `declare`.
+- `test.Build.js` runs `gulp` and checks both manifests, referenced files, and byte-identical PNGs. It rewrites `build/`, so don't run it during `gulp watch`.
+- Not covered: `EventHandler` (drag lifecycle), `SelectionRect` DOM, `SvgOverlay`, the options page. Verify manually with the fixtures in `test/` (`test_links.html`, `issue308.htm`, `iframe_*.htm`, `overlapped_range.html`) using `npx gulp watch` + `npm run run-ff`, or by loading `build/ff` / `build/chrome` unpacked.
 - `test.failing` marks a known bug. Remove `.failing` when you fix it.
-- For a bug fix, write the failing test first; for DOM-touching code add a fixture page to `test/` when practical.
+- For a bug fix, write the failing test first; for layout-dependent code add a fixture page to `test/`.
 
 ## Gotchas
 
 - Runs in **every frame** of every page; be wary of anything heavy at load, and of global name collisions with page scripts (content scripts share an isolated world, but the extension's own files share one scope).
 - Obscured-element detection samples only the rect midpoint; partly covered elements can be mis-classified (known idea in `DevNotes.md`).
 - Gulp 5 pitfalls (both bit 3.1.16): `gulp.src` needs `{ encoding: false }` or it corrupts PNGs, and a positive glob listed after a `!negation` gets base `.` (options.html landed in `src/src/html/`). Keep positive globs first. `test.Build.js` guards both.
-- `MigratePrefs()` never migrates: `OpenTabsAtEndOfTabBar` isn't in `DefaultPrefs`, so reading it throws and the `catch` swallows it (see `test.failing` in `test.StoragePrefs.js`).
+- Removed prefs aren't in `DefaultPrefs`, and `Prefs.<unknown>` throws. A migration must read them from `Prefs.Values` (see `MigratePrefs()`).
+- Known bugs pinned by `test.failing`: `FilterByFontScore` sorts score keys as strings (`'940' > '1640'`), and `GetFontScore` strips the decimal point (`12.5px` → 125).
 - `globals.js` has `isChrome`/`isFirefox` based on `location.protocol`. `isChrome` is misspelled (`'chrome-extenson:'`) and never true. Fix before relying on it.
 - `background.js` has a duplicated `case COPY_TO_CLIPBOARD`, and `src/lib/Configs.js` and `ElementIndexer.IsVisible` are unused. Safe cleanups, but unrelated to most fixes.
 - `artifacts/`, `build/`, `insecure/`, `local/` are gitignored. `dist/` holds old release files, not build output. Never commit secrets from `insecure/`.

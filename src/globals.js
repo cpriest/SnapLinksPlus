@@ -108,15 +108,16 @@ let Prefs;
 
 let DOMReady = new Promise((resolve, reject) => {
 	// Translates previous preference settings to newer settings
-	function MigratePrefs() {
-		// 3.1.9 Release
-		try {
-			// If OpenTabsAtEndOfTabBar is true, delete it and set OpenTabs
-			if(Prefs.OpenTabsAtEndOfTabBar) {
-				Prefs.OpenTabsAtEndOfTabBar = undefined;
-				Prefs.OpenTabs              = TABS_OPEN_END;
+	async function MigratePrefs() {
+		// 3.1.9 Release: OpenTabsAtEndOfTabBar (a boolean no longer in DefaultPrefs, so it is only visible in the stored Values) became OpenTabs
+		if('OpenTabsAtEndOfTabBar' in Prefs.Values) {
+			if(Prefs.Values.OpenTabsAtEndOfTabBar) {
+				await Prefs.storage.set({ OpenTabs: TABS_OPEN_END });
+				Prefs.Values.OpenTabs = TABS_OPEN_END;
 			}
-		} catch(e) { /* ignore (OpenTabsAtEndOfTabBar was default) */ }
+			delete Prefs.Values.OpenTabsAtEndOfTabBar;
+			await Prefs.storage.remove('OpenTabsAtEndOfTabBar');
+		}
 	}
 
 	function LoadPrefs() {
@@ -124,10 +125,9 @@ let DOMReady = new Promise((resolve, reject) => {
 			StorageAPI: 'auto',
 		});
 		Prefs.Ready
-			.then(() => {
-				MigratePrefs();
-				resolve();
-			});
+			.then(MigratePrefs)
+			.catch(e => console.error(`MigratePrefs() failed while migrating stored preferences (StorageAPI: ${Prefs.Values?.StorageAPI}): ${e}`))
+			.then(resolve);
 	}
 
 	if(document.readyState !== 'loading')

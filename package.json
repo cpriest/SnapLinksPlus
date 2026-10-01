@@ -28,6 +28,7 @@
 		"gulp-zip" :              "^6.1.0",
 		"handlebars-cond" :       "^1.0.3",
 		"jest" :                  "^30.2.0",
+		"jest-environment-jsdom" : "^30.5.2",
 		"run-sequence" :          "^2.2.1",
 		"web-ext" :               "^9.4.0",
 		"webextension-polyfill" : "^0.12.0"
