@@ -7,4 +7,4 @@ Found while documenting the project (2026-09-30). None are urgent.
 - [ ] `gulpfile.js` `webext()` and CI use `yarn`; local workflow is npm. Pick one.
 - [ ] `.webext-ff.cjs` is Windows-specific (browser name, backslash path).
 - [ ] The local 3.1.16 artifact (gulp 5 build) has `src/src/html/options.html` (options page path wrong) and larger PNGs; icons displayed fine in Firefox, so only verify the options page in the installed 3.1.16. Build fixed in `gulpfile.js`.
-- [ ] Untested: `EventHandler` drag lifecycle, `SelectionRect` DOM, `SvgOverlay`, options page.
+- [ ] Untested: the options page (`src/lib/Options.js`, `options.html`).

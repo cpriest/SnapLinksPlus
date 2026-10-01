@@ -81,9 +81,11 @@ Add a setting by putting a default in `DefaultPrefs` (`globals.js`), then a cont
 - The browser scripts are plain globals with no exports, so tests load the real source with no changes to it:
   - `loadScripts(files, browser?, globals?)` runs them in a `vm` context (manifest order) with a mock `browser` (`makeBrowser()`). Use for logic that needs no DOM: `Rect`, `ActionMgr`, `StoragePrefs`, `background.js`.
   - `loadScriptsInDom(files, browser?, declare?)` runs them against jsdom; the test file needs a `@jest-environment jsdom` docblock. Use for `CategorizedCollection`, `ElementIndexer`/`RectMapper`. jsdom has no layout, so tests position elements by stubbing `getClientRects`, and `document.elementFromPoint`.
+  - `tests/_support/dom.js` fakes layout for jsdom: `place(el, [top, left, bottom, right])`, `setDocumentSize`, `stubHitTesting` (`elementFromPoint`), `stubEmptyLayout`, and `trackListeners()`. Scripts attach listeners to the shared jsdom document, so call its returned cleanup in `afterEach`.
   - Both return `run(expr)`, which evaluates in the scripts' scope to reach top-level `let`/`class` bindings (`run('Rect')`, `run('Prefs = {...}')`). Globals owned by unloaded files (`ElemDocRects`, `LastModifierKeys`, `SvgOverlay`) are passed in `declare`.
 - `test.Build.js` runs `gulp` and checks both manifests, referenced files, and byte-identical PNGs. It rewrites `build/`, so don't run it during `gulp watch`.
-- Not covered: `EventHandler` (drag lifecycle), `SelectionRect` DOM, `SvgOverlay`, the options page. Verify manually with the fixtures in `test/` (`test_links.html`, `issue308.htm`, `iframe_*.htm`, `overlapped_range.html`) using `npx gulp watch` + `npm run run-ff`, or by loading `build/ff` / `build/chrome` unpacked.
+- `test.EventHandler.js` drives all content scripts with synthetic mouse events (drag, Escape, modifiers, autoscroll, actions), and is the best place to reproduce a lasso bug. jsdom has no real layout, so visual correctness (highlight placement, clipping, real hit-testing) still needs the manual check.
+- Not covered: the options page (`Options.js`). Verify layout-dependent behavior manually with the fixtures in `test/` (`test_links.html`, `issue308.htm`, `iframe_*.htm`, `overlapped_range.html`) using `npx gulp watch` + `npm run run-ff`, or by loading `build/ff` / `build/chrome` unpacked.
 - `test.failing` marks a known bug. Remove `.failing` when you fix it.
 - For a bug fix, write the failing test first; for layout-dependent code add a fixture page to `test/`.
 

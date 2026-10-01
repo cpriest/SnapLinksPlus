@@ -98,12 +98,12 @@ class SvgOverlayMgr {
 	/**
 	 * Called to highlight document elements using the SvgOverlay layer
 	 *
-	 * @param {CategorizedCollection|Array} Elements    A collection of elements which represent the current set of elements to be highlighted
+	 * @param {CategorizedCollection|Element[]} Elements    A collection of elements which represent the current set of elements to be highlighted
 	 *
 	 * @returns {SvgOverlayMgr}
 	 */
 	Highlight(Elements) {
-		let tElems       = Elements.All || [],
+		let tElems       = Array.isArray(Elements) ? Elements : Elements.All || [],
 			tPrevElems   = this.HighlightedElements,
 			tUnhighlight = tPrevElems.filter(
 				(elem) => { return !tElems.includes(elem); },

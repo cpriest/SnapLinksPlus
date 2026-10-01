@@ -5,7 +5,8 @@
 
 /* global test, expect, describe, beforeEach, jest, require */
 
-const { loadScriptsInDom } = require('./_support/loadScripts');
+const { loadScriptsInDom }                    = require('./_support/loadScripts');
+const { place, build, setDocumentSize, stubHitTesting } = require('./_support/dom');
 
 const Scripts = [
 	'StoragePrefs.js', 'CSP.js', 'globals.js', 'content-scripts/Utility.js', 'content-scripts/SelectionRect.js',
@@ -13,17 +14,6 @@ const Scripts = [
 ];
 
 let run, Rect;
-
-/** jsdom has no layout engine, so elements are told where they are */
-const place = (el, ...rects) => {
-	el.getClientRects = () => rects.map(([top, left, bottom, right]) => ({ top, left, bottom, right, width: right - left, height: bottom - top }));
-	return el;
-};
-
-const build = (html) => {
-	document.body.innerHTML = html;
-	return Object.fromEntries(Array.from(document.body.querySelectorAll('[id]')).map(el => [el.id, el]));
-};
 
 beforeEach(() => {
 	({ run } = loadScriptsInDom(Scripts, undefined, ['LastModifierKeys', 'ElemDocRects', 'SvgOverlay']));
@@ -171,12 +161,8 @@ describe('ElementIndexer', () => {
 		for(let [id, rect] of Object.entries(positions))
 			place(els[id], rect);
 
-		Object.defineProperty(document.documentElement, 'scrollHeight', { value: 1000, configurable: true });
-		Object.defineProperty(document.documentElement, 'scrollWidth', { value: 1000, configurable: true });
-		document.elementFromPoint = jest.fn((x, y) => {
-			let hit = Object.entries(positions).find(([, [t, l, b, r]]) => x >= l && x <= r && y >= t && y <= b);
-			return (hit && els[obscuredBy[hit[0]]]) || (hit && els[hit[0]]) || document.body;
-		});
+		setDocumentSize(1000, 1000);
+		stubHitTesting(positions, els, obscuredBy);
 
 		run('ElemDocRects = new RectMapper()');
 		run('SvgOverlay = { AddRect() {}, AddPoint() {}, AddIndexBoundaryMark() {}, Release() {} }');
