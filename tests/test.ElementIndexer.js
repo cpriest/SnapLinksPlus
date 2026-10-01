@@ -67,6 +67,14 @@ describe('RectMapper', () => {
 			expect(mapper.get(a).map(r => r.top)).toEqual([0, 20]);
 		});
 
+		test('an anchor also covers the inline SVG elements inside it', () => {
+			let { a, svg } = build('<a id="a" href="/"><svg id="svg"></svg></a>');
+			place(a, [0, 0, 10, 10]);
+			place(svg, [50, 0, 60, 10]);
+
+			expect(mapper.get(a).map(r => r.top)).toEqual([0, 50]);
+		});
+
 		test('a checkbox also covers its wrapping label', () => {
 			let { cb, lbl } = build('<label id="lbl"><input id="cb" type="checkbox"> text</label>');
 			place(cb, [0, 0, 10, 10]);
@@ -130,9 +138,7 @@ describe('RectMapper', () => {
 			spy.mockRestore();
 		});
 
-		// KNOWN BUG: GetFontScore strips every non-digit from the font size, so '12.5px' reads as 125 and outscores 13px.
-		// Parse the number (parseFloat) instead, then remove `.failing`.
-		test.failing('a fractional font size scores below the next whole size up', () => {
+		test('a fractional font size scores below the next whole size up', () => {
 			let { a, b } = build('<a id="a" href="/" style="font-size: 12.5px"></a><a id="b" href="/" style="font-size: 13px"></a>');
 
 			expect(mapper.GetFontScore(a)).toBeLessThan(mapper.GetFontScore(b));

@@ -135,6 +135,18 @@ describe('change notifications', () => {
 	});
 });
 
+describe('browser detection (globals.js)', () => {
+	test.each([
+		['chrome-extension:', true, false],
+		['moz-extension:', false, true],
+		['https:', false, false],
+	])('%s → isChrome=%s, isFirefox=%s', (protocol, chrome, firefox) => {
+		let { run } = loadScripts(['StoragePrefs.js', 'globals.js'], makeBrowser(), { location: { protocol } });
+
+		expect([run('isChrome'), run('isFirefox')]).toEqual([chrome, firefox]);
+	});
+});
+
 describe('MigratePrefs (globals.js)', () => {
 	const migrate = async (sync) => {
 		let loaded = loadScripts(['StoragePrefs.js', 'globals.js'], makeBrowser({ sync }));

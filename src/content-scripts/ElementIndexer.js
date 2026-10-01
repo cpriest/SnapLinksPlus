@@ -75,7 +75,7 @@ class RectMapper {
 		switch(elem.tagName) {
 			case 'A':
 				// Include all IMG,SVG elements within the <A>
-				Array.from(elem.querySelectorAll('IMG, SVG'))
+				Array.from(elem.querySelectorAll('img, svg'))
 					.forEach(
 						/** @param {Element} innerElem */
 						(innerElem) =>
@@ -137,7 +137,7 @@ class RectMapper {
 				fontSize:   ComputedStyle.fontSize,
 				fontWeight: this.TranslateWeight(ComputedStyle.fontWeight),
 			};
-			CachedStyle.fontScore = (parseInt(CachedStyle.fontSize.replace(/\D+/g, '')) * 100) + (CachedStyle.fontWeight / 10);
+			CachedStyle.fontScore = (parseFloat(CachedStyle.fontSize) * 100) + (CachedStyle.fontWeight / 10);
 			// console.log(elem.textContent, CachedStyle.fontSize, CachedStyle.fontWeight, CachedStyle.fontScore);								// #DevCode
 			this.StyleCache.set(elem, CachedStyle);
 		}

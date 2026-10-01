@@ -192,8 +192,7 @@ class CategorizedCollection {
 			}, {});
 
 		let HighScore = Object.keys(ScoredElems)
-			.sort()
-			.reverse()
+			.sort((a, b) => b - a)
 			.shift();
 
 		let HighScoreElems = ScoredElems[HighScore];

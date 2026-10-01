@@ -34,7 +34,7 @@ const TABS_OPEN_END     = 'OpenTabsAtEnd',
 		TABS_OPEN_RIGHT   = 'OpenTabsToRight',
 		TABS_OPEN_NATURAL = 'OpenTabsNaturally';	// Like Firefox Middle-Click behaves
 
-const isChrome  = location.protocol === 'chrome-extenson:',
+const isChrome  = location.protocol === 'chrome-extension:',
 		isFirefox = location.protocol === 'moz-extension:';
 
 /** @prototype DefaultPrefs */

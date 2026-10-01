@@ -281,6 +281,17 @@ describe('install and update handling', () => {
 		expect(notices()).toEqual(['Snap Links Installed']);
 	});
 
+	test('a fresh install completes without logging an error', async () => {
+		let errors = [];
+		await load({}, {});
+		run('(log) => { console.error = (...args) => log.push(args.join(" ")); }')(errors);
+
+		browser.runtime.onInstalled.addListener.mock.calls[0][0]({});
+		await flush();
+
+		expect(errors).toEqual([]);
+	});
+
 	test('upgrading from before 3.1.7 copies local preferences to sync and selects sync storage', async () => {
 		await install({ local: { LastInstalledVersion: '3.1.6', ScrollRate: 20, ActivateMouseButton: 1 } });
 

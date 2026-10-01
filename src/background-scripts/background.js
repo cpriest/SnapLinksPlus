@@ -38,9 +38,6 @@ function onMessage(msg, sender, respond) {
 		case COPY_TO_CLIPBOARD:
 			CopyToClipboard(msg.tUrls);
 			break;
-		case COPY_TO_CLIPBOARD:
-			CopyToClipboard(msg.tUrls);
-			break;
 	}
 }
 
@@ -150,7 +147,7 @@ async function CheckInstallation() {
 				}));
 			}
 		}
-		if(item.LastInstalledVersion.localeCompare('3.1.7', undefined, { numeric: true }) < 0) {
+		if(item.LastInstalledVersion && item.LastInstalledVersion.localeCompare('3.1.7', undefined, { numeric: true }) < 0) {
 			// Transition to sync storage for v3.1.7 upgrade
 			let local = await browser.storage.local.get();
 

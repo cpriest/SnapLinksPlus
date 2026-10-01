@@ -93,9 +93,7 @@ Add a setting by putting a default in `DefaultPrefs` (`globals.js`), then a cont
 - Obscured-element detection samples only the rect midpoint; partly covered elements can be mis-classified (known idea in `DevNotes.md`).
 - Gulp 5 pitfalls (both bit 3.1.16): `gulp.src` needs `{ encoding: false }` or it corrupts PNGs, and a positive glob listed after a `!negation` gets base `.` (options.html landed in `src/src/html/`). Keep positive globs first. `test.Build.js` guards both.
 - Removed prefs aren't in `DefaultPrefs`, and `Prefs.<unknown>` throws. A migration must read them from `Prefs.Values` (see `MigratePrefs()`).
-- Known bugs pinned by `test.failing`: `FilterByFontScore` sorts score keys as strings (`'940' > '1640'`), and `GetFontScore` strips the decimal point (`12.5px` → 125).
-- `globals.js` has `isChrome`/`isFirefox` based on `location.protocol`. `isChrome` is misspelled (`'chrome-extenson:'`) and never true. Fix before relying on it.
-- `background.js` has a duplicated `case COPY_TO_CLIPBOARD`, and `src/lib/Configs.js` and `ElementIndexer.IsVisible` are unused. Safe cleanups, but unrelated to most fixes.
+- `src/lib/Configs.js` and `ElementIndexer.IsVisible` are unused. Safe cleanups, but unrelated to most fixes.
 - `artifacts/`, `build/`, `insecure/`, `local/` are gitignored. `dist/` holds old release files, not build output. Never commit secrets from `insecure/`.
 
 ## Where else to look

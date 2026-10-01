@@ -182,9 +182,7 @@ describe('font score filtering', () => {
 		expect(ElementsOf(make(links(1640, 1240)).Links)).toEqual(['l0', 'l1']);
 	});
 
-	// KNOWN BUG: FilterByFontScore sorts the score keys as strings, so a 3-digit score (a font under 10px) outranks a
-	// 4-digit one ('940' > '1640').  Sort numerically, then remove `.failing`.
-	test.failing('a larger font wins even when the smaller font has fewer score digits', () => {
+	test('a larger font wins even when the smaller font has fewer score digits', () => {
 		let c = make(links(1640, 940));
 
 		expect(ElementsOf(c.Links)).toEqual(['l0']);
