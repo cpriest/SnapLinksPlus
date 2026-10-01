@@ -58,14 +58,15 @@ TaskGlobs.set('', [
 TaskGlobs.set('src', [
 	'src/**/*.js',
 
+	// ui
+	// NOTE: positive globs must precede the negations, gulp 5 resolves the base of any positive glob after a negation to '.'
+	'src/**/*.htm*',
+
 	'!**/*Test*',
 	'!**/*JetBrains*',
 	'!**/*-compiled*',
 	'!**/*Playground*',
 	'!**/Dev*',
-
-	// ui
-	'src/**/*.htm*',
 ]);
 
 TaskGlobs.set('src/lib', [
@@ -98,7 +99,7 @@ async function buildTmp() {
 	await Promise.all(
 		Array.from(TaskGlobs.entries())
 			.map(([key, globs]) => finished(
-				gulp.src(globs)
+				gulp.src(globs, { encoding: false })
 					.pipe(gulp.dest(`./build/tmp/${key}`))
 			))
 	);
@@ -110,7 +111,7 @@ async function buildFor({ BuildPath, BuildData }) {
 	fs.rmSync(BuildPath, { recursive: true, force: true });
 
 	await Promise.all([
-		finished(gulp.src('./build/tmp/**')
+		finished(gulp.src('./build/tmp/**', { encoding: false })
 			.pipe(gulp.dest(BuildPath))),
 		finished(
 			gulp.src('src/templates/manifest.hbs')
