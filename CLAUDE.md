@@ -18,7 +18,7 @@ npm run run-ff      # web-ext run against build/ff (config: .webext-ff.cjs)
 
 - `gulp publish` signs and uploads to AMO using `insecure/Firefox/api-key.json` (gitignored). Never run it unprompted.
 - `.webext-ff.cjs` is Windows-flavored (`firefoxdeveloperedition`, backslash watch path, profile `SnapLinksDev`); adjust locally, don't commit machine-specific edits.
-- `gulpfile.js` `webext()` shells out to `yarn run web-ext`, and CI (`.github/workflows/nodejs.yml`) uses `yarn`, while day-to-day work uses npm. `yarn.lock` is gitignored.
+- npm only (`package-lock.json` is the lockfile; CI runs `npm ci`). Don't reintroduce yarn.
 
 ## Build pipeline
 
@@ -96,7 +96,6 @@ Add a setting by putting a default in `DefaultPrefs` (`globals.js`), then a cont
 - Obscured-element detection samples only the rect midpoint; partly covered elements can be mis-classified (known idea in `DevNotes.md`).
 - Gulp 5 pitfalls (both bit 3.1.16): `gulp.src` needs `{ encoding: false }` or it corrupts PNGs, and a positive glob listed after a `!negation` gets base `.` (options.html landed in `src/src/html/`). Keep positive globs first. `test.Build.js` guards both.
 - Removed prefs aren't in `DefaultPrefs`, and `Prefs.<unknown>` throws. A migration must read them from `Prefs.Values` (see `MigratePrefs()`).
-- `src/lib/Configs.js` and `ElementIndexer.IsVisible` are unused. Safe cleanups, but unrelated to most fixes.
 - `artifacts/`, `build/`, `insecure/`, `local/` are gitignored. `dist/` holds old release files, not build output. Never commit secrets from `insecure/`.
 
 ## Where else to look

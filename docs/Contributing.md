@@ -49,18 +49,15 @@ You'll need to setup the project locally and install a few tools to build Snap L
     ```
 4.  Setup node by running the following:
     ```shell
-    # Install the gulp tool globally on your machine
-    npm install -g yarn gulp@^4 gulp-cli
-
-    # Install the node packages for SnapLinks (these will go into node_modules/)
-    yarn install
+    # Install the node packages for SnapLinks (these will go into node_modules/), including gulp
+    npm ci
     ```
 
 ### Building the extension
 
-To build the extension we use the gulp v4 build system.
-  * Use <kbd>gulp</kbd> to build the Chrome and Firefox builds.
-  * Use <kbd>gulp watch</kbd> to build updated versions as you modify files.  This way most of the time you'll simply need to refresh the page you're on.
+To build the extension we use the gulp v5 build system.
+  * Use <kbd>npm run build</kbd> to build the Chrome and Firefox builds.
+  * Use <kbd>npx gulp watch</kbd> to build updated versions as you modify files.  This way most of the time you'll simply need to refresh the page you're on.
     * Sometimes you'll need to inform the browser to reload the extension.  <br>
     If you have Developer Mode turned on and SnapLinks is loaded on a page, you can
     hold down <kbd>Ctrl + Alt</kbd> and <kbd>right-click</kbd> to have Snap Links tell the browser to unload and reload SnapLinks.

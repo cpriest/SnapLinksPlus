@@ -306,24 +306,6 @@ class ElementIndexer {
 	}
 
 	/**
-	 * Returns true if the element is visible
-	 *
-	 * @param {Element} elem
-	 *
-	 * @returns {boolean}
-	 */
-	IsVisible(elem) {
-		let style = window.getComputedStyle(elem);
-
-		// noinspection EqualityComparisonWithCoercionJS, JSValidateTypes
-		return style.width == 0 &&
-			   style.height == 0 &&
-			   style.opacity == 0 &&
-			   style.display != 'none' &&
-			   style.visibility !== 'hidden';
-	}
-
-	/**
 	 * Search the index for all elements that intersect with the selection rect
 	 *
 	 * @param {Rect} sel    The rect in document coordinates to search
@@ -366,9 +348,6 @@ class ElementIndexer {
 				for(let r of ElemDocRects.get(elem, offset)) {
 					if(!sel.Intersects(r))
 						continue;
-
-//					if(this.IsVisible(elem) === false)		// This is really slow!  The below section handles most
-//						break;								// of this much faster as well as other situations
 
 					// Check to see if the point in the middle of the rect is the element or a descendent, if not then
 					// it is obscured.  This takes care of display: none, visibility: hidden & width/height of 0, does

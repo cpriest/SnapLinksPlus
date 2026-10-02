@@ -105,7 +105,7 @@ async function buildTmp() {
 	);
 }
 
-let webext = (cmd, data) => `yarn run web-ext ${cmd} -s ${data.BuildPath} -a ${data.ArtifactsPath} `;
+let webext = (cmd, data) => `npx web-ext ${cmd} -s ${data.BuildPath} -a ${data.ArtifactsPath} `;
 
 async function buildFor({ BuildPath, BuildData }) {
 	fs.rmSync(BuildPath, { recursive: true, force: true });
