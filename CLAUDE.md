@@ -13,11 +13,12 @@ npm run lint-fix
 npm run build       # gulp: build/ff/ and build/chrome/
 npx gulp watch      # DevBuild: includes Dev* files, rebuilds on change
 npx gulp package    # also zips via web-ext into artifacts/
-npm run run-ff      # web-ext run against build/ff (config: .webext-ff.cjs)
+npm run run-ff      # Firefox Dev Edition with build/ff loaded, auto-reloads on rebuild (scripts/run-ff.mjs + .webext-ff.cjs)
 ```
 
 - `gulp publish` signs and uploads to AMO using `insecure/Firefox/api-key.json` (gitignored). Never run it unprompted.
-- `.webext-ff.cjs` is Windows-flavored (`firefoxdeveloperedition`, backslash watch path, profile `SnapLinksDev`); adjust locally, don't commit machine-specific edits.
+- `run-ff` uses the persistent profile `SnapLinksDev/` (gitignored) and the `firefoxdeveloperedition` alias: Developer Edition on Windows/macOS, `firefox-developer-edition` on PATH on Linux/WSL. Set `FIREFOX=/path/to/firefox` to use another binary.
+- `scripts/run-ff.mjs` exists because WSL2 mirrored networking resets (rather than refuses) connects to a not-yet-listening localhost port, and web-ext only retries on ECONNREFUSED. It wraps web-ext's `connect` from an internal path (`web-ext/lib/firefox/remote.js`), so re-check it after upgrading web-ext. Under WSL, Firefox renders through WSLg.
 - npm only (`package-lock.json` is the lockfile; CI runs `npm ci`). Don't reintroduce yarn.
 
 ## Build pipeline

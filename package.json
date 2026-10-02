@@ -38,7 +38,7 @@
 		"lint-fix": "eslint --fix src/",
 		"test" :   "jest",
 		"build" :  "gulp",
-		"run-ff" : "web-ext --config=.webext-ff.cjs run"
+		"run-ff" : "node scripts/run-ff.mjs"
 	},
 	"dependencies" :   {
 		"lit-element": "^4.0.0"
