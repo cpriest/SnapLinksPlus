@@ -8,7 +8,7 @@ Snap Links Plus is a Browser Addon that lets you lasso links, checkboxes and oth
 
 ## Contributors Needed
 
-I'm happy to review pull requests, but I'm not able to spend much time on the project, any help you can provide would be greatly appreciated. I'm also willing to help you set up your local development environment if needed.
+I'm happy to review [pull requests](https://github.com/cpriest/SnapLinksPlus/pulls), but I'm not able to spend much time on the project, any help you can provide would be greatly appreciated. I'm also willing to help you set up your local development environment if needed.
 
 I'm looking for some people to help triage [new issues](https://github.com/cpriest/SnapLinksPlus/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc), [label](https://github.com/cpriest/SnapLinksPlus/labels) them by answer them if they are feature related, and confirm them if they are bugs. It would be a **huge help** to the project. I had time recently to work on the project and found myself spending time going through tickets instead.
 
