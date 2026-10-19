@@ -13,3 +13,10 @@ I'm looking for some people to help triage [new issues](https://github.com/cprie
 If you're interested, please reach out to me by opening a ticket about it.
 
 Thanks!
+
+### GNU/Linux
+On GNU/Linux, the long-standing [right click pulls context menu before snap drag](https://github.com/cpriest/SnapLinksPlus/issues/400) issue blocks links from being selected, making Snap Links Plus difficult to use.
+
+Given the lack of recent activity on the underlying Firefox bugs ([bug 1443482](https://bugzilla.mozilla.org/show_bug.cgi?id=1443482) and [bug 1448442](https://bugzilla.mozilla.org/show_bug.cgi?id=1448442)), bringing fresh attention to them on Bugzilla can help prioritize a fix.
+
+Meanwhile, [Linkclump for Firefox](https://addons.mozilla.org/en-US/firefox/addon/linkclump-for-firefox/) (activated by left mouse click + Z) serves as a solid alternative for end-users.
