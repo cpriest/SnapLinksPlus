@@ -1,8 +1,17 @@
 # Snap Links Plus
 
-Snap Links Plus is a Browser Addon that lets you lasso links, checkboxes and other elements and do things with them.
+Snap Links is a Browser Addon that lets you lasso links, checkboxes and other elements and do things with them.
 
-**Quick Tutorial:** Once installed, "lasso" links on a page by holding the right mouse button and dragging the cursor over them, then release the button to open in new tabs.
+**Quick Tutorial:** Once installed, lasso elements on a page by holding the right mouse button and dragging the cursor over them, then release the button to click them (opening links, toggling checkboxes, etc.).
+
+Example when links are lassoed:
+
+<img width="700" height="438" alt="image" src="https://github.com/user-attachments/assets/2c193e84-4ba0-4b93-b69c-7f42f9abeb2c" />
+
+Example when checkboxes, and radio buttons, are lassoed:
+
+<img width="533" height="161" alt="image" src="https://github.com/user-attachments/assets/5c155006-c291-49f3-aff0-1c8ca0f7ad61" />
+
 
 **See our [website](https://cpriest.github.io/SnapLinksPlus/) for news, tutorials, release notes, etc.**
 
