@@ -18,6 +18,7 @@ Example when checkboxes and radio buttons are lassoed:
 
 | Feature | Snap Links Plus | Linkclump |
 | :--- | :---: | :---: |
+| **License** | [MIT License](https://www.google.com/search?q=https://github.com/cpriest/SnapLinksPlus/blob/master/LICENSE) | [MIT License](https://www.google.com/search?q=https://github.com/benranya/Linkclump/blob/master/LICENSE) |
 | **Default Trigger** | Right-click + Drag | `Z` + Left-click + Drag |
 | **Lasso Links** | Yes | Yes |
 | **Lasso Checkboxes & Radio Buttons** | **Yes** | No |
