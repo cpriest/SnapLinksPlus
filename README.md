@@ -4,9 +4,7 @@ Snap Links is a browser add-on that lets you lasso links, checkboxes, and other 
 
 **See our [website](https://cpriest.github.io/SnapLinksPlus/) for news, tutorials, release notes, etc.**
 
-Quick Tutorial: Once installed, lasso elements on a page using the default action: hold the right mouse button, drag the cursor over them, and release to click them (opening links, toggling checkboxes, etc.).
-
-**Quick Tutorial:** Once installed, lasso elements on a page by holding the right mouse button and dragging the cursor over them, then release the button to click them (opening links, toggling checkboxes, etc.).
+**Quick Tutorial:** Once installed, lasso elements on a page using the default action: hold the right mouse button, drag the cursor over them, and release to click them (opening links, toggling checkboxes, etc.).
 
 Example when links are lassoed:
 
