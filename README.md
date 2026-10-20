@@ -2,7 +2,9 @@
 
 Snap Links is a browser add-on that lets you lasso links, checkboxes, and other elements and do things with them.
 
-**Quick Tutorial:** Once installed, lasso elements on a page by holding the right mouse button and dragging the cursor over them, then release the button to click them (opening links, toggling checkboxes, etc.).
+**See our [website](https://cpriest.github.io/SnapLinksPlus/) for news, tutorials, release notes, etc.**
+
+**Quick Tutorial:** Once installed, lasso elements on a page using the default action: hold the right mouse button, drag the cursor over them, and release to click them (opening links, toggling checkboxes, etc.).
 
 Example when links are lassoed:
 
@@ -12,8 +14,27 @@ Example when checkboxes and radio buttons are lassoed:
 
 <img width="533" height="161" alt="image" src="https://github.com/user-attachments/assets/5c155006-c291-49f3-aff0-1c8ca0f7ad61" />
 
+## Comparison with Linkclump
 
-**See our [website](https://cpriest.github.io/SnapLinksPlus/) for news, tutorials, release notes, etc.**
+### Overview & Capabilities
+
+| General Feature | Snap Links Plus | Linkclump |
+| --- | --- | --- |
+| **License** | [MIT License](https://www.google.com/search?q=https://github.com/cpriest/SnapLinksPlus/blob/master/LICENSE) | [MIT License](https://www.google.com/search?q=https://github.com/benranya/Linkclump/blob/master/LICENSE) |
+| **Default Trigger** | Right-click + Drag | `Z` + Left-click + Drag |
+| **Lasso Links** | Yes | Yes |
+| **Lasso Checkboxes & Radio Buttons** | **Yes** | No |
+
+### Supported Actions
+
+| Action | Snap Links Plus | Linkclump |
+| --- | --- | --- |
+| **Open links in new tabs** | Yes (default) | Yes (default) |
+| **Open links as tabs in new window** | Planned ([#182](https://github.com/cpriest/SnapLinksPlus/issues/182)) | Yes |
+| **Open links in new windows** | Planned ([#576](https://github.com/cpriest/SnapLinksPlus/issues/576)) | Yes |
+| **Copy URLs to clipboard** | Yes | Yes |
+| **Bookmark selected links** | Planned ([#216](https://github.com/cpriest/SnapLinksPlus/issues/216)) | Yes |
+
 
 ## Contributors Needed
 
@@ -28,4 +49,4 @@ Thanks!
 ### GNU/Linux
 On Firefox-based browsers for GNU/Linux, Snap Links Plus is affected by a long-standing issue where [right click pulls context menu before snap drag](https://github.com/cpriest/SnapLinksPlus/issues/400), blocking links from being selected. Given the lack of recent activity on the underlying Firefox bugs ([bug 1443482](https://bugzilla.mozilla.org/show_bug.cgi?id=1443482) and [bug 1448442](https://bugzilla.mozilla.org/show_bug.cgi?id=1448442)), bringing fresh attention to them on Bugzilla can help prioritize a fix.
 
-Meanwhile, [Linkclump for Firefox](https://addons.mozilla.org/en-US/firefox/addon/linkclump-for-firefox/) is a solid alternative for end users. Activate by holding the Z key, then holding the left mouse button and dragging the cursor over links, then releasing the button to open them in new tabs.
+Meanwhile, [Linkclump for Firefox](https://addons.mozilla.org/en-US/firefox/addon/linkclump-for-firefox/) is a solid alternative for link management. By default, hold the Z key, hold the left mouse button, and drag the cursor over links, then release the button to open them in new tabs.
