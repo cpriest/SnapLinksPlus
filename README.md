@@ -16,17 +16,25 @@ Example when checkboxes and radio buttons are lassoed:
 
 ## Comparison with Linkclump
 
-| Feature | Snap Links Plus | Linkclump |
-| :--- | :---: | :---: |
+### Overview & Capabilities
+
+| General Feature | Snap Links Plus | Linkclump |
+| --- | --- | --- |
 | **License** | [MIT License](https://www.google.com/search?q=https://github.com/cpriest/SnapLinksPlus/blob/master/LICENSE) | [MIT License](https://www.google.com/search?q=https://github.com/benranya/Linkclump/blob/master/LICENSE) |
 | **Default Trigger** | Right-click + Drag | `Z` + Left-click + Drag |
 | **Lasso Links** | Yes | Yes |
 | **Lasso Checkboxes & Radio Buttons** | **Yes** | No |
-| **Open in New Tabs** | Yes | Yes |
-| **Open in New Windows** | Planned ([#576](https://github.com/cpriest/SnapLinksPlus/issues/576)) | Yes |
-| **Open Tabs in New Window** | Planned ([#182](https://github.com/cpriest/SnapLinksPlus/issues/182)) | Yes |
-| **Copy URLs to Clipboard** | Yes | Yes |
-| **Bookmark Selected Links** | Planned ([#216](https://github.com/cpriest/SnapLinksPlus/issues/216)) | Yes |
+
+### Supported Actions
+
+| Action | Snap Links Plus | Linkclump |
+| --- | --- | --- |
+| **Open links in new tabs** | Yes (default) | Yes (default) |
+| **Open links as tabs in new window** | Planned ([#182](https://github.com/cpriest/SnapLinksPlus/issues/182)) | Yes |
+| **Open links in new windows** | Planned ([#576](https://github.com/cpriest/SnapLinksPlus/issues/576)) | Yes |
+| **Copy URLs to clipboard** | Yes | Yes |
+| **Bookmark selected links** | Planned ([#216](https://github.com/cpriest/SnapLinksPlus/issues/216)) | Yes |
+
 
 ## Contributors Needed
 
