@@ -4,6 +4,8 @@ Snap Links is a browser add-on that lets you lasso links, checkboxes, and other 
 
 **See our [website](https://cpriest.github.io/SnapLinksPlus/) for news, tutorials, release notes, etc.**
 
+Quick Tutorial: Once installed, lasso elements on a page using the default action: hold the right mouse button, drag the cursor over them, and release to click them (opening links, toggling checkboxes, etc.).
+
 **Quick Tutorial:** Once installed, lasso elements on a page by holding the right mouse button and dragging the cursor over them, then release the button to click them (opening links, toggling checkboxes, etc.).
 
 Example when links are lassoed:
@@ -22,7 +24,7 @@ Example when checkboxes and radio buttons are lassoed:
 | **Lasso Links** | Yes | Yes |
 | **Lasso Checkboxes & Radio Buttons** | **Yes** | No |
 | **Open in New Tabs** | Yes | Yes |
-| **Open in New Windows** | Planned ([#182](https://github.com/cpriest/SnapLinksPlus/issues/182)) | Yes |
+| **Open in New Windows** | Planned ([#576](https://github.com/cpriest/SnapLinksPlus/issues/576)) | Yes |
 | **Open Tabs in New Window** | Planned ([#182](https://github.com/cpriest/SnapLinksPlus/issues/182)) | Yes |
 | **Copy URLs to Clipboard** | Yes | Yes |
 | **Bookmark Selected Links** | Planned ([#216](https://github.com/cpriest/SnapLinksPlus/issues/216)) | Yes |
