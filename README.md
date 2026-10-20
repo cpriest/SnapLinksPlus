@@ -14,6 +14,19 @@ Example when checkboxes and radio buttons are lassoed:
 
 <img width="533" height="161" alt="image" src="https://github.com/user-attachments/assets/5c155006-c291-49f3-aff0-1c8ca0f7ad61" />
 
+## Comparison with Linkclump
+
+| Feature | Snap Links Plus | Linkclump |
+| :--- | :---: | :---: |
+| **Default Trigger** | Right-click + Drag | `Z` + Left-click + Drag |
+| **Lasso Links** | Yes | Yes |
+| **Lasso Checkboxes & Radio Buttons** | **Yes** | No |
+| **Open in New Tabs** | Yes | Yes |
+| **Open in New Windows** | Planned ([#182](https://github.com/cpriest/SnapLinksPlus/issues/182)) | Yes |
+| **Open Tabs in New Window** | Planned ([#182](https://github.com/cpriest/SnapLinksPlus/issues/182)) | Yes |
+| **Copy URLs to Clipboard** | Yes | Yes |
+| **Bookmark Selected Links** | Planned ([#216](https://github.com/cpriest/SnapLinksPlus/issues/216)) | Yes |
+
 ## Contributors Needed
 
 I'm happy to review [pull requests](https://github.com/cpriest/SnapLinksPlus/pulls), but I can't spend much time on the project; any help you can provide would be greatly appreciated. I'm also willing to help you set up your local development environment if needed.
@@ -27,4 +40,4 @@ Thanks!
 ### GNU/Linux
 On Firefox-based browsers for GNU/Linux, Snap Links Plus is affected by a long-standing issue where [right click pulls context menu before snap drag](https://github.com/cpriest/SnapLinksPlus/issues/400), blocking links from being selected. Given the lack of recent activity on the underlying Firefox bugs ([bug 1443482](https://bugzilla.mozilla.org/show_bug.cgi?id=1443482) and [bug 1448442](https://bugzilla.mozilla.org/show_bug.cgi?id=1448442)), bringing fresh attention to them on Bugzilla can help prioritize a fix.
 
-Meanwhile, [Linkclump for Firefox](https://addons.mozilla.org/en-US/firefox/addon/linkclump-for-firefox/) is a solid alternative for link management. By default, hold the Z key, hold the left mouse button, and drag the cursor over links, then release the button to open them in new tabs. While both Snap Links Plus and Linkclump open links in new tabs by default and can be configured to copy URLs to the clipboard, they differ in other capabilities. Linkclump can also open links in new windows ([planned](https://github.com/cpriest/SnapLinksPlus/issues/182) for Snap Links Plus) or bookmark them ([planned](https://github.com/cpriest/SnapLinksPlus/issues/216) for Snap Links Plus), but it does not support checkboxes or other non-link elements like Snap Links Plus does.
+Meanwhile, [Linkclump for Firefox](https://addons.mozilla.org/en-US/firefox/addon/linkclump-for-firefox/) is a solid alternative for link management. By default, hold the Z key, hold the left mouse button, and drag the cursor over links, then release the button to open them in new tabs.
