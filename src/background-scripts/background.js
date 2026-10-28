@@ -174,6 +174,9 @@ async function ApplyContextMenuShowEvent() {
 	if(platformInfo.os === 'win')
 		return;
 
+	if(!browser.browserSettings)
+		return;
+
 	let setting = browser.browserSettings.contextMenuShowEvent;
 
 	try {
