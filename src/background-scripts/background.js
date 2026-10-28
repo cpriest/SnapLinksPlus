@@ -163,6 +163,32 @@ async function CheckInstallation() {
 	}
 }
 
+/**
+ * Firefox on Linux and macOS opens the context menu on mousedown, which shows it when starting a right-button drag (#400),
+ * so switch it to mouseup while Snap Links is activated by the right mouse button
+ *
+ * @return {Promise<void>}
+ */
+async function ApplyContextMenuShowEvent() {
+	let platformInfo = await browser.runtime.getPlatformInfo();
+	if(platformInfo.os === 'win')
+		return;
+
+	let setting = browser.browserSettings.contextMenuShowEvent;
+
+	try {
+		if(Prefs.ActivateMouseButton == RMB) {
+			let current = await setting.get({});
+			if(['controllable_by_this_extension', 'controlled_by_this_extension'].includes(current.levelOfControl))
+				await setting.set({ value: 'mouseup' });
+		} else {
+			await setting.clear({});
+		}
+	} catch(e) {
+		console.error('Error while setting contextMenuShowEvent: ', e);
+	}
+}
+
 function Notify(title, message, onClick) {
 	if(onClick)
 		browser.notifications.onClicked.addListener((...args) => onClick(...args));
@@ -187,6 +213,12 @@ browser.runtime.onInstalled.addListener((e) => {
 
 DOMReady.then(() => {
 	browser.runtime.onMessage.addListener(onMessage);
+
+	ApplyContextMenuShowEvent();
+	Prefs.onChanged((key) => {
+		if(key == 'ActivateMouseButton')
+			ApplyContextMenuShowEvent();
+	});
 
 	if(Prefs.DevMode)
 		console.log('Snap Links reloaded %s', (new Date()).toLocaleString());
