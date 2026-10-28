@@ -14,6 +14,7 @@
 
 	"minimum_chrome_version": "51",
 
+{{#Firefox}}
 	"permissions":            [
 		"cookies",
 		"storage",
@@ -21,6 +22,15 @@
 		"clipboardWrite",
 		"browserSettings"
 	],
+{{/Firefox}}
+{{#Chrome}}
+	"permissions":            [
+		"cookies",
+		"storage",
+		"notifications",
+		"clipboardWrite"
+	],
+{{/Chrome}}
 
 	"optional_permissions":   [
 	],
