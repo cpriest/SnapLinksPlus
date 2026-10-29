@@ -25,7 +25,10 @@ If you're interested, please reach out by [opening a ticket](https://github.com/
 
 Thanks!
 
-### GNU/Linux
-On Firefox-based browsers for GNU/Linux, Snap Links Plus is affected by a long-standing issue where [right click pulls context menu before snap drag](https://github.com/cpriest/SnapLinksPlus/issues/400), blocking links from being selected. Given the lack of recent activity on the underlying Firefox bugs ([bug 1443482](https://bugzilla.mozilla.org/show_bug.cgi?id=1443482) and [bug 1448442](https://bugzilla.mozilla.org/show_bug.cgi?id=1448442)), bringing fresh attention to them on Bugzilla can help prioritize a fix.
+### GNU/Linux and macOS
 
-Meanwhile, [Linkclump for Firefox](https://addons.mozilla.org/en-US/firefox/addon/linkclump-for-firefox/) is a solid alternative for end users. Activate by holding the Z key, then holding the left mouse button and dragging the cursor over links, then releasing the button to open them in new tabs.
+While selection uses the right mouse button, Snap Links Plus uses Firefox's `browserSettings` permission to make context menus open when the mouse button is released. This prevents the [context menu from opening over a selection drag (#400)](https://github.com/cpriest/SnapLinksPlus/issues/400). No manual `about:config` change is needed. Windows already opens context menus on release.
+
+**This changes global context menu behavior throughout Firefox**, including ordinary right-clicks outside Snap Links selections. On GNU/Linux and macOS, menus will open on button release instead of button press.
+
+Selecting another activation button in Snap Links options releases the extension's control of this setting. Firefox also releases that control when the extension is disabled or uninstalled, restoring the underlying user preference or another extension's setting. A browser policy or another extension controlling the setting may prevent this fix from taking effect.

@@ -3,6 +3,53 @@
 let openUrlsPromiseChain = Promise.resolve();
 let TabStacks = new Map();
 
+// Serialize changes so switching activation buttons cannot leave a stale setting.
+let contextMenuSettingsChain = Promise.resolve();
+let contextMenuStateMessages = Promise.resolve();
+const contextMenuDragRecoveryReady = isFirefox
+	? browser.runtime.getPlatformInfo().then(info => info.os == 'linux')
+	: Promise.resolve(false);
+
+// Frame initialization must not wait for preference storage to finish loading.
+function onContextMenuMessage(msg, sender) {
+	if(msg.Action == 'GetContextMenuDragRecovery')
+		return contextMenuDragRecoveryReady;
+	if(msg.Action != 'SetContextMenuShown' || !sender.tab || typeof msg.shown != 'boolean')
+		return;
+
+	// Keep menu-open and menu-dismissed broadcasts in the order received.
+	contextMenuStateMessages = contextMenuStateMessages.then(async () => {
+		if(await contextMenuDragRecoveryReady)
+			await browser.tabs.sendMessage(sender.tab.id, {
+				Action: 'SetContextMenuShown', shown: msg.shown, source: msg.source,
+			});
+	}).catch(error => {
+		console.warn('Snap Links could not share context menu state:', error);
+	});
+	return contextMenuStateMessages;
+}
+
+browser.runtime.onMessage.addListener(onContextMenuMessage);
+
+function UpdateContextMenuSetting() {
+	if(!isFirefox || !browser.browserSettings?.contextMenuShowEvent)
+		return;
+
+	let useMouseUp = Prefs.ActivateMouseButton == RMB;
+	contextMenuSettingsChain = contextMenuSettingsChain.then(async () => {
+		let setting = browser.browserSettings.contextMenuShowEvent;
+		if(useMouseUp) {
+			let changed = await setting.set({ value: 'mouseup' });
+			if(!changed)
+				console.warn('Snap Links could not change context menu timing. The setting may be locked or controlled by another extension.');
+		} else {
+			await setting.clear({});
+		}
+	}).catch(error => {
+		console.error('Snap Links could not update context menu timing:', error);
+	});
+}
+
 /**
  * Log that we received the message.
  * Then display a notification. The notification contains the URL,
@@ -216,6 +263,18 @@ browser.runtime.onInstalled.addListener((e) => {
 
 DOMReady.then(() => {
 	browser.runtime.onMessage.addListener(onMessage);
+	Prefs.onChanged(key => {
+		if(key == 'ActivateMouseButton')
+			UpdateContextMenuSetting();
+	});
+	// StoragePrefs may reload a different store without notifying its observers.
+	browser.storage.onChanged.addListener((changes, area) => {
+		if(area == 'local' && 'StorageAPI' in changes)
+			Prefs.Ready.then(UpdateContextMenuSetting).catch(error => {
+				console.error('Snap Links could not load context menu preferences:', error);
+			});
+	});
+	UpdateContextMenuSetting();
 
 	ApplyContextMenuShowEvent();
 	Prefs.onChanged((key) => {
