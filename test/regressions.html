@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Snap Links regression checks</title>
+	<style>
+		body { font: 16px sans-serif; margin: 20px; }
+		section { border: 1px solid #999; padding: 10px 14px; margin: 0 0 24px; width: 520px; }
+		h2 { font-size: 15px; margin: 0 0 6px; }
+		p.expect { font-size: 13px; color: #555; margin: 8px 0 0; }
+		a { margin-right: 14px; }
+	</style>
+</head>
+<body>
+
+<section id="svg">
+	<h2>1. Links that are only an inline SVG</h2>
+	<a href="https://example.com/svg-1"><svg width="40" height="40"><circle cx="20" cy="20" r="16" fill="teal"/></svg></a>
+	<a href="https://example.com/svg-2"><svg width="40" height="40"><rect x="4" y="4" width="32" height="32" fill="orange"/></svg></a>
+	<p class="expect">Lasso both shapes: both highlight, label says "2 Links", 2 tabs open.</p>
+</section>
+
+<section id="tiny">
+	<h2>2. Small fonts must not beat large fonts</h2>
+	<a href="https://example.com/big-1" style="font-size: 16px">Big one</a>
+	<a href="https://example.com/big-2" style="font-size: 16px">Big two</a>
+	<a href="https://example.com/tiny" style="font-size: 9px">tiny</a>
+	<p class="expect">Lasso all three: only the two 16px links highlight. Hold Alt: all three highlight.</p>
+</section>
+
+<section id="fraction">
+	<h2>3. Fractional font sizes</h2>
+	<a href="https://example.com/13px" style="font-size: 13px">Thirteen px</a>
+	<a href="https://example.com/12.5px" style="font-size: 12.5px">Twelve and a half px</a>
+	<p class="expect">Lasso both: only the 13px link highlights.</p>
+</section>
+
+<section id="scroll">
+	<h2>4. Highlights stay put while the page scrolls</h2>
+	<a href="https://example.com/scroll-1">Scroll one</a>
+	<a href="https://example.com/scroll-2">Scroll two</a>
+	<a href="https://example.com/scroll-3">Scroll three</a>
+	<p class="expect">Start the lasso above this box and drag below the bottom of the window. The page scrolls and
+		these links stay highlighted the whole time, with no flicker. Escape cancels.</p>
+</section>
+
+<div style="height: 1500px"></div>
+<p>Bottom of the page.</p>
+
+</body>
+</html>
