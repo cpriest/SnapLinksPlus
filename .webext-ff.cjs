@@ -10,7 +10,7 @@ module.exports = {
 		profileCreateIfMissing: true,
 		keepProfileChanges:     true,
 		reload:                 true,
-//		startUrl:               [`file://${__dirname}/test/test_links.html`, 'about:addons', 'about:devtools-toolbox?id=snaplinks%40snaplinks.mozdev.org&type=extension'],
+		startUrl:               [`file://${path.join(__dirname, 'test', 'regressions.html')}`],
 		watchFile: [path.join(__dirname, 'build', 'build.json')],
 		// FIREFOX overrides; then a copy in ~/.local/bin (found even when PATH lacks it, eg: `su -c`); then web-ext's alias, which
 		// finds Developer Edition on Windows/macOS and `firefox-developer-edition` on PATH on Linux
