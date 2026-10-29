@@ -48,6 +48,9 @@ function makeTabStrip() {
 
 let run, browser, strip;
 
+/** What load() reports to background.js, change before calling load() */
+let platformOs, contextMenuControl;
+
 /** Replaces the storage-backed Prefs so each test controls exactly what background.js sees */
 const setPrefs = (overrides = {}) => run('(p) => { Prefs = p; }')({
 	OpenTabs: run('TABS_OPEN_NATURAL'), SwitchFocusToNewTab: true, NewTabDelayMS: 0, SetOwnershipTabID_FF: false, NewTabsOpenUnloaded: false,
@@ -64,13 +67,20 @@ const load = async (globals = {}, stores = undefined) => {
 		...makeBrowser(stores),
 		tabs:          strip.api,
 		notifications: { create: jest.fn(async () => 'n'), onClicked: { addListener: jest.fn() } },
+		browserSettings: {
+			contextMenuShowEvent: {
+				get:   jest.fn(async () => ({ levelOfControl: contextMenuControl })),
+				set:   jest.fn(async () => true),
+				clear: jest.fn(async () => true),
+			},
+		},
 	};
 	browser.runtime = {
 		sendMessage:     jest.fn(),
 		onMessage:       { addListener: jest.fn(), removeListener: jest.fn() },
 		onInstalled:     { addListener: jest.fn() },
 		getManifest:     () => ({ version: '3.1.16' }),
-		getPlatformInfo: async () => ({ os: 'linux' }),
+		getPlatformInfo: async () => ({ os: platformOs }),
 		reload:          jest.fn(),
 	};
 
@@ -85,7 +95,11 @@ const load = async (globals = {}, stores = undefined) => {
 		setPrefs();
 };
 
-beforeEach(() => load());
+beforeEach(() => {
+	platformOs         = 'linux';
+	contextMenuControl = 'controllable_by_this_extension';
+	return load();
+});
 
 describe('OpenUrlsInTabs placement', () => {
 	const open = (urls) => run('OpenUrlsInTabs')(urls);
@@ -302,5 +316,66 @@ describe('install and update handling', () => {
 		await install({ local: { LastInstalledVersion: '3.1.7', ScrollRate: 20 } });
 
 		expect(browser.storage.sync.data.ScrollRate).toBeUndefined();
+	});
+});
+
+describe('context menu show event (#400: Linux/macOS open the menu on mousedown)', () => {
+	const setting = () => browser.browserSettings.contextMenuShowEvent;
+
+	/** Loads with real storage-backed Prefs, so the pref change listener is the real one */
+	const loadWith = async (sync = {}) => {
+		await load({}, { sync });
+		await flush();
+	};
+
+	test.each(['linux', 'mac'])('on %s with the right mouse button, the menu is moved to mouseup', async (os) => {
+		platformOs = os;
+		await loadWith();
+
+		expect(setting().set).toHaveBeenCalledWith({ value: 'mouseup' });
+	});
+
+	test('on Windows the setting is left alone', async () => {
+		platformOs = 'win';
+		await loadWith();
+
+		expect(setting().get).not.toHaveBeenCalled();
+		expect(setting().set).not.toHaveBeenCalled();
+		expect(setting().clear).not.toHaveBeenCalled();
+	});
+
+	test('with another activation button, our override is cleared', async () => {
+		await loadWith({ ActivateMouseButton: 1 });
+
+		expect(setting().clear).toHaveBeenCalled();
+		expect(setting().set).not.toHaveBeenCalled();
+	});
+
+	test('a setting controlled by another extension or policy is not overridden', async () => {
+		contextMenuControl = 'controlled_by_other_extensions';
+		await loadWith();
+
+		expect(setting().set).not.toHaveBeenCalled();
+	});
+
+	test('changing ActivateMouseButton re-applies the setting', async () => {
+		await loadWith();
+		setting().clear.mockClear();
+
+		browser.fireStorageChanged({ ActivateMouseButton: { newValue: 1, oldValue: 2 } }, 'sync');
+		await flush();
+
+		expect(setting().clear).toHaveBeenCalledTimes(1);
+	});
+
+	test('without the browserSettings API (Chrome) nothing fails', async () => {
+		let errors = [];
+		await load({}, {});
+		delete browser.browserSettings;
+		run('(log) => { console.error = (...a) => log.push(a.join(" ")); }')(errors);
+
+		await run('ApplyContextMenuShowEvent')();
+
+		expect(errors).toEqual([]);
 	});
 });
