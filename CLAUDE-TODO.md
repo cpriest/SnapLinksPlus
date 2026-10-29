@@ -2,4 +2,4 @@
 
 Found while documenting the project (2026-09-30). None are urgent.
 
-- [ ] `file://` pages: Firefox now needs the per-extension "Access local files on your computer" opt-in. Confirm the toggle shows for Snap Links; if not, add `file:///*` to the Firefox permissions. Then document it for users.
+- [ ] `file://` pages: Firefox needs the per-extension opt-in (about:addons > Snap Links > Permissions > "Access local files on your computer", then reload the page). Verified 2026-10-29. Document it for users in README / docs/Tutorial.md.
