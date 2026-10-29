@@ -8,6 +8,7 @@
 
 import { execFileSync, spawnSync } from 'child_process';
 import fs from 'fs';
+import http from 'http';
 import { createRequire } from 'module';
 import path from 'path';
 import { pathToFileURL } from 'url';
@@ -61,6 +62,42 @@ if(process.argv.includes('--verbose'))
 if(!process.env.DISPLAY && !process.env.WAYLAND_DISPLAY && fs.existsSync('/mnt/wslg/.X11-unix/X0'))
 	process.env.DISPLAY = ':0';
 
+/**
+ * Firefox does not run content scripts on file:// pages, so the test fixtures are served over http instead.
+ * Only test/ is served: the project root also holds insecure/ (signing keys).
+ *
+ * @return {Promise<string>}  The base URL, eg: http://127.0.0.1:41234/
+ */
+async function serveTestDir() {
+	const Root  = path.join(ProjectDir, 'test'),
+		  Types = { '.html': 'text/html', '.htm': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.gif': 'image/gif', '.png': 'image/png', '.svg': 'image/svg+xml' };
+
+	let server = http.createServer((req, res) => {
+		let file = path.join(Root, path.normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)));
+
+		if(!file.startsWith(Root + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
+			res.writeHead(404).end(`run-ff: ${req.url} is not a file in ${Root}`);
+			return;
+		}
+		res.writeHead(200, { 'Content-Type': Types[path.extname(file).toLowerCase()] || 'application/octet-stream' });
+		fs.createReadStream(file).pipe(res);
+	});
+
+	await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+	return `http://127.0.0.1:${server.address().port}/`;
+}
+
+/** Rewrites file:// start URLs inside test/ to the http server */
+async function httpStartUrls(urls = []) {
+	let prefix = `file://${path.join(ProjectDir, 'test')}/`;
+
+	if(!urls.some(u => u.startsWith(prefix)))
+		return urls;
+
+	let base = await serveTestDir();
+	return urls.map(u => u.startsWith(prefix) ? base + u.slice(prefix.length) : u);
+}
+
 const MaxRetries    = 250,	// ~30s, matching web-ext's own limit
 	  RetryInterval = 120;
 
@@ -77,4 +114,4 @@ async function firefoxClient({ port }) {
 	}
 }
 
-await webExt.cmd.run({ sourceDir: config.sourceDir, ...config.run, noInput: !process.stdin.isTTY }, { firefoxClient, shouldExitProgram: false });
+await webExt.cmd.run({ sourceDir: config.sourceDir, ...config.run, startUrl: await httpStartUrls(config.run.startUrl), noInput: !process.stdin.isTTY }, { firefoxClient, shouldExitProgram: false });
