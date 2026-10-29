@@ -12,11 +12,16 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 
 import webExt from 'web-ext';
+import { consoleStream } from 'web-ext/util/logger';
 
 const require   = createRequire(import.meta.url);
 const config    = require('../.webext-ff.cjs');
 const RemoteJs  = path.join(path.dirname(require.resolve('web-ext')), 'lib/firefox/remote.js');
 const { connect } = await import(pathToFileURL(RemoteJs).href);
+
+// `npm run run-ff -- --verbose` also shows Firefox's own stderr, which is where a launch failure is explained
+if(process.argv.includes('--verbose'))
+	consoleStream.makeVerbose();
 
 // Shells that WSL does not start itself (ssh, some IDE terminals) have no DISPLAY, and Firefox then exits without a word
 if(!process.env.DISPLAY && !process.env.WAYLAND_DISPLAY && fs.existsSync('/mnt/wslg/.X11-unix/X0'))
@@ -32,7 +37,7 @@ async function firefoxClient({ port }) {
 		} catch(error) {
 			if(!['ECONNREFUSED', 'ECONNRESET'].includes(error.code) || attempt >= MaxRetries)
 				throw new Error(`Could not connect to the Firefox debugger on 127.0.0.1:${port} after ${attempt + 1} attempts: ${error.message}. `
-					+ `If Firefox never opened a window, check that it can reach a display (DISPLAY=${process.env.DISPLAY || '<unset>'}, WAYLAND_DISPLAY=${process.env.WAYLAND_DISPLAY || '<unset>'}).`, { cause: error });
+					+ `Run 'npm run run-ff -- --verbose' to see Firefox's own output. If Firefox never opened a window, check that it can reach a display (DISPLAY=${process.env.DISPLAY || '<unset>'}, WAYLAND_DISPLAY=${process.env.WAYLAND_DISPLAY || '<unset>'}).`, { cause: error });
 			await new Promise(resolve => setTimeout(resolve, RetryInterval));
 		}
 	}
