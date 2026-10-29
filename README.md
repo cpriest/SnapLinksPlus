@@ -33,7 +33,9 @@ Firefox does not let add-ons run on local files until you allow it for each add-
 3. Turn on **Access local files on your computer**.
 4. Reload any local page that is already open.
 
-### GNU/Linux
-On Firefox-based browsers for GNU/Linux, Snap Links Plus is affected by a long-standing issue where [right click pulls context menu before snap drag](https://github.com/cpriest/SnapLinksPlus/issues/400), blocking links from being selected. Given the lack of recent activity on the underlying Firefox bugs ([bug 1443482](https://bugzilla.mozilla.org/show_bug.cgi?id=1443482) and [bug 1448442](https://bugzilla.mozilla.org/show_bug.cgi?id=1448442)), bringing fresh attention to them on Bugzilla can help prioritize a fix.
+### GNU/Linux and macOS
+On Linux and macOS, Firefox opens the context menu when you press the right mouse button, not when you release it. This stopped right-button drags ([#400](https://github.com/cpriest/SnapLinksPlus/issues/400)).
 
-Meanwhile, [Linkclump for Firefox](https://addons.mozilla.org/en-US/firefox/addon/linkclump-for-firefox/) is a solid alternative for end users. Activate by holding the Z key, then holding the left mouse button and dragging the cursor over links, then releasing the button to open them in new tabs.
+Snap Links now fixes this itself. While the right mouse button starts a selection, Snap Links tells Firefox to open the context menu when you release the button. A right-click without a drag still shows the context menu. If you change Snap Links to another mouse button, Firefox goes back to its normal behavior.
+
+If the context menu still opens when you start a drag, another add-on or a policy may control this Firefox setting. Then set `ui.context_menus.after_mouseup` to `true` in `about:config`.
