@@ -2,4 +2,4 @@
 
 Found while documenting the project (2026-09-30). None are urgent.
 
-- [ ] Snap Links does nothing on `file://` pages in Firefox 158 (content scripts not injected). Check whether release Firefox does the same and whether users need it.
+- [ ] `file://` pages: Firefox now needs the per-extension "Access local files on your computer" opt-in. Confirm the toggle shows for Snap Links; if not, add `file:///*` to the Firefox permissions. Then document it for users.
