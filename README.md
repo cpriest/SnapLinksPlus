@@ -25,6 +25,14 @@ If you're interested, please reach out by [opening a ticket](https://github.com/
 
 Thanks!
 
+### Local files (file:// pages)
+Firefox does not let add-ons run on local files until you allow it for each add-on. To use Snap Links on `file://` pages:
+
+1. Open `about:addons` and select **Snap Links**.
+2. Open the **Permissions** tab.
+3. Turn on **Access local files on your computer**.
+4. Reload any local page that is already open.
+
 ### GNU/Linux
 On Firefox-based browsers for GNU/Linux, Snap Links Plus is affected by a long-standing issue where [right click pulls context menu before snap drag](https://github.com/cpriest/SnapLinksPlus/issues/400), blocking links from being selected. Given the lack of recent activity on the underlying Firefox bugs ([bug 1443482](https://bugzilla.mozilla.org/show_bug.cgi?id=1443482) and [bug 1448442](https://bugzilla.mozilla.org/show_bug.cgi?id=1448442)), bringing fresh attention to them on Bugzilla can help prioritize a fix.
 
