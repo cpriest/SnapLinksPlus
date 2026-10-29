@@ -18,7 +18,7 @@ npm run run-ff      # Firefox Dev Edition with build/ff loaded, auto-reloads on 
 
 - `gulp publish` signs and uploads to AMO using `insecure/Firefox/api-key.json` (gitignored). Never run it unprompted.
 - `run-ff` uses the persistent profile `SnapLinksDev/` (gitignored) and the `firefoxdeveloperedition` alias: Developer Edition on Windows/macOS, `firefox-developer-edition` on PATH on Linux/WSL. Set `FIREFOX=/path/to/firefox` to use another binary.
-- `scripts/run-ff.mjs` exists because WSL2 mirrored networking resets (rather than refuses) connects to a not-yet-listening localhost port, and web-ext only retries on ECONNREFUSED. It wraps web-ext's `connect` from an internal path (`web-ext/lib/firefox/remote.js`), so re-check it after upgrading web-ext. Under WSL, Firefox renders through WSLg.
+- `scripts/run-ff.mjs` exists because WSL2 mirrored networking resets (rather than refuses) connects to a not-yet-listening localhost port, and web-ext only retries on ECONNREFUSED. It wraps web-ext's `connect` from an internal path (`web-ext/lib/firefox/remote.js`), so re-check it after upgrading web-ext. Under WSL, Firefox renders through WSLg; the script sets `DISPLAY=:0` when the shell has no display set (ssh, some IDE terminals).
 - npm only (`package-lock.json` is the lockfile; CI runs `npm ci`). Don't reintroduce yarn.
 
 ## Build pipeline
