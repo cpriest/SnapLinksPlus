@@ -1,3 +1,5 @@
+const fs   = require('fs');
+const os   = require('os');
 const path = require('path');
 
 module.exports = {
@@ -10,7 +12,8 @@ module.exports = {
 		reload:                 true,
 //		startUrl:               [`file://${__dirname}/test/test_links.html`, 'about:addons', 'about:devtools-toolbox?id=snaplinks%40snaplinks.mozdev.org&type=extension'],
 		watchFile: [path.join(__dirname, 'build', 'build.json')],
-		// The alias finds Developer Edition on Windows/macOS, and `firefox-developer-edition` on PATH on Linux; FIREFOX overrides it
-		firefox:   process.env.FIREFOX || 'firefoxdeveloperedition',
+		// FIREFOX overrides; then a copy in ~/.local/bin (found even when PATH lacks it, eg: `su -c`); then web-ext's alias, which
+		// finds Developer Edition on Windows/macOS and `firefox-developer-edition` on PATH on Linux
+		firefox:   process.env.FIREFOX || [path.join(os.homedir(), '.local/bin/firefox-developer-edition')].find(f => fs.existsSync(f)) || 'firefoxdeveloperedition',
 	},
 };

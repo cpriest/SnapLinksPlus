@@ -6,6 +6,7 @@
  * web-ext/lib/firefox/remote.js), so it gives up before Firefox has opened its debugger port.
  */
 
+import { execFileSync, spawnSync } from 'child_process';
 import fs from 'fs';
 import { createRequire } from 'module';
 import path from 'path';
@@ -14,16 +15,43 @@ import { pathToFileURL } from 'url';
 import webExt from 'web-ext';
 import { consoleStream } from 'web-ext/util/logger';
 
+const ProjectDir = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+
+/*
+ * Firefox exits at once as root in another user's session ("Running Firefox ... as root in a regular user's session is not
+ * supported").  As root, re-run this script as the owner of the project directory, with that user's HOME and PATH.
+ */
+if(process.getuid?.() === 0) {
+	let uid    = fs.statSync(ProjectDir).uid,
+		passwd = execFileSync('getent', ['passwd', String(uid)], { encoding: 'utf8' }).trim().split(':'),
+		[user, , , gid, , home] = passwd;
+
+	if(uid === 0)
+		throw new Error(`run-ff: ${ProjectDir} is owned by root, so there is no regular user to run Firefox as.`);
+
+	console.log(`run-ff: running as ${user} instead of root`);
+
+	let runtimeDir = `/run/user/${uid}`,
+		env        = {
+			...process.env,
+			HOME:    home,
+			USER:    user,
+			LOGNAME: user,
+			PATH:    `${home}/.local/bin:${process.env.PATH}`,
+			...(fs.existsSync(runtimeDir) ? { XDG_RUNTIME_DIR: runtimeDir, DBUS_SESSION_BUS_ADDRESS: `unix:path=${runtimeDir}/bus` } : {}),
+		};
+
+	let result = spawnSync('runuser', ['-u', user, '--', process.execPath, ...process.argv.slice(1)], { cwd: ProjectDir, env, stdio: 'inherit' });
+
+	if(result.error)
+		throw new Error(`run-ff: could not run as ${user} (uid ${uid}, gid ${gid}) with runuser: ${result.error.message}`, { cause: result.error });
+	process.exit(result.status ?? 1);
+}
+
 const require   = createRequire(import.meta.url);
 const config    = require('../.webext-ff.cjs');
 const RemoteJs  = path.join(path.dirname(require.resolve('web-ext')), 'lib/firefox/remote.js');
 const { connect } = await import(pathToFileURL(RemoteJs).href);
-
-// Firefox exits at once as root in another user's session ("Running Firefox ... as root in a regular user's session is not supported")
-if(process.getuid?.() === 0) {
-	console.error(`run-ff: Firefox will not run as root (HOME=${process.env.HOME}). Run it as your own user, for example: su ${process.env.SUDO_USER || '<user>'} -c 'npm run run-ff'`);
-	process.exit(1);
-}
 
 // `npm run run-ff -- --verbose` also shows Firefox's own stderr, which is where a launch failure is explained
 if(process.argv.includes('--verbose'))
