@@ -19,6 +19,12 @@ const config    = require('../.webext-ff.cjs');
 const RemoteJs  = path.join(path.dirname(require.resolve('web-ext')), 'lib/firefox/remote.js');
 const { connect } = await import(pathToFileURL(RemoteJs).href);
 
+// Firefox exits at once as root in another user's session ("Running Firefox ... as root in a regular user's session is not supported")
+if(process.getuid?.() === 0) {
+	console.error(`run-ff: Firefox will not run as root (HOME=${process.env.HOME}). Run it as your own user, for example: su ${process.env.SUDO_USER || '<user>'} -c 'npm run run-ff'`);
+	process.exit(1);
+}
+
 // `npm run run-ff -- --verbose` also shows Firefox's own stderr, which is where a launch failure is explained
 if(process.argv.includes('--verbose'))
 	consoleStream.makeVerbose();
