@@ -35,12 +35,27 @@ class EventHandler {
 			pub(ElementPositionsChanged, {});
 		}, true);
 		docElem.addEventListener('mousedown', this.onMouseDown, true);
+		this.ContextMenuSource = Math.random().toString(36).slice(2);
+		this.ContextMenuRecoveryReady = browser.runtime.sendMessage({ Action: 'GetContextMenuDragRecovery' }).then(enabled => {
+			if(!enabled)
+				return;
+			this.ContextMenuRecoveryEnabled = true;
+			browser.runtime.onMessage.addListener(msg => {
+				if(msg.Action == 'SetContextMenuShown' && msg.source != this.ContextMenuSource)
+					this.ContextMenuShown = msg.shown;
+			});
+			docElem.addEventListener('mousemove', this.onRecoverContextMenuDrag.bind(this), true);
+			window.addEventListener('contextmenu', this.onContextMenu.bind(this));
+		}).catch(error => {
+			console.warn('Snap Links could not enable context menu drag recovery:', error);
+		});
 	}
 
 	/**
 	 * @param {MouseEvent} e
 	 */
 	onMouseDown(e) {
+		this.SetContextMenuShown(false);
 		e = AddModsToEvent(e);
 
 		if(Prefs.DevMode) {
@@ -66,6 +81,42 @@ class EventHandler {
 	onMouseMove(e) {
 		this.LastMouseEvent = AddModsToEvent(e);
 		LastModifierKeys    = e.mods;
+	}
+
+	/**
+	 * Recover a press consumed by Firefox's native menu dismissal on Linux.
+	 *
+	 * @param {MouseEvent} e
+	 */
+	onRecoverContextMenuDrag(e) {
+		if(this.Dragging || !this.ContextMenuShown)
+			return;
+		e = AddModsToEvent(e);
+		if(e.mods != Prefs.ActivateModifiers || e.buttons != Prefs.ActivateMouseButton)
+			return;
+		this.BeginDrag(e);
+		this.onMouseMove(e);
+	}
+
+	/**
+	 * Remember a native menu so a drag can recover if its next press is consumed.
+	 *
+	 * @param {MouseEvent} e
+	 */
+	onContextMenu(e) {
+		this.SetContextMenuShown(!e.defaultPrevented);
+	}
+
+	SetContextMenuShown(shown) {
+		let changed = this.ContextMenuShown !== shown;
+		this.ContextMenuShown = shown;
+		if(!this.ContextMenuRecoveryEnabled || !changed)
+			return;
+		browser.runtime.sendMessage({
+			Action: 'SetContextMenuShown', shown: shown, source: this.ContextMenuSource,
+		}).catch(error => {
+			console.warn('Snap Links could not share context menu state:', error);
+		});
 	}
 
 	/**
@@ -111,6 +162,8 @@ class EventHandler {
 	 * @param {MouseEvent} e
 	 */
 	BeginDrag(e) {
+		this.Dragging = true;
+		this.SetContextMenuShown(false);
 		this.FirstInit();
 		let [clientWidth, clientHeight] = GetClientDims();
 		this.MousePos = { clientX: e.clientX, clientY: e.clientY };
@@ -189,6 +242,7 @@ class EventHandler {
 	 * @param {MouseEvent|KeyboardEvent} e
 	 */
 	EndDrag(e) {
+		this.Dragging = false;
 		//noinspection JSVoidFunctionReturnValueUsed
 		this.mmTimer = clearInterval(this.mmTimer);
 
