@@ -31,9 +31,10 @@ function onMessage(msg, sender, respond) {
 			browser.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			openUrlsPromiseChain = openUrlsPromiseChain.then(() => {
-				return OpenUrlsInTabs(msg.tUrls);
-			});
+			// Catch errors so that a failed request doesn't leave the chain rejected, which would skip every later request
+			openUrlsPromiseChain = openUrlsPromiseChain
+				.then(() => OpenUrlsInTabs(msg.tUrls))
+				.catch(error => console.error('Error while opening URLs in tabs: ', error));
 			break;
 		case COPY_TO_CLIPBOARD:
 			CopyToClipboard(msg.tUrls);
@@ -101,26 +102,72 @@ async function OpenUrlsInTabs(urls) {
 			break;
 	}
 
+	let openerTabId = isFirefox && Prefs.SetOwnershipTabID_FF ? activeTab.id : undefined;
+
 	for(let url of urls) {
 		let props = {
 			url:      url,
 			active:   Prefs.SwitchFocusToNewTab ? (--tabsLeft) === 0 : false,	// Activate the last tab to be opened
-			index:    startIndex + tabsOpened++,
+			index:    startIndex + tabsOpened,
 			windowId: activeTab.windowId,
 		};
 
 		if(isFirefox) {
 			props.cookieStoreId = activeTab.cookieStoreId;
-			if(Prefs.SetOwnershipTabID_FF)
-				props.openerTabId = activeTab.id;
+			if(openerTabId !== undefined)
+				props.openerTabId = openerTabId;
 		}
 
-		let newTab = await browser.tabs.create(props);
+		let newTab;
+		try {
+			newTab = await CreateTab(props);
+		} catch(error) {
+			// Skip this URL (e.g. an illegal URL) and keep opening the rest
+			console.error(`Error while opening ${url} in a new tab: `, error);
+			continue;
+		}
+
+		// The opener tab was closed, so don't try to set it for the remaining URLs
+		if(!('openerTabId' in props))
+			openerTabId = undefined;
+
+		tabsOpened++;
 		tabStack.unshift(newTab.id);
 
 		await sleep(Prefs.NewTabDelayMS);
 	}
 	TabStacks.set(activeTab.id, tabStack);
+}
+
+/**
+ * Creates a tab, and if the opener tab has been closed in the meantime, creates it again without an opener
+ *
+ * @param {object} props    The properties for browser.tabs.create(), openerTabId is removed if it is no longer valid
+ * @return {Promise<object>}
+ */
+async function CreateTab(props) {
+	try {
+		return await browser.tabs.create(props);
+	} catch(error) {
+		if(!('openerTabId' in props) || await TabExists(props.openerTabId))
+			throw error;
+
+		delete props.openerTabId;
+		return browser.tabs.create(props);
+	}
+}
+
+/**
+ * @param {number} tabId
+ * @return {Promise<boolean>}
+ */
+async function TabExists(tabId) {
+	try {
+		await browser.tabs.get(tabId);
+		return true;
+	} catch(error) {
+		return false;
+	}
 }
 
 /**
