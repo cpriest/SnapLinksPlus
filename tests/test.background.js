@@ -19,8 +19,9 @@ const source = fs.readFileSync(path.join(__dirname, '../src/background-scripts/b
 function LoadBackground({ create, tabIds = [1], prefs = {} }) {
 	const browser = {
 		runtime: {
-			onMessage:   { addListener: jest.fn() },
-			onInstalled: { addListener: jest.fn() },
+			getPlatformInfo: jest.fn(async () => ({ os: 'win' })),
+			onMessage:       { addListener: jest.fn() },
+			onInstalled:     { addListener: jest.fn() },
 		},
 		tabs:    {
 			query:  jest.fn(async () => [{ id: 1, index: 0, windowId: 1, cookieStoreId: 'firefox-default' }]),
