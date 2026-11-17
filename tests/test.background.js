@@ -109,7 +109,7 @@ describe('OPEN_URLS_IN_TABS', () => {
 			.toEqual([1, 2]);
 	});
 
-	test('tabs keep opening without an opener after the opener tab is closed', async () => {
+	test('openerTabId is only set while the opener tab still exists', async () => {
 		const tabIds = [1];
 		const opened = [];
 		const bg     = LoadBackground({
@@ -133,11 +133,14 @@ describe('OPEN_URLS_IN_TABS', () => {
 				['https://b.example/', undefined],
 				['https://c.example/', undefined],
 			]);
+		// tabs.create() is never called with the closed opener tab
+		expect(bg.browser.tabs.create)
+			.toHaveBeenCalledTimes(3);
 		expect(bg.console.error)
 			.not.toHaveBeenCalled();
 	});
 
-	test('an error is not hidden when the opener tab still exists', async () => {
+	test('a failed tab is logged and not retried', async () => {
 		const bg = LoadBackground({
 			create: async () => {
 				throw new Error('Some other error');
@@ -146,7 +149,6 @@ describe('OPEN_URLS_IN_TABS', () => {
 
 		await bg.OpenUrls(['https://a.example/']);
 
-		// Not retried without the opener
 		expect(bg.browser.tabs.create)
 			.toHaveBeenCalledTimes(1);
 		expect(bg.console.error)

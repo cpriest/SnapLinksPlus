@@ -102,8 +102,6 @@ async function OpenUrlsInTabs(urls) {
 			break;
 	}
 
-	let openerTabId = isFirefox && Prefs.SetOwnershipTabID_FF ? activeTab.id : undefined;
-
 	for(let url of urls) {
 		let props = {
 			url:      url,
@@ -114,22 +112,19 @@ async function OpenUrlsInTabs(urls) {
 
 		if(isFirefox) {
 			props.cookieStoreId = activeTab.cookieStoreId;
-			if(openerTabId !== undefined)
-				props.openerTabId = openerTabId;
+			// The opener tab may have been closed while tabs are still opening (#579)
+			if(Prefs.SetOwnershipTabID_FF && await TabExists(activeTab.id))
+				props.openerTabId = activeTab.id;
 		}
 
 		let newTab;
 		try {
-			newTab = await CreateTab(props);
+			newTab = await browser.tabs.create(props);
 		} catch(error) {
 			// Skip this URL (e.g. an illegal URL) and keep opening the rest
 			console.error(`Error while opening ${url} in a new tab: `, error);
 			continue;
 		}
-
-		// The opener tab was closed, so don't try to set it for the remaining URLs
-		if(!('openerTabId' in props))
-			openerTabId = undefined;
 
 		tabsOpened++;
 		tabStack.unshift(newTab.id);
@@ -137,24 +132,6 @@ async function OpenUrlsInTabs(urls) {
 		await sleep(Prefs.NewTabDelayMS);
 	}
 	TabStacks.set(activeTab.id, tabStack);
-}
-
-/**
- * Creates a tab, and if the opener tab has been closed in the meantime, creates it again without an opener
- *
- * @param {object} props    The properties for browser.tabs.create(), openerTabId is removed if it is no longer valid
- * @return {Promise<object>}
- */
-async function CreateTab(props) {
-	try {
-		return await browser.tabs.create(props);
-	} catch(error) {
-		if(!('openerTabId' in props) || await TabExists(props.openerTabId))
-			throw error;
-
-		delete props.openerTabId;
-		return browser.tabs.create(props);
-	}
 }
 
 /**
