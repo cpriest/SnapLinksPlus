@@ -379,3 +379,78 @@ describe('context menu show event (#400: Linux/macOS open the menu on mousedown)
 		expect(errors).toEqual([]);
 	});
 });
+
+describe('OpenUrlsInWindow (#182)', () => {
+	const source = { id: 2, windowId: 7, cookieStoreId: 'c2', incognito: false };
+	let windows;
+
+	beforeEach(() => {
+		windows = {
+			create: jest.fn(async (props) => ({ id: 50, ...props })),
+			update: jest.fn(async () => ({})),
+		};
+		browser.windows = windows;
+	});
+
+	const open = (urls, tab = source) => run('OpenUrlsInWindow')(urls, tab);
+
+	test('opens the first link as a new window and the rest as its tabs, in order, in the source tab\'s container', async () => {
+		await open(['u1', 'u2', 'u3']);
+
+		expect(windows.create).toHaveBeenCalledWith({ url: 'u1', incognito: false, cookieStoreId: 'c2' });
+		expect(strip.api.create.mock.calls.map(([p]) => p)).toEqual([
+			{ url: 'u2', active: false, windowId: 50, cookieStoreId: 'c2' },
+			{ url: 'u3', active: false, windowId: 50, cookieStoreId: 'c2' },
+		]);
+	});
+
+	test('a private window opens private', async () => {
+		await open(['u1'], { ...source, incognito: true, cookieStoreId: 'firefox-private' });
+
+		expect(windows.create).toHaveBeenCalledWith({ url: 'u1', incognito: true, cookieStoreId: 'firefox-private' });
+	});
+
+	test.each([
+		[true, 0],
+		[false, 1],
+	])('SwitchFocusToNewTab=%s → refocuses the source window %i time(s)', async (focusNew, calls) => {
+		setPrefs({ SwitchFocusToNewTab: focusNew });
+
+		await open(['u1', 'u2']);
+
+		expect(windows.update).toHaveBeenCalledTimes(calls);
+		if(calls)
+			expect(windows.update).toHaveBeenCalledWith(7, { focused: true });
+	});
+
+	test('NewTabsOpenUnloaded opens the extra tabs discarded', async () => {
+		setPrefs({ NewTabsOpenUnloaded: true });
+
+		await open(['u1', 'u2']);
+
+		expect(strip.api.create.mock.calls[0][0].discarded).toBe(true);
+	});
+
+	test('without a source tab, uses the active tab', async () => {
+		await run('OpenUrlsInWindow')(['u1']);
+
+		expect(strip.api.query).toHaveBeenCalledWith({ active: true, currentWindow: true });
+		expect(windows.create).toHaveBeenCalledWith({ url: 'u1', incognito: false, cookieStoreId: 'c2' });
+	});
+
+	test('does nothing for no links', async () => {
+		await open([]);
+
+		expect(windows.create).not.toHaveBeenCalled();
+	});
+
+	test('OPEN_URLS_IN_WINDOW messages use the sending tab and share the queue with OPEN_URLS_IN_TABS', async () => {
+		run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a1'] }, { tab: source }, () => {});
+		run('onMessage')({ Action: run('OPEN_URLS_IN_WINDOW'), tUrls: ['w1', 'w2'] }, { tab: { ...source, cookieStoreId: 'c9' } }, () => {});
+		await flush();
+		await flush();
+
+		expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['a1', 'w2']);
+		expect(windows.create).toHaveBeenCalledWith({ url: 'w1', incognito: false, cookieStoreId: 'c9' });
+	});
+});

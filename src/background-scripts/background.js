@@ -35,6 +35,11 @@ function onMessage(msg, sender, respond) {
 				return OpenUrlsInTabs(msg.tUrls);
 			});
 			break;
+		case OPEN_URLS_IN_WINDOW:
+			openUrlsPromiseChain = openUrlsPromiseChain.then(() => {
+				return OpenUrlsInWindow(msg.tUrls, sender.tab);
+			});
+			break;
 		case COPY_TO_CLIPBOARD:
 			CopyToClipboard(msg.tUrls);
 			break;
@@ -120,6 +125,55 @@ async function OpenUrlsInTabs(urls) {
 		await sleep(Prefs.NewTabDelayMS);
 	}
 	TabStacks.set(activeTab.id, tabStack);
+}
+
+/**
+ * Opens the urls, in order, as the tabs of one new window, in the container and private browsing mode of the tab they came from
+ *
+ * @param {string[]} urls
+ * @param {Tab}      [sourceTab]    The tab the links were selected in, defaults to the active tab
+ * @return {Promise<void>}
+ */
+async function OpenUrlsInWindow(urls, sourceTab) {
+	if(!urls || urls.length === 0)
+		return;
+
+	sourceTab = sourceTab || (await browser.tabs.query({
+		active:        true,
+		currentWindow: true,
+	}))[0];
+
+	let props = {
+		url:       urls[0],
+		incognito: Boolean(sourceTab.incognito),
+	};
+
+	if(isFirefox)
+		props.cookieStoreId = sourceTab.cookieStoreId;
+
+	let newWindow = await browser.windows.create(props);
+
+	// Keep the window the links came from in front
+	if(!Prefs.SwitchFocusToNewTab)
+		await browser.windows.update(sourceTab.windowId, { focused: true });
+
+	for(let url of urls.slice(1)) {
+		await sleep(Prefs.NewTabDelayMS);
+
+		let tabProps = {
+			url:      url,
+			active:   false,
+			windowId: newWindow.id,
+		};
+
+		if(isFirefox) {
+			tabProps.cookieStoreId = sourceTab.cookieStoreId;
+			if(Prefs.NewTabsOpenUnloaded)
+				tabProps.discarded = true;
+		}
+
+		await browser.tabs.create(tabProps);
+	}
 }
 
 /**
