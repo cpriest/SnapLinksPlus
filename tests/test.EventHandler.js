@@ -263,3 +263,50 @@ describe('developer mode', () => {
 		expect(sent()).toEqual([{ Action: 'ReloadExtension' }]);
 	});
 });
+
+describe('disabled sites (DisabledSites pref)', () => {
+	const matches = (href, list) => run('SiteListMatches')(href, list);
+
+	test.each([
+		['the host', 'https://example.com/a', 'example.com', true],
+		['a subdomain', 'https://mail.example.com/a', 'example.com', true],
+		['not a host that merely ends the same', 'https://badexample.com/a', 'example.com', false],
+		['a * wildcard in the host', 'https://maps.example.org/x', '*.example.*', true],
+		['a path prefix', 'https://www.example.com/forum/thread?id=1', 'example.com/forum', true],
+		['not another path', 'https://example.com/blog', 'example.com/forum', false],
+		['a full URL, ignoring its scheme', 'http://example.com/forum/1', 'https://example.com/forum', true],
+		['a port only when the pattern has one', 'http://localhost:8080/', 'localhost:8080', true],
+		['not a different port', 'http://localhost:9090/', 'localhost:8080', false],
+		['any line of several', 'https://b.test/', 'a.test\nb.test\n', true],
+		['not comments or blank lines', 'https://b.test/', '# b.test\n\n   ', false],
+		['nothing for an empty list', 'https://b.test/', '', false],
+		['nothing for a URL that does not parse', 'not a url', '*', false],
+		['regex characters literally', 'https://exampleXcom/', 'example.com', false],
+	])('matches %s', (_label, href, list, expected) => {
+		expect(matches(href, list)).toBe(expected);
+	});
+
+	test('a drag on a disabled site does nothing and leaves the mousedown to the page', async () => {
+		cleanup();
+		cleanup = trackListeners();
+		await load({ sync: { DisabledSites: 'example.com\nlocalhost' } });
+
+		let e = down(50, 50);
+		move(450, 200);
+		up(450, 200);
+
+		expect(e.defaultPrevented).toBe(false);
+		expect(container()).toBeNull();
+		expect(sent()).toEqual([]);
+	});
+
+	test('a drag on a site that is not listed works as usual', async () => {
+		cleanup();
+		cleanup = trackListeners();
+		await load({ sync: { DisabledSites: 'example.com' } });
+
+		drag([50, 50], [450, 200]);
+
+		expect(sent()).toHaveLength(1);
+	});
+});

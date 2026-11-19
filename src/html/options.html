@@ -101,6 +101,15 @@
 	</label>
 </div>
 
+<label title="Snap Links does nothing on pages that match one of these lines:
+  &bull;  example.com matches the site and its subdomains
+  &bull;  example.com/forum matches only pages whose path starts with /forum
+  &bull;  * matches any characters, eg: *.example.*
+  &bull;  Lines starting with # are ignored">
+	<span>Disable Snap Links on these sites (one per line):</span><br>
+	<textarea id="DisabledSites" rows="4" cols="60" spellcheck="false" placeholder="example.com&#10;maps.example.org/edit"></textarea>
+</label>
+
 <details id="UI_AdvancedOptions_Section">
 	<summary>Advanced Settings</summary>
 
