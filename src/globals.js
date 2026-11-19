@@ -42,6 +42,8 @@ const DefaultPrefs = {
 	IndexBuckets: 10,
 	ScrollRate:   8,
 
+	AutoScrollEdgeZone: 20,	// Pixels from an edge of the window within which a drag towards that edge scrolls the page, 0 to scroll only outside the window
+
 	Activation_Min: 5,
 
 	SelectionLabel_CursorMargin: 2,

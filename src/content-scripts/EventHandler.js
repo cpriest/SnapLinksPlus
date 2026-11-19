@@ -159,17 +159,11 @@ class EventHandler {
 		let [clientWidth, clientHeight] = GetClientDims();
 
 		if(e) {
+			let origin = this.CurrentSelection.dims;
+
 			this.IntervalScrollOffset = {
-				x: e.clientX < 0
-					? e.clientX
-					: e.clientX > clientWidth
-						? e.clientX - clientWidth
-						: 0,
-				y: e.clientY < 0
-					? e.clientY
-					: e.clientY > clientHeight
-						? e.clientY - clientHeight
-						: 0,
+				x: this.AutoScrollStep(e.clientX, clientWidth, window.scrollX + e.clientX - origin.originLeft),
+				y: this.AutoScrollStep(e.clientY, clientHeight, window.scrollY + e.clientY - origin.originTop),
 			};
 
 			this.MousePos = { clientX: e.clientX, clientY: e.clientY };
@@ -183,6 +177,32 @@ class EventHandler {
 			window.scrollY + Math.min(this.MousePos.clientY, clientHeight),
 			window.scrollX + Math.min(this.MousePos.clientX, clientWidth)
 		);
+	}
+
+	/**
+	 * Returns how far to scroll along one axis on each interval for the given mouse position:
+	 *	-	outside the viewport, the distance beyond its edge
+	 *	-	within Prefs.AutoScrollEdgeZone pixels of an edge the lasso is growing towards, 1px at the zone's inner border, faster
+	 *		towards the edge.  This lets a maximized or full screen window scroll, where the mouse can't leave the viewport.
+	 *
+	 * @param {number} pos        The mouse's client coordinate on this axis
+	 * @param {number} size       The viewport's size on this axis, see GetClientDims()
+	 * @param {number} growing    The lasso's extent from its origin on this axis, negative when it grows towards 0 (up or left)
+	 *
+	 * @returns {number}    The pixels to scroll by, negative to scroll up or left
+	 */
+	AutoScrollStep(pos, size, growing) {
+		let zone = Number(Prefs.AutoScrollEdgeZone) || 0;
+
+		if(pos < 0)
+			return pos;
+		if(pos > size)
+			return pos - size;
+		if(growing > 0 && pos > size - zone)
+			return Math.ceil((pos - (size - zone)) / 2);
+		if(growing < 0 && pos < zone)
+			return -Math.ceil((zone - pos) / 2);
+		return 0;
 	}
 
 	/**

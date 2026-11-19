@@ -80,6 +80,10 @@ beforeEach(async () => {
 afterEach(() => {
 	cleanup();
 	jest.useRealTimers();
+	// Undo sizes and modes faked by a test, the jsdom document is shared
+	delete document.body.clientHeight;
+	delete document.documentElement.clientHeight;
+	delete document.compatMode;
 });
 
 describe('activation', () => {
@@ -162,6 +166,54 @@ describe('during the drag', () => {
 
 		expect(window.scrollBy).toHaveBeenCalledWith(0, expect.any(Number));
 		expect(window.scrollBy.mock.calls.at(-1)[1]).toBeGreaterThan(0);
+	});
+
+	test('dragging past the bottom of the window autoscrolls on a page taller than the window (#566, #516)', () => {
+		// A long page in standards mode: the body is as tall as the content, the root element reports the viewport
+		Object.defineProperty(document.body, 'clientHeight', { value: 5000, configurable: true });
+		Object.defineProperty(document.documentElement, 'clientHeight', { value: 700, configurable: true });
+
+		down(50, 50);
+		move(450, 750);
+
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 50]);
+	});
+
+	// jsdom: the window is 1024 x 768 and the root element reports no size, so GetClientDims() is the window
+	test('dragging down into the bottom 20px of the window autoscrolls, faster closer to the edge', () => {
+		down(50, 50);
+		move(450, 750);
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 1]);
+
+		move(450, 767);
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 10]);
+	});
+
+	test('dragging up into the top 20px of the window scrolls up', () => {
+		down(50, 400);
+		move(450, 4);
+
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, -8]);
+	});
+
+	test('a drag that starts near the bottom edge and moves sideways does not scroll', () => {
+		down(50, 760);
+		move(450, 760);
+
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 0]);
+	});
+
+	test('AutoScrollEdgeZone 0 scrolls only once the mouse leaves the window', async () => {
+		cleanup();
+		cleanup = trackListeners();
+		await load({ sync: { AutoScrollEdgeZone: 0 } });
+
+		down(50, 50);
+		move(450, 767);
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 0]);
+
+		move(450, 778);
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 10]);
 	});
 });
 
@@ -261,5 +313,33 @@ describe('developer mode', () => {
 		down(50, 50, { ctrlKey: true, altKey: true });
 
 		expect(sent()).toEqual([{ Action: 'ReloadExtension' }]);
+	});
+});
+
+describe('GetClientDims (the viewport, not the page)', () => {
+	const dims = () => run('GetClientDims')();
+	const fake = (el, prop, value) => Object.defineProperty(el, prop, { value, configurable: true });
+
+	test('standards mode: the root element\'s size, not the body\'s content height', () => {
+		fake(document.documentElement, 'clientHeight', 700);
+		fake(document.body, 'clientHeight', 5000);
+
+		expect(dims()[1]).toBe(700);
+	});
+
+	test('quirks mode: the body\'s size, not the root element\'s', () => {
+		fake(document, 'compatMode', 'BackCompat');
+		fake(document.documentElement, 'clientHeight', 5000);
+		fake(document.body, 'clientHeight', 700);
+
+		expect(dims()[1]).toBe(700);
+	});
+
+	test('never larger than the window, and the window when the element reports nothing', () => {
+		fake(document.documentElement, 'clientHeight', 5000);
+		expect(dims()).toEqual([1024, 768]);
+
+		fake(document.documentElement, 'clientHeight', 0);
+		expect(dims()).toEqual([1024, 768]);
 	});
 });
