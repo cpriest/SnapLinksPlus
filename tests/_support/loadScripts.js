@@ -44,7 +44,8 @@ function makeBrowser({ local, sync } = {}) {
 			sync:      makeStorageArea(sync),
 			onChanged: { addListener: (fn) => changeListeners.push(fn) },
 		},
-		runtime: { sendMessage: jest.fn() },
+		// Like the real API, sendMessage returns a Promise; resolving undefined leaves Linux drag recovery (#580) off
+		runtime: { sendMessage: jest.fn(async () => undefined), onMessage: { addListener: jest.fn() } },
 		/** Simulates the browser notifying every storage.onChanged listener */
 		fireStorageChanged: (changes, area) => changeListeners.forEach(fn => fn(changes, area)),
 	};

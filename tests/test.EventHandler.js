@@ -52,7 +52,8 @@ const key  = (k, init = {}) => {
 const drag = (from, to, upInit = {}) => { down(...from); move(...to); return up(...to, upInit); };
 
 const container = () => document.querySelector('.SnapLinksContainer');
-const sent      = () => browser.runtime.sendMessage.mock.calls.map(([msg]) => msg);
+/** Action messages sent to the background, without the context menu recovery handshake (#580) */
+const sent      = () => browser.runtime.sendMessage.mock.calls.map(([msg]) => msg).filter(msg => !/ContextMenu/.test(msg.Action));
 
 async function load(stores) {
 	browser = makeBrowser(stores);

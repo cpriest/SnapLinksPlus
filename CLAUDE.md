@@ -47,6 +47,7 @@ Background page: polyfill (Chrome) → `StoragePrefs` → `globals` → `[DevBui
 3. `ElementIndexer` builds a bucketed vertical index on first change (`UpdateIndex`), then `Search(rect)` returns a `CategorizedCollection` and publishes `ElementsSelected`. `SvgOverlayMgr` highlights them.
 4. `mouseup` → `EndDrag` → publishes `DragCompleted` → **calls `ActionMgr.ActUpon` directly**, not via pub/sub. This is deliberate: browsers reject clipboard/tab/click actions outside a short-lived user-event handler.
 5. `Escape` cancels. The next context menu is suppressed after a successful drag (`StopNextContextMenu`).
+6. Linux/macOS right-drag (#400): while RMB activates, `background.js` sets Firefox's `browserSettings.contextMenuShowEvent` to `mouseup` (`UpdateContextMenuSetting`). On Linux only, when a native menu is open Firefox uses the next press to dismiss it, so `onRecoverContextMenuDrag` starts the drag from the first RMB-held `mousemove`. Frames share the menu-open state through the background (`GetContextMenuDragRecovery`, `SetContextMenuShown`). Tests: `test.ContextMenuSetting.js`, `test.ContextMenuRecovery.js`.
 
 ### Files
 
@@ -61,7 +62,7 @@ Background page: polyfill (Chrome) → `StoragePrefs` → `globals` → `[DevBui
 | `ActionMgr.js` | Acts on the greatest category. Links go to background via `runtime.sendMessage`. |
 | `SelectionRect.js` | `Rect`/`DocRect` geometry and the lasso DOM (`DIV.SnapLinksContainer`, counter label). |
 | `SvgOverlay.js` | SVG highlight layer; styles come from `Prefs.HighlightStyles_*`. |
-| `background.js` | Messages: `OpenUrlsInTabs` (serialized on a promise chain; `TABS_OPEN_*` placement), `CopyToClipboard`, `ReloadExtension` (dev), install/update notifications, storage migration at 3.1.7. |
+| `background.js` | Messages: `OpenUrlsInTabs` (serialized on a promise chain; `TABS_OPEN_*` placement), `CopyToClipboard`, `ReloadExtension` (dev), context-menu timing and drag-recovery state (#400), install/update notifications, storage migration at 3.1.7. |
 | `src/lib/Options.js`, `src/html/options.html` | Options page, driven by `DefaultPrefs` keys. |
 
 ### Preferences
