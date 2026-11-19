@@ -78,9 +78,10 @@ function onMessage(msg, sender, respond) {
 			browser.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			openUrlsPromiseChain = openUrlsPromiseChain.then(() => {
-				return OpenUrlsInTabs(msg.tUrls);
-			});
+			// Catch errors so that a failed request doesn't leave the chain rejected, which would skip every later request
+			openUrlsPromiseChain = openUrlsPromiseChain
+				.then(() => OpenUrlsInTabs(msg.tUrls))
+				.catch(error => console.error('Error while opening URLs in tabs: ', error));
 			break;
 		case COPY_TO_CLIPBOARD:
 			CopyToClipboard(msg.tUrls);
@@ -149,24 +150,47 @@ async function OpenUrlsInTabs(urls) {
 		let props = {
 			url:      url,
 			active:   Prefs.SwitchFocusToNewTab ? (--tabsLeft) === 0 : false,	// Activate the last tab to be opened
-			index:    startIndex + tabsOpened++,
+			index:    startIndex + tabsOpened,
 			windowId: activeTab.windowId,
 		};
 
 		if(isFirefox) {
 			props.cookieStoreId = activeTab.cookieStoreId;
-			if(Prefs.SetOwnershipTabID_FF)
+			// The opener tab may have been closed while tabs are still opening (#579)
+			if(Prefs.SetOwnershipTabID_FF && await TabExists(activeTab.id))
 				props.openerTabId = activeTab.id;
 			if(Prefs.NewTabsOpenUnloaded)
 				props.discarded = true;
 		}
 
-		let newTab = await browser.tabs.create(props);
+		let newTab;
+		try {
+			newTab = await browser.tabs.create(props);
+		} catch(error) {
+			// Skip this URL (e.g. an illegal URL) and keep opening the rest
+			console.error(`Error while opening ${url} in a new tab: `, error);
+			continue;
+		}
+
+		tabsOpened++;
 		tabStack.unshift(newTab.id);
 
 		await sleep(Prefs.NewTabDelayMS);
 	}
 	TabStacks.set(activeTab.id, tabStack);
+}
+
+/**
+ * @param {number} tabId
+ * @return {Promise<boolean>}
+ */
+async function TabExists(tabId) {
+	try {
+		await browser.tabs.get(tabId);
+		return true;
+	} catch(error) {
+		return false;
+	}
 }
 
 /**
