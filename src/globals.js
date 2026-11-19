@@ -21,18 +21,29 @@ const LMB = 1,	// Left Mouse Button
 		MMB = 4;	// Middle Mouse Button
 
 //  Default Action
-const OPEN_LINKS = 1,	// Open links
-		COPY_LINKS = 2;	// Copy links
+const OPEN_LINKS     = 1,	// Open links
+		COPY_LINKS     = 2,	// Copy links
+		BOOKMARK_LINKS = 4;	// Bookmark links in a new folder
 
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest',
 		RELOAD_EXTENSION  = 'ReloadExtension',
 		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs',
-		COPY_TO_CLIPBOARD = 'CopyToClipboard';
+		COPY_TO_CLIPBOARD = 'CopyToClipboard',
+		BOOKMARK_LINKS_IN_FOLDER = 'BookmarkLinksInFolder';
 
 const TABS_OPEN_END     = 'OpenTabsAtEnd',
 		TABS_OPEN_RIGHT   = 'OpenTabsToRight',
 		TABS_OPEN_NATURAL = 'OpenTabsNaturally';	// Like Firefox Middle-Click behaves
+
+// How copied links are written (Prefs.CopyFormat)
+const COPY_URLS            = 'Urls',				// One URL per line
+		COPY_TITLES_URLS   = 'TitlesAndUrls',		// Title<TAB>URL per line
+		COPY_TITLES        = 'Titles',				// One title per line
+		COPY_MARKDOWN      = 'Markdown',			// [Title](URL) per line
+		COPY_HTML          = 'Html',				// <a href="URL">Title</a> per line
+		COPY_HTML_LIST     = 'HtmlList',			// <ul> of <li><a href="URL">Title</a></li>
+		COPY_URLS_SPACED   = 'UrlsSpaceSeparated';	// URLs on one line, separated by spaces
 
 const isChrome  = location.protocol === 'chrome-extension:',
 		isFirefox = location.protocol === 'moz-extension:';
@@ -54,6 +65,7 @@ const DefaultPrefs = {
 
 	OpenTabs:            TABS_OPEN_NATURAL,
 	DefaultAction:       OPEN_LINKS,
+	CopyFormat:          COPY_URLS,
 	NewTabsOpenUnloaded: false,
 	SwitchFocusToNewTab: true,
 	ShowNumberOfLinks:   true,

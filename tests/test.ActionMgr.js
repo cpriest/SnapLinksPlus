@@ -52,6 +52,35 @@ describe('ActUpon links', () => {
 		expect(browser.runtime.sendMessage.mock.calls[0][0].tUrls).toEqual(['http://a/', 'http://b/', 'http://c/']);
 	});
 
+	test('copying sends the text of the first link to each URL as its title', () => {
+		let selected = [
+			{ href: 'http://a/', innerText: '  Article\n  title ' },
+			{ href: 'http://b/', innerText: '', getAttribute: (name) => name === 'title' ? 'Tooltip' : null },
+			{ href: 'http://a/', innerText: 'comments' },
+			{ href: 'http://c/', innerText: '', getAttribute: () => null, querySelector: () => ({ alt: ' Logo ' }) },
+			{ href: 'http://d/' },
+		];
+
+		actions.ActUpon(collection(run('CT_LINKS'), { Links: selected }), { ctrlKey: true });
+
+		expect(browser.runtime.sendMessage.mock.calls[0][0]).toEqual({
+			Action:  run('COPY_TO_CLIPBOARD'),
+			tUrls:   ['http://a/', 'http://b/', 'http://c/', 'http://d/'],
+			tTitles: ['Article title', 'Tooltip', 'Logo', ''],
+		});
+	});
+
+	test.each([
+		[false, 'BOOKMARK_LINKS_IN_FOLDER'],
+		[true, 'COPY_TO_CLIPBOARD'],
+	])('default action bookmark, ctrlKey=%s → %s with titles', (ctrlKey, expectedAction) => {
+		setPrefs({ DefaultAction: run('BOOKMARK_LINKS') });
+
+		actions.ActUpon(collection(run('CT_LINKS'), { Links: [{ href: 'http://a/', innerText: 'A' }, { href: 'http://b/', innerText: '' }] }), { ctrlKey });
+
+		expect(browser.runtime.sendMessage.mock.calls).toEqual([[{ Action: run(expectedAction), tUrls: ['http://a/', 'http://b/'], tTitles: ['A', ''] }]]);
+	});
+
 	test('Dev_Skip_AllActions suppresses the message in DevMode only', () => {
 		setPrefs({ DevMode: true, Dev_Skip_AllActions: true });
 		actions.ActUpon(collection(run('CT_LINKS'), { Links: links('http://a/') }), { ctrlKey: false });

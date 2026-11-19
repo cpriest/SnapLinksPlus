@@ -232,7 +232,7 @@ describe('actions by greatest element type', () => {
 	test('holding Ctrl at mouseup copies instead of opening (DefaultAction is OPEN_LINKS)', () => {
 		drag([50, 50], [450, 200], { ctrlKey: true });
 
-		expect(sent()).toEqual([{ Action: run('COPY_TO_CLIPBOARD'), tUrls: ['http://x.test/a', 'http://x.test/b'] }]);
+		expect(sent()).toEqual([{ Action: run('COPY_TO_CLIPBOARD'), tUrls: ['http://x.test/a', 'http://x.test/b'], tTitles: ['a', 'b'] }]);
 	});
 
 	test('a link covered by another element is not opened', () => {
