@@ -107,6 +107,16 @@ describe('link counter', () => {
 		expect(label().innerHTML).toBe('2 Links');
 	});
 
+	test.each([
+		[true, '1 Links'],
+		[false, '3 Links'],
+	])('with SmartDuplicateDetection %s, links to the same page count %s', (on, expected) => {
+		run('(on) => { Prefs = { ...Prefs, SelectionLabel_CursorMargin: 2, ShowNumberOfLinks: true, SmartDuplicateDetection: on }; }')(on);
+		select('https://a.test/x', 'https://a.test/x#top', 'http://www.a.test/x/?utm_source=feed');
+
+		expect(label().innerHTML).toBe(expected);
+	});
+
 	test('pins to the bottom right of the rect for a normal drag', () => {
 		selection.SetOrigin(100, 100).SetBottomRight(200, 200);
 		select('http://a/');
