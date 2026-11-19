@@ -56,6 +56,7 @@ const DefaultPrefs = {
 	DefaultAction:       OPEN_LINKS,
 	NewTabsOpenUnloaded: false,
 	SwitchFocusToNewTab: true,
+	ReverseLinkOrder:    false,	// Open/copy links last to first, SHIFT on release flips it for one selection
 	ShowNumberOfLinks:   true,
 	ActivateModifiers:   NONE,
 	ActivateMouseButton: RMB,
