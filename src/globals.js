@@ -21,14 +21,16 @@ const LMB = 1,	// Left Mouse Button
 		MMB = 4;	// Middle Mouse Button
 
 //  Default Action
-const OPEN_LINKS = 1,	// Open links
-		COPY_LINKS = 2;	// Copy links
+const OPEN_LINKS     = 1,	// Open links
+		COPY_LINKS     = 2,	// Copy links
+		BOOKMARK_LINKS = 4;	// Bookmark links in a new folder
 
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest',
 		RELOAD_EXTENSION  = 'ReloadExtension',
 		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs',
-		COPY_TO_CLIPBOARD = 'CopyToClipboard';
+		COPY_TO_CLIPBOARD = 'CopyToClipboard',
+		BOOKMARK_LINKS_IN_FOLDER = 'BookmarkLinksInFolder';
 
 const TABS_OPEN_END     = 'OpenTabsAtEnd',
 		TABS_OPEN_RIGHT   = 'OpenTabsToRight',

@@ -62,9 +62,15 @@
 	<select id="DefaultAction" title="Select the default action.">
 		<option value="1">Open Links</option>
 		<option value="2">Copy Links to clipboard</option>
+		<option value="4">Bookmark Links in a new folder</option>
 	</select>
 	<span>press CTRL after selection to modify default action</span>
 </label>
+
+<p id="BookmarkPermission" hidden>
+	Bookmarking links needs permission to create bookmarks:
+	<button id="GrantBookmarkPermission" type="button">Allow</button>
+</p>
 
 <label>
 	<span>Copy links as</span>

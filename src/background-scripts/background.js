@@ -38,6 +38,9 @@ function onMessage(msg, sender, respond) {
 		case COPY_TO_CLIPBOARD:
 			CopyToClipboard(msg.tUrls, msg.tTitles);
 			break;
+		case BOOKMARK_LINKS_IN_FOLDER:
+			BookmarkLinks(msg.tUrls, msg.tTitles);
+			break;
 	}
 }
 
@@ -49,6 +52,33 @@ function onMessage(msg, sender, respond) {
 async function CopyToClipboard(urls, titles = []) {
 	let platformInfo = await browser.runtime.getPlatformInfo();
 	navigator.clipboard.writeText(FormatLinks(urls, titles, Prefs.CopyFormat, platformInfo.os === chrome.runtime.PlatformOs.WIN ? '\r\n' : '\n'));
+}
+
+/** The bookmarks permission is optional, the options page asks for it when bookmarking is chosen */
+const BookmarksPermission = { permissions: ['bookmarks'] };
+
+/**
+ * Bookmarks the links, in order, in a new folder named "Snap Links <date and time>", which is created in the browser's
+ * default folder for new bookmarks (Other Bookmarks).  Without the bookmarks permission it opens the options page instead,
+ * where the permission can be granted.
+ *
+ * @param {string[]} urls
+ * @param {string[]} [titles]    The text of each link, a link without text is named by its URL
+ * @return {Promise<void>}
+ */
+async function BookmarkLinks(urls, titles = []) {
+	if(!await browser.permissions.contains(BookmarksPermission))
+		return browser.runtime.openOptionsPage();
+
+	let folder = await browser.bookmarks.create({ title: `Snap Links ${new Date().toLocaleString()}` });
+
+	for(let [i, url] of urls.entries()) {
+		await browser.bookmarks.create({
+			parentId: folder.id,
+			title:    (titles && titles[i]) || url,
+			url:      url,
+		});
+	}
 }
 
 /**

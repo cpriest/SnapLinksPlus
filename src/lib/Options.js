@@ -70,7 +70,34 @@ class Options {
 				};
 				devModeElem.addEventListener('change', UpdateCheckboxState);
 				UpdateCheckboxState();
-			});
+			})
+			.then(() => this.SetupBookmarkPermission());
+	}
+
+	/**
+	 * Bookmarking needs the optional bookmarks permission, which a browser grants only from a click on one of the extension's
+	 * pages, so while bookmarking is the default action and the permission is missing, an Allow button is shown
+	 */
+	SetupBookmarkPermission() {
+		let action = $('#DefaultAction')[0],
+			note   = $('#BookmarkPermission')[0],
+			button = $('#GrantBookmarkPermission')[0];
+
+		if(!action || !note || !button || !browser.permissions)
+			return;
+
+		let permission = { permissions: ['bookmarks'] },
+			update     = async () => {
+				note.hidden = action.value != BOOKMARK_LINKS || await browser.permissions.contains(permission);
+			};
+
+		button.addEventListener('click', () => {
+			browser.permissions.request(permission)
+				.then(update);
+		});
+		action.addEventListener('change', update);
+
+		return update();
 	}
 
 	ConfigureElements() {

@@ -13,18 +13,46 @@ class ActionMgr {
 		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
 			return console.log('Skipped Copying Links: %o', links);
 
-		// The first element with each URL names it
+		browser.runtime.sendMessage({
+			Action:  COPY_TO_CLIPBOARD,
+			tUrls:   links,
+			tTitles: this.LinkTitles(links, Elements),
+		});
+	}
+
+	/**
+	 * Bookmarks the links in a new folder
+	 *
+	 * @param {string[]}  links         The URLs to bookmark
+	 * @param {Element[]} [Elements]    The selected link elements, their text names the bookmarks
+	 */
+	BookmarkLinks(links, Elements = []) {
+		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+			return console.log('Skipped Bookmarking Links: %o', links);
+
+		browser.runtime.sendMessage({
+			Action:  BOOKMARK_LINKS_IN_FOLDER,
+			tUrls:   links,
+			tTitles: this.LinkTitles(links, Elements),
+		});
+	}
+
+	/**
+	 * Returns the title of each URL, from the first of the elements that links to it
+	 *
+	 * @param {string[]}  links       The URLs
+	 * @param {Element[]} Elements    The link elements
+	 *
+	 * @returns {string[]}    The titles in the same order as links, '' for a URL without one
+	 */
+	LinkTitles(links, Elements) {
 		let titles = new Map();
+
 		for(let elem of Elements) {
 			if(!titles.has(elem.href))
 				titles.set(elem.href, this.LinkTitle(elem));
 		}
-
-		browser.runtime.sendMessage({
-			Action:  COPY_TO_CLIPBOARD,
-			tUrls:   links,
-			tTitles: links.map(url => titles.get(url) || ''),
-		});
+		return links.map(url => titles.get(url) || '');
 	}
 
 	/**
@@ -135,8 +163,11 @@ class ActionMgr {
 				);
 
 				/** TODO: This should be cleaned up, not easily grokkable what this is meaning */
-				if ((e.ctrlKey && Prefs.DefaultAction == OPEN_LINKS) || (!(e.ctrlKey) && Prefs.DefaultAction == COPY_LINKS))
+				// CTRL copies, unless copying is the default action, then CTRL opens the links in tabs
+				if ((e.ctrlKey && Prefs.DefaultAction != COPY_LINKS) || (!(e.ctrlKey) && Prefs.DefaultAction == COPY_LINKS))
 				    this.CopyToClipboard(links, SelectedElements.Links);
+				else if(!e.ctrlKey && Prefs.DefaultAction == BOOKMARK_LINKS)
+					this.BookmarkLinks(links, SelectedElements.Links);
 				else
 					this.OpenUrlsInTabs(links);
 

@@ -421,3 +421,49 @@ describe('FormatLinks (copy formats, #198)', () => {
 		expect(run('FormatLinks')(urls, titles, 'Nonsense', '\n')).toBe('https://a.test/1\nhttps://a.test/(2)');
 	});
 });
+
+describe('BookmarkLinks (#216)', () => {
+	let created, granted;
+
+	beforeEach(() => {
+		created = [];
+		granted = true;
+		browser.permissions = { contains: jest.fn(async () => granted) };
+		browser.bookmarks   = {
+			create: jest.fn(async (props) => {
+				let node = { id: `n${created.length}`, ...props };
+				created.push(node);
+				return node;
+			}),
+		};
+		browser.runtime.openOptionsPage = jest.fn(async () => {});
+	});
+
+	test('creates a "Snap Links <date>" folder holding the links in order, named by their titles or URLs', async () => {
+		await run('BookmarkLinks')(['http://a/', 'http://b/'], ['A', '']);
+
+		expect(browser.permissions.contains).toHaveBeenCalledWith({ permissions: ['bookmarks'] });
+		expect(created[0]).toEqual({ id: 'n0', title: expect.stringMatching(/^Snap Links \S/) });
+		expect(created[0].parentId).toBeUndefined();
+		expect(created.slice(1)).toEqual([
+			{ id: 'n1', parentId: 'n0', title: 'A', url: 'http://a/' },
+			{ id: 'n2', parentId: 'n0', title: 'http://b/', url: 'http://b/' },
+		]);
+	});
+
+	test('without the permission it opens the options page and creates nothing', async () => {
+		granted = false;
+
+		await run('BookmarkLinks')(['http://a/'], ['A']);
+
+		expect(browser.runtime.openOptionsPage).toHaveBeenCalledTimes(1);
+		expect(browser.bookmarks.create).not.toHaveBeenCalled();
+	});
+
+	test('BOOKMARK_LINKS_IN_FOLDER messages bookmark the links', async () => {
+		run('onMessage')({ Action: run('BOOKMARK_LINKS_IN_FOLDER'), tUrls: ['http://a/'], tTitles: ['A'] }, {}, () => {});
+		await flush();
+
+		expect(created.map(n => n.url)).toEqual([undefined, 'http://a/']);
+	});
+});

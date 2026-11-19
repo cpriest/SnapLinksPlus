@@ -70,6 +70,17 @@ describe('ActUpon links', () => {
 		});
 	});
 
+	test.each([
+		[false, 'BOOKMARK_LINKS_IN_FOLDER'],
+		[true, 'COPY_TO_CLIPBOARD'],
+	])('default action bookmark, ctrlKey=%s → %s with titles', (ctrlKey, expectedAction) => {
+		setPrefs({ DefaultAction: run('BOOKMARK_LINKS') });
+
+		actions.ActUpon(collection(run('CT_LINKS'), { Links: [{ href: 'http://a/', innerText: 'A' }, { href: 'http://b/', innerText: '' }] }), { ctrlKey });
+
+		expect(browser.runtime.sendMessage.mock.calls).toEqual([[{ Action: run(expectedAction), tUrls: ['http://a/', 'http://b/'], tTitles: ['A', ''] }]]);
+	});
+
 	test('Dev_Skip_AllActions suppresses the message in DevMode only', () => {
 		setPrefs({ DevMode: true, Dev_Skip_AllActions: true });
 		actions.ActUpon(collection(run('CT_LINKS'), { Links: links('http://a/') }), { ctrlKey: false });
