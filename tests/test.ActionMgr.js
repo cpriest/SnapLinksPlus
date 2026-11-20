@@ -1,10 +1,10 @@
 'use strict';
 
-/* global test, expect, describe, beforeEach, jest, require */
+/* global test, expect, describe, beforeEach, jest, require, URL, URLSearchParams */
 
 const { loadScripts } = require('./_support/loadScripts');
 
-const Scripts = ['StoragePrefs.js', 'globals.js', 'content-scripts/CategorizedCollection.js', 'content-scripts/ActionMgr.js'];
+const Scripts = ['StoragePrefs.js', 'globals.js', 'content-scripts/Utility.js', 'content-scripts/CategorizedCollection.js', 'content-scripts/ActionMgr.js'];
 
 let browser, run, actions;
 
@@ -23,7 +23,7 @@ const collection = (GreatestType, props) => ({ GreatestType, ...props });
 const checkbox = (checked) => ({ checked, click: jest.fn() });
 
 beforeEach(async () => {
-	({ run, browser } = loadScripts(Scripts));
+	({ run, browser } = loadScripts(Scripts, undefined, { URL, URLSearchParams }));
 	await run('DOMReady');
 	actions = new (run('ActionMgr'))();
 	setPrefs();
@@ -50,6 +50,16 @@ describe('ActUpon links', () => {
 		actions.ActUpon(collection(run('CT_LINKS'), { Links: links(...urls) }), { ctrlKey: false });
 
 		expect(browser.runtime.sendMessage.mock.calls[0][0].tUrls).toEqual(['http://a/', 'http://b/', 'http://c/']);
+	});
+
+	test('with SmartDuplicateDetection, sends the first-seen href of each page', () => {
+		setPrefs({ SmartDuplicateDetection: true });
+
+		actions.ActUpon(collection(run('CT_LINKS'), {
+			Links: links('https://a.test/x?utm_source=feed', 'https://a.test/x#comments', 'https://a.test/y', 'http://www.a.test/x/'),
+		}), { ctrlKey: false });
+
+		expect(browser.runtime.sendMessage.mock.calls[0][0].tUrls).toEqual(['https://a.test/x?utm_source=feed', 'https://a.test/y']);
 	});
 
 	test('Dev_Skip_AllActions suppresses the message in DevMode only', () => {

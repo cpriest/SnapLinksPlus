@@ -97,14 +97,9 @@ class ActionMgr {
 
 		switch(SelectedElements.GreatestType) {
 			case CT_LINKS:
-				// Remove duplicates by HREF
-				let links = Array.from(
-					new Set(
-						SelectedElements
-							.Links
-							.map(elem => elem.href)
-					)
-				);
+				// Remove links to the same page
+				let links = UniqueLinks(SelectedElements.Links)
+					.map(elem => elem.href);
 
 				/** TODO: This should be cleaned up, not easily grokkable what this is meaning */
 				if ((e.ctrlKey && Prefs.DefaultAction == OPEN_LINKS) || (!(e.ctrlKey) && Prefs.DefaultAction == COPY_LINKS))
