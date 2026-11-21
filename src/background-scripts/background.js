@@ -83,6 +83,9 @@ function onMessage(msg, sender, respond) {
 		case OPEN_URLS_IN_WINDOW:
 			QueueOpen(() => OpenUrlsInWindow(msg.tUrls, sender.tab));
 			break;
+		case OPEN_URLS_IN_SEPARATE_WINDOWS:
+			QueueOpen(() => OpenUrlsInSeparateWindows(msg.tUrls, sender.tab));
+			break;
 		case COPY_TO_CLIPBOARD:
 			CopyToClipboard(msg.tUrls, msg.tTitles);
 			break;
@@ -295,6 +298,51 @@ async function OpenUrlsInWindow(urls, sourceTab) {
 			console.error(`Error while opening ${url} in a new tab: `, error);
 		}
 	}
+}
+
+/**
+ * Opens each url in its own new window, in the container and private browsing mode of the tab they came from
+ *
+ * @param {string[]} urls
+ * @param {Tab}      [sourceTab]    The tab the links were selected in, defaults to the active tab
+ * @return {Promise<void>}
+ */
+async function OpenUrlsInSeparateWindows(urls, sourceTab) {
+	if(!urls || urls.length === 0)
+		return;
+
+	// Firefox for Android has no windows
+	if(!browser.windows)
+		return OpenUrlsInTabs(urls);
+
+	sourceTab = sourceTab || (await browser.tabs.query({
+		active:        true,
+		currentWindow: true,
+	}))[0];
+
+	let props = { incognito: Boolean(sourceTab.incognito) },
+		opened = false;
+
+	if(isFirefox)
+		props.cookieStoreId = sourceTab.cookieStoreId;
+
+	for(let [index, url] of urls.entries()) {
+		if(index > 0)
+			await sleep(Prefs.NewTabDelayMS);
+
+		try {
+			await browser.windows.create({ ...props, url });
+			opened = true;
+		} catch(error) {
+			// Skip this URL and keep opening the rest
+			console.error(`Error while opening ${url} in a new window: `, error);
+		}
+	}
+
+	// Keep the window the links came from in front, it may have been closed meanwhile
+	if(opened && !Prefs.SwitchFocusToNewTab)
+		await browser.windows.update(sourceTab.windowId, { focused: true })
+			.catch(error => console.error(`Error while focusing window ${sourceTab.windowId}: `, error));
 }
 
 /**
