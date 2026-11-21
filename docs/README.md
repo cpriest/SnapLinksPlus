@@ -54,12 +54,10 @@
 * Check/Uncheck checkboxes
 * Select radio items
 
-Other actions in the not too distant future planned (from v2)
+Other actions in the not too distant future planned (from v3)
 
-* Open Tabs in a New Window
 * Bookmark All
 * Download All
-* Copy Links to Clipboard
 
 # Issues
 
@@ -100,15 +98,14 @@ This means some legacy features may no longer exist while other new features are
 
 The reasons behind this are simple, [electrolysis](https://wiki.mozilla.org/Electrolysis) is here, [XUL/XPCOM are on the way out and chrome style plugins are the new standard](https://blog.mozilla.org/addons/2015/08/21/the-future-of-developing-firefox-add-ons/), which also happens to be both restartless and compatible with chrome, opera and other browsers.
 
-## Snap Links v2 Features
+## Snap Links v3 Features
 
-Snap Links Plus is a Firefox addon that lets you draw a lasso around links, checkboxes and other on-screen elements and open them in new tabs as  well as other actions:
+Snap Links Plus is a Firefox addon that lets you draw a lasso around links, checkboxes and other on-screen elements. Links can be handled with the following actions:
 
-* Open in New Tabs
+* Open in New Tabs (default)
 * Open in New Windows
-* Open Tabs in New Window6
-* Bookmark All
-* Download All
 * Copy to Clipboard
+
+(Additional actions such as bookmarking and downloading can be re-added to this list as they are implemented in upcoming v3 releases.)
 
 [Links](Links.md ':include')
