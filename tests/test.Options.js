@@ -230,19 +230,52 @@ describe('bookmarks permission (#216)', () => {
 		expect(el('BookmarkPermission').hidden).toBe(true);
 	});
 
-	test('choosing bookmarking shows the note, and Allow requests the permission and hides it', async () => {
-		await load({}, { permissions: permissions() });
-		await settle();
-
+	/** Chooses bookmarking in the Default Action select, as a user would */
+	const chooseBookmarking = async () => {
 		el('DefaultAction').value = String(run('BOOKMARK_LINKS'));
 		change(el('DefaultAction'));
 		await settle();
+		await flush();
+	};
+
+	test('choosing bookmarking asks for the permission at once, and no Allow note shows once it is granted', async () => {
+		await load({}, { permissions: permissions() });
+		await settle();
+
+		await chooseBookmarking();
+
+		expect(browser.permissions.request).toHaveBeenCalledWith({ permissions: ['bookmarks'] });
+		expect(el('BookmarkPermission').hidden).toBe(true);
+		expect(stored().DefaultAction).toBe(String(run('BOOKMARK_LINKS')));
+	});
+
+	test('refusing the permission puts the previous default action back, and saves it', async () => {
+		let apis = permissions();
+		apis.request = jest.fn(async () => false);
+		await load({ DefaultAction: run('COPY_LINKS') }, { permissions: apis });
+		await settle();
+
+		await chooseBookmarking();
+
+		expect(el('DefaultAction').value).toBe(String(run('COPY_LINKS')));
+		expect(stored().DefaultAction).toBe(String(run('COPY_LINKS')));
+		expect(el('BookmarkPermission').hidden).toBe(true);
+	});
+
+	test('when the browser rejects the request (not user input), the Allow note is the fallback', async () => {
+		let apis = permissions(), request = apis.request;
+		apis.request = jest.fn().mockRejectedValueOnce(new Error('permissions.request may only be called from a user input handler')).mockImplementation(request);
+		await load({}, { permissions: apis });
+		await settle();
+
+		await chooseBookmarking();
+		expect(el('DefaultAction').value).toBe(String(run('BOOKMARK_LINKS')));
 		expect(el('BookmarkPermission').hidden).toBe(false);
 
 		el('GrantBookmarkPermission').click();
 		await settle();
 
-		expect(browser.permissions.request).toHaveBeenCalledWith({ permissions: ['bookmarks'] });
 		expect(el('BookmarkPermission').hidden).toBe(true);
 	});
+
 });

@@ -75,8 +75,10 @@ class Options {
 	}
 
 	/**
-	 * Bookmarking needs the optional bookmarks permission, which a browser grants only from a click on one of the extension's
-	 * pages, so while bookmarking is the default action and the permission is missing, an Allow button is shown
+	 * Bookmarking needs the optional bookmarks permission, which a browser grants only during a user action on one of the
+	 * extension's pages.  Choosing bookmarking as the default action asks for it at once; refusing puts the previous action
+	 * back.  If the browser rejects the request (eg: a select change does not count as user input), or the permission is
+	 * missing later, an Allow button is shown instead.
 	 */
 	SetupBookmarkPermission() {
 		let action = $('#DefaultAction')[0],
@@ -86,15 +88,34 @@ class Options {
 		if(!action || !note || !button || !browser.permissions)
 			return;
 
-		let update = async () => {
-			note.hidden = action.value != BOOKMARK_LINKS || await browser.permissions.contains(BOOKMARKS_PERMISSION);
-		};
+		let previous = action.value,
+			update   = async () => {
+				note.hidden = action.value != BOOKMARK_LINKS || await browser.permissions.contains(BOOKMARKS_PERMISSION);
+			},
+			request  = () => browser.permissions.request(BOOKMARKS_PERMISSION),
+			logError = error => console.error('Snap Links could not request the bookmarks permission: ', error);
 
 		button.addEventListener('click', () => {
-			browser.permissions.request(BOOKMARKS_PERMISSION)
+			request()
+				.then(update)
+				.catch(logError);
+		});
+
+		action.addEventListener('change', () => {
+			if(action.value != BOOKMARK_LINKS) {
+				previous = action.value;
+				return update();
+			}
+			// Called synchronously in the change handler, so the browser can still see the user's action
+			request()
+				.then(granted => {
+					if(!granted) {
+						action.value = previous;
+						action.dispatchEvent(new Event('change', { bubbles: true }));	// Saves the previous action again
+					}
+				}, logError)
 				.then(update);
 		});
-		action.addEventListener('change', update);
 
 		return update();
 	}
