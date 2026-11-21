@@ -50,19 +50,24 @@ function stubHitTesting(placements, els, coveredBy = {}) {
  * Records every listener added from now on so they can all be removed, as the scripts attach theirs to the
  * shared jsdom document and would otherwise keep reacting in later tests.
  *
+ * jsdom gives window its own addEventListener rather than EventTarget.prototype's, so both are wrapped.
+ *
  * @return {function(): void}  Removes the recorded listeners and restores addEventListener
  */
 function trackListeners() {
-	let original = EventTarget.prototype.addEventListener,
-		added    = [];
+	let added    = [],
+		restores = [EventTarget.prototype, window].map(owner => {
+			let original = owner.addEventListener;
 
-	EventTarget.prototype.addEventListener = function(type, fn, options) {
-		added.push([this, type, fn, options]);
-		return original.call(this, type, fn, options);
-	};
+			owner.addEventListener = function(type, fn, options) {
+				added.push([this, type, fn, options]);
+				return original.call(this, type, fn, options);
+			};
+			return () => owner.addEventListener = original;
+		});
 
 	return () => {
-		EventTarget.prototype.addEventListener = original;
+		restores.forEach(restore => restore());
 		for(let [target, type, fn, options] of added)
 			target.removeEventListener(type, fn, options);
 	};
