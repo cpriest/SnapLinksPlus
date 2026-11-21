@@ -76,12 +76,27 @@ class EventHandler {
 			pub(ElementPositionsChanged, {});
 		}, true);
 		docElem.addEventListener('mousedown', this.onMouseDown, true);
+		this.ContextMenuSource = Math.random().toString(36).slice(2);
+		this.ContextMenuRecoveryReady = browser.runtime.sendMessage({ Action: 'GetContextMenuDragRecovery' }).then(enabled => {
+			if(!enabled)
+				return;
+			this.ContextMenuRecoveryEnabled = true;
+			browser.runtime.onMessage.addListener(msg => {
+				if(msg.Action == 'SetContextMenuShown' && msg.source != this.ContextMenuSource)
+					this.ContextMenuShown = msg.shown;
+			});
+			docElem.addEventListener('mousemove', this.onRecoverContextMenuDrag.bind(this), true);
+			window.addEventListener('contextmenu', this.onContextMenu.bind(this));
+		}).catch(error => {
+			console.warn('Snap Links could not enable context menu drag recovery:', error);
+		});
 	}
 
 	/**
 	 * @param {MouseEvent} e
 	 */
 	onMouseDown(e) {
+		this.SetContextMenuShown(false);
 		e = AddModsToEvent(e);
 
 		if(Prefs.DevMode) {
@@ -135,6 +150,42 @@ class EventHandler {
 	}
 
 	/**
+	 * Recover a press consumed by Firefox's native menu dismissal on Linux.
+	 *
+	 * @param {MouseEvent} e
+	 */
+	onRecoverContextMenuDrag(e) {
+		if(this.Dragging || !this.ContextMenuShown)
+			return;
+		e = AddModsToEvent(e);
+		if(e.mods != Prefs.ActivateModifiers || e.buttons != Prefs.ActivateMouseButton || this.IsDisabledHere())
+			return;
+		this.BeginDrag(e);
+		this.onMouseMove(e);
+	}
+
+	/**
+	 * Remember a native menu so a drag can recover if its next press is consumed.
+	 *
+	 * @param {MouseEvent} e
+	 */
+	onContextMenu(e) {
+		this.SetContextMenuShown(!e.defaultPrevented);
+	}
+
+	SetContextMenuShown(shown) {
+		let changed = this.ContextMenuShown !== shown;
+		this.ContextMenuShown = shown;
+		if(!this.ContextMenuRecoveryEnabled || !changed)
+			return;
+		browser.runtime.sendMessage({
+			Action: 'SetContextMenuShown', shown: shown, source: this.ContextMenuSource,
+		}).catch(error => {
+			console.warn('Snap Links could not share context menu state:', error);
+		});
+	}
+
+	/**
 	 * @param {MouseEvent} e
 	 */
 	onMouseUp(e) {
@@ -177,6 +228,8 @@ class EventHandler {
 	 * @param {MouseEvent} e
 	 */
 	BeginDrag(e) {
+		this.Dragging = true;
+		this.SetContextMenuShown(false);
 		this.FirstInit();
 		let [clientWidth, clientHeight] = GetClientDims();
 		this.MousePos = { clientX: e.clientX, clientY: e.clientY };
@@ -225,17 +278,15 @@ class EventHandler {
 		let [clientWidth, clientHeight] = GetClientDims();
 
 		if(e) {
+			let origin = this.CurrentSelection.dims,
+				growX  = window.scrollX + e.clientX - origin.originLeft,
+				growY  = window.scrollY + e.clientY - origin.originTop,
+				// No edge scrolling until the drag activates, so a plain right-click near an edge cannot scroll the page
+				zone   = Math.max(Math.abs(growX), Math.abs(growY)) > Prefs.Activation_Min ? Number(Prefs.AutoScrollEdgeZone) || 0 : 0;
+
 			this.IntervalScrollOffset = {
-				x: e.clientX < 0
-					? e.clientX
-					: e.clientX > clientWidth
-						? e.clientX - clientWidth
-						: 0,
-				y: e.clientY < 0
-					? e.clientY
-					: e.clientY > clientHeight
-						? e.clientY - clientHeight
-						: 0,
+				x: this.AutoScrollStep(e.clientX, clientWidth, growX, zone),
+				y: this.AutoScrollStep(e.clientY, clientHeight, growY, zone),
 			};
 
 			this.MousePos = { clientX: e.clientX, clientY: e.clientY };
@@ -252,9 +303,35 @@ class EventHandler {
 	}
 
 	/**
+	 * Returns how far to scroll along one axis on each interval for the given mouse position:
+	 *	-	outside the viewport, the distance beyond its edge
+	 *	-	within Prefs.AutoScrollEdgeZone pixels of an edge the lasso is growing towards, 1px at the zone's inner border, faster
+	 *		towards the edge.  This lets a maximized or full screen window scroll, where the mouse can't leave the viewport.
+	 *
+	 * @param {number} pos        The mouse's client coordinate on this axis
+	 * @param {number} size       The viewport's size on this axis, see GetClientDims()
+	 * @param {number} growing    The lasso's extent from its origin on this axis, negative when it grows towards 0 (up or left)
+	 * @param {number} zone       The edge zone width, Prefs.AutoScrollEdgeZone once the drag has activated, otherwise 0
+	 *
+	 * @returns {number}    The pixels to scroll by, negative to scroll up or left
+	 */
+	AutoScrollStep(pos, size, growing, zone) {
+		if(pos < 0)
+			return pos;
+		if(pos > size)
+			return pos - size;
+		if(growing > 0 && pos > size - zone)
+			return Math.ceil((pos - (size - zone)) / 2);
+		if(growing < 0 && pos < zone)
+			return -Math.ceil((zone - pos) / 2);
+		return 0;
+	}
+
+	/**
 	 * @param {MouseEvent|KeyboardEvent} e
 	 */
 	EndDrag(e) {
+		this.Dragging = false;
 		//noinspection JSVoidFunctionReturnValueUsed
 		this.mmTimer = clearInterval(this.mmTimer);
 

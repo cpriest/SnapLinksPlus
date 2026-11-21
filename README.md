@@ -36,6 +36,6 @@ Firefox does not let add-ons run on local files until you allow it for each add-
 ### GNU/Linux and macOS
 On Linux and macOS, Firefox opens the context menu when you press the right mouse button, not when you release it. This stopped right-button drags ([#400](https://github.com/cpriest/SnapLinksPlus/issues/400)).
 
-Snap Links now fixes this itself. While the right mouse button starts a selection, Snap Links tells Firefox to open the context menu when you release the button. A right-click without a drag still shows the context menu. If you change Snap Links to another mouse button, Firefox goes back to its normal behavior.
+Snap Links now fixes this itself. While the right mouse button starts a selection, Snap Links tells Firefox to open the context menu when you release the button. A right-click without a drag still shows the context menu. This applies to every right-click in Firefox, not only to drags. If you change Snap Links to another mouse button, or disable or remove Snap Links, Firefox goes back to its normal behavior.
 
 If the context menu still opens when you start a drag, another add-on or a policy may control this Firefox setting. Then set `ui.context_menus.after_mouseup` to `true` in `about:config`.

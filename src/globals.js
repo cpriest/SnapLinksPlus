@@ -42,6 +42,8 @@ const DefaultPrefs = {
 	IndexBuckets: 10,
 	ScrollRate:   8,
 
+	AutoScrollEdgeZone: 20,	// Pixels from an edge of the window within which a drag towards that edge scrolls the page, 0 to scroll only outside the window
+
 	Activation_Min: 5,
 
 	SelectionLabel_CursorMargin: 2,
@@ -56,6 +58,7 @@ const DefaultPrefs = {
 	DefaultAction:       OPEN_LINKS,
 	NewTabsOpenUnloaded: false,
 	SwitchFocusToNewTab: true,
+	ReverseLinkOrder:    false,	// Open/copy links last to first, SHIFT on release flips it for one selection
 	ShowNumberOfLinks:   true,
 	ActivateModifiers:   NONE,
 	ActivateMouseButton: RMB,

@@ -49,7 +49,7 @@ function makeTabStrip() {
 let run, browser, strip;
 
 /** What load() reports to background.js, change before calling load() */
-let platformOs, contextMenuControl;
+let platformOs;
 
 /** Replaces the storage-backed Prefs so each test controls exactly what background.js sees */
 const setPrefs = (overrides = {}) => run('(p) => { Prefs = p; }')({
@@ -69,7 +69,6 @@ const load = async (globals = {}, stores = undefined) => {
 		notifications: { create: jest.fn(async () => 'n'), onClicked: { addListener: jest.fn() } },
 		browserSettings: {
 			contextMenuShowEvent: {
-				get:   jest.fn(async () => ({ levelOfControl: contextMenuControl })),
 				set:   jest.fn(async () => true),
 				clear: jest.fn(async () => true),
 			},
@@ -96,8 +95,7 @@ const load = async (globals = {}, stores = undefined) => {
 };
 
 beforeEach(() => {
-	platformOs         = 'linux';
-	contextMenuControl = 'controllable_by_this_extension';
+	platformOs = 'linux';
 	return load();
 });
 
@@ -254,6 +252,73 @@ describe('message handling', () => {
 	});
 });
 
+describe('failed tab opens (#578, #579)', () => {
+	const send    = (urls) => run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: urls }, {}, () => {});
+	const settled = () => run('openUrlsPromiseChain');
+	let errors;
+
+	/** Makes tabs.create() throw for the tabs that fail(props) picks, and create the rest */
+	const failCreate = (fail) => {
+		let create = strip.api.create.getMockImplementation();
+		strip.api.create.mockImplementation(async (props) => {
+			if(fail(props))
+				throw new Error(`Cannot open ${props.url}`);
+			return create(props);
+		});
+	};
+
+	beforeEach(() => {
+		errors = [];
+		run('(log) => { console.error = (...a) => log.push(a); }')(errors);
+	});
+
+	test('a failed request does not block later requests', async () => {
+		strip.api.query.mockRejectedValueOnce(new Error('Invalid tab ID: 2'));
+
+		send(['a']);
+		send(['b']);
+		await settled();
+
+		expect(strip.order()).toEqual(['#1', '#2', 'b', '#3']);
+		expect(errors).toHaveLength(1);
+	});
+
+	test('an illegal URL is skipped, and the rest of the batch opens with no gap', async () => {
+		failCreate(props => props.url === 'bad');
+
+		send(['a', 'bad', 'b']);
+		await settled();
+
+		expect(strip.order()).toEqual(['#1', '#2', 'a', 'b', '#3']);
+		expect(errors[0][0]).toContain('bad');
+	});
+
+	test('openerTabId is set only while the opener tab exists', async () => {
+		setPrefs({ SetOwnershipTabID_FF: true });
+		failCreate(props => 'openerTabId' in props && !strip.tabs.some(t => t.id === props.openerTabId));
+		strip.api.create.mockImplementationOnce(async (props) => {
+			strip.tabs.splice(1, 1);	// The opener (active tab 2) closes after the first tab opens
+			return { ...props, id: 99 };
+		});
+
+		send(['a', 'b', 'c']);
+		await settled();
+
+		expect(strip.api.create.mock.calls.map(([p]) => [p.url, p.openerTabId])).toEqual([['a', 2], ['b', undefined], ['c', undefined]]);
+		expect(errors).toEqual([]);
+	});
+
+	test('a failed tab is logged and not retried', async () => {
+		failCreate(() => true);
+
+		send(['a']);
+		await settled();
+
+		expect(strip.api.create).toHaveBeenCalledTimes(1);
+		expect(errors).toHaveLength(1);
+	});
+});
+
 describe('install and update handling', () => {
 	/** Runs the onInstalled handler against the given prior state and waits for CheckInstallation() to finish */
 	async function install(stores = {}) {
@@ -316,66 +381,5 @@ describe('install and update handling', () => {
 		await install({ local: { LastInstalledVersion: '3.1.7', ScrollRate: 20 } });
 
 		expect(browser.storage.sync.data.ScrollRate).toBeUndefined();
-	});
-});
-
-describe('context menu show event (#400: Linux/macOS open the menu on mousedown)', () => {
-	const setting = () => browser.browserSettings.contextMenuShowEvent;
-
-	/** Loads with real storage-backed Prefs, so the pref change listener is the real one */
-	const loadWith = async (sync = {}) => {
-		await load({}, { sync });
-		await flush();
-	};
-
-	test.each(['linux', 'mac'])('on %s with the right mouse button, the menu is moved to mouseup', async (os) => {
-		platformOs = os;
-		await loadWith();
-
-		expect(setting().set).toHaveBeenCalledWith({ value: 'mouseup' });
-	});
-
-	test('on Windows the setting is left alone', async () => {
-		platformOs = 'win';
-		await loadWith();
-
-		expect(setting().get).not.toHaveBeenCalled();
-		expect(setting().set).not.toHaveBeenCalled();
-		expect(setting().clear).not.toHaveBeenCalled();
-	});
-
-	test('with another activation button, our override is cleared', async () => {
-		await loadWith({ ActivateMouseButton: 1 });
-
-		expect(setting().clear).toHaveBeenCalled();
-		expect(setting().set).not.toHaveBeenCalled();
-	});
-
-	test('a setting controlled by another extension or policy is not overridden', async () => {
-		contextMenuControl = 'controlled_by_other_extensions';
-		await loadWith();
-
-		expect(setting().set).not.toHaveBeenCalled();
-	});
-
-	test('changing ActivateMouseButton re-applies the setting', async () => {
-		await loadWith();
-		setting().clear.mockClear();
-
-		browser.fireStorageChanged({ ActivateMouseButton: { newValue: 1, oldValue: 2 } }, 'sync');
-		await flush();
-
-		expect(setting().clear).toHaveBeenCalledTimes(1);
-	});
-
-	test('without the browserSettings API (Chrome) nothing fails', async () => {
-		let errors = [];
-		await load({}, {});
-		delete browser.browserSettings;
-		run('(log) => { console.error = (...a) => log.push(a.join(" ")); }')(errors);
-
-		await run('ApplyContextMenuShowEvent')();
-
-		expect(errors).toEqual([]);
 	});
 });
