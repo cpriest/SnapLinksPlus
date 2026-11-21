@@ -23,13 +23,15 @@ const LMB = 1,	// Left Mouse Button
 //  Default Action
 const OPEN_LINKS     = 1,	// Open links
 		COPY_LINKS     = 2,	// Copy links
-		OPEN_IN_WINDOW = 3;	// Open links as tabs of a new window
+		OPEN_IN_WINDOW = 3,	// Open links as tabs of a new window
+		OPEN_IN_SEPARATE_WINDOWS = 4;	// Open each link in its own window
 
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest',
 		RELOAD_EXTENSION  = 'ReloadExtension',
 		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs',
 		OPEN_URLS_IN_WINDOW = 'OpenUrlsInWindow',
+		OPEN_URLS_IN_SEPARATE_WINDOWS = 'OpenUrlsInSeparateWindows',
 		COPY_TO_CLIPBOARD = 'CopyToClipboard';
 
 const TABS_OPEN_END     = 'OpenTabsAtEnd',
