@@ -34,6 +34,15 @@ const TABS_OPEN_END     = 'OpenTabsAtEnd',
 		TABS_OPEN_RIGHT   = 'OpenTabsToRight',
 		TABS_OPEN_NATURAL = 'OpenTabsNaturally';	// Like Firefox Middle-Click behaves
 
+// How copied links are written (Prefs.CopyFormat)
+const COPY_URLS            = 'Urls',				// One URL per line
+		COPY_TITLES_URLS   = 'TitlesAndUrls',		// Title<TAB>URL per line
+		COPY_TITLES        = 'Titles',				// One title per line
+		COPY_MARKDOWN      = 'Markdown',			// [Title](URL) per line
+		COPY_HTML          = 'Html',				// <a href="URL">Title</a> per line
+		COPY_HTML_LIST     = 'HtmlList',			// <ul> of <li><a href="URL">Title</a></li>
+		COPY_URLS_SPACED   = 'UrlsSpaceSeparated';	// URLs on one line, separated by spaces
+
 const isChrome  = location.protocol === 'chrome-extension:',
 		isFirefox = location.protocol === 'moz-extension:';
 
@@ -56,6 +65,7 @@ const DefaultPrefs = {
 
 	OpenTabs:            TABS_OPEN_NATURAL,
 	DefaultAction:       OPEN_LINKS,
+	CopyFormat:          COPY_URLS,
 	NewTabsOpenUnloaded: false,
 	SwitchFocusToNewTab: true,
 	ReverseLinkOrder:    false,	// Open/copy links last to first, SHIFT on release flips it for one selection

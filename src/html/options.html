@@ -67,6 +67,19 @@
 </label>
 
 <label>
+	<span>Copy links as</span>
+	<select id="CopyFormat" title="How copied links are written to the clipboard. The title of a link is its text.">
+		<option value="Urls">URLs, one per line</option>
+		<option value="TitlesAndUrls">Titles and URLs, tab separated</option>
+		<option value="Titles">Titles only</option>
+		<option value="Markdown">Markdown: [Title](URL)</option>
+		<option value="Html">HTML: &lt;a href="URL"&gt;Title&lt;/a&gt;</option>
+		<option value="HtmlList">HTML list: &lt;ul&gt;&lt;li&gt;&lt;a href="URL"&gt;Title&lt;/a&gt;&lt;/li&gt;...&lt;/ul&gt;</option>
+		<option value="UrlsSpaceSeparated">URLs on one line, space separated</option>
+	</select>
+</label>
+
+<label>
 	Open Tabs
 	<select id="OpenTabs">
 		<option title="Always open tabs at the end of the tab bar."

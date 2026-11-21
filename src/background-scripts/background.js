@@ -84,18 +84,55 @@ function onMessage(msg, sender, respond) {
 				.catch(error => console.error('Error while opening URLs in tabs: ', error));
 			break;
 		case COPY_TO_CLIPBOARD:
-			CopyToClipboard(msg.tUrls);
+			CopyToClipboard(msg.tUrls, msg.tTitles);
 			break;
 	}
 }
 
 /**
  * @param {string[]} urls
+ * @param {string[]} [titles]    The text of each link, same order as urls
  * @return {Promise<void>}
  */
-async function CopyToClipboard(urls) {
+async function CopyToClipboard(urls, titles = []) {
 	let platformInfo = await browser.runtime.getPlatformInfo();
-	navigator.clipboard.writeText(urls.join(platformInfo.os === chrome.runtime.PlatformOs.WIN ? '\r\n' : '\n'));
+	navigator.clipboard.writeText(FormatLinks(urls, titles, Prefs.CopyFormat, platformInfo.os === chrome.runtime.PlatformOs.WIN ? '\r\n' : '\n'));
+}
+
+/**
+ * Writes the links in one of the COPY_* formats
+ *
+ * @param {string[]} urls
+ * @param {string[]} titles    The text of each link, a link without text is titled by its URL
+ * @param {string}   format    One of the COPY_* constants, anything else is COPY_URLS
+ * @param {string}   eol       The line separator
+ *
+ * @return {string}
+ */
+function FormatLinks(urls, titles, format, eol) {
+	let links = urls.map((url, i) => ({ url, title: (titles && titles[i]) || url }));
+
+	let html     = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'),
+		htmlLink = ({ url, title }) => `<a href="${html(url)}">${html(title)}</a>`,
+		mdText   = (s) => s.replace(/[\\[\]]/g, '\\$&'),
+		mdUrl    = (s) => s.replace(/[()\s]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'));
+
+	switch(format) {
+		case COPY_TITLES_URLS:
+			return links.map(l => `${l.title}\t${l.url}`).join(eol);
+		case COPY_TITLES:
+			return links.map(l => l.title).join(eol);
+		case COPY_MARKDOWN:
+			return links.map(l => `[${mdText(l.title)}](${mdUrl(l.url)})`).join(eol);
+		case COPY_HTML:
+			return links.map(htmlLink).join(eol);
+		case COPY_HTML_LIST:
+			return ['<ul>', ...links.map(l => `\t<li>${htmlLink(l)}</li>`), '</ul>'].join(eol);
+		case COPY_URLS_SPACED:
+			return urls.join(' ');
+		default:
+			return urls.join(eol);
+	}
 }
 
 /**
