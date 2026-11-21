@@ -63,6 +63,8 @@ const DefaultPrefs = {
 	ActivateModifiers:   NONE,
 	ActivateMouseButton: RMB,
 
+	DisabledSites: '',	// Sites where Snap Links does nothing, one pattern per line, see SiteListMatches()
+
 	ShowUpdateNotification: true,		// Controls whether version update notifications are shown
 
 	DisableFontWeightFiltering: false,

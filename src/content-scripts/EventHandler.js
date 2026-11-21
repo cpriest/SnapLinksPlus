@@ -15,6 +15,47 @@ let SvgOverlay;
 let LastModifierKeys;
 
 /**
+ * Returns true if the URL matches one of the site patterns in the list, one pattern per line:
+ *    example.com              the host and all of its subdomains
+ *    *.example.*              * matches any characters
+ *    example.com/forum        pages of the host (and its subdomains) whose path starts with /forum
+ *    https://example.com/x    the same, the scheme is ignored
+ *    # comment                blank lines and lines starting with # are ignored
+ *
+ * @param {string} href    The URL to test
+ * @param {string} list    The patterns, one per line
+ *
+ * @returns {boolean}
+ */
+function SiteListMatches(href, list) {
+	let url;
+
+	try {
+		url = new URL(href);
+	} catch(e) {
+		return false;
+	}
+
+	/** @param {string} glob    A pattern where * matches any characters @returns {string} The regular expression source */
+	let globToRegExp = (glob) => glob.split('*').map(part => part.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*');
+
+	for(let line of String(list || '').split('\n')) {
+		let pattern = line.trim().replace(/^[a-z][a-z0-9+.-]*:\/\//i, '');
+
+		if(pattern === '' || pattern.startsWith('#'))
+			continue;
+
+		let [, host, path] = pattern.match(/^([^/]*)(\/.*)?$/),
+			urlHost        = host.includes(':') ? url.host : url.hostname;
+
+		if(new RegExp(`^(.*\\.)?${globToRegExp(host)}$`, 'i').test(urlHost) &&
+			(!path || new RegExp(`^${globToRegExp(path)}`, 'i').test(url.pathname + url.search)))
+			return true;
+	}
+	return false;
+}
+
+/**
  * The main Event Handler for Snap Links, registers/un-registers event handlers as appropriate
  *
  * @refactor This class is probably doing too much
@@ -69,10 +110,35 @@ class EventHandler {
 				e.preventDefault();
 			}
 		}
-		if(e.mods == Prefs.ActivateModifiers && e.buttons == Prefs.ActivateMouseButton) {
+		if(e.mods == Prefs.ActivateModifiers && e.buttons == Prefs.ActivateMouseButton && !this.IsDisabledHere()) {
 			this.BeginDrag(e);
 			e.preventDefault();
 		}
+	}
+
+	/**
+	 * Returns true if this page, or the page this frame is in, matches a pattern in Prefs.DisabledSites
+	 *
+	 * @returns {boolean}
+	 */
+	IsDisabledHere() {
+		let list = Prefs.DisabledSites;
+
+		if(!list)
+			return false;
+
+		let urls = [location.href];
+
+		if(window !== window.top) {
+			try {
+				urls.push(window.top.location.href);
+			} catch(e) {
+				// The top page is cross-origin, the referrer is usually its address (or at least its origin)
+				if(document.referrer)
+					urls.push(document.referrer);
+			}
+		}
+		return urls.some(href => SiteListMatches(href, list));
 	}
 
 	/**
@@ -92,7 +158,7 @@ class EventHandler {
 		if(this.Dragging || !this.ContextMenuShown)
 			return;
 		e = AddModsToEvent(e);
-		if(e.mods != Prefs.ActivateModifiers || e.buttons != Prefs.ActivateMouseButton)
+		if(e.mods != Prefs.ActivateModifiers || e.buttons != Prefs.ActivateMouseButton || this.IsDisabledHere())
 			return;
 		this.BeginDrag(e);
 		this.onMouseMove(e);
