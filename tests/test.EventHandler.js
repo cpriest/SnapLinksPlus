@@ -197,6 +197,15 @@ describe('during the drag', () => {
 		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, -8]);
 	});
 
+	test('a press near the bottom edge does not scroll until the drag is large enough to activate', () => {
+		down(50, 755);
+		move(52, 758);	// Within Activation_Min (5px): still an ordinary right-click
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 0]);
+
+		move(52, 762);
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 7]);
+	});
+
 	test('a drag that starts near the bottom edge and moves sideways does not scroll', () => {
 		down(50, 760);
 		move(450, 760);

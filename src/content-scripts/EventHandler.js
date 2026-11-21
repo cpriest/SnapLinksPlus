@@ -212,11 +212,15 @@ class EventHandler {
 		let [clientWidth, clientHeight] = GetClientDims();
 
 		if(e) {
-			let origin = this.CurrentSelection.dims;
+			let origin = this.CurrentSelection.dims,
+				growX  = window.scrollX + e.clientX - origin.originLeft,
+				growY  = window.scrollY + e.clientY - origin.originTop,
+				// No edge scrolling until the drag activates, so a plain right-click near an edge cannot scroll the page
+				zone   = Math.max(Math.abs(growX), Math.abs(growY)) > Prefs.Activation_Min ? Number(Prefs.AutoScrollEdgeZone) || 0 : 0;
 
 			this.IntervalScrollOffset = {
-				x: this.AutoScrollStep(e.clientX, clientWidth, window.scrollX + e.clientX - origin.originLeft),
-				y: this.AutoScrollStep(e.clientY, clientHeight, window.scrollY + e.clientY - origin.originTop),
+				x: this.AutoScrollStep(e.clientX, clientWidth, growX, zone),
+				y: this.AutoScrollStep(e.clientY, clientHeight, growY, zone),
 			};
 
 			this.MousePos = { clientX: e.clientX, clientY: e.clientY };
@@ -241,12 +245,11 @@ class EventHandler {
 	 * @param {number} pos        The mouse's client coordinate on this axis
 	 * @param {number} size       The viewport's size on this axis, see GetClientDims()
 	 * @param {number} growing    The lasso's extent from its origin on this axis, negative when it grows towards 0 (up or left)
+	 * @param {number} zone       The edge zone width, Prefs.AutoScrollEdgeZone once the drag has activated, otherwise 0
 	 *
 	 * @returns {number}    The pixels to scroll by, negative to scroll up or left
 	 */
-	AutoScrollStep(pos, size, growing) {
-		let zone = Number(Prefs.AutoScrollEdgeZone) || 0;
-
+	AutoScrollStep(pos, size, growing, zone) {
 		if(pos < 0)
 			return pos;
 		if(pos > size)
