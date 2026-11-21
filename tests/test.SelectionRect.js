@@ -100,11 +100,44 @@ describe('link counter', () => {
 		let links = hrefs.map(href => ({ href }));
 		run('(c) => pub(ElementsSelected, c)')({ Links: links });
 	};
+	const selectElements = (collection) => {
+		run('(c) => pub(ElementsSelected, c)')(collection);
+	};
 
 	test('counts distinct hrefs', () => {
 		select('http://a/', 'http://b/', 'http://a/');
 
 		expect(label().innerHTML).toBe('2 Links');
+	});
+
+	test('counts checkboxes instead of showing 0 Links when only checkboxes are selected', () => {
+		selectElements({ Links: [], Checkboxes: [{}, {}, {}] });
+
+		expect(label().innerHTML).toBe('3 Checkboxes');
+	});
+
+	test('counts radio buttons when only radio buttons are selected', () => {
+		selectElements({ Links: [], RadioButtons: [{}, {}] });
+
+		expect(label().innerHTML).toBe('2 Radio Buttons');
+	});
+
+	test('shows the greatest category when the selection mixes links and checkboxes', () => {
+		selectElements({ Links: [{ href: 'http://a/' }], Checkboxes: [{}, {}, {}] });
+
+		expect(label().innerHTML).toBe('3 Checkboxes');
+	});
+
+	test('still shows links when they are the greatest category', () => {
+		selectElements({ Links: [{ href: 'http://a/' }, { href: 'http://b/' }], Checkboxes: [{}] });
+
+		expect(label().innerHTML).toBe('2 Links');
+	});
+
+	test('counts clickable elements when they are the greatest category', () => {
+		selectElements({ Links: [], Clickable: [{}, {}], Checkboxes: [{}] });
+
+		expect(label().innerHTML).toBe('2 Clickable');
 	});
 
 	test('pins to the bottom right of the rect for a normal drag', () => {
