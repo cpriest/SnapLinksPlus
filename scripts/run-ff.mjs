@@ -73,8 +73,13 @@ async function serveTestDir() {
 		  Types = { '.html': 'text/html', '.htm': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.gif': 'image/gif', '.png': 'image/png', '.svg': 'image/svg+xml' };
 
 	let server = http.createServer((req, res) => {
-		let file = path.join(Root, path.normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)));
+		let pathname = new URL(req.url, 'http://x').pathname,
+			file     = path.join(Root, path.normalize(decodeURIComponent(pathname)));
 
+		if(pathname === '/') {
+			res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }).end(testIndex(Root));
+			return;
+		}
 		if(!file.startsWith(Root + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
 			res.writeHead(404).end(`run-ff: ${req.url} is not a file in ${Root}`);
 			return;
@@ -85,6 +90,30 @@ async function serveTestDir() {
 
 	await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 	return `http://127.0.0.1:${server.address().port}/`;
+}
+
+/**
+ * The page served at /: a link to each fixture page in test/, with its <title>. Built per request, so new pages appear without a restart.
+ *
+ * @param {string} root    The test/ directory
+ * @return {string}
+ */
+function testIndex(root) {
+	const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+	let rows = fs.readdirSync(root)
+		.filter(f => /\.html?$/i.test(f))
+		.sort()
+		.map(f => {
+			let title = fs.readFileSync(path.join(root, f), 'utf8').match(/<title>([^<]*)<\/title>/i)?.[1].trim() || '';
+			return `<li><a href="${encodeURIComponent(f)}">${esc(f)}</a>${title ? ` <span>${esc(title)}</span>` : ''}</li>`;
+		});
+
+	return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Snap Links test pages</title>
+<style>body { font: 16px sans-serif; margin: 20px; } li { margin: 6px 0; } span { color: #666; margin-left: 10px; }</style></head>
+<body><h2>Snap Links test pages</h2><p>Served from <code>${esc(root)}</code></p><ul>
+${rows.join('\n')}
+</ul></body></html>`;
 }
 
 /** Rewrites file:// start URLs inside test/ to the http server */
