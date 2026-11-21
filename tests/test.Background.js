@@ -565,3 +565,95 @@ describe('OpenUrlsInWindow (#182)', () => {
 		expect(windows.create).toHaveBeenCalledWith({ url: 'w1', incognito: false, cookieStoreId: 'c9' });
 	});
 });
+
+describe('FormatLinks (copy formats, #198)', () => {
+	const urls   = ['https://a.test/1', 'https://a.test/(2)'],
+		titles = ['First <b>&</b> "one"', '[Second]'];
+	const format = (constant, eol = '\n', t = titles) => run('FormatLinks')(urls, t, run(constant), eol);
+
+	test.each([
+		['COPY_URLS', 'https://a.test/1\nhttps://a.test/(2)'],
+		['COPY_TITLES_URLS', 'First <b>&</b> "one"\thttps://a.test/1\n[Second]\thttps://a.test/(2)'],
+		['COPY_TITLES', 'First <b>&</b> "one"\n[Second]'],
+		['COPY_MARKDOWN', '[First <b>&</b> "one"](https://a.test/1)\n[\\[Second\\]](https://a.test/%282%29)'],
+		['COPY_HTML', '<a href="https://a.test/1">First &lt;b&gt;&amp;&lt;/b&gt; &quot;one&quot;</a>\n<a href="https://a.test/(2)">[Second]</a>'],
+		['COPY_HTML_LIST', '<ul>\n\t<li><a href="https://a.test/1">First &lt;b&gt;&amp;&lt;/b&gt; &quot;one&quot;</a></li>\n\t<li><a href="https://a.test/(2)">[Second]</a></li>\n</ul>'],
+		['COPY_URLS_SPACED', 'https://a.test/1 https://a.test/(2)'],
+	])('%s', (constant, expected) => {
+		expect(format(constant)).toBe(expected);
+	});
+
+	test('uses the given line separator', () => {
+		expect(format('COPY_TITLES_URLS', '\r\n')).toBe('First <b>&</b> "one"\thttps://a.test/1\r\n[Second]\thttps://a.test/(2)');
+	});
+
+	test('a link without a title is titled by its URL', () => {
+		expect(format('COPY_TITLES', '\n', ['', undefined])).toBe('https://a.test/1\nhttps://a.test/(2)');
+		expect(run('FormatLinks')(urls, undefined, run('COPY_TITLES'), '\n')).toBe('https://a.test/1\nhttps://a.test/(2)');
+	});
+
+	test('an unknown format copies URLs', () => {
+		expect(run('FormatLinks')(urls, titles, 'Nonsense', '\n')).toBe('https://a.test/1\nhttps://a.test/(2)');
+	});
+});
+
+describe('BookmarkLinks (#216)', () => {
+	let created, granted;
+
+	beforeEach(() => {
+		created = [];
+		granted = true;
+		browser.permissions = { contains: jest.fn(async () => granted) };
+		browser.bookmarks   = {
+			create: jest.fn(async (props) => {
+				let node = { id: `n${created.length}`, ...props };
+				created.push(node);
+				return node;
+			}),
+		};
+		browser.runtime.openOptionsPage = jest.fn(async () => {});
+	});
+
+	test('creates a "Snap Links <date>" folder holding the links in order, named by their titles or URLs', async () => {
+		await run('BookmarkLinks')(['http://a/', 'http://b/'], ['A', '']);
+
+		expect(browser.permissions.contains).toHaveBeenCalledWith({ permissions: ['bookmarks'] });
+		expect(created[0]).toEqual({ id: 'n0', title: expect.stringMatching(/^Snap Links \S/) });
+		expect(created[0].parentId).toBeUndefined();
+		expect(created.slice(1)).toEqual([
+			{ id: 'n1', parentId: 'n0', title: 'A', url: 'http://a/' },
+			{ id: 'n2', parentId: 'n0', title: 'http://b/', url: 'http://b/' },
+		]);
+	});
+
+	test('without the permission it opens the options page and creates nothing', async () => {
+		granted = false;
+
+		await run('BookmarkLinks')(['http://a/'], ['A']);
+
+		expect(browser.runtime.openOptionsPage).toHaveBeenCalledTimes(1);
+		expect(browser.bookmarks.create).not.toHaveBeenCalled();
+	});
+
+	test('a link that cannot be bookmarked is skipped, and the rest are still bookmarked', async () => {
+		let errors = [], create = browser.bookmarks.create.getMockImplementation();
+		run('(log) => { console.error = (...a) => log.push(a); }')(errors);
+		browser.bookmarks.create.mockImplementation(async (props) => {
+			if(props.url === 'bad:')
+				throw new Error('Invalid URL');
+			return create(props);
+		});
+
+		await run('BookmarkLinks')(['http://a/', 'bad:', 'http://c/'], []);
+
+		expect(created.map(n => n.url)).toEqual([undefined, 'http://a/', 'http://c/']);
+		expect(errors[0][0]).toContain('bad:');
+	});
+
+	test('BOOKMARK_LINKS_IN_FOLDER messages bookmark the links', async () => {
+		run('onMessage')({ Action: run('BOOKMARK_LINKS_IN_FOLDER'), tUrls: ['http://a/'], tTitles: ['A'] }, {}, () => {});
+		await flush();
+
+		expect(created.map(n => n.url)).toEqual([undefined, 'http://a/']);
+	});
+});

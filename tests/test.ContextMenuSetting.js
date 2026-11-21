@@ -37,6 +37,7 @@ function createBackgroundTestHarness({
 		OPEN_URLS_IN_TABS: 'OpenUrlsInTabs',
 		OPEN_URLS_IN_WINDOW: 'OpenUrlsInWindow',
 		COPY_TO_CLIPBOARD: 'CopyToClipboard',
+		BOOKMARK_LINKS_IN_FOLDER: 'BookmarkLinksInFolder',
 		Prefs:             {
 			...preferences,
 			Ready:     preferencesReady,
