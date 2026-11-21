@@ -52,6 +52,7 @@ module.exports = {
 		'COPY_URLS_SPACED':        'readonly',
 		'OPEN_IN_WINDOW':          'readonly',
 		'BOOKMARK_LINKS':          'readonly',
+		'BOOKMARKS_PERMISSION':    'readonly',
 		'isChrome':                'readonly',
 		'isFirefox':               'readonly',
 		'DragRectChanged':         'readonly',

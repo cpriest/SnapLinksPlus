@@ -86,13 +86,12 @@ class Options {
 		if(!action || !note || !button || !browser.permissions)
 			return;
 
-		let permission = { permissions: ['bookmarks'] },
-			update     = async () => {
-				note.hidden = action.value != BOOKMARK_LINKS || await browser.permissions.contains(permission);
-			};
+		let update = async () => {
+			note.hidden = action.value != BOOKMARK_LINKS || await browser.permissions.contains(BOOKMARKS_PERMISSION);
+		};
 
 		button.addEventListener('click', () => {
-			browser.permissions.request(permission)
+			browser.permissions.request(BOOKMARKS_PERMISSION)
 				.then(update);
 		});
 		action.addEventListener('change', update);

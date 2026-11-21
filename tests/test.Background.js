@@ -635,6 +635,21 @@ describe('BookmarkLinks (#216)', () => {
 		expect(browser.bookmarks.create).not.toHaveBeenCalled();
 	});
 
+	test('a link that cannot be bookmarked is skipped, and the rest are still bookmarked', async () => {
+		let errors = [], create = browser.bookmarks.create.getMockImplementation();
+		run('(log) => { console.error = (...a) => log.push(a); }')(errors);
+		browser.bookmarks.create.mockImplementation(async (props) => {
+			if(props.url === 'bad:')
+				throw new Error('Invalid URL');
+			return create(props);
+		});
+
+		await run('BookmarkLinks')(['http://a/', 'bad:', 'http://c/'], []);
+
+		expect(created.map(n => n.url)).toEqual([undefined, 'http://a/', 'http://c/']);
+		expect(errors[0][0]).toContain('bad:');
+	});
+
 	test('BOOKMARK_LINKS_IN_FOLDER messages bookmark the links', async () => {
 		run('onMessage')({ Action: run('BOOKMARK_LINKS_IN_FOLDER'), tUrls: ['http://a/'], tTitles: ['A'] }, {}, () => {});
 		await flush();

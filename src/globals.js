@@ -34,6 +34,9 @@ const BACKGROUND_TEST   = 'BackgroundTest',
 		COPY_TO_CLIPBOARD = 'CopyToClipboard',
 		BOOKMARK_LINKS_IN_FOLDER = 'BookmarkLinksInFolder';
 
+// Bookmarking needs this optional permission, the options page asks for it when bookmarking is the default action
+const BOOKMARKS_PERMISSION = { permissions: ['bookmarks'] };
+
 const TABS_OPEN_END     = 'OpenTabsAtEnd',
 		TABS_OPEN_RIGHT   = 'OpenTabsToRight',
 		TABS_OPEN_NATURAL = 'OpenTabsNaturally';	// Like Firefox Middle-Click behaves
