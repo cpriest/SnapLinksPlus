@@ -252,6 +252,73 @@ describe('message handling', () => {
 	});
 });
 
+describe('failed tab opens (#578, #579)', () => {
+	const send    = (urls) => run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: urls }, {}, () => {});
+	const settled = () => run('openUrlsPromiseChain');
+	let errors;
+
+	/** Makes tabs.create() throw for the tabs that fail(props) picks, and create the rest */
+	const failCreate = (fail) => {
+		let create = strip.api.create.getMockImplementation();
+		strip.api.create.mockImplementation(async (props) => {
+			if(fail(props))
+				throw new Error(`Cannot open ${props.url}`);
+			return create(props);
+		});
+	};
+
+	beforeEach(() => {
+		errors = [];
+		run('(log) => { console.error = (...a) => log.push(a); }')(errors);
+	});
+
+	test('a failed request does not block later requests', async () => {
+		strip.api.query.mockRejectedValueOnce(new Error('Invalid tab ID: 2'));
+
+		send(['a']);
+		send(['b']);
+		await settled();
+
+		expect(strip.order()).toEqual(['#1', '#2', 'b', '#3']);
+		expect(errors).toHaveLength(1);
+	});
+
+	test('an illegal URL is skipped, and the rest of the batch opens with no gap', async () => {
+		failCreate(props => props.url === 'bad');
+
+		send(['a', 'bad', 'b']);
+		await settled();
+
+		expect(strip.order()).toEqual(['#1', '#2', 'a', 'b', '#3']);
+		expect(errors[0][0]).toContain('bad');
+	});
+
+	test('openerTabId is set only while the opener tab exists', async () => {
+		setPrefs({ SetOwnershipTabID_FF: true });
+		failCreate(props => 'openerTabId' in props && !strip.tabs.some(t => t.id === props.openerTabId));
+		strip.api.create.mockImplementationOnce(async (props) => {
+			strip.tabs.splice(1, 1);	// The opener (active tab 2) closes after the first tab opens
+			return { ...props, id: 99 };
+		});
+
+		send(['a', 'b', 'c']);
+		await settled();
+
+		expect(strip.api.create.mock.calls.map(([p]) => [p.url, p.openerTabId])).toEqual([['a', 2], ['b', undefined], ['c', undefined]]);
+		expect(errors).toEqual([]);
+	});
+
+	test('a failed tab is logged and not retried', async () => {
+		failCreate(() => true);
+
+		send(['a']);
+		await settled();
+
+		expect(strip.api.create).toHaveBeenCalledTimes(1);
+		expect(errors).toHaveLength(1);
+	});
+});
+
 describe('install and update handling', () => {
 	/** Runs the onInstalled handler against the given prior state and waits for CheckInstallation() to finish */
 	async function install(stores = {}) {
