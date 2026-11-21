@@ -78,15 +78,10 @@ function onMessage(msg, sender, respond) {
 			browser.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			// Catch errors so that a failed request doesn't leave the chain rejected, which would skip every later request
-			openUrlsPromiseChain = openUrlsPromiseChain
-				.then(() => OpenUrlsInTabs(msg.tUrls))
-				.catch(error => console.error('Error while opening URLs in tabs: ', error));
+			QueueOpen(() => OpenUrlsInTabs(msg.tUrls));
 			break;
 		case OPEN_URLS_IN_WINDOW:
-			openUrlsPromiseChain = openUrlsPromiseChain.then(() => {
-				return OpenUrlsInWindow(msg.tUrls, sender.tab);
-			});
+			QueueOpen(() => OpenUrlsInWindow(msg.tUrls, sender.tab));
 			break;
 		case COPY_TO_CLIPBOARD:
 			CopyToClipboard(msg.tUrls, msg.tTitles);
@@ -138,6 +133,18 @@ function FormatLinks(urls, titles, format, eol) {
 		default:
 			return urls.join(eol);
 	}
+}
+
+/**
+ * Runs open() after the earlier open requests, so selections open in the order they were made.
+ * Errors are caught so that a failed request doesn't leave the chain rejected, which would skip every later request (#578, #579).
+ *
+ * @param {function(): Promise<void>} open
+ */
+function QueueOpen(open) {
+	openUrlsPromiseChain = openUrlsPromiseChain
+		.then(open)
+		.catch(error => console.error('Error while opening URLs: ', error));
 }
 
 /**
@@ -233,26 +240,40 @@ async function OpenUrlsInWindow(urls, sourceTab) {
 	if(!urls || urls.length === 0)
 		return;
 
+	// Firefox for Android has no windows
+	if(!browser.windows)
+		return OpenUrlsInTabs(urls);
+
 	sourceTab = sourceTab || (await browser.tabs.query({
 		active:        true,
 		currentWindow: true,
 	}))[0];
 
-	let props = {
-		url:       urls[0],
-		incognito: Boolean(sourceTab.incognito),
-	};
+	let props = { incognito: Boolean(sourceTab.incognito) },
+		rest  = urls.slice(),
+		newWindow;
 
 	if(isFirefox)
 		props.cookieStoreId = sourceTab.cookieStoreId;
 
-	let newWindow = await browser.windows.create(props);
+	// The window opens with the first link that can be opened (eg: not an illegal URL)
+	while(!newWindow && rest.length) {
+		let url = rest.shift();
+		try {
+			newWindow = await browser.windows.create({ ...props, url });
+		} catch(error) {
+			console.error(`Error while opening ${url} in a new window: `, error);
+		}
+	}
+	if(!newWindow)
+		return;
 
-	// Keep the window the links came from in front
+	// Keep the window the links came from in front, it may have been closed meanwhile
 	if(!Prefs.SwitchFocusToNewTab)
-		await browser.windows.update(sourceTab.windowId, { focused: true });
+		await browser.windows.update(sourceTab.windowId, { focused: true })
+			.catch(error => console.error(`Error while focusing window ${sourceTab.windowId}: `, error));
 
-	for(let url of urls.slice(1)) {
+	for(let url of rest) {
 		await sleep(Prefs.NewTabDelayMS);
 
 		let tabProps = {
@@ -267,7 +288,12 @@ async function OpenUrlsInWindow(urls, sourceTab) {
 				tabProps.discarded = true;
 		}
 
-		await browser.tabs.create(tabProps);
+		try {
+			await browser.tabs.create(tabProps);
+		} catch(error) {
+			// Skip this URL and keep opening the rest
+			console.error(`Error while opening ${url} in a new tab: `, error);
+		}
 	}
 }
 
