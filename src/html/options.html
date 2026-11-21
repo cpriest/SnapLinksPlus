@@ -25,9 +25,11 @@
 		IMG.Info { cursor: help; margin-left: 5px; }
 		DIV > LABEL { display: inline-block; width: auto; }
 
+		/* Wraps onto as many lines as the width needs; a fixed height with column wrap overflowed sideways */
 		DIV.flex-list {
-			display:   flex;
-			flex-flow: column wrap;
+			display:    flex;
+			flex-wrap:  wrap;
+			column-gap: 16px;
 		}
 	</style>
 	<title>SnapLinks Options</title>
@@ -101,7 +103,7 @@
 	<span>(hold SHIFT when releasing to reverse just once)</span>
 </label>
 
-<div class="flex-list" style="height: 64px;">
+<div class="flex-list">
 
 	<label browsers="FireFox" title="Open new tabs in background unloaded.">
 		<input id="NewTabsOpenUnloaded" type="checkbox"> Open in background unloaded
