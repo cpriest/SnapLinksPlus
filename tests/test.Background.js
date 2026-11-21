@@ -49,7 +49,7 @@ function makeTabStrip() {
 let run, browser, strip;
 
 /** What load() reports to background.js, change before calling load() */
-let platformOs, contextMenuControl;
+let platformOs;
 
 /** Replaces the storage-backed Prefs so each test controls exactly what background.js sees */
 const setPrefs = (overrides = {}) => run('(p) => { Prefs = p; }')({
@@ -69,7 +69,6 @@ const load = async (globals = {}, stores = undefined) => {
 		notifications: { create: jest.fn(async () => 'n'), onClicked: { addListener: jest.fn() } },
 		browserSettings: {
 			contextMenuShowEvent: {
-				get:   jest.fn(async () => ({ levelOfControl: contextMenuControl })),
 				set:   jest.fn(async () => true),
 				clear: jest.fn(async () => true),
 			},
@@ -96,8 +95,7 @@ const load = async (globals = {}, stores = undefined) => {
 };
 
 beforeEach(() => {
-	platformOs         = 'linux';
-	contextMenuControl = 'controllable_by_this_extension';
+	platformOs = 'linux';
 	return load();
 });
 
@@ -245,12 +243,90 @@ describe('message handling', () => {
 		expect(writeText).toHaveBeenCalledWith(`http://a/${separator}http://b/`);
 	});
 
+	test('COPY_TO_CLIPBOARD writes the links in Prefs.CopyFormat with the titles sent along', async () => {
+		let writeText = jest.fn();
+		await load({ navigator: { clipboard: { writeText } } });
+		setPrefs({ CopyFormat: run('COPY_MARKDOWN') });
+
+		send({ Action: run('COPY_TO_CLIPBOARD'), tUrls: ['http://a/', 'http://b/'], tTitles: ['A', ''] });
+		await flush();
+
+		expect(writeText).toHaveBeenCalledWith('[A](http://a/)\n[http://b/](http://b/)');
+	});
+
 	test('RELOAD_EXTENSION detaches the listener and reloads the tab and extension', () => {
 		send({ Action: run('RELOAD_EXTENSION') });
 
 		expect(browser.runtime.onMessage.removeListener).toHaveBeenCalledWith(run('onMessage'));
 		expect(strip.api.reload).toHaveBeenCalledTimes(1);
 		expect(browser.runtime.reload).toHaveBeenCalledTimes(1);
+	});
+});
+
+describe('failed tab opens (#578, #579)', () => {
+	const send    = (urls) => run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: urls }, {}, () => {});
+	const settled = () => run('openUrlsPromiseChain');
+	let errors;
+
+	/** Makes tabs.create() throw for the tabs that fail(props) picks, and create the rest */
+	const failCreate = (fail) => {
+		let create = strip.api.create.getMockImplementation();
+		strip.api.create.mockImplementation(async (props) => {
+			if(fail(props))
+				throw new Error(`Cannot open ${props.url}`);
+			return create(props);
+		});
+	};
+
+	beforeEach(() => {
+		errors = [];
+		run('(log) => { console.error = (...a) => log.push(a); }')(errors);
+	});
+
+	test('a failed request does not block later requests', async () => {
+		strip.api.query.mockRejectedValueOnce(new Error('Invalid tab ID: 2'));
+
+		send(['a']);
+		send(['b']);
+		await settled();
+
+		expect(strip.order()).toEqual(['#1', '#2', 'b', '#3']);
+		expect(errors).toHaveLength(1);
+	});
+
+	test('an illegal URL is skipped, and the rest of the batch opens with no gap', async () => {
+		failCreate(props => props.url === 'bad');
+
+		send(['a', 'bad', 'b']);
+		await settled();
+
+		expect(strip.order()).toEqual(['#1', '#2', 'a', 'b', '#3']);
+		expect(errors[0][0]).toContain('bad');
+	});
+
+	test('openerTabId is set only while the opener tab exists', async () => {
+		setPrefs({ SetOwnershipTabID_FF: true });
+		failCreate(props => 'openerTabId' in props && !strip.tabs.some(t => t.id === props.openerTabId));
+		strip.api.create.mockImplementationOnce(async (props) => {
+			strip.tabs.splice(1, 1);	// The opener (active tab 2) closes after the first tab opens
+			return { ...props, id: 99 };
+		});
+
+		send(['a', 'b', 'c']);
+		await settled();
+
+		expect(strip.api.create.mock.calls.map(([p]) => [p.url, p.openerTabId])).toEqual([['a', 2], ['b', undefined], ['c', undefined]]);
+		expect(errors).toEqual([]);
+	});
+
+	test('a failed tab is logged and not retried', async () => {
+		failCreate(() => true);
+
+		send(['a']);
+		await settled();
+
+		expect(strip.api.create).toHaveBeenCalledTimes(1);
+		expect(errors).toHaveLength(1);
 	});
 });
 
@@ -319,64 +395,34 @@ describe('install and update handling', () => {
 	});
 });
 
-describe('context menu show event (#400: Linux/macOS open the menu on mousedown)', () => {
-	const setting = () => browser.browserSettings.contextMenuShowEvent;
+describe('FormatLinks (copy formats, #198)', () => {
+	const urls   = ['https://a.test/1', 'https://a.test/(2)'],
+		titles = ['First <b>&</b> "one"', '[Second]'];
+	const format = (constant, eol = '\n', t = titles) => run('FormatLinks')(urls, t, run(constant), eol);
 
-	/** Loads with real storage-backed Prefs, so the pref change listener is the real one */
-	const loadWith = async (sync = {}) => {
-		await load({}, { sync });
-		await flush();
-	};
-
-	test.each(['linux', 'mac'])('on %s with the right mouse button, the menu is moved to mouseup', async (os) => {
-		platformOs = os;
-		await loadWith();
-
-		expect(setting().set).toHaveBeenCalledWith({ value: 'mouseup' });
+	test.each([
+		['COPY_URLS', 'https://a.test/1\nhttps://a.test/(2)'],
+		['COPY_TITLES_URLS', 'First <b>&</b> "one"\thttps://a.test/1\n[Second]\thttps://a.test/(2)'],
+		['COPY_TITLES', 'First <b>&</b> "one"\n[Second]'],
+		['COPY_MARKDOWN', '[First <b>&</b> "one"](https://a.test/1)\n[\\[Second\\]](https://a.test/%282%29)'],
+		['COPY_HTML', '<a href="https://a.test/1">First &lt;b&gt;&amp;&lt;/b&gt; &quot;one&quot;</a>\n<a href="https://a.test/(2)">[Second]</a>'],
+		['COPY_HTML_LIST', '<ul>\n\t<li><a href="https://a.test/1">First &lt;b&gt;&amp;&lt;/b&gt; &quot;one&quot;</a></li>\n\t<li><a href="https://a.test/(2)">[Second]</a></li>\n</ul>'],
+		['COPY_URLS_SPACED', 'https://a.test/1 https://a.test/(2)'],
+	])('%s', (constant, expected) => {
+		expect(format(constant)).toBe(expected);
 	});
 
-	test('on Windows the setting is left alone', async () => {
-		platformOs = 'win';
-		await loadWith();
-
-		expect(setting().get).not.toHaveBeenCalled();
-		expect(setting().set).not.toHaveBeenCalled();
-		expect(setting().clear).not.toHaveBeenCalled();
+	test('uses the given line separator', () => {
+		expect(format('COPY_TITLES_URLS', '\r\n')).toBe('First <b>&</b> "one"\thttps://a.test/1\r\n[Second]\thttps://a.test/(2)');
 	});
 
-	test('with another activation button, our override is cleared', async () => {
-		await loadWith({ ActivateMouseButton: 1 });
-
-		expect(setting().clear).toHaveBeenCalled();
-		expect(setting().set).not.toHaveBeenCalled();
+	test('a link without a title is titled by its URL', () => {
+		expect(format('COPY_TITLES', '\n', ['', undefined])).toBe('https://a.test/1\nhttps://a.test/(2)');
+		expect(run('FormatLinks')(urls, undefined, run('COPY_TITLES'), '\n')).toBe('https://a.test/1\nhttps://a.test/(2)');
 	});
 
-	test('a setting controlled by another extension or policy is not overridden', async () => {
-		contextMenuControl = 'controlled_by_other_extensions';
-		await loadWith();
-
-		expect(setting().set).not.toHaveBeenCalled();
-	});
-
-	test('changing ActivateMouseButton re-applies the setting', async () => {
-		await loadWith();
-		setting().clear.mockClear();
-
-		browser.fireStorageChanged({ ActivateMouseButton: { newValue: 1, oldValue: 2 } }, 'sync');
-		await flush();
-
-		expect(setting().clear).toHaveBeenCalledTimes(1);
-	});
-
-	test('without the browserSettings API (Chrome) nothing fails', async () => {
-		let errors = [];
-		await load({}, {});
-		delete browser.browserSettings;
-		run('(log) => { console.error = (...a) => log.push(a.join(" ")); }')(errors);
-
-		await run('ApplyContextMenuShowEvent')();
-
-		expect(errors).toEqual([]);
+	test('an unknown format copies URLs', () => {
+		expect(run('FormatLinks')(urls, titles, 'Nonsense', '\n')).toBe('https://a.test/1\nhttps://a.test/(2)');
 	});
 });
 

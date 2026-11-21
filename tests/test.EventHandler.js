@@ -52,12 +52,20 @@ const key  = (k, init = {}) => {
 const drag = (from, to, upInit = {}) => { down(...from); move(...to); return up(...to, upInit); };
 
 const container = () => document.querySelector('.SnapLinksContainer');
-const sent      = () => browser.runtime.sendMessage.mock.calls.map(([msg]) => msg);
+/** Action messages sent to the background, without the context menu recovery handshake (#580) */
+const sent      = () => browser.runtime.sendMessage.mock.calls.map(([msg]) => msg).filter(msg => !/ContextMenu/.test(msg.Action));
 
-async function load(stores) {
+/**
+ * @param {object}  [stores]      Starting storage contents, see makeBrowser()
+ * @param {boolean} [recovery]    Turn on Linux context menu drag recovery (#580), as the background does on Linux
+ */
+async function load(stores, recovery = false) {
 	browser = makeBrowser(stores);
+	if(recovery)
+		browser.runtime.sendMessage.mockImplementation(async msg => msg.Action === 'GetContextMenuDragRecovery' || undefined);
 	({ run } = loadScriptsInDom(Scripts, browser));
 	await run('DOMReady');
+	await run('SnapLinks.ContextMenuRecoveryReady');
 }
 
 beforeEach(async () => {
@@ -80,6 +88,10 @@ beforeEach(async () => {
 afterEach(() => {
 	cleanup();
 	jest.useRealTimers();
+	// Undo sizes and modes faked by a test, the jsdom document is shared
+	delete document.body.clientHeight;
+	delete document.documentElement.clientHeight;
+	delete document.compatMode;
 });
 
 describe('activation', () => {
@@ -163,6 +175,63 @@ describe('during the drag', () => {
 		expect(window.scrollBy).toHaveBeenCalledWith(0, expect.any(Number));
 		expect(window.scrollBy.mock.calls.at(-1)[1]).toBeGreaterThan(0);
 	});
+
+	test('dragging past the bottom of the window autoscrolls on a page taller than the window (#566, #516)', () => {
+		// A long page in standards mode: the body is as tall as the content, the root element reports the viewport
+		Object.defineProperty(document.body, 'clientHeight', { value: 5000, configurable: true });
+		Object.defineProperty(document.documentElement, 'clientHeight', { value: 700, configurable: true });
+
+		down(50, 50);
+		move(450, 750);
+
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 50]);
+	});
+
+	// jsdom: the window is 1024 x 768 and the root element reports no size, so GetClientDims() is the window
+	test('dragging down into the bottom 20px of the window autoscrolls, faster closer to the edge', () => {
+		down(50, 50);
+		move(450, 750);
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 1]);
+
+		move(450, 767);
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 10]);
+	});
+
+	test('dragging up into the top 20px of the window scrolls up', () => {
+		down(50, 400);
+		move(450, 4);
+
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, -8]);
+	});
+
+	test('a press near the bottom edge does not scroll until the drag is large enough to activate', () => {
+		down(50, 755);
+		move(52, 758);	// Within Activation_Min (5px): still an ordinary right-click
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 0]);
+
+		move(52, 762);
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 7]);
+	});
+
+	test('a drag that starts near the bottom edge and moves sideways does not scroll', () => {
+		down(50, 760);
+		move(450, 760);
+
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 0]);
+	});
+
+	test('AutoScrollEdgeZone 0 scrolls only once the mouse leaves the window', async () => {
+		cleanup();
+		cleanup = trackListeners();
+		await load({ sync: { AutoScrollEdgeZone: 0 } });
+
+		down(50, 50);
+		move(450, 767);
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 0]);
+
+		move(450, 778);
+		expect(window.scrollBy.mock.calls.at(-1)).toEqual([0, 10]);
+	});
 });
 
 describe('finishing the drag', () => {
@@ -232,7 +301,7 @@ describe('actions by greatest element type', () => {
 	test('holding Ctrl at mouseup copies instead of opening (DefaultAction is OPEN_LINKS)', () => {
 		drag([50, 50], [450, 200], { ctrlKey: true });
 
-		expect(sent()).toEqual([{ Action: run('COPY_TO_CLIPBOARD'), tUrls: ['http://x.test/a', 'http://x.test/b'] }]);
+		expect(sent()).toEqual([{ Action: run('COPY_TO_CLIPBOARD'), tUrls: ['http://x.test/a', 'http://x.test/b'], tTitles: ['a', 'b'] }]);
 	});
 
 	test('a link covered by another element is not opened', () => {
@@ -261,5 +330,109 @@ describe('developer mode', () => {
 		down(50, 50, { ctrlKey: true, altKey: true });
 
 		expect(sent()).toEqual([{ Action: 'ReloadExtension' }]);
+	});
+});
+
+describe('disabled sites (DisabledSites pref)', () => {
+	const matches = (href, list) => run('SiteListMatches')(href, list);
+
+	test.each([
+		['the host', 'https://example.com/a', 'example.com', true],
+		['a subdomain', 'https://mail.example.com/a', 'example.com', true],
+		['not a host that merely ends the same', 'https://badexample.com/a', 'example.com', false],
+		['a * wildcard in the host', 'https://maps.example.org/x', '*.example.*', true],
+		['a path prefix', 'https://www.example.com/forum/thread?id=1', 'example.com/forum', true],
+		['not another path', 'https://example.com/blog', 'example.com/forum', false],
+		['a full URL, ignoring its scheme', 'http://example.com/forum/1', 'https://example.com/forum', true],
+		['a port only when the pattern has one', 'http://localhost:8080/', 'localhost:8080', true],
+		['not a different port', 'http://localhost:9090/', 'localhost:8080', false],
+		['any line of several', 'https://b.test/', 'a.test\nb.test\n', true],
+		['not comments or blank lines', 'https://b.test/', '# b.test\n\n   ', false],
+		['nothing for an empty list', 'https://b.test/', '', false],
+		['nothing for a URL that does not parse', 'not a url', '*', false],
+		['regex characters literally', 'https://exampleXcom/', 'example.com', false],
+	])('matches %s', (_label, href, list, expected) => {
+		expect(matches(href, list)).toBe(expected);
+	});
+
+	test('a drag on a disabled site does nothing and leaves the mousedown to the page', async () => {
+		cleanup();
+		cleanup = trackListeners();
+		await load({ sync: { DisabledSites: 'example.com\nlocalhost' } });
+
+		let e = down(50, 50);
+		move(450, 200);
+		up(450, 200);
+
+		expect(e.defaultPrevented).toBe(false);
+		expect(container()).toBeNull();
+		expect(sent()).toEqual([]);
+	});
+
+	/** Opens a native context menu, then right-drags from (50, 50): with recovery on, the drag starts from mousemove (#580) */
+	const dragAfterContextMenu = () => {
+		window.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+		move(50, 50);
+		move(450, 200);
+	};
+
+	test('drag recovery after a context menu works on a site that is not listed', async () => {
+		cleanup();
+		cleanup = trackListeners();
+		await load({ sync: { DisabledSites: 'example.com' } }, true);
+
+		dragAfterContextMenu();
+		up(450, 200);
+
+		expect(sent()).toHaveLength(1);
+	});
+
+	test('drag recovery after a context menu does not start a drag on a disabled site', async () => {
+		cleanup();
+		cleanup = trackListeners();
+		await load({ sync: { DisabledSites: 'localhost' } }, true);
+
+		dragAfterContextMenu();
+
+		expect(run('SnapLinks.Dragging')).toBeFalsy();
+		expect(sent()).toEqual([]);
+	});
+
+	test('a drag on a site that is not listed works as usual', async () => {
+		cleanup();
+		cleanup = trackListeners();
+		await load({ sync: { DisabledSites: 'example.com' } });
+
+		drag([50, 50], [450, 200]);
+
+		expect(sent()).toHaveLength(1);
+	});
+});
+
+describe('GetClientDims (the viewport, not the page)', () => {
+	const dims = () => run('GetClientDims')();
+	const fake = (el, prop, value) => Object.defineProperty(el, prop, { value, configurable: true });
+
+	test('standards mode: the root element\'s size, not the body\'s content height', () => {
+		fake(document.documentElement, 'clientHeight', 700);
+		fake(document.body, 'clientHeight', 5000);
+
+		expect(dims()[1]).toBe(700);
+	});
+
+	test('quirks mode: the body\'s size, not the root element\'s', () => {
+		fake(document, 'compatMode', 'BackCompat');
+		fake(document.documentElement, 'clientHeight', 5000);
+		fake(document.body, 'clientHeight', 700);
+
+		expect(dims()[1]).toBe(700);
+	});
+
+	test('never larger than the window, and the window when the element reports nothing', () => {
+		fake(document.documentElement, 'clientHeight', 5000);
+		expect(dims()).toEqual([1024, 768]);
+
+		fake(document.documentElement, 'clientHeight', 0);
+		expect(dims()).toEqual([1024, 768]);
 	});
 });

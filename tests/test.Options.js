@@ -77,6 +77,11 @@ describe('markup matches the code', () => {
 		expect(Array.from(el('OpenTabs').options).map(o => o.value).sort()).toEqual([run('TABS_OPEN_END'), run('TABS_OPEN_RIGHT'), run('TABS_OPEN_NATURAL')].sort());
 	});
 
+	test('CopyFormat options are the COPY_* constants', () => {
+		expect(Array.from(el('CopyFormat').options).map(o => o.value).sort())
+			.toEqual(['COPY_URLS', 'COPY_TITLES_URLS', 'COPY_TITLES', 'COPY_MARKDOWN', 'COPY_HTML', 'COPY_HTML_LIST', 'COPY_URLS_SPACED'].map(c => run(c)).sort());
+	});
+
 	test('StorageAPI options are the valid storage areas', () => {
 		expect(Array.from(el('StorageAPI').options).map(o => o.value).sort()).toEqual(['local', 'sync']);
 	});
@@ -134,6 +139,14 @@ describe('saving preferences', () => {
 
 		expect(browser.storage.sync.set.mock.calls.filter(([o]) => 'NewTabDelayMS' in o)).toHaveLength(1);
 		expect(stored().NewTabDelayMS).toBe('123');
+	});
+
+	test('the DisabledSites textarea saves its lines', async () => {
+		el('DisabledSites').value = 'example.com\nexample.org/forum';
+		change(el('DisabledSites'), 'input');
+		await flush();
+
+		expect(stored().DisabledSites).toBe('example.com\nexample.org/forum');
 	});
 
 	test('toggling a details section is remembered', async () => {

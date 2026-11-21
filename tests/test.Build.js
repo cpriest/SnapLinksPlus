@@ -1,6 +1,6 @@
 'use strict';
 
-/* global test, expect, describe, beforeAll, require, __dirname */
+/* global test, expect, describe, beforeAll, require, __dirname, process */
 
 const fs            = require('fs');
 const path          = require('path');
@@ -19,7 +19,9 @@ const readManifest = (target) => JSON.parse(read('build', target, 'manifest.json
 const ScriptSrcs = (html) => Array.from(html.matchAll(/<script[^>]+src="([^"]+)"/g), m => m[1]);
 
 beforeAll(() => {
-	execFileSync(path.join(Root, 'node_modules/.bin/gulp'), ['default'], { cwd: Root, stdio: 'pipe' });
+	// Run gulp's JS entry with this node: node_modules/.bin/gulp is a shell script, which execFileSync can't run on Windows
+	let GulpDir = path.join(Root, 'node_modules/gulp');
+	execFileSync(process.execPath, [path.join(GulpDir, require(path.join(GulpDir, 'package.json')).bin.gulp), 'default'], { cwd: Root, stdio: 'pipe' });
 }, 60000);
 
 describe.each(Targets)('build/%s', (target) => {

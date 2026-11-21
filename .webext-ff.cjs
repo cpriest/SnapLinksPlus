@@ -10,7 +10,7 @@ module.exports = {
 		profileCreateIfMissing: true,
 		keepProfileChanges:     true,
 		reload:                 true,
-		startUrl:               [`file://${path.join(__dirname, 'test', 'regressions.html')}`],
+		startUrl:               [`file://${path.join(__dirname, 'test')}/`],	// run-ff serves test/ over http; / is an index of the fixture pages
 		watchFile: [path.join(__dirname, 'build', 'build.json')],
 		// Scales the whole browser; WSLg windows are tiny on high-DPI screens
 		pref: { 'layout.css.devPixelsPerPx': '1.25' },

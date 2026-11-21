@@ -34,3 +34,10 @@ and set `"strict_min_version": "142.0"`.
 **Reasoning:** Silences both `KEY_FIREFOX_UNSUPPORTED_BY_MIN_VERSION` warnings cleanly. Firefox 142 is recent but the extension targets modern browsers; the old floor of 63.0 was very stale.
 **Alternatives Considered:** Keeping 63.0 and accepting the warnings — rejected as noise in CI lint output.
 **Outcome:** Lint warnings reduced from 7 to 5 (only pre-existing code-quality warnings remain).
+
+### Decision: Dependency cleanup and audit baseline (2026-11-19)
+**Context:** `npm audit` showed 44 dev-only findings (4 critical). Production (`--omit=dev`) had none.
+**Decision:** Removed unused devDependencies (`@babel/core`, `crx`, `run-sequence`, `gulp-replace`, `gulp-zip`, `gulp-sourcemaps`) and the unused `lit-element` dependency. Upgraded web-ext 9.4 → 10.8, eslint 10.15, jest 30.5.2, then `npm audit fix`.
+**Reasoning:** Jest pulls in its own `@babel/core`; a direct pin only risks a babel 8 / jest mismatch. Nothing in `src/`, the gulpfile or the manifest referenced the others.
+**Accepted residue:** 20 moderate findings, all inside jest's own tree (`glob`, `minimatch`, `uuid` via the optional `node-notifier`). npm's only offered fix is a downgrade to jest 26. They affect local test tooling only. Re-check when jest 31 ships.
+**Outcome:** 0 critical, 0 high. `scripts/run-ff.mjs` verified against web-ext 10.8 (`connect` in `lib/firefox/remote.js` and the `firefoxClient` run option are unchanged).
