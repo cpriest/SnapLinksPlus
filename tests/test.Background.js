@@ -425,3 +425,143 @@ describe('FormatLinks (copy formats, #198)', () => {
 		expect(run('FormatLinks')(urls, titles, 'Nonsense', '\n')).toBe('https://a.test/1\nhttps://a.test/(2)');
 	});
 });
+
+describe('OpenUrlsInWindow (#182)', () => {
+	const source = { id: 2, windowId: 7, cookieStoreId: 'c2', incognito: false };
+	let windows;
+
+	beforeEach(() => {
+		windows = {
+			create: jest.fn(async (props) => ({ id: 50, ...props })),
+			update: jest.fn(async () => ({})),
+		};
+		browser.windows = windows;
+	});
+
+	const open = (urls, tab = source) => run('OpenUrlsInWindow')(urls, tab);
+
+	test('opens the first link as a new window and the rest as its tabs, in order, in the source tab\'s container', async () => {
+		await open(['u1', 'u2', 'u3']);
+
+		expect(windows.create).toHaveBeenCalledWith({ url: 'u1', incognito: false, cookieStoreId: 'c2' });
+		expect(strip.api.create.mock.calls.map(([p]) => p)).toEqual([
+			{ url: 'u2', active: false, windowId: 50, cookieStoreId: 'c2' },
+			{ url: 'u3', active: false, windowId: 50, cookieStoreId: 'c2' },
+		]);
+	});
+
+	test('a private window opens private', async () => {
+		await open(['u1'], { ...source, incognito: true, cookieStoreId: 'firefox-private' });
+
+		expect(windows.create).toHaveBeenCalledWith({ url: 'u1', incognito: true, cookieStoreId: 'firefox-private' });
+	});
+
+	test.each([
+		[true, 0],
+		[false, 1],
+	])('SwitchFocusToNewTab=%s → refocuses the source window %i time(s)', async (focusNew, calls) => {
+		setPrefs({ SwitchFocusToNewTab: focusNew });
+
+		await open(['u1', 'u2']);
+
+		expect(windows.update).toHaveBeenCalledTimes(calls);
+		if(calls)
+			expect(windows.update).toHaveBeenCalledWith(7, { focused: true });
+	});
+
+	test('NewTabsOpenUnloaded opens the extra tabs discarded', async () => {
+		setPrefs({ NewTabsOpenUnloaded: true });
+
+		await open(['u1', 'u2']);
+
+		expect(strip.api.create.mock.calls[0][0].discarded).toBe(true);
+	});
+
+	test('without a source tab, uses the active tab', async () => {
+		await run('OpenUrlsInWindow')(['u1']);
+
+		expect(strip.api.query).toHaveBeenCalledWith({ active: true, currentWindow: true });
+		expect(windows.create).toHaveBeenCalledWith({ url: 'u1', incognito: false, cookieStoreId: 'c2' });
+	});
+
+	test('does nothing for no links', async () => {
+		await open([]);
+
+		expect(windows.create).not.toHaveBeenCalled();
+	});
+
+	describe('failures (as #578, #579 for tabs)', () => {
+		let errors;
+
+		beforeEach(() => {
+			errors = [];
+			run('(log) => { console.error = (...a) => log.push(a); }')(errors);
+		});
+
+		/** Makes create() throw for the URLs fail(url) picks */
+		const failFor = (mock, fail) => {
+			let create = mock.getMockImplementation();
+			mock.mockImplementation(async (props) => {
+				if(fail(props.url))
+					throw new Error(`Cannot open ${props.url}`);
+				return create(props);
+			});
+		};
+
+		test('a failed window request does not block later requests', async () => {
+			windows.create.mockRejectedValueOnce(new Error('Window failed'));
+
+			run('onMessage')({ Action: run('OPEN_URLS_IN_WINDOW'), tUrls: ['w1'] }, { tab: source }, () => {});
+			run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a1'] }, { tab: source }, () => {});
+			await run('openUrlsPromiseChain');
+
+			expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['a1']);
+			expect(errors).toHaveLength(1);
+		});
+
+		test('a link that cannot open as a tab is skipped, and the rest still open', async () => {
+			failFor(strip.api.create, url => url === 'bad');
+
+			await open(['u1', 'bad', 'u3']);
+
+			expect(strip.order()).toContain('u3');
+			expect(errors[0][0]).toContain('bad');
+		});
+
+		test('when the first link cannot open a window, the next one does', async () => {
+			failFor(windows.create, url => url === 'bad');
+
+			await open(['bad', 'u2', 'u3']);
+
+			expect(windows.create).toHaveBeenLastCalledWith({ url: 'u2', incognito: false, cookieStoreId: 'c2' });
+			expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['u3']);
+		});
+
+		test('a closed source window does not stop the rest of the links', async () => {
+			setPrefs({ SwitchFocusToNewTab: false });
+			windows.update.mockRejectedValueOnce(new Error('Invalid window ID: 7'));
+
+			await open(['u1', 'u2']);
+
+			expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['u2']);
+		});
+	});
+
+	test('without the windows API (Firefox for Android), the links open as tabs', async () => {
+		delete browser.windows;
+
+		await open(['u1', 'u2']);
+
+		expect(strip.order()).toEqual(['#1', '#2', 'u1', 'u2', '#3']);
+	});
+
+	test('OPEN_URLS_IN_WINDOW messages use the sending tab and share the queue with OPEN_URLS_IN_TABS', async () => {
+		run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a1'] }, { tab: source }, () => {});
+		run('onMessage')({ Action: run('OPEN_URLS_IN_WINDOW'), tUrls: ['w1', 'w2'] }, { tab: { ...source, cookieStoreId: 'c9' } }, () => {});
+		await flush();
+		await flush();
+
+		expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['a1', 'w2']);
+		expect(windows.create).toHaveBeenCalledWith({ url: 'w1', incognito: false, cookieStoreId: 'c9' });
+	});
+});

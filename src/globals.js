@@ -21,13 +21,15 @@ const LMB = 1,	// Left Mouse Button
 		MMB = 4;	// Middle Mouse Button
 
 //  Default Action
-const OPEN_LINKS = 1,	// Open links
-		COPY_LINKS = 2;	// Copy links
+const OPEN_LINKS     = 1,	// Open links
+		COPY_LINKS     = 2,	// Copy links
+		OPEN_IN_WINDOW = 3;	// Open links as tabs of a new window
 
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest',
 		RELOAD_EXTENSION  = 'ReloadExtension',
 		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs',
+		OPEN_URLS_IN_WINDOW = 'OpenUrlsInWindow',
 		COPY_TO_CLIPBOARD = 'CopyToClipboard';
 
 const TABS_OPEN_END     = 'OpenTabsAtEnd',

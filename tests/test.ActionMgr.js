@@ -46,6 +46,18 @@ describe('ActUpon links', () => {
 		expect(browser.runtime.sendMessage.mock.calls[0][0].Action).toBe(run(expectedAction === 'OpenUrlsInTabs' ? 'OPEN_URLS_IN_TABS' : 'COPY_TO_CLIPBOARD'));
 	});
 
+	test.each([
+		[false, 'OPEN_URLS_IN_WINDOW'],
+		[true, 'COPY_TO_CLIPBOARD'],
+	])('default action open in a new window, ctrlKey=%s → %s', (ctrlKey, expectedAction) => {
+		setPrefs({ DefaultAction: run('OPEN_IN_WINDOW') });
+
+		actions.ActUpon(collection(run('CT_LINKS'), { Links: links(...urls) }), { ctrlKey });
+
+		expect(browser.runtime.sendMessage).toHaveBeenCalledTimes(1);
+		expect(browser.runtime.sendMessage.mock.calls[0][0]).toMatchObject({ Action: run(expectedAction), tUrls: ['http://a/', 'http://b/', 'http://c/'] });
+	});
+
 	test('removes duplicate hrefs, keeping first-seen order', () => {
 		actions.ActUpon(collection(run('CT_LINKS'), { Links: links(...urls) }), { ctrlKey: false });
 

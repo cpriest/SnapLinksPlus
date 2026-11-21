@@ -63,6 +63,21 @@ class ActionMgr {
 	}
 
 	/**
+	 * Opens the set of links as the tabs of a new window
+	 *
+	 * @param {string[]} links
+	 */
+	OpenUrlsInWindow(links) {
+		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+			return console.log('Skipped Opening Links in a Window: %o', links);
+
+		browser.runtime.sendMessage({
+			Action: OPEN_URLS_IN_WINDOW,
+			tUrls:  links,
+		});
+	}
+
+	/**
 	 * Selects the first radio button per group
 	 *
 	 * @param {HTMLInputElement[]} RadioButtons
@@ -144,8 +159,11 @@ class ActionMgr {
 					links.reverse();
 
 				/** TODO: This should be cleaned up, not easily grokkable what this is meaning */
-				if ((e.ctrlKey && Prefs.DefaultAction == OPEN_LINKS) || (!(e.ctrlKey) && Prefs.DefaultAction == COPY_LINKS))
+				// CTRL copies, unless copying is the default action, then CTRL opens the links in tabs
+				if ((e.ctrlKey && Prefs.DefaultAction != COPY_LINKS) || (!(e.ctrlKey) && Prefs.DefaultAction == COPY_LINKS))
 				    this.CopyToClipboard(links, SelectedElements.Links);
+				else if(!e.ctrlKey && Prefs.DefaultAction == OPEN_IN_WINDOW)
+					this.OpenUrlsInWindow(links);
 				else
 					this.OpenUrlsInTabs(links);
 
