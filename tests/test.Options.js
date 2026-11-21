@@ -69,8 +69,8 @@ describe('markup matches the code', () => {
 		expect(values).toEqual([run('NONE'), run('CTRL'), run('ALT'), run('CTRL | ALT'), run('SHIFT'), run('CTRL | SHIFT'), run('ALT | SHIFT'), run('CTRL | ALT | SHIFT')].sort());
 	});
 
-	test('DefaultAction options are OPEN_LINKS, COPY_LINKS and OPEN_IN_WINDOW', () => {
-		expect(Array.from(el('DefaultAction').options).map(o => Number(o.value)).sort()).toEqual([run('OPEN_LINKS'), run('COPY_LINKS'), run('OPEN_IN_WINDOW')].sort());
+	test('DefaultAction options are OPEN_LINKS, COPY_LINKS, OPEN_IN_WINDOW and OPEN_IN_SEPARATE_WINDOWS', () => {
+		expect(Array.from(el('DefaultAction').options).map(o => Number(o.value)).sort()).toEqual([run('OPEN_LINKS'), run('COPY_LINKS'), run('OPEN_IN_WINDOW'), run('OPEN_IN_SEPARATE_WINDOWS')].sort());
 	});
 
 	test('OpenTabs options are the three TABS_OPEN_* constants', () => {
