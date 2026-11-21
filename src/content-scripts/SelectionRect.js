@@ -188,7 +188,7 @@ class SelectionRect {
 		pub(ContainerElementCreated, this.elContainer);
 
 		sub(ElementsSelected, (Elements) => {
-			this.SetCounter((new Set(Elements.Links.map((elem) => elem.href))).size);
+			this.SetCounter(Elements);
 		});
 
 		sub(DragStarted, data => this.InsertElements());
@@ -243,13 +243,31 @@ class SelectionRect {
 	}
 
 	/**
-	 * Sets the label for the rect to {count} Links
-	 * @param {number} count    The count of the links to set the label to
+	 * Sets the label for the rect to the count of the largest selected category,
+	 * e.g. "2 Links", "3 Checkboxes" or "1 Radio Buttons"
+	 * @param {CategorizedCollection|number} Elements    The selected elements, or a legacy link count
 	 *
 	 * @returns {SelectionRect}
 	 */
-	SetCounter(count) {
-		this.elRect.firstElementChild.innerHTML = `${count} Links`;
+	SetCounter(Elements) {
+		let count, type;
+
+		if(typeof Elements === 'number') {
+			[count, type] = [Elements, 'Links'];
+		} else {
+			/* Links are counted by distinct href, as before; the other categories by element count.
+			   The greatest category wins (Links first on a tie), matching what ActUpon will act on. */
+			let Counts = [
+				['Links', (new Set((Elements.Links || []).map((elem) => elem.href))).size],
+				['Clickable', (Elements.Clickable || []).length],
+				['Checkboxes', (Elements.Checkboxes || []).length],
+				['Radio Buttons', (Elements.RadioButtons || []).length],
+			];
+
+			[type, count] = Counts.reduce((greatest, current) => current[1] > greatest[1] ? current : greatest);
+		}
+
+		this.elRect.firstElementChild.innerHTML = `${count} ${type}`;
 
 		return this.AlignCounter();
 	}
