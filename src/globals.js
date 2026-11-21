@@ -23,12 +23,14 @@ const LMB = 1,	// Left Mouse Button
 //  Default Action
 const OPEN_LINKS     = 1,	// Open links
 		COPY_LINKS     = 2,	// Copy links
+		OPEN_IN_WINDOW = 3,	// Open links as tabs of a new window
 		BOOKMARK_LINKS = 4;	// Bookmark links in a new folder
 
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest',
 		RELOAD_EXTENSION  = 'ReloadExtension',
 		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs',
+		OPEN_URLS_IN_WINDOW = 'OpenUrlsInWindow',
 		COPY_TO_CLIPBOARD = 'CopyToClipboard',
 		BOOKMARK_LINKS_IN_FOLDER = 'BookmarkLinksInFolder';
 
@@ -53,6 +55,8 @@ const DefaultPrefs = {
 	IndexBuckets: 10,
 	ScrollRate:   8,
 
+	AutoScrollEdgeZone: 20,	// Pixels from an edge of the window within which a drag towards that edge scrolls the page, 0 to scroll only outside the window
+
 	Activation_Min: 5,
 
 	SelectionLabel_CursorMargin: 2,
@@ -68,9 +72,12 @@ const DefaultPrefs = {
 	CopyFormat:          COPY_URLS,
 	NewTabsOpenUnloaded: false,
 	SwitchFocusToNewTab: true,
+	ReverseLinkOrder:    false,	// Open/copy links last to first, SHIFT on release flips it for one selection
 	ShowNumberOfLinks:   true,
 	ActivateModifiers:   NONE,
 	ActivateMouseButton: RMB,
+
+	DisabledSites: '',	// Sites where Snap Links does nothing, one pattern per line, see SiteListMatches()
 
 	ShowUpdateNotification: true,		// Controls whether version update notifications are shown
 

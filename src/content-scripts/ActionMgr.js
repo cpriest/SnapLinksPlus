@@ -13,6 +13,13 @@ class ActionMgr {
 		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
 			return console.log('Skipped Copying Links: %o', links);
 
+		// The first element with each URL names it
+		let titles = new Map();
+		for(let elem of Elements) {
+			if(!titles.has(elem.href))
+				titles.set(elem.href, this.LinkTitle(elem));
+		}
+
 		browser.runtime.sendMessage({
 			Action:  COPY_TO_CLIPBOARD,
 			tUrls:   links,
@@ -91,6 +98,21 @@ class ActionMgr {
 	}
 
 	/**
+	 * Opens the set of links as the tabs of a new window
+	 *
+	 * @param {string[]} links
+	 */
+	OpenUrlsInWindow(links) {
+		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+			return console.log('Skipped Opening Links in a Window: %o', links);
+
+		browser.runtime.sendMessage({
+			Action: OPEN_URLS_IN_WINDOW,
+			tUrls:  links,
+		});
+	}
+
+	/**
 	 * Selects the first radio button per group
 	 *
 	 * @param {HTMLInputElement[]} RadioButtons
@@ -162,10 +184,21 @@ class ActionMgr {
 					)
 				);
 
+				let reverse = Boolean(Prefs.ReverseLinkOrder);
+
+				// SHIFT on release flips the order for this selection, unless SHIFT is held to activate Snap Links
+				if(e.shiftKey && !(Prefs.ActivateModifiers & SHIFT))
+					reverse = !reverse;
+
+				if(reverse)
+					links.reverse();
+
 				/** TODO: This should be cleaned up, not easily grokkable what this is meaning */
 				// CTRL copies, unless copying is the default action, then CTRL opens the links in tabs
 				if ((e.ctrlKey && Prefs.DefaultAction != COPY_LINKS) || (!(e.ctrlKey) && Prefs.DefaultAction == COPY_LINKS))
 				    this.CopyToClipboard(links, SelectedElements.Links);
+				else if(!e.ctrlKey && Prefs.DefaultAction == OPEN_IN_WINDOW)
+					this.OpenUrlsInWindow(links);
 				else if(!e.ctrlKey && Prefs.DefaultAction == BOOKMARK_LINKS)
 					this.BookmarkLinks(links, SelectedElements.Links);
 				else

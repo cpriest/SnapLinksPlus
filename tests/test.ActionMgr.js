@@ -46,6 +46,18 @@ describe('ActUpon links', () => {
 		expect(browser.runtime.sendMessage.mock.calls[0][0].Action).toBe(run(expectedAction === 'OpenUrlsInTabs' ? 'OPEN_URLS_IN_TABS' : 'COPY_TO_CLIPBOARD'));
 	});
 
+	test.each([
+		[false, 'OPEN_URLS_IN_WINDOW'],
+		[true, 'COPY_TO_CLIPBOARD'],
+	])('default action open in a new window, ctrlKey=%s → %s', (ctrlKey, expectedAction) => {
+		setPrefs({ DefaultAction: run('OPEN_IN_WINDOW') });
+
+		actions.ActUpon(collection(run('CT_LINKS'), { Links: links(...urls) }), { ctrlKey });
+
+		expect(browser.runtime.sendMessage).toHaveBeenCalledTimes(1);
+		expect(browser.runtime.sendMessage.mock.calls[0][0]).toMatchObject({ Action: run(expectedAction), tUrls: ['http://a/', 'http://b/', 'http://c/'] });
+	});
+
 	test('removes duplicate hrefs, keeping first-seen order', () => {
 		actions.ActUpon(collection(run('CT_LINKS'), { Links: links(...urls) }), { ctrlKey: false });
 
@@ -79,6 +91,32 @@ describe('ActUpon links', () => {
 		actions.ActUpon(collection(run('CT_LINKS'), { Links: [{ href: 'http://a/', innerText: 'A' }, { href: 'http://b/', innerText: '' }] }), { ctrlKey });
 
 		expect(browser.runtime.sendMessage.mock.calls).toEqual([[{ Action: run(expectedAction), tUrls: ['http://a/', 'http://b/'], tTitles: ['A', ''] }]]);
+	});
+
+	describe('order (#456)', () => {
+		const sentUrls = () => browser.runtime.sendMessage.mock.calls[0][0].tUrls;
+		const act = (event) => actions.ActUpon(collection(run('CT_LINKS'), { Links: links('http://a/', 'http://b/', 'http://a/', 'http://c/') }), event);
+
+		test.each([
+			['default order', {}, { ctrlKey: false }, ['http://a/', 'http://b/', 'http://c/']],
+			['ReverseLinkOrder', { ReverseLinkOrder: true }, { ctrlKey: false }, ['http://c/', 'http://b/', 'http://a/']],
+			['SHIFT on release reverses once', {}, { shiftKey: true }, ['http://c/', 'http://b/', 'http://a/']],
+			['SHIFT on release with ReverseLinkOrder restores page order', { ReverseLinkOrder: true }, { shiftKey: true }, ['http://a/', 'http://b/', 'http://c/']],
+			['SHIFT held to activate does not reverse', { ActivateModifiers: 4 /* SHIFT */ }, { shiftKey: true }, ['http://a/', 'http://b/', 'http://c/']],
+			['copying (CTRL) is reversed too', { ReverseLinkOrder: true }, { ctrlKey: true }, ['http://c/', 'http://b/', 'http://a/']],
+		])('%s', (_label, prefs, event, expected) => {
+			setPrefs(prefs);
+
+			act(event);
+
+			expect(sentUrls()).toEqual(expected);
+		});
+
+		test('CTRL+SHIFT copies in reverse order', () => {
+			act({ ctrlKey: true, shiftKey: true });
+
+			expect(browser.runtime.sendMessage.mock.calls[0][0]).toEqual({ Action: run('COPY_TO_CLIPBOARD'), tUrls: ['http://c/', 'http://b/', 'http://a/'], tTitles: ['', '', ''] });
+		});
 	});
 
 	test('Dev_Skip_AllActions suppresses the message in DevMode only', () => {

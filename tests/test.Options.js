@@ -69,8 +69,8 @@ describe('markup matches the code', () => {
 		expect(values).toEqual([run('NONE'), run('CTRL'), run('ALT'), run('CTRL | ALT'), run('SHIFT'), run('CTRL | SHIFT'), run('ALT | SHIFT'), run('CTRL | ALT | SHIFT')].sort());
 	});
 
-	test('DefaultAction options are OPEN_LINKS, COPY_LINKS and BOOKMARK_LINKS', () => {
-		expect(Array.from(el('DefaultAction').options).map(o => Number(o.value)).sort()).toEqual([run('OPEN_LINKS'), run('COPY_LINKS'), run('BOOKMARK_LINKS')].sort());
+	test('DefaultAction options are OPEN_LINKS, COPY_LINKS, OPEN_IN_WINDOW and BOOKMARK_LINKS', () => {
+		expect(Array.from(el('DefaultAction').options).map(o => Number(o.value)).sort()).toEqual([run('OPEN_LINKS'), run('COPY_LINKS'), run('OPEN_IN_WINDOW'), run('BOOKMARK_LINKS')].sort());
 	});
 
 	test('OpenTabs options are the three TABS_OPEN_* constants', () => {
@@ -139,6 +139,14 @@ describe('saving preferences', () => {
 
 		expect(browser.storage.sync.set.mock.calls.filter(([o]) => 'NewTabDelayMS' in o)).toHaveLength(1);
 		expect(stored().NewTabDelayMS).toBe('123');
+	});
+
+	test('the DisabledSites textarea saves its lines', async () => {
+		el('DisabledSites').value = 'example.com\nexample.org/forum';
+		change(el('DisabledSites'), 'input');
+		await flush();
+
+		expect(stored().DisabledSites).toBe('example.com\nexample.org/forum');
 	});
 
 	test('toggling a details section is remembered', async () => {

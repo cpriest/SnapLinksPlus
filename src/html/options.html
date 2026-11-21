@@ -25,9 +25,11 @@
 		IMG.Info { cursor: help; margin-left: 5px; }
 		DIV > LABEL { display: inline-block; width: auto; }
 
+		/* Wraps onto as many lines as the width needs; a fixed height with column wrap overflowed sideways */
 		DIV.flex-list {
-			display:   flex;
-			flex-flow: column wrap;
+			display:    flex;
+			flex-wrap:  wrap;
+			column-gap: 16px;
 		}
 	</style>
 	<title>SnapLinks Options</title>
@@ -62,6 +64,7 @@
 	<select id="DefaultAction" title="Select the default action.">
 		<option value="1">Open Links</option>
 		<option value="2">Copy Links to clipboard</option>
+		<option value="3">Open Links in a New Window</option>
 		<option value="4">Bookmark Links in a new folder</option>
 	</select>
 	<span>press CTRL after selection to modify default action</span>
@@ -71,6 +74,19 @@
 	Bookmarking links needs permission to create bookmarks:
 	<button id="GrantBookmarkPermission" type="button">Allow</button>
 </p>
+
+<label>
+	<span>Copy links as</span>
+	<select id="CopyFormat" title="How copied links are written to the clipboard. The title of a link is its text.">
+		<option value="Urls">URLs, one per line</option>
+		<option value="TitlesAndUrls">Titles and URLs, tab separated</option>
+		<option value="Titles">Titles only</option>
+		<option value="Markdown">Markdown: [Title](URL)</option>
+		<option value="Html">HTML: &lt;a href="URL"&gt;Title&lt;/a&gt;</option>
+		<option value="HtmlList">HTML list: &lt;ul&gt;&lt;li&gt;&lt;a href="URL"&gt;Title&lt;/a&gt;&lt;/li&gt;...&lt;/ul&gt;</option>
+		<option value="UrlsSpaceSeparated">URLs on one line, space separated</option>
+	</select>
+</label>
 
 <label>
 	<span>Copy links as</span>
@@ -100,15 +116,21 @@
 	</select>
 </label>
 
-<div class="flex-list" style="height: 64px;">
+<label title="Open or copy the selected links from last to first, eg: to read a newest-first list oldest first.
+&bull;  Holding SHIFT when releasing the mouse button reverses the order for that selection only.">
+	<input id="ReverseLinkOrder" type="checkbox"> Open and copy links in reverse order
+	<span>(hold SHIFT when releasing to reverse just once)</span>
+</label>
+
+<div class="flex-list">
 
 	<label browsers="FireFox" title="Open new tabs in background unloaded.">
 		<input id="NewTabsOpenUnloaded" type="checkbox"> Open in background unloaded
 		<img class="Info" alt="Firefox Only" src="../../res/FireFox16.png" title="This only works in FireFox."/>
 	</label>
 
-	<label title="Switch focus to the closest new tab when opening tabs.">
-		<input id="SwitchFocusToNewTab" type="checkbox"> Switch focus to new tab
+	<label title="Switch focus to the closest new tab when opening tabs, or bring the new window to the front when opening links in a new window.">
+		<input id="SwitchFocusToNewTab" type="checkbox"> Switch focus to new tab or window
 	</label>
 
 	<label title="Show the number of selected unique links as a label while selecting.">
@@ -119,6 +141,15 @@
 		<input id="ShowUpdateNotification" type="checkbox"> Notify me when updates happen
 	</label>
 </div>
+
+<label title="Snap Links does nothing on pages that match one of these lines:
+  &bull;  example.com matches the site and its subdomains
+  &bull;  example.com/forum matches only pages whose path starts with /forum
+  &bull;  * matches any characters, eg: *.example.*
+  &bull;  Lines starting with # are ignored">
+	<span>Disable Snap Links on these sites (one per line):</span><br>
+	<textarea id="DisabledSites" rows="4" cols="60" spellcheck="false" placeholder="example.com&#10;maps.example.org/edit"></textarea>
+</label>
 
 <details id="UI_AdvancedOptions_Section">
 	<summary>Advanced Settings</summary>
