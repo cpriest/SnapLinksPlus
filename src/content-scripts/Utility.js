@@ -96,23 +96,23 @@ function AddModsToEvent(e) {
 }
 
 /**
- * Returns the client dimensions, adjusting for various situations
+ * Returns the size of the viewport (the visible part of the page) without its scrollbars, in client coordinates.
+ *	In standards mode the root element reports it, in quirks mode the body does.  The other element's size is the size of
+ *	its content (eg: body.clientHeight of a long page is the page's height), which is not the viewport and must not be used.
  *
  * @returns {[number,number]}
  */
 function GetClientDims() {
-	let clientHeight = Math.max(docElem.clientHeight,
-			window.innerHeight - 12,
-			document.body.clientHeight,
-			document.documentElement.clientHeight
-		),
-		clientWidth  = Math.max(docElem.clientWidth,
-			window.innerWidth - 12,
-			document.body.clientWidth,
-			document.documentElement.clientWidth
-		);
+	let root = document.compatMode === 'BackCompat' && document.body
+		? document.body
+		: document.documentElement;
 
-	return [clientWidth, clientHeight];
+	// The viewport can't be larger than the window, fall back to the window when the element reports nothing sensible
+	let dim = (client, inner) => client > 0 && client <= inner
+		? client
+		: inner;
+
+	return [dim(root.clientWidth, window.innerWidth), dim(root.clientHeight, window.innerHeight)];
 }
 
 /**

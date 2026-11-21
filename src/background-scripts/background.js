@@ -3,6 +3,53 @@
 let openUrlsPromiseChain = Promise.resolve();
 let TabStacks = new Map();
 
+// Serialize changes so switching activation buttons cannot leave a stale setting.
+let contextMenuSettingsChain = Promise.resolve();
+let contextMenuStateMessages = Promise.resolve();
+const contextMenuDragRecoveryReady = isFirefox
+	? browser.runtime.getPlatformInfo().then(info => info.os == 'linux')
+	: Promise.resolve(false);
+
+// Frame initialization must not wait for preference storage to finish loading.
+function onContextMenuMessage(msg, sender) {
+	if(msg.Action == 'GetContextMenuDragRecovery')
+		return contextMenuDragRecoveryReady;
+	if(msg.Action != 'SetContextMenuShown' || !sender.tab || typeof msg.shown != 'boolean')
+		return;
+
+	// Keep menu-open and menu-dismissed broadcasts in the order received.
+	contextMenuStateMessages = contextMenuStateMessages.then(async () => {
+		if(await contextMenuDragRecoveryReady)
+			await browser.tabs.sendMessage(sender.tab.id, {
+				Action: 'SetContextMenuShown', shown: msg.shown, source: msg.source,
+			});
+	}).catch(error => {
+		console.warn('Snap Links could not share context menu state:', error);
+	});
+	return contextMenuStateMessages;
+}
+
+browser.runtime.onMessage.addListener(onContextMenuMessage);
+
+function UpdateContextMenuSetting() {
+	if(!isFirefox || !browser.browserSettings?.contextMenuShowEvent)
+		return;
+
+	let useMouseUp = Prefs.ActivateMouseButton == RMB;
+	contextMenuSettingsChain = contextMenuSettingsChain.then(async () => {
+		let setting = browser.browserSettings.contextMenuShowEvent;
+		if(useMouseUp) {
+			let changed = await setting.set({ value: 'mouseup' });
+			if(!changed)
+				console.warn('Snap Links could not change context menu timing. The setting may be locked or controlled by another extension.');
+		} else {
+			await setting.clear({});
+		}
+	}).catch(error => {
+		console.error('Snap Links could not update context menu timing:', error);
+	});
+}
+
 /**
  * Log that we received the message.
  * Then display a notification. The notification contains the URL,
@@ -31,9 +78,10 @@ function onMessage(msg, sender, respond) {
 			browser.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			openUrlsPromiseChain = openUrlsPromiseChain.then(() => {
-				return OpenUrlsInTabs(msg.tUrls);
-			});
+			// Catch errors so that a failed request doesn't leave the chain rejected, which would skip every later request
+			openUrlsPromiseChain = openUrlsPromiseChain
+				.then(() => OpenUrlsInTabs(msg.tUrls))
+				.catch(error => console.error('Error while opening URLs in tabs: ', error));
 			break;
 		case COPY_TO_CLIPBOARD:
 			CopyToClipboard(msg.tUrls, msg.tTitles);
@@ -139,24 +187,47 @@ async function OpenUrlsInTabs(urls) {
 		let props = {
 			url:      url,
 			active:   Prefs.SwitchFocusToNewTab ? (--tabsLeft) === 0 : false,	// Activate the last tab to be opened
-			index:    startIndex + tabsOpened++,
+			index:    startIndex + tabsOpened,
 			windowId: activeTab.windowId,
 		};
 
 		if(isFirefox) {
 			props.cookieStoreId = activeTab.cookieStoreId;
-			if(Prefs.SetOwnershipTabID_FF)
+			// The opener tab may have been closed while tabs are still opening (#579)
+			if(Prefs.SetOwnershipTabID_FF && await TabExists(activeTab.id))
 				props.openerTabId = activeTab.id;
 			if(Prefs.NewTabsOpenUnloaded)
 				props.discarded = true;
 		}
 
-		let newTab = await browser.tabs.create(props);
+		let newTab;
+		try {
+			newTab = await browser.tabs.create(props);
+		} catch(error) {
+			// Skip this URL (e.g. an illegal URL) and keep opening the rest
+			console.error(`Error while opening ${url} in a new tab: `, error);
+			continue;
+		}
+
+		tabsOpened++;
 		tabStack.unshift(newTab.id);
 
 		await sleep(Prefs.NewTabDelayMS);
 	}
 	TabStacks.set(activeTab.id, tabStack);
+}
+
+/**
+ * @param {number} tabId
+ * @return {Promise<boolean>}
+ */
+async function TabExists(tabId) {
+	try {
+		await browser.tabs.get(tabId);
+		return true;
+	} catch(error) {
+		return false;
+	}
 }
 
 /**
@@ -199,35 +270,6 @@ async function CheckInstallation() {
 	}
 }
 
-/**
- * Firefox on Linux and macOS opens the context menu on mousedown, which shows it when starting a right-button drag (#400),
- * so switch it to mouseup while Snap Links is activated by the right mouse button
- *
- * @return {Promise<void>}
- */
-async function ApplyContextMenuShowEvent() {
-	let platformInfo = await browser.runtime.getPlatformInfo();
-	if(platformInfo.os === 'win')
-		return;
-
-	if(!browser.browserSettings)
-		return;
-
-	let setting = browser.browserSettings.contextMenuShowEvent;
-
-	try {
-		if(Prefs.ActivateMouseButton == RMB) {
-			let current = await setting.get({});
-			if(['controllable_by_this_extension', 'controlled_by_this_extension'].includes(current.levelOfControl))
-				await setting.set({ value: 'mouseup' });
-		} else {
-			await setting.clear({});
-		}
-	} catch(e) {
-		console.error('Error while setting contextMenuShowEvent: ', e);
-	}
-}
-
 function Notify(title, message, onClick) {
 	if(onClick)
 		browser.notifications.onClicked.addListener((...args) => onClick(...args));
@@ -252,12 +294,18 @@ browser.runtime.onInstalled.addListener((e) => {
 
 DOMReady.then(() => {
 	browser.runtime.onMessage.addListener(onMessage);
-
-	ApplyContextMenuShowEvent();
-	Prefs.onChanged((key) => {
+	Prefs.onChanged(key => {
 		if(key == 'ActivateMouseButton')
-			ApplyContextMenuShowEvent();
+			UpdateContextMenuSetting();
 	});
+	// StoragePrefs may reload a different store without notifying its observers.
+	browser.storage.onChanged.addListener((changes, area) => {
+		if(area == 'local' && 'StorageAPI' in changes)
+			Prefs.Ready.then(UpdateContextMenuSetting).catch(error => {
+				console.error('Snap Links could not load context menu preferences:', error);
+			});
+	});
+	UpdateContextMenuSetting();
 
 	if(Prefs.DevMode)
 		console.log('Snap Links reloaded %s', (new Date()).toLocaleString());

@@ -94,6 +94,12 @@
 	</select>
 </label>
 
+<label title="Open or copy the selected links from last to first, eg: to read a newest-first list oldest first.
+&bull;  Holding SHIFT when releasing the mouse button reverses the order for that selection only.">
+	<input id="ReverseLinkOrder" type="checkbox"> Open and copy links in reverse order
+	<span>(hold SHIFT when releasing to reverse just once)</span>
+</label>
+
 <div class="flex-list" style="height: 64px;">
 
 	<label browsers="FireFox" title="Open new tabs in background unloaded.">
@@ -113,6 +119,15 @@
 		<input id="ShowUpdateNotification" type="checkbox"> Notify me when updates happen
 	</label>
 </div>
+
+<label title="Snap Links does nothing on pages that match one of these lines:
+  &bull;  example.com matches the site and its subdomains
+  &bull;  example.com/forum matches only pages whose path starts with /forum
+  &bull;  * matches any characters, eg: *.example.*
+  &bull;  Lines starting with # are ignored">
+	<span>Disable Snap Links on these sites (one per line):</span><br>
+	<textarea id="DisabledSites" rows="4" cols="60" spellcheck="false" placeholder="example.com&#10;maps.example.org/edit"></textarea>
+</label>
 
 <details id="UI_AdvancedOptions_Section">
 	<summary>Advanced Settings</summary>

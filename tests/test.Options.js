@@ -141,6 +141,14 @@ describe('saving preferences', () => {
 		expect(stored().NewTabDelayMS).toBe('123');
 	});
 
+	test('the DisabledSites textarea saves its lines', async () => {
+		el('DisabledSites').value = 'example.com\nexample.org/forum';
+		change(el('DisabledSites'), 'input');
+		await flush();
+
+		expect(stored().DisabledSites).toBe('example.com\nexample.org/forum');
+	});
+
 	test('toggling a details section is remembered', async () => {
 		el('UI_AdvancedOptions_Section').open = true;
 		change(el('UI_AdvancedOptions_Section'), 'toggle');

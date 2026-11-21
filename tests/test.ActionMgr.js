@@ -70,6 +70,32 @@ describe('ActUpon links', () => {
 		});
 	});
 
+	describe('order (#456)', () => {
+		const sentUrls = () => browser.runtime.sendMessage.mock.calls[0][0].tUrls;
+		const act = (event) => actions.ActUpon(collection(run('CT_LINKS'), { Links: links('http://a/', 'http://b/', 'http://a/', 'http://c/') }), event);
+
+		test.each([
+			['default order', {}, { ctrlKey: false }, ['http://a/', 'http://b/', 'http://c/']],
+			['ReverseLinkOrder', { ReverseLinkOrder: true }, { ctrlKey: false }, ['http://c/', 'http://b/', 'http://a/']],
+			['SHIFT on release reverses once', {}, { shiftKey: true }, ['http://c/', 'http://b/', 'http://a/']],
+			['SHIFT on release with ReverseLinkOrder restores page order', { ReverseLinkOrder: true }, { shiftKey: true }, ['http://a/', 'http://b/', 'http://c/']],
+			['SHIFT held to activate does not reverse', { ActivateModifiers: 4 /* SHIFT */ }, { shiftKey: true }, ['http://a/', 'http://b/', 'http://c/']],
+			['copying (CTRL) is reversed too', { ReverseLinkOrder: true }, { ctrlKey: true }, ['http://c/', 'http://b/', 'http://a/']],
+		])('%s', (_label, prefs, event, expected) => {
+			setPrefs(prefs);
+
+			act(event);
+
+			expect(sentUrls()).toEqual(expected);
+		});
+
+		test('CTRL+SHIFT copies in reverse order', () => {
+			act({ ctrlKey: true, shiftKey: true });
+
+			expect(browser.runtime.sendMessage.mock.calls[0][0]).toEqual({ Action: run('COPY_TO_CLIPBOARD'), tUrls: ['http://c/', 'http://b/', 'http://a/'], tTitles: ['', '', ''] });
+		});
+	});
+
 	test('Dev_Skip_AllActions suppresses the message in DevMode only', () => {
 		setPrefs({ DevMode: true, Dev_Skip_AllActions: true });
 		actions.ActUpon(collection(run('CT_LINKS'), { Links: links('http://a/') }), { ctrlKey: false });

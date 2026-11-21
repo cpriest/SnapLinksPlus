@@ -134,6 +134,15 @@ class ActionMgr {
 					)
 				);
 
+				let reverse = Boolean(Prefs.ReverseLinkOrder);
+
+				// SHIFT on release flips the order for this selection, unless SHIFT is held to activate Snap Links
+				if(e.shiftKey && !(Prefs.ActivateModifiers & SHIFT))
+					reverse = !reverse;
+
+				if(reverse)
+					links.reverse();
+
 				/** TODO: This should be cleaned up, not easily grokkable what this is meaning */
 				if ((e.ctrlKey && Prefs.DefaultAction == OPEN_LINKS) || (!(e.ctrlKey) && Prefs.DefaultAction == COPY_LINKS))
 				    this.CopyToClipboard(links, SelectedElements.Links);
