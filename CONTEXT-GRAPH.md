@@ -41,3 +41,30 @@ and set `"strict_min_version": "142.0"`.
 **Reasoning:** Jest pulls in its own `@babel/core`; a direct pin only risks a babel 8 / jest mismatch. Nothing in `src/`, the gulpfile or the manifest referenced the others.
 **Accepted residue:** 20 moderate findings, all inside jest's own tree (`glob`, `minimatch`, `uuid` via the optional `node-notifier`). npm's only offered fix is a downgrade to jest 26. They affect local test tooling only. Re-check when jest 31 ships.
 **Outcome:** 0 critical, 0 high. `scripts/run-ff.mjs` verified against web-ext 10.8 (`connect` in `lib/firefox/remote.js` and the `firefoxClient` run option are unchanged).
+
+---
+
+## 2026-11-22 Manifest V3 (Firefox)
+
+### Decision: Firefox moves to Manifest V3 with an event page; Chrome keeps its Manifest V2 manifest in this change
+**Context:** MV3 is Firefox's current manifest version (generally available since Firefox 109; `strict_min_version` is already 142). Chrome removed MV2 in Chrome 139, so the Chrome build had not loaded in Chrome or Chromium since then; Edge 158 still loads it.
+**Decision:** Firefox: `manifest_version: 3`, `background.scripts` (an event page, the only MV3 background Firefox supports), no `persistent`, `options_ui` without `chrome_style`. Same permissions, same gecko id. Chrome: its MV3 move needs a service worker and an offscreen document for copying, done as a separate change.
+**Alternatives Considered:** Firefox `background.service_worker`: not supported by Firefox. Adding `host_permissions: ["<all_urls>"]`: not needed, Firefox treats the content scripts' matches as the requested host access, and least privilege.
+
+### Lesson Learned: Firefox keeps only the event page listeners added while its script first runs
+**Discovery:** `EventManager` records a listener as persistent only while `context.listenerPromises` is set, which Firefox clears once background startup completes (`ext-backgroundPage.js`, `ExtensionCommon.sys.mjs`, Firefox 160). Only recorded listeners wake a suspended page. `runtime.sendMessage` waits for the woken page's startup, then delivers to the listeners present.
+**Context:** `background.js` added `runtime.onMessage` in `DOMReady.then()`, after the storage reads. On a woken page the action message reached only the context-menu listener and was dropped. Notification click listeners were added when the notification was shown.
+**Application:** Add every listener at the top level of `background.js`. Handlers that read `Prefs` wait for `DOMReady`: primed events (`storage.onChanged`, `notifications.onClicked`) can fire before DOMContentLoaded, when `Prefs` does not exist yet.
+
+### Lesson Learned: what keeps an event page loaded
+**Discovery:** Firefox resets the 30 s idle timer (`extensions.background.idle.timeout`) on every extension API call from the background into the parent process ("parentapicall"). A listener's pending promise defers termination once. Nothing else (timers, pending fetches) does.
+**Application:** Opening tabs resets it per tab, but a `NewTabDelayMS` over the timeout would unload the page between tabs. `QueueOpen` calls `runtime.getPlatformInfo()` every 10 s while links are queued. State that must outlive the page goes to storage: `TabStacks` in `storage.session`.
+
+### Lesson Learned: MV3 host access is revocable; an MV2 → MV3 update keeps it
+**Discovery:** With `originControls` (MV3), Firefox treats the manifest's origins (`host_permissions` and content script `matches`) as optional: granted at install (`extensions.originControls.grantByDefault`), and the user can withdraw them in about:addons or per site. On an update, `ExtensionData.migratePermissions()` grants the permissions the old version required that the new one makes optional, so the MV2 content scripts' `<all_urls>` carries over. Because they count as optional origins, `permissions.request({ origins: ['<all_urls>'] })` may ask for them again, without `optional_host_permissions`.
+**Verified:** Firefox Developer Edition 161 (Linux), permanent installs: 3.1.16 (MV2) updated by 3.1.17 (MV3) keeps `<all_urls>`, the preferences, and works on pages at once; no options page opens. (Temporary installs, as in about:debugging, also get host access, so they cannot show this.)
+**Application:** As Mozilla's migration guide asks, the extension checks for it: `ALL_SITES_PERMISSION`; `CheckSitesPermission()` opens the options page after an install or update without it; the options page shows "Allow on all websites" while it is missing.
+
+### Lesson Learned: MV3 changes outside the background
+- The extension CSP applies to content scripts too: no `eval` / `new Function` (RateReporter used it). `test.Build.js` scans the build.
+- `options_ui.browser_style` defaulted to true in MV2 and is not supported in MV3; without it the page fell back to a serif font, page margins and collapsed label margins. `options.html` now sets the flex column, `font: caption` and zero margins that `extension.css` gave it; screenshots of the page in about:addons before and after match.

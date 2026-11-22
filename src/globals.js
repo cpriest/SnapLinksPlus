@@ -37,8 +37,9 @@ const BACKGROUND_TEST   = 'BackgroundTest',
 // Bookmarking needs this optional permission, the options page asks for it when bookmarking is the default action
 const BOOKMARKS_PERMISSION = { permissions: ['bookmarks'] };
 
-// The content scripts act on every site.  Under Manifest V3 Firefox lets the user withdraw that, and an update from a Manifest V2
-// version does not grant it; without it Snap Links does nothing on those sites.  The options page asks for it back.
+// The content scripts act on every site.  Under Manifest V3 the user can withdraw that (about:addons > Permissions, or per site),
+// and then Snap Links does nothing on those sites.  The options page asks for it back.  (An update from the Manifest V2 version
+// keeps it: Firefox grants the origins the old version required.)
 const ALL_SITES_PERMISSION = { origins: ['<all_urls>'] };
 
 const TABS_OPEN_END     = 'OpenTabsAtEnd',

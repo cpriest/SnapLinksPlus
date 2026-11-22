@@ -390,7 +390,7 @@ describe('install and update handling', () => {
 		expect(browser.storage.sync.data).toMatchObject({ ScrollRate: 20, ActivateMouseButton: 1, StorageAPI: 'sync', LastInstalledVersion: '3.1.16' });
 	});
 
-	describe('access to all websites (Manifest V3: not granted on an update from a Manifest V2 version)', () => {
+	describe('access to all websites (Manifest V3: the user can withdraw it)', () => {
 		let allSites;
 
 		/** Fires onInstalled for the reason, with or without access to all websites */

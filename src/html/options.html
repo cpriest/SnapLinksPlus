@@ -7,7 +7,9 @@
 	<script src="../globals.js" type="application/javascript"></script>
 	<script src="../lib/Options.js" type="application/javascript"></script>
 	<style>
-		BODY { }
+		/* The layout and type browser_style gave the page in Manifest V2 (from Firefox's extension.css), which Manifest V3 dropped */
+		HTML, BODY { display: flex; flex-direction: column; box-sizing: border-box; font: caption; margin: 0; padding: 0; }
+		BODY * { box-sizing: border-box; }
 		LABEL { display: block; margin: 6px 4px 8px 0px; }
 		INPUT[type=checkbox] { margin: 0px 2px; vertical-align: -2px; }
 		INPUT[type=checkbox]:enabled { cursor: pointer; }
