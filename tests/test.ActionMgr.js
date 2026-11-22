@@ -94,6 +94,17 @@ describe('ActUpon links', () => {
 		});
 	});
 
+	test.each([
+		[false, 'BOOKMARK_LINKS_IN_FOLDER'],
+		[true, 'COPY_TO_CLIPBOARD'],
+	])('default action bookmark, ctrlKey=%s → %s with titles', (ctrlKey, expectedAction) => {
+		setPrefs({ DefaultAction: run('BOOKMARK_LINKS') });
+
+		actions.ActUpon(collection(run('CT_LINKS'), { Links: [{ href: 'http://a/', innerText: 'A' }, { href: 'http://b/', innerText: '' }] }), { ctrlKey });
+
+		expect(browser.runtime.sendMessage.mock.calls).toEqual([[{ Action: run(expectedAction), tUrls: ['http://a/', 'http://b/'], tTitles: ['A', ''] }]]);
+	});
+
 	describe('order (#456)', () => {
 		const sentUrls = () => browser.runtime.sendMessage.mock.calls[0][0].tUrls;
 		const act = (event) => actions.ActUpon(collection(run('CT_LINKS'), { Links: links('http://a/', 'http://b/', 'http://a/', 'http://c/') }), event);

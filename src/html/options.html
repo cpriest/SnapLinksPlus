@@ -25,6 +25,10 @@
 		IMG.Info { cursor: help; margin-left: 5px; }
 		DIV > LABEL { display: inline-block; width: auto; }
 
+		/* Shown when bookmarking is the default action but the permission is missing, eg: the options page opened after a selection */
+		#BookmarkPermission { width: fit-content; margin: 4px 0px 10px; padding: 6px 10px; border: 1px solid #c9a227; border-radius: 4px; background: #fff3cd; color: #3d3000; font-weight: bold; }
+		#BookmarkPermission BUTTON { margin-left: 6px; font-weight: bold; }
+
 		/* Wraps onto as many lines as the width needs; a fixed height with column wrap overflowed sideways */
 		DIV.flex-list {
 			display:    flex;
@@ -66,8 +70,27 @@
 		<option value="2">Copy Links to clipboard</option>
 		<option value="3">Open Links in a New Window</option>
 		<option value="4">Open Each Link in its own Window</option>
+		<option value="5">Bookmark Links in a new folder</option>
 	</select>
 	<span>press CTRL after selection to modify default action</span>
+</label>
+
+<p id="BookmarkPermission" hidden>
+	Snap Links needs your permission to create bookmarks before it can bookmark links:
+	<button id="GrantBookmarkPermission" type="button">Allow</button>
+</p>
+
+<label>
+	<span>Copy links as</span>
+	<select id="CopyFormat" title="How copied links are written to the clipboard. The title of a link is its text.">
+		<option value="Urls">URLs, one per line</option>
+		<option value="TitlesAndUrls">Titles and URLs, tab separated</option>
+		<option value="Titles">Titles only</option>
+		<option value="Markdown">Markdown: [Title](URL)</option>
+		<option value="Html">HTML: &lt;a href="URL"&gt;Title&lt;/a&gt;</option>
+		<option value="HtmlList">HTML list: &lt;ul&gt;&lt;li&gt;&lt;a href="URL"&gt;Title&lt;/a&gt;&lt;/li&gt;...&lt;/ul&gt;</option>
+		<option value="UrlsSpaceSeparated">URLs on one line, space separated</option>
+	</select>
 </label>
 
 <label>

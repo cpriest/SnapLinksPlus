@@ -23,8 +23,43 @@ class ActionMgr {
 		browser.runtime.sendMessage({
 			Action:  COPY_TO_CLIPBOARD,
 			tUrls:   links,
-			tTitles: links.map(url => titles.get(url) || ''),
+			tTitles: this.LinkTitles(links, Elements),
 		});
+	}
+
+	/**
+	 * Bookmarks the links in a new folder
+	 *
+	 * @param {string[]}  links         The URLs to bookmark
+	 * @param {Element[]} [Elements]    The selected link elements, their text names the bookmarks
+	 */
+	BookmarkLinks(links, Elements = []) {
+		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+			return console.log('Skipped Bookmarking Links: %o', links);
+
+		browser.runtime.sendMessage({
+			Action:  BOOKMARK_LINKS_IN_FOLDER,
+			tUrls:   links,
+			tTitles: this.LinkTitles(links, Elements),
+		});
+	}
+
+	/**
+	 * Returns the title of each URL, from the first of the elements that links to it
+	 *
+	 * @param {string[]}  links       The URLs
+	 * @param {Element[]} Elements    The link elements
+	 *
+	 * @returns {string[]}    The titles in the same order as links, '' for a URL without one
+	 */
+	LinkTitles(links, Elements) {
+		let titles = new Map();
+
+		for(let elem of Elements) {
+			if(!titles.has(elem.href))
+				titles.set(elem.href, this.LinkTitle(elem));
+		}
+		return links.map(url => titles.get(url) || '');
 	}
 
 	/**
@@ -181,6 +216,8 @@ class ActionMgr {
 					this.OpenUrlsInWindow(links);
 				else if(!e.ctrlKey && Prefs.DefaultAction == OPEN_IN_SEPARATE_WINDOWS)
 					this.OpenUrlsInSeparateWindows(links);
+				else if(!e.ctrlKey && Prefs.DefaultAction == BOOKMARK_LINKS)
+					this.BookmarkLinks(links, SelectedElements.Links);
 				else
 					this.OpenUrlsInTabs(links);
 

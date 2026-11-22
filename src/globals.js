@@ -25,6 +25,7 @@ const OPEN_LINKS     = 1,	// Open links
 		COPY_LINKS     = 2,	// Copy links
 		OPEN_IN_WINDOW = 3,	// Open links as tabs of a new window
 		OPEN_IN_SEPARATE_WINDOWS = 4;	// Open each link in its own window
+		BOOKMARK_LINKS = 5;	// Bookmark links in a new folder
 
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest',
@@ -33,6 +34,10 @@ const BACKGROUND_TEST   = 'BackgroundTest',
 		OPEN_URLS_IN_WINDOW = 'OpenUrlsInWindow',
 		OPEN_URLS_IN_SEPARATE_WINDOWS = 'OpenUrlsInSeparateWindows',
 		COPY_TO_CLIPBOARD = 'CopyToClipboard';
+		BOOKMARK_LINKS_IN_FOLDER = 'BookmarkLinksInFolder';
+
+// Bookmarking needs this optional permission, the options page asks for it when bookmarking is the default action
+const BOOKMARKS_PERMISSION = { permissions: ['bookmarks'] };
 
 const TABS_OPEN_END     = 'OpenTabsAtEnd',
 		TABS_OPEN_RIGHT   = 'OpenTabsToRight',
