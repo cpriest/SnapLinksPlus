@@ -1,5 +1,7 @@
 'use strict';
 
+/* global WriteToClipboardOffscreen */
+
 /*
  * This runs as Firefox's event page and in Chrome's service worker (Manifest V3, see service-worker.js).  Both browsers
  * unload it after it has been idle for a while (30 seconds; in Firefox pref extensions.background.idle.timeout) and load it
@@ -153,16 +155,9 @@ async function CopyToClipboard(urls, titles = []) {
 	return WriteToClipboard(FormatLinks(urls, titles, Prefs.CopyFormat, platformInfo.os === chrome.runtime.PlatformOs.WIN ? '\r\n' : '\n'));
 }
 
-/** Chrome: the offscreen document that copies, and the message it copies (see src/lib/Offscreen.js) */
-const OFFSCREEN_DOCUMENT = 'src/html/offscreen.html',
-	OFFSCREEN_COPY       = 'OffscreenCopy';
-
-/** Copies run one after another in Chrome, which allows one offscreen document at a time */
-let clipboardChain = Promise.resolve();
-
 /**
  * Writes the text to the clipboard.  Firefox's background page writes it itself.  Chrome's background is a service
- * worker, which has no clipboard: there an offscreen document copies it, opened for the copy and closed after it.
+ * worker, which has no clipboard: there OffscreenClipboard.js (Chrome only) copies it through an offscreen document.
  *
  * @param {string} text
  * @return {Promise<void>}
@@ -171,26 +166,7 @@ function WriteToClipboard(text) {
 	if(navigator.clipboard)
 		return navigator.clipboard.writeText(text);
 
-	clipboardChain = clipboardChain.then(async () => {
-		let url = browser.runtime.getURL(OFFSCREEN_DOCUMENT);
-
-		// The worker may have been stopped during an earlier copy, with its document still open
-		if(!(await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'], documentUrls: [url] })).length) {
-			await chrome.offscreen.createDocument({
-				url:           OFFSCREEN_DOCUMENT,
-				reasons:       ['CLIPBOARD'],
-				justification: 'Copies the links selected with Snap Links to the clipboard',
-			});
-		}
-		try {
-			if(!await browser.runtime.sendMessage({ Action: OFFSCREEN_COPY, text }))
-				throw new Error('the offscreen document could not copy');
-		} finally {
-			await chrome.offscreen.closeDocument();
-		}
-	}).catch(error => console.error('Snap Links could not copy to the clipboard: ', error));
-
-	return clipboardChain;
+	return WriteToClipboardOffscreen(text);
 }
 
 /**

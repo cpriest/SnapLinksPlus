@@ -8,7 +8,7 @@
  *
  * Like Firefox's event page, Chrome stops the worker when idle and starts it again for the next event, see the top of
  * background.js.  A worker has no DOM and no clipboard: globals.js loads Prefs at once, and copying goes through an
- * offscreen document (WriteToClipboard() in background.js).
+ * offscreen document (OffscreenClipboard.js).
  */
 importScripts('../lib/browser-polyfill.js', '../StoragePrefs.js', '../globals.js');
 
@@ -16,4 +16,5 @@ importScripts('../lib/browser-polyfill.js', '../StoragePrefs.js', '../globals.js
 if(chrome.runtime.getManifest().commands?.['dev-do-1'])
 	importScripts('DevBuild.js');
 
-importScripts('background.js');
+// Chrome only: copying through an offscreen document, used by background.js
+importScripts('OffscreenClipboard.js', 'background.js');

@@ -42,5 +42,5 @@ test('leaves other messages to other listeners (content scripts\' messages reach
 });
 
 test('the background sends the action name this page answers to', () => {
-	expect(fs.readFileSync(path.resolve(__dirname, '../src/background-scripts/background.js'), 'utf8')).toMatch(/OFFSCREEN_COPY\s*=\s*'OffscreenCopy'/);
+	expect(fs.readFileSync(path.resolve(__dirname, '../src/background-scripts/OffscreenClipboard.js'), 'utf8')).toMatch(/OFFSCREEN_COPY\s*=\s*'OffscreenCopy'/);
 });

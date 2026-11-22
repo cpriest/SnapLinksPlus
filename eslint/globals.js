@@ -54,6 +54,7 @@ module.exports = {
 		'BOOKMARK_LINKS':          'readonly',
 		'BOOKMARKS_PERMISSION':    'readonly',
 		'ALL_SITES_PERMISSION':    'readonly',
+		'WriteToClipboardOffscreen': 'readonly',
 		'isChrome':                'readonly',
 		'isFirefox':               'readonly',
 		'DragRectChanged':         'readonly',

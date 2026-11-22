@@ -65,16 +65,16 @@ describe('the service worker', () => {
 	test('loads the polyfill and the background scripts, in manifest order, with no document', async () => {
 		await startWorker();
 
-		expect(imported).toEqual(['lib/browser-polyfill.js', 'StoragePrefs.js', 'globals.js', 'background-scripts/background.js']);
+		expect(imported).toEqual(['lib/browser-polyfill.js', 'StoragePrefs.js', 'globals.js', 'background-scripts/OffscreenClipboard.js', 'background-scripts/background.js']);
 		expect(run('typeof document')).toBe('undefined');
 		expect(run('docElem')).toBeUndefined();
 		expect(run('isChrome')).toBe(true);
 	});
 
-	test('a DevBuild loads DevBuild.js before background.js', async () => {
+	test('a DevBuild loads DevBuild.js before the background scripts', async () => {
 		await startWorker({ manifest: { commands: { 'dev-do-1': {} } } });
 
-		expect(imported.slice(-2)).toEqual(['background-scripts/DevBuild.js', 'background-scripts/background.js']);
+		expect(imported.slice(-3)).toEqual(['background-scripts/DevBuild.js', 'background-scripts/OffscreenClipboard.js', 'background-scripts/background.js']);
 		expect(browser.commands.onCommand.addListener).toHaveBeenCalledTimes(1);
 	});
 

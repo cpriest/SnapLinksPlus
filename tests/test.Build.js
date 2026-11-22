@@ -145,9 +145,19 @@ describe('Firefox Manifest V3', () => {
 describe('Chrome Manifest V3', () => {
 	const chrome = () => readManifest('chrome');
 
-	test('the background is a service worker that loads the polyfill, then the same scripts as the Firefox background', () => {
+	test('the background is a service worker that loads the polyfill, the Firefox background scripts and its offscreen clipboard', () => {
+		let ff = BackgroundScripts('ff');
+
 		expect(chrome().background).toEqual({ service_worker: 'src/background-scripts/service-worker.js' });
-		expect(BackgroundScripts('chrome')).toEqual(['src/background-scripts/service-worker.js', 'src/lib/browser-polyfill.js', ...BackgroundScripts('ff')]);
+		expect(BackgroundScripts('chrome')).toEqual(['src/background-scripts/service-worker.js', 'src/lib/browser-polyfill.js',
+			...ff.slice(0, -1), 'src/background-scripts/OffscreenClipboard.js', ff.at(-1)]);
+	});
+
+	test('the Chrome-only files are in the Chrome build and left out of the Firefox build', () => {
+		let chromeOnly = ['src/background-scripts/service-worker.js', 'src/background-scripts/OffscreenClipboard.js', 'src/html/offscreen.html', 'src/lib/Offscreen.js'];
+
+		expect(chromeOnly.filter(file => !exists('build', 'chrome', file))).toEqual([]);
+		expect(chromeOnly.filter(file => exists('build', 'ff', file))).toEqual([]);
 	});
 
 	test('asks for the same permissions as before, plus offscreen for copying', () => {
@@ -178,7 +188,7 @@ describe('Chrome Manifest V3', () => {
 	});
 });
 
-test('the DevBuild service worker also loads DevBuild.js, before background.js', () => {
+test('the DevBuild service worker also loads DevBuild.js, before the background scripts', () => {
 	let m      = readManifest('chrome'),
 		loaded = [];
 
@@ -186,7 +196,7 @@ test('the DevBuild service worker also loads DevBuild.js, before background.js',
 		chrome:        { runtime: { getManifest: () => ({ ...m, commands: { 'dev-do-1': {} } }) } },
 		importScripts: (...files) => loaded.push(...files),
 	});
-	expect(loaded.slice(-2)).toEqual(['DevBuild.js', 'background.js']);
+	expect(loaded.slice(-3)).toEqual(['DevBuild.js', 'OffscreenClipboard.js', 'background.js']);
 });
 
 test.each(Targets)('build/%s scripts evaluate no strings as code (blocked by the Manifest V3 content security policy)', (target) => {
