@@ -80,6 +80,7 @@ const load = async (globals = {}, stores = undefined) => {
 		onInstalled:     { addListener: jest.fn() },
 		getManifest:     () => ({ version: '3.1.16' }),
 		getPlatformInfo: async () => ({ os: platformOs }),
+		getURL:          (path) => `moz-extension://snaplinks/${path}`,
 		reload:          jest.fn(),
 	};
 

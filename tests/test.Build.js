@@ -4,6 +4,7 @@
 
 const fs            = require('fs');
 const path          = require('path');
+const vm            = require('vm');
 const { execFileSync } = require('child_process');
 
 const Root    = path.resolve(__dirname, '..');
@@ -18,6 +19,26 @@ const readManifest = (target) => JSON.parse(read('build', target, 'manifest.json
 
 const ScriptSrcs = (html) => Array.from(html.matchAll(/<script[^>]+src="([^"]+)"/g), m => m[1]);
 
+/**
+ * The scripts the background loads, in order, relative to the build: Firefox lists them in the manifest, Chrome's service
+ * worker loads them with importScripts(), which this runs (with the build's manifest) to see which.
+ */
+function BackgroundScripts(target) {
+	let m = readManifest(target);
+
+	if(m.background.scripts)
+		return m.background.scripts;
+
+	let worker   = m.background.service_worker,
+		imported = [];
+
+	vm.runInNewContext(read('build', target, worker).toString(), {
+		chrome:        { runtime: { getManifest: () => m } },
+		importScripts: (...files) => imported.push(...files.map(file => path.posix.normalize(path.posix.join(path.posix.dirname(worker), file)))),
+	});
+	return [worker, ...imported];
+}
+
 beforeAll(() => {
 	// Run gulp's JS entry with this node: node_modules/.bin/gulp is a shell script, which execFileSync can't run on Windows
 	let GulpDir = path.join(Root, 'node_modules/gulp');
@@ -28,15 +49,14 @@ describe.each(Targets)('build/%s', (target) => {
 	const manifest = () => readManifest(target);
 
 	test('manifest.json is valid and carries the package version', () => {
-		// Firefox is on Manifest V3, Chrome stays on V2 until its background moves to a service worker (CONTEXT-GRAPH.md)
-		expect(manifest().manifest_version).toBe(target === 'ff' ? 3 : 2);
+		expect(manifest().manifest_version).toBe(3);
 		expect(target === 'ff' ? manifest().version : manifest().version_name).toBe(Package.version);
 	});
 
 	test('every script and page the manifest references exists in the build', () => {
 		let m    = manifest();
 		let refs = [
-			...m.background.scripts,
+			...BackgroundScripts(target),
 			...m.content_scripts.flatMap(cs => cs.js),
 			m.options_ui.page,
 			...Object.values(m.icons),
@@ -57,7 +77,7 @@ describe.each(Targets)('build/%s', (target) => {
 
 	test('production builds contain no Dev* files or dev commands', () => {
 		let m = manifest();
-		let scripts = [...m.background.scripts, ...m.content_scripts.flatMap(cs => cs.js)];
+		let scripts = [...BackgroundScripts(target), ...m.content_scripts.flatMap(cs => cs.js)];
 
 		expect(scripts.filter(s => /Dev/.test(path.basename(s)))).toEqual([]);
 		expect(Object.keys(m.commands)).toEqual([]);
@@ -67,7 +87,7 @@ describe.each(Targets)('build/%s', (target) => {
 		let m         = manifest();
 		let hasPoly   = (list) => list.includes('src/lib/browser-polyfill.js');
 
-		expect(hasPoly(m.background.scripts)).toBe(target === 'chrome');
+		expect(hasPoly(BackgroundScripts(target))).toBe(target === 'chrome');
 		expect(hasPoly(m.content_scripts[0].js)).toBe(target === 'chrome');
 	});
 
@@ -122,12 +142,51 @@ describe('Firefox Manifest V3', () => {
 	});
 });
 
-test('the Chrome manifest stays on Manifest V2 with its Chrome-only options', () => {
-	let m = readManifest('chrome');
+describe('Chrome Manifest V3', () => {
+	const chrome = () => readManifest('chrome');
 
-	expect(m.manifest_version).toBe(2);
-	expect(m.options_ui).toEqual({ page: 'src/html/options.html', chrome_style: true });
-	expect(m.background).not.toHaveProperty('service_worker');
+	test('the background is a service worker that loads the polyfill, then the same scripts as the Firefox background', () => {
+		expect(chrome().background).toEqual({ service_worker: 'src/background-scripts/service-worker.js' });
+		expect(BackgroundScripts('chrome')).toEqual(['src/background-scripts/service-worker.js', 'src/lib/browser-polyfill.js', ...BackgroundScripts('ff')]);
+	});
+
+	test('asks for the same permissions as before, plus offscreen for copying', () => {
+		let m = chrome();
+
+		expect(m.permissions).toEqual(['cookies', 'storage', 'notifications', 'clipboardWrite', 'offscreen']);
+		expect(m.optional_permissions).toEqual(['bookmarks']);
+		expect(m).not.toHaveProperty('host_permissions');
+		expect(m.content_scripts.map(cs => cs.matches)).toEqual([['<all_urls>']]);
+	});
+
+	test('has no Manifest V2 keys, and needs Chrome 116 (runtime.getContexts)', () => {
+		let m = chrome();
+
+		for(let key of ['browser_action', 'page_action'])
+			expect(m).not.toHaveProperty(key);
+		expect(m.options_ui).toEqual({ page: 'src/html/options.html' });	// chrome_style is Manifest V2 only
+		expect(m.minimum_chrome_version).toBe('116');
+	});
+
+	test('the offscreen document that copies, and its script, are in the build', () => {
+		let page = 'src/html/offscreen.html';
+
+		expect(exists('build', 'chrome', page)).toBe(true);
+		expect(ScriptSrcs(read('build', 'chrome', page).toString())
+			.map(src => path.posix.normalize(path.posix.join(path.posix.dirname(page), src)))
+			.filter(file => !exists('build', 'chrome', file))).toEqual([]);
+	});
+});
+
+test('the DevBuild service worker also loads DevBuild.js, before background.js', () => {
+	let m      = readManifest('chrome'),
+		loaded = [];
+
+	vm.runInNewContext(read('build', 'chrome', m.background.service_worker).toString(), {
+		chrome:        { runtime: { getManifest: () => ({ ...m, commands: { 'dev-do-1': {} } }) } },
+		importScripts: (...files) => loaded.push(...files),
+	});
+	expect(loaded.slice(-2)).toEqual(['DevBuild.js', 'background.js']);
 });
 
 test.each(Targets)('build/%s scripts evaluate no strings as code (blocked by the Manifest V3 content security policy)', (target) => {

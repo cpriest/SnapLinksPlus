@@ -4,7 +4,8 @@
  * @typedef {{x: number, y: number}}    Point
  * @typedef {HTMLAnchorElement|Element|HTMLInputElement}    ClickableElement
  */
-let docElem = document.documentElement;
+// Undefined in Chrome's background, a service worker, which has no document
+let docElem = globalThis.document?.documentElement;
 
 // General Purpose Variables
 /* global _, __, docElem*/
@@ -157,7 +158,8 @@ let DOMReady = new Promise((resolve, reject) => {
 			.then(resolve);
 	}
 
-	if(document.readyState !== 'loading')
+	// Chrome's background is a service worker, which has no document to wait for
+	if(!globalThis.document || document.readyState !== 'loading')
 		return LoadPrefs();
 
 	return window.addEventListener('DOMContentLoaded', () => LoadPrefs(), { once: true, passive: true });

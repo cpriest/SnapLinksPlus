@@ -1,9 +1,9 @@
 'use strict';
 
 /*
- * In Firefox this runs as an event page (Manifest V3): Firefox unloads it after it has been idle for a while (30 seconds,
- * pref extensions.background.idle.timeout) and loads it again for the next event it listens to, which clears every
- * variable here.  So:
+ * This runs as Firefox's event page and in Chrome's service worker (Manifest V3, see service-worker.js).  Both browsers
+ * unload it after it has been idle for a while (30 seconds; in Firefox pref extensions.background.idle.timeout) and load it
+ * again for the next event it listens to, which clears every variable here.  So:
  *  - Listeners are added at the top level, when the script runs.  Only those wake a suspended page; one added later
  *    (eg: once Prefs are ready) misses the event that loads the page again.
  *  - The event that wakes the page arrives before Prefs have loaded, so handlers that read Prefs wait for DOMReady.
@@ -21,12 +21,9 @@ const KEEP_AWAKE_MS = 10000;
 
 /**
  * For TABS_OPEN_NATURAL: the ids of the tabs each tab has opened, the latest first.  Kept in storage.session (cleared when the
- * browser closes, as tab ids are) so they survive the event page being unloaded; the Chrome (Manifest V2) build has no
- * storage.session and keeps them in memory, its background page is never unloaded.
+ * browser closes, as tab ids are) so they survive the background being unloaded.
  */
 const TabStacks = {
-	memory: new Map(),
-
 	/** @param {number} tabId @return {string} */
 	key: (tabId) => `TabStack.${tabId}`,
 
@@ -35,9 +32,6 @@ const TabStacks = {
 	 * @return {Promise<number[]>}
 	 */
 	async get(tabId) {
-		if(!browser.storage.session)
-			return this.memory.get(tabId) || [];
-
 		let key = this.key(tabId);
 		return (await browser.storage.session.get(key))[key] || [];
 	},
@@ -48,9 +42,6 @@ const TabStacks = {
 	 * @return {Promise<void>}
 	 */
 	async set(tabId, stack) {
-		if(!browser.storage.session)
-			return void this.memory.set(tabId, stack);
-
 		await browser.storage.session.set({ [this.key(tabId)]: stack });
 	},
 };
@@ -159,7 +150,47 @@ function HandleMessage(msg, sender) {
  */
 async function CopyToClipboard(urls, titles = []) {
 	let platformInfo = await browser.runtime.getPlatformInfo();
-	navigator.clipboard.writeText(FormatLinks(urls, titles, Prefs.CopyFormat, platformInfo.os === chrome.runtime.PlatformOs.WIN ? '\r\n' : '\n'));
+	return WriteToClipboard(FormatLinks(urls, titles, Prefs.CopyFormat, platformInfo.os === chrome.runtime.PlatformOs.WIN ? '\r\n' : '\n'));
+}
+
+/** Chrome: the offscreen document that copies, and the message it copies (see src/lib/Offscreen.js) */
+const OFFSCREEN_DOCUMENT = 'src/html/offscreen.html',
+	OFFSCREEN_COPY       = 'OffscreenCopy';
+
+/** Copies run one after another in Chrome, which allows one offscreen document at a time */
+let clipboardChain = Promise.resolve();
+
+/**
+ * Writes the text to the clipboard.  Firefox's background page writes it itself.  Chrome's background is a service
+ * worker, which has no clipboard: there an offscreen document copies it, opened for the copy and closed after it.
+ *
+ * @param {string} text
+ * @return {Promise<void>}
+ */
+function WriteToClipboard(text) {
+	if(navigator.clipboard)
+		return navigator.clipboard.writeText(text);
+
+	clipboardChain = clipboardChain.then(async () => {
+		let url = browser.runtime.getURL(OFFSCREEN_DOCUMENT);
+
+		// The worker may have been stopped during an earlier copy, with its document still open
+		if(!(await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'], documentUrls: [url] })).length) {
+			await chrome.offscreen.createDocument({
+				url:           OFFSCREEN_DOCUMENT,
+				reasons:       ['CLIPBOARD'],
+				justification: 'Copies the links selected with Snap Links to the clipboard',
+			});
+		}
+		try {
+			if(!await browser.runtime.sendMessage({ Action: OFFSCREEN_COPY, text }))
+				throw new Error('the offscreen document could not copy');
+		} finally {
+			await chrome.offscreen.closeDocument();
+		}
+	}).catch(error => console.error('Snap Links could not copy to the clipboard: ', error));
+
+	return clipboardChain;
 }
 
 /**
@@ -231,9 +262,9 @@ function FormatLinks(urls, titles, format, eol) {
  * Runs open() after the earlier open requests, so selections open in the order they were made.
  * Errors are caught so that a failed request doesn't leave the chain rejected, which would skip every later request (#578, #579).
  *
- * Firefox resets the event page's idle timer on every extension API call, which opening a tab is, but a NewTabDelayMS longer
- * than the idle timeout would let it unload the page between two tabs and drop the rest.  So while the queue has work, an
- * API call is made every KEEP_AWAKE_MS.
+ * Firefox and Chrome reset the background's idle timer on every extension API call, which opening a tab is, but a
+ * NewTabDelayMS longer than the idle timeout would let them unload it between two tabs and drop the rest.  So while the
+ * queue has work, an API call is made every KEEP_AWAKE_MS.
  *
  * @param {function(): Promise<void>} open
  */
@@ -490,7 +521,7 @@ function Notify(id, title, message) {
 	browser.notifications.create(id, {
 			type:    'basic',
 			title:   title,
-			iconUrl: 'res/SnapLinksLogo32.png',
+			iconUrl: browser.runtime.getURL('res/SnapLinksLogo32.png'),	// Chrome's service worker resolves relative paths from src/background-scripts/
 			message: message,
 //			buttons: [
 //				{ title: 'Disable This Notification' },
