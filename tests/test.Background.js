@@ -691,6 +691,9 @@ describe('OpenUrlsInSeparateWindows (#576)', () => {
 			{ url: 'w1', incognito: false, cookieStoreId: 'c9' },
 			{ url: 'w2', incognito: false, cookieStoreId: 'c9' },
 		]);
+	});
+});
+
 describe('FormatLinks (copy formats, #198)', () => {
 	const urls   = ['https://a.test/1', 'https://a.test/(2)'],
 		titles = ['First <b>&</b> "one"', '[Second]'];
