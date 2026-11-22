@@ -1,28 +1,93 @@
 name: Node CI
 
+# Runs on every push and pull request: lint, unit tests and both builds, then the
+# Firefox build through `web-ext lint` (the checks addons.mozilla.org runs on upload).
+# The zips of both builds are kept for 30 days as artifacts of the run, so a pull
+# request can be tried without building it (about:debugging > Load Temporary Add-on).
+#
+# Actions are pinned to the commit of a release (the tag is in the comment):
+# a moved tag cannot change what runs here. Dependabot's github-actions updates
+# keep the pins current.
+
 on: [ 'push', 'pull_request' ]
 
-jobs:
-  build:
+# A newer push to a pull request cancels its older run; other runs (master, tags) always finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# Reads the checkout and uploads artifacts, needs nothing else.
+permissions:
+  contents: read
+
+jobs:
+  # No name: the check is "build (22.x)", which branch protection may require
+  build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     strategy:
       matrix:
-        node-version: [ 22.x ]
+        node-version: [ 22.x, 24.x ]
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
+
       - name: npm install, lint, test, and build
         run: |
           npm ci
           npm run lint
           npm test
           npm run build
+        env:
+          CI: true
+
+      # Errors fail the run; warnings (innerHTML assignments, already reviewed) are only listed.
+      - name: web-ext lint (Firefox build)
+        run: npx web-ext lint --source-dir build/ff
+
+      - name: Package both builds
+        if: matrix.node-version == '22.x'
+        run: npx gulp package
+
+      - name: Keep the packages
+        if: matrix.node-version == '22.x'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: snaplinks-${{ github.sha }}
+          path: artifacts/**/*.zip
+          if-no-files-found: error
+          retention-days: 30
+
+  # The unit tests on Windows, where most users are: path handling in the tests and the gulp
+  # build differ there (test.Build.js runs gulp through node for that reason). No lint: the
+  # Windows checkout has CRLF line endings, which the linebreak-style rule rejects.
+  test-windows:
+    name: Unit tests on Windows
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - name: npm install and test
+        run: |
+          npm ci
+          npm test
         env:
           CI: true
