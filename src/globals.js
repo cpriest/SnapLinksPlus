@@ -32,9 +32,9 @@ const BACKGROUND_TEST   = 'BackgroundTest',
 		RELOAD_EXTENSION  = 'ReloadExtension',
 		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs',
 		OPEN_URLS_IN_WINDOW = 'OpenUrlsInWindow',
-		OPEN_URLS_IN_SEPARATE_WINDOWS = 'OpenUrlsInSeparateWindows',
 		COPY_TO_CLIPBOARD = 'CopyToClipboard';
 		BOOKMARK_LINKS_IN_FOLDER = 'BookmarkLinksInFolder';
+		OPEN_URLS_IN_SEPARATE_WINDOWS = 'OpenUrlsInSeparateWindows',
 
 // Bookmarking needs this optional permission, the options page asks for it when bookmarking is the default action
 const BOOKMARKS_PERMISSION = { permissions: ['bookmarks'] };
