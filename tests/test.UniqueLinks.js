@@ -75,7 +75,7 @@ describe('UniqueLinks', () => {
 		expect(run('UniqueLinks')(list)[1]).toBe(list[3]);
 	});
 
-	test('SmartDuplicateDetection is on by default', () => {
-		expect(run('DefaultPrefs').SmartDuplicateDetection).toBe(true);
+	test('SmartDuplicateDetection is off by default', () => {
+		expect(run('DefaultPrefs').SmartDuplicateDetection).toBe(false);
 	});
 });

@@ -3,6 +3,53 @@
 let openUrlsPromiseChain = Promise.resolve();
 let TabStacks = new Map();
 
+// Serialize changes so switching activation buttons cannot leave a stale setting.
+let contextMenuSettingsChain = Promise.resolve();
+let contextMenuStateMessages = Promise.resolve();
+const contextMenuDragRecoveryReady = isFirefox
+	? browser.runtime.getPlatformInfo().then(info => info.os == 'linux')
+	: Promise.resolve(false);
+
+// Frame initialization must not wait for preference storage to finish loading.
+function onContextMenuMessage(msg, sender) {
+	if(msg.Action == 'GetContextMenuDragRecovery')
+		return contextMenuDragRecoveryReady;
+	if(msg.Action != 'SetContextMenuShown' || !sender.tab || typeof msg.shown != 'boolean')
+		return;
+
+	// Keep menu-open and menu-dismissed broadcasts in the order received.
+	contextMenuStateMessages = contextMenuStateMessages.then(async () => {
+		if(await contextMenuDragRecoveryReady)
+			await browser.tabs.sendMessage(sender.tab.id, {
+				Action: 'SetContextMenuShown', shown: msg.shown, source: msg.source,
+			});
+	}).catch(error => {
+		console.warn('Snap Links could not share context menu state:', error);
+	});
+	return contextMenuStateMessages;
+}
+
+browser.runtime.onMessage.addListener(onContextMenuMessage);
+
+function UpdateContextMenuSetting() {
+	if(!isFirefox || !browser.browserSettings?.contextMenuShowEvent)
+		return;
+
+	let useMouseUp = Prefs.ActivateMouseButton == RMB;
+	contextMenuSettingsChain = contextMenuSettingsChain.then(async () => {
+		let setting = browser.browserSettings.contextMenuShowEvent;
+		if(useMouseUp) {
+			let changed = await setting.set({ value: 'mouseup' });
+			if(!changed)
+				console.warn('Snap Links could not change context menu timing. The setting may be locked or controlled by another extension.');
+		} else {
+			await setting.clear({});
+		}
+	}).catch(error => {
+		console.error('Snap Links could not update context menu timing:', error);
+	});
+}
+
 /**
  * Log that we received the message.
  * Then display a notification. The notification contains the URL,
@@ -31,23 +78,106 @@ function onMessage(msg, sender, respond) {
 			browser.runtime.reload();
 			break;
 		case OPEN_URLS_IN_TABS:
-			openUrlsPromiseChain = openUrlsPromiseChain.then(() => {
-				return OpenUrlsInTabs(msg.tUrls);
-			});
+			QueueOpen(() => OpenUrlsInTabs(msg.tUrls));
+			break;
+		case OPEN_URLS_IN_WINDOW:
+			QueueOpen(() => OpenUrlsInWindow(msg.tUrls, sender.tab));
 			break;
 		case COPY_TO_CLIPBOARD:
-			CopyToClipboard(msg.tUrls);
+			CopyToClipboard(msg.tUrls, msg.tTitles);
+			break;
+		case BOOKMARK_LINKS_IN_FOLDER:
+			BookmarkLinks(msg.tUrls, msg.tTitles)
+				.catch(error => console.error('Error while bookmarking links: ', error));
 			break;
 	}
 }
 
 /**
  * @param {string[]} urls
+ * @param {string[]} [titles]    The text of each link, same order as urls
  * @return {Promise<void>}
  */
-async function CopyToClipboard(urls) {
+async function CopyToClipboard(urls, titles = []) {
 	let platformInfo = await browser.runtime.getPlatformInfo();
-	navigator.clipboard.writeText(urls.join(platformInfo.os === chrome.runtime.PlatformOs.WIN ? '\r\n' : '\n'));
+	navigator.clipboard.writeText(FormatLinks(urls, titles, Prefs.CopyFormat, platformInfo.os === chrome.runtime.PlatformOs.WIN ? '\r\n' : '\n'));
+}
+
+/**
+ * Bookmarks the links, in order, in a new folder named "Snap Links <date and time>", which is created in the browser's
+ * default folder for new bookmarks (Other Bookmarks).  Without the bookmarks permission it opens the options page instead,
+ * where the permission can be granted.
+ *
+ * @param {string[]} urls
+ * @param {string[]} [titles]    The text of each link, a link without text is named by its URL
+ * @return {Promise<void>}
+ */
+async function BookmarkLinks(urls, titles = []) {
+	if(!await browser.permissions.contains(BOOKMARKS_PERMISSION))
+		return browser.runtime.openOptionsPage();
+
+	let folder = await browser.bookmarks.create({ title: `Snap Links ${new Date().toLocaleString()}` });
+
+	for(let [i, url] of urls.entries()) {
+		try {
+			await browser.bookmarks.create({
+				parentId: folder.id,
+				title:    (titles && titles[i]) || url,
+				url:      url,
+			});
+		} catch(error) {
+			// Skip this URL and keep bookmarking the rest
+			console.error(`Error while bookmarking ${url}: `, error);
+		}
+	}
+}
+
+/**
+ * Writes the links in one of the COPY_* formats
+ *
+ * @param {string[]} urls
+ * @param {string[]} titles    The text of each link, a link without text is titled by its URL
+ * @param {string}   format    One of the COPY_* constants, anything else is COPY_URLS
+ * @param {string}   eol       The line separator
+ *
+ * @return {string}
+ */
+function FormatLinks(urls, titles, format, eol) {
+	let links = urls.map((url, i) => ({ url, title: (titles && titles[i]) || url }));
+
+	let html     = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'),
+		htmlLink = ({ url, title }) => `<a href="${html(url)}">${html(title)}</a>`,
+		mdText   = (s) => s.replace(/[\\[\]]/g, '\\$&'),
+		mdUrl    = (s) => s.replace(/[()\s]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'));
+
+	switch(format) {
+		case COPY_TITLES_URLS:
+			return links.map(l => `${l.title}\t${l.url}`).join(eol);
+		case COPY_TITLES:
+			return links.map(l => l.title).join(eol);
+		case COPY_MARKDOWN:
+			return links.map(l => `[${mdText(l.title)}](${mdUrl(l.url)})`).join(eol);
+		case COPY_HTML:
+			return links.map(htmlLink).join(eol);
+		case COPY_HTML_LIST:
+			return ['<ul>', ...links.map(l => `\t<li>${htmlLink(l)}</li>`), '</ul>'].join(eol);
+		case COPY_URLS_SPACED:
+			return urls.join(' ');
+		default:
+			return urls.join(eol);
+	}
+}
+
+/**
+ * Runs open() after the earlier open requests, so selections open in the order they were made.
+ * Errors are caught so that a failed request doesn't leave the chain rejected, which would skip every later request (#578, #579).
+ *
+ * @param {function(): Promise<void>} open
+ */
+function QueueOpen(open) {
+	openUrlsPromiseChain = openUrlsPromiseChain
+		.then(open)
+		.catch(error => console.error('Error while opening URLs: ', error));
 }
 
 /**
@@ -102,24 +232,115 @@ async function OpenUrlsInTabs(urls) {
 		let props = {
 			url:      url,
 			active:   Prefs.SwitchFocusToNewTab ? (--tabsLeft) === 0 : false,	// Activate the last tab to be opened
-			index:    startIndex + tabsOpened++,
+			index:    startIndex + tabsOpened,
 			windowId: activeTab.windowId,
 		};
 
 		if(isFirefox) {
 			props.cookieStoreId = activeTab.cookieStoreId;
-			if(Prefs.SetOwnershipTabID_FF)
+			// The opener tab may have been closed while tabs are still opening (#579)
+			if(Prefs.SetOwnershipTabID_FF && await TabExists(activeTab.id))
 				props.openerTabId = activeTab.id;
 			if(Prefs.NewTabsOpenUnloaded)
 				props.discarded = true;
 		}
 
-		let newTab = await browser.tabs.create(props);
+		let newTab;
+		try {
+			newTab = await browser.tabs.create(props);
+		} catch(error) {
+			// Skip this URL (e.g. an illegal URL) and keep opening the rest
+			console.error(`Error while opening ${url} in a new tab: `, error);
+			continue;
+		}
+
+		tabsOpened++;
 		tabStack.unshift(newTab.id);
 
 		await sleep(Prefs.NewTabDelayMS);
 	}
 	TabStacks.set(activeTab.id, tabStack);
+}
+
+/**
+ * Opens the urls, in order, as the tabs of one new window, in the container and private browsing mode of the tab they came from
+ *
+ * @param {string[]} urls
+ * @param {Tab}      [sourceTab]    The tab the links were selected in, defaults to the active tab
+ * @return {Promise<void>}
+ */
+async function OpenUrlsInWindow(urls, sourceTab) {
+	if(!urls || urls.length === 0)
+		return;
+
+	// Firefox for Android has no windows
+	if(!browser.windows)
+		return OpenUrlsInTabs(urls);
+
+	sourceTab = sourceTab || (await browser.tabs.query({
+		active:        true,
+		currentWindow: true,
+	}))[0];
+
+	let props = { incognito: Boolean(sourceTab.incognito) },
+		rest  = urls.slice(),
+		newWindow;
+
+	if(isFirefox)
+		props.cookieStoreId = sourceTab.cookieStoreId;
+
+	// The window opens with the first link that can be opened (eg: not an illegal URL)
+	while(!newWindow && rest.length) {
+		let url = rest.shift();
+		try {
+			newWindow = await browser.windows.create({ ...props, url });
+		} catch(error) {
+			console.error(`Error while opening ${url} in a new window: `, error);
+		}
+	}
+	if(!newWindow)
+		return;
+
+	// Keep the window the links came from in front, it may have been closed meanwhile
+	if(!Prefs.SwitchFocusToNewTab)
+		await browser.windows.update(sourceTab.windowId, { focused: true })
+			.catch(error => console.error(`Error while focusing window ${sourceTab.windowId}: `, error));
+
+	for(let url of rest) {
+		await sleep(Prefs.NewTabDelayMS);
+
+		let tabProps = {
+			url:      url,
+			active:   false,
+			windowId: newWindow.id,
+		};
+
+		if(isFirefox) {
+			tabProps.cookieStoreId = sourceTab.cookieStoreId;
+			if(Prefs.NewTabsOpenUnloaded)
+				tabProps.discarded = true;
+		}
+
+		try {
+			await browser.tabs.create(tabProps);
+		} catch(error) {
+			// Skip this URL and keep opening the rest
+			console.error(`Error while opening ${url} in a new tab: `, error);
+		}
+	}
+}
+
+/**
+ * @param {number} tabId
+ * @return {Promise<boolean>}
+ */
+async function TabExists(tabId) {
+	try {
+		await browser.tabs.get(tabId);
+		return true;
+	} catch(error) {
+		return false;
+	}
 }
 
 /**
@@ -162,35 +383,6 @@ async function CheckInstallation() {
 	}
 }
 
-/**
- * Firefox on Linux and macOS opens the context menu on mousedown, which shows it when starting a right-button drag (#400),
- * so switch it to mouseup while Snap Links is activated by the right mouse button
- *
- * @return {Promise<void>}
- */
-async function ApplyContextMenuShowEvent() {
-	let platformInfo = await browser.runtime.getPlatformInfo();
-	if(platformInfo.os === 'win')
-		return;
-
-	if(!browser.browserSettings)
-		return;
-
-	let setting = browser.browserSettings.contextMenuShowEvent;
-
-	try {
-		if(Prefs.ActivateMouseButton == RMB) {
-			let current = await setting.get({});
-			if(['controllable_by_this_extension', 'controlled_by_this_extension'].includes(current.levelOfControl))
-				await setting.set({ value: 'mouseup' });
-		} else {
-			await setting.clear({});
-		}
-	} catch(e) {
-		console.error('Error while setting contextMenuShowEvent: ', e);
-	}
-}
-
 function Notify(title, message, onClick) {
 	if(onClick)
 		browser.notifications.onClicked.addListener((...args) => onClick(...args));
@@ -215,12 +407,18 @@ browser.runtime.onInstalled.addListener((e) => {
 
 DOMReady.then(() => {
 	browser.runtime.onMessage.addListener(onMessage);
-
-	ApplyContextMenuShowEvent();
-	Prefs.onChanged((key) => {
+	Prefs.onChanged(key => {
 		if(key == 'ActivateMouseButton')
-			ApplyContextMenuShowEvent();
+			UpdateContextMenuSetting();
 	});
+	// StoragePrefs may reload a different store without notifying its observers.
+	browser.storage.onChanged.addListener((changes, area) => {
+		if(area == 'local' && 'StorageAPI' in changes)
+			Prefs.Ready.then(UpdateContextMenuSetting).catch(error => {
+				console.error('Snap Links could not load context menu preferences:', error);
+			});
+	});
+	UpdateContextMenuSetting();
 
 	if(Prefs.DevMode)
 		console.log('Snap Links reloaded %s', (new Date()).toLocaleString());

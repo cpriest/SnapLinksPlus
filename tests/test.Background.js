@@ -49,7 +49,7 @@ function makeTabStrip() {
 let run, browser, strip;
 
 /** What load() reports to background.js, change before calling load() */
-let platformOs, contextMenuControl;
+let platformOs;
 
 /** Replaces the storage-backed Prefs so each test controls exactly what background.js sees */
 const setPrefs = (overrides = {}) => run('(p) => { Prefs = p; }')({
@@ -69,7 +69,6 @@ const load = async (globals = {}, stores = undefined) => {
 		notifications: { create: jest.fn(async () => 'n'), onClicked: { addListener: jest.fn() } },
 		browserSettings: {
 			contextMenuShowEvent: {
-				get:   jest.fn(async () => ({ levelOfControl: contextMenuControl })),
 				set:   jest.fn(async () => true),
 				clear: jest.fn(async () => true),
 			},
@@ -96,8 +95,7 @@ const load = async (globals = {}, stores = undefined) => {
 };
 
 beforeEach(() => {
-	platformOs         = 'linux';
-	contextMenuControl = 'controllable_by_this_extension';
+	platformOs = 'linux';
 	return load();
 });
 
@@ -245,12 +243,90 @@ describe('message handling', () => {
 		expect(writeText).toHaveBeenCalledWith(`http://a/${separator}http://b/`);
 	});
 
+	test('COPY_TO_CLIPBOARD writes the links in Prefs.CopyFormat with the titles sent along', async () => {
+		let writeText = jest.fn();
+		await load({ navigator: { clipboard: { writeText } } });
+		setPrefs({ CopyFormat: run('COPY_MARKDOWN') });
+
+		send({ Action: run('COPY_TO_CLIPBOARD'), tUrls: ['http://a/', 'http://b/'], tTitles: ['A', ''] });
+		await flush();
+
+		expect(writeText).toHaveBeenCalledWith('[A](http://a/)\n[http://b/](http://b/)');
+	});
+
 	test('RELOAD_EXTENSION detaches the listener and reloads the tab and extension', () => {
 		send({ Action: run('RELOAD_EXTENSION') });
 
 		expect(browser.runtime.onMessage.removeListener).toHaveBeenCalledWith(run('onMessage'));
 		expect(strip.api.reload).toHaveBeenCalledTimes(1);
 		expect(browser.runtime.reload).toHaveBeenCalledTimes(1);
+	});
+});
+
+describe('failed tab opens (#578, #579)', () => {
+	const send    = (urls) => run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: urls }, {}, () => {});
+	const settled = () => run('openUrlsPromiseChain');
+	let errors;
+
+	/** Makes tabs.create() throw for the tabs that fail(props) picks, and create the rest */
+	const failCreate = (fail) => {
+		let create = strip.api.create.getMockImplementation();
+		strip.api.create.mockImplementation(async (props) => {
+			if(fail(props))
+				throw new Error(`Cannot open ${props.url}`);
+			return create(props);
+		});
+	};
+
+	beforeEach(() => {
+		errors = [];
+		run('(log) => { console.error = (...a) => log.push(a); }')(errors);
+	});
+
+	test('a failed request does not block later requests', async () => {
+		strip.api.query.mockRejectedValueOnce(new Error('Invalid tab ID: 2'));
+
+		send(['a']);
+		send(['b']);
+		await settled();
+
+		expect(strip.order()).toEqual(['#1', '#2', 'b', '#3']);
+		expect(errors).toHaveLength(1);
+	});
+
+	test('an illegal URL is skipped, and the rest of the batch opens with no gap', async () => {
+		failCreate(props => props.url === 'bad');
+
+		send(['a', 'bad', 'b']);
+		await settled();
+
+		expect(strip.order()).toEqual(['#1', '#2', 'a', 'b', '#3']);
+		expect(errors[0][0]).toContain('bad');
+	});
+
+	test('openerTabId is set only while the opener tab exists', async () => {
+		setPrefs({ SetOwnershipTabID_FF: true });
+		failCreate(props => 'openerTabId' in props && !strip.tabs.some(t => t.id === props.openerTabId));
+		strip.api.create.mockImplementationOnce(async (props) => {
+			strip.tabs.splice(1, 1);	// The opener (active tab 2) closes after the first tab opens
+			return { ...props, id: 99 };
+		});
+
+		send(['a', 'b', 'c']);
+		await settled();
+
+		expect(strip.api.create.mock.calls.map(([p]) => [p.url, p.openerTabId])).toEqual([['a', 2], ['b', undefined], ['c', undefined]]);
+		expect(errors).toEqual([]);
+	});
+
+	test('a failed tab is logged and not retried', async () => {
+		failCreate(() => true);
+
+		send(['a']);
+		await settled();
+
+		expect(strip.api.create).toHaveBeenCalledTimes(1);
+		expect(errors).toHaveLength(1);
 	});
 });
 
@@ -319,63 +395,265 @@ describe('install and update handling', () => {
 	});
 });
 
-describe('context menu show event (#400: Linux/macOS open the menu on mousedown)', () => {
-	const setting = () => browser.browserSettings.contextMenuShowEvent;
+describe('FormatLinks (copy formats, #198)', () => {
+	const urls   = ['https://a.test/1', 'https://a.test/(2)'],
+		titles = ['First <b>&</b> "one"', '[Second]'];
+	const format = (constant, eol = '\n', t = titles) => run('FormatLinks')(urls, t, run(constant), eol);
 
-	/** Loads with real storage-backed Prefs, so the pref change listener is the real one */
-	const loadWith = async (sync = {}) => {
-		await load({}, { sync });
+	test.each([
+		['COPY_URLS', 'https://a.test/1\nhttps://a.test/(2)'],
+		['COPY_TITLES_URLS', 'First <b>&</b> "one"\thttps://a.test/1\n[Second]\thttps://a.test/(2)'],
+		['COPY_TITLES', 'First <b>&</b> "one"\n[Second]'],
+		['COPY_MARKDOWN', '[First <b>&</b> "one"](https://a.test/1)\n[\\[Second\\]](https://a.test/%282%29)'],
+		['COPY_HTML', '<a href="https://a.test/1">First &lt;b&gt;&amp;&lt;/b&gt; &quot;one&quot;</a>\n<a href="https://a.test/(2)">[Second]</a>'],
+		['COPY_HTML_LIST', '<ul>\n\t<li><a href="https://a.test/1">First &lt;b&gt;&amp;&lt;/b&gt; &quot;one&quot;</a></li>\n\t<li><a href="https://a.test/(2)">[Second]</a></li>\n</ul>'],
+		['COPY_URLS_SPACED', 'https://a.test/1 https://a.test/(2)'],
+	])('%s', (constant, expected) => {
+		expect(format(constant)).toBe(expected);
+	});
+
+	test('uses the given line separator', () => {
+		expect(format('COPY_TITLES_URLS', '\r\n')).toBe('First <b>&</b> "one"\thttps://a.test/1\r\n[Second]\thttps://a.test/(2)');
+	});
+
+	test('a link without a title is titled by its URL', () => {
+		expect(format('COPY_TITLES', '\n', ['', undefined])).toBe('https://a.test/1\nhttps://a.test/(2)');
+		expect(run('FormatLinks')(urls, undefined, run('COPY_TITLES'), '\n')).toBe('https://a.test/1\nhttps://a.test/(2)');
+	});
+
+	test('an unknown format copies URLs', () => {
+		expect(run('FormatLinks')(urls, titles, 'Nonsense', '\n')).toBe('https://a.test/1\nhttps://a.test/(2)');
+	});
+});
+
+describe('OpenUrlsInWindow (#182)', () => {
+	const source = { id: 2, windowId: 7, cookieStoreId: 'c2', incognito: false };
+	let windows;
+
+	beforeEach(() => {
+		windows = {
+			create: jest.fn(async (props) => ({ id: 50, ...props })),
+			update: jest.fn(async () => ({})),
+		};
+		browser.windows = windows;
+	});
+
+	const open = (urls, tab = source) => run('OpenUrlsInWindow')(urls, tab);
+
+	test('opens the first link as a new window and the rest as its tabs, in order, in the source tab\'s container', async () => {
+		await open(['u1', 'u2', 'u3']);
+
+		expect(windows.create).toHaveBeenCalledWith({ url: 'u1', incognito: false, cookieStoreId: 'c2' });
+		expect(strip.api.create.mock.calls.map(([p]) => p)).toEqual([
+			{ url: 'u2', active: false, windowId: 50, cookieStoreId: 'c2' },
+			{ url: 'u3', active: false, windowId: 50, cookieStoreId: 'c2' },
+		]);
+	});
+
+	test('a private window opens private', async () => {
+		await open(['u1'], { ...source, incognito: true, cookieStoreId: 'firefox-private' });
+
+		expect(windows.create).toHaveBeenCalledWith({ url: 'u1', incognito: true, cookieStoreId: 'firefox-private' });
+	});
+
+	test.each([
+		[true, 0],
+		[false, 1],
+	])('SwitchFocusToNewTab=%s → refocuses the source window %i time(s)', async (focusNew, calls) => {
+		setPrefs({ SwitchFocusToNewTab: focusNew });
+
+		await open(['u1', 'u2']);
+
+		expect(windows.update).toHaveBeenCalledTimes(calls);
+		if(calls)
+			expect(windows.update).toHaveBeenCalledWith(7, { focused: true });
+	});
+
+	test('NewTabsOpenUnloaded opens the extra tabs discarded', async () => {
+		setPrefs({ NewTabsOpenUnloaded: true });
+
+		await open(['u1', 'u2']);
+
+		expect(strip.api.create.mock.calls[0][0].discarded).toBe(true);
+	});
+
+	test('without a source tab, uses the active tab', async () => {
+		await run('OpenUrlsInWindow')(['u1']);
+
+		expect(strip.api.query).toHaveBeenCalledWith({ active: true, currentWindow: true });
+		expect(windows.create).toHaveBeenCalledWith({ url: 'u1', incognito: false, cookieStoreId: 'c2' });
+	});
+
+	test('does nothing for no links', async () => {
+		await open([]);
+
+		expect(windows.create).not.toHaveBeenCalled();
+	});
+
+	describe('failures (as #578, #579 for tabs)', () => {
+		let errors;
+
+		beforeEach(() => {
+			errors = [];
+			run('(log) => { console.error = (...a) => log.push(a); }')(errors);
+		});
+
+		/** Makes create() throw for the URLs fail(url) picks */
+		const failFor = (mock, fail) => {
+			let create = mock.getMockImplementation();
+			mock.mockImplementation(async (props) => {
+				if(fail(props.url))
+					throw new Error(`Cannot open ${props.url}`);
+				return create(props);
+			});
+		};
+
+		test('a failed window request does not block later requests', async () => {
+			windows.create.mockRejectedValueOnce(new Error('Window failed'));
+
+			run('onMessage')({ Action: run('OPEN_URLS_IN_WINDOW'), tUrls: ['w1'] }, { tab: source }, () => {});
+			run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a1'] }, { tab: source }, () => {});
+			await run('openUrlsPromiseChain');
+
+			expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['a1']);
+			expect(errors).toHaveLength(1);
+		});
+
+		test('a link that cannot open as a tab is skipped, and the rest still open', async () => {
+			failFor(strip.api.create, url => url === 'bad');
+
+			await open(['u1', 'bad', 'u3']);
+
+			expect(strip.order()).toContain('u3');
+			expect(errors[0][0]).toContain('bad');
+		});
+
+		test('when the first link cannot open a window, the next one does', async () => {
+			failFor(windows.create, url => url === 'bad');
+
+			await open(['bad', 'u2', 'u3']);
+
+			expect(windows.create).toHaveBeenLastCalledWith({ url: 'u2', incognito: false, cookieStoreId: 'c2' });
+			expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['u3']);
+		});
+
+		test('a closed source window does not stop the rest of the links', async () => {
+			setPrefs({ SwitchFocusToNewTab: false });
+			windows.update.mockRejectedValueOnce(new Error('Invalid window ID: 7'));
+
+			await open(['u1', 'u2']);
+
+			expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['u2']);
+		});
+	});
+
+	test('without the windows API (Firefox for Android), the links open as tabs', async () => {
+		delete browser.windows;
+
+		await open(['u1', 'u2']);
+
+		expect(strip.order()).toEqual(['#1', '#2', 'u1', 'u2', '#3']);
+	});
+
+	test('OPEN_URLS_IN_WINDOW messages use the sending tab and share the queue with OPEN_URLS_IN_TABS', async () => {
+		run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a1'] }, { tab: source }, () => {});
+		run('onMessage')({ Action: run('OPEN_URLS_IN_WINDOW'), tUrls: ['w1', 'w2'] }, { tab: { ...source, cookieStoreId: 'c9' } }, () => {});
 		await flush();
-	};
-
-	test.each(['linux', 'mac'])('on %s with the right mouse button, the menu is moved to mouseup', async (os) => {
-		platformOs = os;
-		await loadWith();
-
-		expect(setting().set).toHaveBeenCalledWith({ value: 'mouseup' });
-	});
-
-	test('on Windows the setting is left alone', async () => {
-		platformOs = 'win';
-		await loadWith();
-
-		expect(setting().get).not.toHaveBeenCalled();
-		expect(setting().set).not.toHaveBeenCalled();
-		expect(setting().clear).not.toHaveBeenCalled();
-	});
-
-	test('with another activation button, our override is cleared', async () => {
-		await loadWith({ ActivateMouseButton: 1 });
-
-		expect(setting().clear).toHaveBeenCalled();
-		expect(setting().set).not.toHaveBeenCalled();
-	});
-
-	test('a setting controlled by another extension or policy is not overridden', async () => {
-		contextMenuControl = 'controlled_by_other_extensions';
-		await loadWith();
-
-		expect(setting().set).not.toHaveBeenCalled();
-	});
-
-	test('changing ActivateMouseButton re-applies the setting', async () => {
-		await loadWith();
-		setting().clear.mockClear();
-
-		browser.fireStorageChanged({ ActivateMouseButton: { newValue: 1, oldValue: 2 } }, 'sync');
 		await flush();
 
-		expect(setting().clear).toHaveBeenCalledTimes(1);
+		expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['a1', 'w2']);
+		expect(windows.create).toHaveBeenCalledWith({ url: 'w1', incognito: false, cookieStoreId: 'c9' });
+	});
+});
+
+describe('FormatLinks (copy formats, #198)', () => {
+	const urls   = ['https://a.test/1', 'https://a.test/(2)'],
+		titles = ['First <b>&</b> "one"', '[Second]'];
+	const format = (constant, eol = '\n', t = titles) => run('FormatLinks')(urls, t, run(constant), eol);
+
+	test.each([
+		['COPY_URLS', 'https://a.test/1\nhttps://a.test/(2)'],
+		['COPY_TITLES_URLS', 'First <b>&</b> "one"\thttps://a.test/1\n[Second]\thttps://a.test/(2)'],
+		['COPY_TITLES', 'First <b>&</b> "one"\n[Second]'],
+		['COPY_MARKDOWN', '[First <b>&</b> "one"](https://a.test/1)\n[\\[Second\\]](https://a.test/%282%29)'],
+		['COPY_HTML', '<a href="https://a.test/1">First &lt;b&gt;&amp;&lt;/b&gt; &quot;one&quot;</a>\n<a href="https://a.test/(2)">[Second]</a>'],
+		['COPY_HTML_LIST', '<ul>\n\t<li><a href="https://a.test/1">First &lt;b&gt;&amp;&lt;/b&gt; &quot;one&quot;</a></li>\n\t<li><a href="https://a.test/(2)">[Second]</a></li>\n</ul>'],
+		['COPY_URLS_SPACED', 'https://a.test/1 https://a.test/(2)'],
+	])('%s', (constant, expected) => {
+		expect(format(constant)).toBe(expected);
 	});
 
-	test('without the browserSettings API (Chrome) nothing fails', async () => {
-		let errors = [];
-		await load({}, {});
-		delete browser.browserSettings;
-		run('(log) => { console.error = (...a) => log.push(a.join(" ")); }')(errors);
+	test('uses the given line separator', () => {
+		expect(format('COPY_TITLES_URLS', '\r\n')).toBe('First <b>&</b> "one"\thttps://a.test/1\r\n[Second]\thttps://a.test/(2)');
+	});
 
-		await run('ApplyContextMenuShowEvent')();
+	test('a link without a title is titled by its URL', () => {
+		expect(format('COPY_TITLES', '\n', ['', undefined])).toBe('https://a.test/1\nhttps://a.test/(2)');
+		expect(run('FormatLinks')(urls, undefined, run('COPY_TITLES'), '\n')).toBe('https://a.test/1\nhttps://a.test/(2)');
+	});
 
-		expect(errors).toEqual([]);
+	test('an unknown format copies URLs', () => {
+		expect(run('FormatLinks')(urls, titles, 'Nonsense', '\n')).toBe('https://a.test/1\nhttps://a.test/(2)');
+	});
+});
+
+describe('BookmarkLinks (#216)', () => {
+	let created, granted;
+
+	beforeEach(() => {
+		created = [];
+		granted = true;
+		browser.permissions = { contains: jest.fn(async () => granted) };
+		browser.bookmarks   = {
+			create: jest.fn(async (props) => {
+				let node = { id: `n${created.length}`, ...props };
+				created.push(node);
+				return node;
+			}),
+		};
+		browser.runtime.openOptionsPage = jest.fn(async () => {});
+	});
+
+	test('creates a "Snap Links <date>" folder holding the links in order, named by their titles or URLs', async () => {
+		await run('BookmarkLinks')(['http://a/', 'http://b/'], ['A', '']);
+
+		expect(browser.permissions.contains).toHaveBeenCalledWith({ permissions: ['bookmarks'] });
+		expect(created[0]).toEqual({ id: 'n0', title: expect.stringMatching(/^Snap Links \S/) });
+		expect(created[0].parentId).toBeUndefined();
+		expect(created.slice(1)).toEqual([
+			{ id: 'n1', parentId: 'n0', title: 'A', url: 'http://a/' },
+			{ id: 'n2', parentId: 'n0', title: 'http://b/', url: 'http://b/' },
+		]);
+	});
+
+	test('without the permission it opens the options page and creates nothing', async () => {
+		granted = false;
+
+		await run('BookmarkLinks')(['http://a/'], ['A']);
+
+		expect(browser.runtime.openOptionsPage).toHaveBeenCalledTimes(1);
+		expect(browser.bookmarks.create).not.toHaveBeenCalled();
+	});
+
+	test('a link that cannot be bookmarked is skipped, and the rest are still bookmarked', async () => {
+		let errors = [], create = browser.bookmarks.create.getMockImplementation();
+		run('(log) => { console.error = (...a) => log.push(a); }')(errors);
+		browser.bookmarks.create.mockImplementation(async (props) => {
+			if(props.url === 'bad:')
+				throw new Error('Invalid URL');
+			return create(props);
+		});
+
+		await run('BookmarkLinks')(['http://a/', 'bad:', 'http://c/'], []);
+
+		expect(created.map(n => n.url)).toEqual([undefined, 'http://a/', 'http://c/']);
+		expect(errors[0][0]).toContain('bad:');
+	});
+
+	test('BOOKMARK_LINKS_IN_FOLDER messages bookmark the links', async () => {
+		run('onMessage')({ Action: run('BOOKMARK_LINKS_IN_FOLDER'), tUrls: ['http://a/'], tTitles: ['A'] }, {}, () => {});
+		await flush();
+
+		expect(created.map(n => n.url)).toEqual([undefined, 'http://a/']);
 	});
 });

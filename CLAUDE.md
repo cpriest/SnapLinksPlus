@@ -19,7 +19,8 @@ npm run run-ff      # Firefox Dev Edition with build/ff loaded, auto-reloads on 
 - `gulp publish` signs and uploads to AMO using `insecure/Firefox/api-key.json` (gitignored). Never run it unprompted.
 - `run-ff` uses the persistent profile `SnapLinksDev/` (gitignored) and the `firefoxdeveloperedition` alias: Developer Edition on Windows/macOS, `firefox-developer-edition` on PATH on Linux/WSL. Set `FIREFOX=/path/to/firefox` to use another binary. Firefox refuses to run as root, so as root the script re-runs itself as the owner of the project directory (`runuser`), and the config looks for `~/.local/bin/firefox-developer-edition` without relying on PATH.
 - `scripts/run-ff.mjs` exists because WSL2 mirrored networking resets (rather than refuses) connects to a not-yet-listening localhost port, and web-ext only retries on ECONNREFUSED. It wraps web-ext's `connect` from an internal path (`web-ext/lib/firefox/remote.js`), so re-check it after upgrading web-ext. Under WSL, Firefox renders through WSLg; the script sets `DISPLAY=:0` when the shell has no display set (ssh, some IDE terminals).
-- Newer Firefox runs extensions on `file://` pages only after the user turns on "Access local files on your computer" for the extension (about:addons > Permissions; pref `extensions.webextensions.fileSchemeAccess.requireOptIn`). So `run-ff` serves `test/` (only) from a local http server and rewrites `file://` start URLs under `test/` to it. Open other fixtures at the same `http://127.0.0.1:<port>/` base.
+- Newer Firefox runs extensions on `file://` pages only after the user turns on "Access local files on your computer" for the extension (about:addons > Permissions; pref `extensions.webextensions.fileSchemeAccess.requireOptIn`). So `run-ff` serves `test/` (only) from a local http server and rewrites `file://` start URLs under `test/` to it. It opens on `/`, a generated index of the fixture pages.
+- Firefox caches parsed manifests by add-on id + version across restarts, so with an unchanged version a manifest edit (permissions) is ignored until the add-on reloads. `run-ff` deletes `SnapLinksDev/startupCache/webext.sc.lz4` before each start; while it runs, use Reload in about:debugging after a manifest change if the auto-reload did not pick it up.
 - npm only (`package-lock.json` is the lockfile; CI runs `npm ci`). Don't reintroduce yarn.
 
 ## Build pipeline
@@ -47,6 +48,7 @@ Background page: polyfill (Chrome) → `StoragePrefs` → `globals` → `[DevBui
 3. `ElementIndexer` builds a bucketed vertical index on first change (`UpdateIndex`), then `Search(rect)` returns a `CategorizedCollection` and publishes `ElementsSelected`. `SvgOverlayMgr` highlights them.
 4. `mouseup` → `EndDrag` → publishes `DragCompleted` → **calls `ActionMgr.ActUpon` directly**, not via pub/sub. This is deliberate: browsers reject clipboard/tab/click actions outside a short-lived user-event handler.
 5. `Escape` cancels. The next context menu is suppressed after a successful drag (`StopNextContextMenu`).
+6. Linux/macOS right-drag (#400): while RMB activates, `background.js` sets Firefox's `browserSettings.contextMenuShowEvent` to `mouseup` (`UpdateContextMenuSetting`). On Linux only, when a native menu is open Firefox uses the next press to dismiss it, so `onRecoverContextMenuDrag` starts the drag from the first RMB-held `mousemove`. Frames share the menu-open state through the background (`GetContextMenuDragRecovery`, `SetContextMenuShown`). Tests: `test.ContextMenuSetting.js`, `test.ContextMenuRecovery.js`.
 
 ### Files
 
@@ -61,7 +63,7 @@ Background page: polyfill (Chrome) → `StoragePrefs` → `globals` → `[DevBui
 | `ActionMgr.js` | Acts on the greatest category. Links go to background via `runtime.sendMessage`. |
 | `SelectionRect.js` | `Rect`/`DocRect` geometry and the lasso DOM (`DIV.SnapLinksContainer`, counter label). |
 | `SvgOverlay.js` | SVG highlight layer; styles come from `Prefs.HighlightStyles_*`. |
-| `background.js` | Messages: `OpenUrlsInTabs` (serialized on a promise chain; `TABS_OPEN_*` placement), `CopyToClipboard`, `ReloadExtension` (dev), install/update notifications, storage migration at 3.1.7. |
+| `background.js` | Messages: `OpenUrlsInTabs` (serialized on a promise chain; `TABS_OPEN_*` placement), `CopyToClipboard`, `ReloadExtension` (dev), context-menu timing and drag-recovery state (#400), install/update notifications, storage migration at 3.1.7. |
 | `src/lib/Options.js`, `src/html/options.html` | Options page, driven by `DefaultPrefs` keys. |
 
 ### Preferences

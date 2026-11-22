@@ -21,18 +21,34 @@ const LMB = 1,	// Left Mouse Button
 		MMB = 4;	// Middle Mouse Button
 
 //  Default Action
-const OPEN_LINKS = 1,	// Open links
-		COPY_LINKS = 2;	// Copy links
+const OPEN_LINKS     = 1,	// Open links
+		COPY_LINKS     = 2,	// Copy links
+		OPEN_IN_WINDOW = 3,	// Open links as tabs of a new window
+		BOOKMARK_LINKS = 4;	// Bookmark links in a new folder
 
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest',
 		RELOAD_EXTENSION  = 'ReloadExtension',
 		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs',
-		COPY_TO_CLIPBOARD = 'CopyToClipboard';
+		OPEN_URLS_IN_WINDOW = 'OpenUrlsInWindow',
+		COPY_TO_CLIPBOARD = 'CopyToClipboard',
+		BOOKMARK_LINKS_IN_FOLDER = 'BookmarkLinksInFolder';
+
+// Bookmarking needs this optional permission, the options page asks for it when bookmarking is the default action
+const BOOKMARKS_PERMISSION = { permissions: ['bookmarks'] };
 
 const TABS_OPEN_END     = 'OpenTabsAtEnd',
 		TABS_OPEN_RIGHT   = 'OpenTabsToRight',
 		TABS_OPEN_NATURAL = 'OpenTabsNaturally';	// Like Firefox Middle-Click behaves
+
+// How copied links are written (Prefs.CopyFormat)
+const COPY_URLS            = 'Urls',				// One URL per line
+		COPY_TITLES_URLS   = 'TitlesAndUrls',		// Title<TAB>URL per line
+		COPY_TITLES        = 'Titles',				// One title per line
+		COPY_MARKDOWN      = 'Markdown',			// [Title](URL) per line
+		COPY_HTML          = 'Html',				// <a href="URL">Title</a> per line
+		COPY_HTML_LIST     = 'HtmlList',			// <ul> of <li><a href="URL">Title</a></li>
+		COPY_URLS_SPACED   = 'UrlsSpaceSeparated';	// URLs on one line, separated by spaces
 
 const isChrome  = location.protocol === 'chrome-extension:',
 		isFirefox = location.protocol === 'moz-extension:';
@@ -41,6 +57,8 @@ const isChrome  = location.protocol === 'chrome-extension:',
 const DefaultPrefs = {
 	IndexBuckets: 10,
 	ScrollRate:   8,
+
+	AutoScrollEdgeZone: 20,	// Pixels from an edge of the window within which a drag towards that edge scrolls the page, 0 to scroll only outside the window
 
 	Activation_Min: 5,
 
@@ -54,17 +72,21 @@ const DefaultPrefs = {
 
 	OpenTabs:            TABS_OPEN_NATURAL,
 	DefaultAction:       OPEN_LINKS,
+	CopyFormat:          COPY_URLS,
 	NewTabsOpenUnloaded: false,
 	SwitchFocusToNewTab: true,
+	ReverseLinkOrder:    false,	// Open/copy links last to first, SHIFT on release flips it for one selection
 	ShowNumberOfLinks:   true,
 	ActivateModifiers:   NONE,
 	ActivateMouseButton: RMB,
+
+	DisabledSites: '',	// Sites where Snap Links does nothing, one pattern per line, see SiteListMatches()
 
 	ShowUpdateNotification: true,		// Controls whether version update notifications are shown
 
 	DisableFontWeightFiltering: false,
 
-	SmartDuplicateDetection: true,	// Treat links that lead to the same page (eg: differ only by #fragment or utm_* parameters) as duplicates
+	SmartDuplicateDetection: false,	// Treat links that lead to the same page (eg: differ only by #fragment or utm_* parameters) as duplicates
 
 	SetOwnershipTabID_FF: false,	// Whether or not to set tab.openerTabId in Firefox on tab creation
 

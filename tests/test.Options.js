@@ -24,9 +24,9 @@ const flush   = async () => { jest.advanceTimersByTime(250); await jest.runAllTi
 const stored  = () => browser.storage.sync.data;
 const change  = (node, type = 'change') => node.dispatchEvent(new Event(type, { bubbles: true }));
 
-async function load(sync = {}) {
+async function load(sync = {}, extraApis = {}) {
 	document.body.innerHTML = BodyHtml;
-	browser                 = makeBrowser({ sync });
+	browser                 = Object.assign(makeBrowser({ sync }), extraApis);
 	({ run } = loadScriptsInDom(['StoragePrefs.js', 'globals.js', 'lib/Options.js'], browser));
 	await run('DOMReady');
 	await Promise.resolve();
@@ -69,12 +69,17 @@ describe('markup matches the code', () => {
 		expect(values).toEqual([run('NONE'), run('CTRL'), run('ALT'), run('CTRL | ALT'), run('SHIFT'), run('CTRL | SHIFT'), run('ALT | SHIFT'), run('CTRL | ALT | SHIFT')].sort());
 	});
 
-	test('DefaultAction options are OPEN_LINKS and COPY_LINKS', () => {
-		expect(Array.from(el('DefaultAction').options).map(o => Number(o.value)).sort()).toEqual([run('OPEN_LINKS'), run('COPY_LINKS')].sort());
+	test('DefaultAction options are OPEN_LINKS, COPY_LINKS, OPEN_IN_WINDOW and BOOKMARK_LINKS', () => {
+		expect(Array.from(el('DefaultAction').options).map(o => Number(o.value)).sort()).toEqual([run('OPEN_LINKS'), run('COPY_LINKS'), run('OPEN_IN_WINDOW'), run('BOOKMARK_LINKS')].sort());
 	});
 
 	test('OpenTabs options are the three TABS_OPEN_* constants', () => {
 		expect(Array.from(el('OpenTabs').options).map(o => o.value).sort()).toEqual([run('TABS_OPEN_END'), run('TABS_OPEN_RIGHT'), run('TABS_OPEN_NATURAL')].sort());
+	});
+
+	test('CopyFormat options are the COPY_* constants', () => {
+		expect(Array.from(el('CopyFormat').options).map(o => o.value).sort())
+			.toEqual(['COPY_URLS', 'COPY_TITLES_URLS', 'COPY_TITLES', 'COPY_MARKDOWN', 'COPY_HTML', 'COPY_HTML_LIST', 'COPY_URLS_SPACED'].map(c => run(c)).sort());
 	});
 
 	test('StorageAPI options are the valid storage areas', () => {
@@ -136,6 +141,14 @@ describe('saving preferences', () => {
 		expect(stored().NewTabDelayMS).toBe('123');
 	});
 
+	test('the DisabledSites textarea saves its lines', async () => {
+		el('DisabledSites').value = 'example.com\nexample.org/forum';
+		change(el('DisabledSites'), 'input');
+		await flush();
+
+		expect(stored().DisabledSites).toBe('example.com\nexample.org/forum');
+	});
+
 	test('toggling a details section is remembered', async () => {
 		el('UI_AdvancedOptions_Section').open = true;
 		change(el('UI_AdvancedOptions_Section'), 'toggle');
@@ -183,4 +196,86 @@ describe('constructing Options', () => {
 		expect(() => new Options()).toThrow('No configuration given to Options');
 		expect(() => new Options({})).toThrow('No configuration given to Options');
 	});
+});
+
+describe('bookmarks permission (#216)', () => {
+	let granted;
+	const permissions = () => ({
+		contains: jest.fn(async () => granted),
+		request:  jest.fn(async () => (granted = true)),
+	});
+	const settle = async () => { for(let i = 0; i < 5; i++) await Promise.resolve(); };
+
+	beforeEach(() => { granted = false; });
+
+	test('the Allow note is hidden while bookmarking is not the default action', async () => {
+		await load({}, { permissions: permissions() });
+		await settle();
+
+		expect(el('BookmarkPermission').hidden).toBe(true);
+	});
+
+	test('the Allow note shows when bookmarking is the default action and the permission is missing', async () => {
+		await load({ DefaultAction: 4 }, { permissions: permissions() });
+		await settle();
+
+		expect(el('BookmarkPermission').hidden).toBe(false);
+	});
+
+	test('the Allow note stays hidden when the permission was already granted', async () => {
+		granted = true;
+		await load({ DefaultAction: 4 }, { permissions: permissions() });
+		await settle();
+
+		expect(el('BookmarkPermission').hidden).toBe(true);
+	});
+
+	/** Chooses bookmarking in the Default Action select, as a user would */
+	const chooseBookmarking = async () => {
+		el('DefaultAction').value = String(run('BOOKMARK_LINKS'));
+		change(el('DefaultAction'));
+		await settle();
+		await flush();
+	};
+
+	test('choosing bookmarking asks for the permission at once, and no Allow note shows once it is granted', async () => {
+		await load({}, { permissions: permissions() });
+		await settle();
+
+		await chooseBookmarking();
+
+		expect(browser.permissions.request).toHaveBeenCalledWith({ permissions: ['bookmarks'] });
+		expect(el('BookmarkPermission').hidden).toBe(true);
+		expect(stored().DefaultAction).toBe(String(run('BOOKMARK_LINKS')));
+	});
+
+	test('refusing the permission puts the previous default action back, and saves it', async () => {
+		let apis = permissions();
+		apis.request = jest.fn(async () => false);
+		await load({ DefaultAction: run('COPY_LINKS') }, { permissions: apis });
+		await settle();
+
+		await chooseBookmarking();
+
+		expect(el('DefaultAction').value).toBe(String(run('COPY_LINKS')));
+		expect(stored().DefaultAction).toBe(String(run('COPY_LINKS')));
+		expect(el('BookmarkPermission').hidden).toBe(true);
+	});
+
+	test('when the browser rejects the request (not user input), the Allow note is the fallback', async () => {
+		let apis = permissions(), request = apis.request;
+		apis.request = jest.fn().mockRejectedValueOnce(new Error('permissions.request may only be called from a user input handler')).mockImplementation(request);
+		await load({}, { permissions: apis });
+		await settle();
+
+		await chooseBookmarking();
+		expect(el('DefaultAction').value).toBe(String(run('BOOKMARK_LINKS')));
+		expect(el('BookmarkPermission').hidden).toBe(false);
+
+		el('GrantBookmarkPermission').click();
+		await settle();
+
+		expect(el('BookmarkPermission').hidden).toBe(true);
+	});
+
 });
