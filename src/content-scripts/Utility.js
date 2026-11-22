@@ -67,15 +67,16 @@ class RateReporter {
 			ElapsedS  = ElapsedMS / 1000,
 			Elapsed;
 
-		// Function to resolve template literal
-		let z = new Function('Count', 'PerSecond', 'Elapsed', 'return `' + this.msg + '`');
-
 		// Show ms if less than 1 second, otherwise seconds rounded to two places
 		Elapsed = ElapsedMS < 1000
 			? ElapsedMS + 'ms'
 			: (Math.round(ElapsedS * 100) / 100) + 's';
 
-		console.log(z(Count, (Math.round(Count / ElapsedS * 100) / 100) + '/s', Elapsed));
+		let values = { Count, PerSecond: (Math.round(Count / ElapsedS * 100) / 100) + '/s', Elapsed };
+
+		// Fills in the ${...} placeholders by name.  Evaluating the template as code (the Function constructor) is blocked by
+		// the content security policy, which applies to content scripts in Manifest V3
+		console.log(this.msg.replace(/\$\{(Count|PerSecond|Elapsed)\}/g, (placeholder, name) => values[name]));
 	}
 }
 

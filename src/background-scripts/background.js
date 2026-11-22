@@ -1,7 +1,59 @@
 'use strict';
 
+/*
+ * In Firefox this runs as an event page (Manifest V3): Firefox unloads it after it has been idle for a while (30 seconds,
+ * pref extensions.background.idle.timeout) and loads it again for the next event it listens to, which clears every
+ * variable here.  So:
+ *  - Listeners are added at the top level, when the script runs.  Only those wake a suspended page; one added later
+ *    (eg: once Prefs are ready) misses the event that loads the page again.
+ *  - The event that wakes the page arrives before Prefs have loaded, so handlers that read Prefs wait for DOMReady.
+ *  - State that must outlive the page goes to storage (see TabStacks).
+ */
+
 let openUrlsPromiseChain = Promise.resolve();
-let TabStacks = new Map();
+
+/** The number of open requests queued or running, see QueueOpen() */
+let queuedOpens = 0,
+	keepAwakeTimer;
+
+/** How often an API call keeps the event page loaded while links are still opening, see QueueOpen() */
+const KEEP_AWAKE_MS = 10000;
+
+/**
+ * For TABS_OPEN_NATURAL: the ids of the tabs each tab has opened, the latest first.  Kept in storage.session (cleared when the
+ * browser closes, as tab ids are) so they survive the event page being unloaded; the Chrome (Manifest V2) build has no
+ * storage.session and keeps them in memory, its background page is never unloaded.
+ */
+const TabStacks = {
+	memory: new Map(),
+
+	/** @param {number} tabId @return {string} */
+	key: (tabId) => `TabStack.${tabId}`,
+
+	/**
+	 * @param {number} tabId
+	 * @return {Promise<number[]>}
+	 */
+	async get(tabId) {
+		if(!browser.storage.session)
+			return this.memory.get(tabId) || [];
+
+		let key = this.key(tabId);
+		return (await browser.storage.session.get(key))[key] || [];
+	},
+
+	/**
+	 * @param {number}   tabId
+	 * @param {number[]} stack
+	 * @return {Promise<void>}
+	 */
+	async set(tabId, stack) {
+		if(!browser.storage.session)
+			return void this.memory.set(tabId, stack);
+
+		await browser.storage.session.set({ [this.key(tabId)]: stack });
+	},
+};
 
 // Serialize changes so switching activation buttons cannot leave a stale setting.
 let contextMenuSettingsChain = Promise.resolve();
@@ -51,9 +103,8 @@ function UpdateContextMenuSetting() {
 }
 
 /**
- * Log that we received the message.
- * Then display a notification. The notification contains the URL,
- * which we read from the message.
+ * Carries out the actions content scripts send.  A message may be what wakes the event page, so it can arrive before Prefs
+ * have loaded: the action runs once DOMReady resolves.  Messages are handled in the order they arrive.
  *
  * @param msg object
  * @param sender MessageSender
@@ -63,6 +114,14 @@ function onMessage(msg, sender, respond) {
 	if(!('Action' in msg))
 		return;
 
+	DOMReady.then(() => HandleMessage(msg, sender));
+}
+
+/**
+ * @param msg object
+ * @param sender MessageSender
+ */
+function HandleMessage(msg, sender) {
 	switch(msg.Action) {
 		case BACKGROUND_TEST:
 			// let p = browser.notifications.create({
@@ -172,12 +231,23 @@ function FormatLinks(urls, titles, format, eol) {
  * Runs open() after the earlier open requests, so selections open in the order they were made.
  * Errors are caught so that a failed request doesn't leave the chain rejected, which would skip every later request (#578, #579).
  *
+ * Firefox resets the event page's idle timer on every extension API call, which opening a tab is, but a NewTabDelayMS longer
+ * than the idle timeout would let it unload the page between two tabs and drop the rest.  So while the queue has work, an
+ * API call is made every KEEP_AWAKE_MS.
+ *
  * @param {function(): Promise<void>} open
  */
 function QueueOpen(open) {
+	if(queuedOpens++ === 0)
+		keepAwakeTimer = setInterval(() => browser.runtime.getPlatformInfo(), KEEP_AWAKE_MS);
+
 	openUrlsPromiseChain = openUrlsPromiseChain
 		.then(open)
-		.catch(error => console.error('Error while opening URLs: ', error));
+		.catch(error => console.error('Error while opening URLs: ', error))
+		.finally(() => {
+			if(--queuedOpens === 0)
+				clearInterval(keepAwakeTimer);
+		});
 }
 
 /**
@@ -193,7 +263,7 @@ async function OpenUrlsInTabs(urls) {
 	let tabsLeft   = urls.length,
 		tabsOpened = 0,
 		startIndex,
-		tabStack   = TabStacks.get(activeTab.id) || [];
+		tabStack   = await TabStacks.get(activeTab.id);
 
 	switch(Prefs.OpenTabs) {
 		case TABS_OPEN_END:
@@ -259,7 +329,7 @@ async function OpenUrlsInTabs(urls) {
 
 		await sleep(Prefs.NewTabDelayMS);
 	}
-	TabStacks.set(activeTab.id, tabStack);
+	await TabStacks.set(activeTab.id, tabStack);
 }
 
 /**
@@ -357,15 +427,9 @@ async function CheckInstallation() {
 		if(Prefs.ShowUpdateNotification) {
 			if(!item || !item.LastInstalledVersion) {
 				// New installation
-				Notify('Snap Links Installed', `Click for a quick tutorial on usage.`, id => browser.tabs.create({
-					url:    'https://cpriest.github.io/SnapLinksPlus/#/Tutorial',
-					active: true,
-				}));
+				Notify(NOTIFICATION_INSTALLED, 'Snap Links Installed', `Click for a quick tutorial on usage.`);
 			} else if(item.LastInstalledVersion != manifest.version) {
-				Notify('Snap Links Updated', `Version ${manifest.version} is now installed.\n\nClick here for more information.`, id => browser.tabs.create({
-					url:    'https://cpriest.github.io/SnapLinksPlus/#/Updated',
-					active: true,
-				}));
+				Notify(NOTIFICATION_UPDATED, 'Snap Links Updated', `Version ${manifest.version} is now installed.\n\nClick here for more information.`);
 			}
 		}
 		if(item.LastInstalledVersion && item.LastInstalledVersion.localeCompare('3.1.7', undefined, { numeric: true }) < 0) {
@@ -383,11 +447,47 @@ async function CheckInstallation() {
 	}
 }
 
-function Notify(title, message, onClick) {
-	if(onClick)
-		browser.notifications.onClicked.addListener((...args) => onClick(...args));
+/**
+ * Opens the options page, which asks for access to all websites, when Snap Links was installed or updated without it (see
+ * ALL_SITES_PERMISSION).  Only then, so a user who later limits Snap Links to some sites is not asked again.
+ *
+ * @return {Promise<void>}
+ */
+async function CheckSitesPermission() {
+	try {
+		if(!await browser.permissions.contains(ALL_SITES_PERMISSION))
+			await browser.runtime.openOptionsPage();
+	} catch(e) {
+		console.error('Error while checking access to websites: ', e);
+	}
+}
 
-	browser.notifications.create('', {
+/** Notification ids, and the page a click on each opens (see onNotificationClicked) */
+const NOTIFICATION_INSTALLED = 'SnapLinksInstalled',
+	NOTIFICATION_UPDATED     = 'SnapLinksUpdated',
+	NotificationPages        = {
+		[NOTIFICATION_INSTALLED]: 'https://cpriest.github.io/SnapLinksPlus/#/Tutorial',
+		[NOTIFICATION_UPDATED]:   'https://cpriest.github.io/SnapLinksPlus/#/Updated',
+	};
+
+/**
+ * Opens the page of the notification clicked.  The id names the page, rather than a listener added along with the
+ * notification, so that a click still works after the event page was unloaded: it wakes the page through this listener.
+ *
+ * @param {string} id
+ */
+function onNotificationClicked(id) {
+	if(NotificationPages[id])
+		browser.tabs.create({ url: NotificationPages[id], active: true });
+}
+
+/**
+ * @param {string} id         One of the NOTIFICATION_* ids
+ * @param {string} title
+ * @param {string} message
+ */
+function Notify(id, title, message) {
+	browser.notifications.create(id, {
 			type:    'basic',
 			title:   title,
 			iconUrl: 'res/SnapLinksLogo32.png',
@@ -399,14 +499,22 @@ function Notify(title, message, onClick) {
 		.then(r => {});
 }
 
+// The event page's listeners: added here, at the top level, so that their events wake a suspended page (see the top of this file)
 browser.runtime.onInstalled.addListener((e) => {
-	Prefs.Ready.then(() => {
+	DOMReady.then(() => {
 		CheckInstallation();
+		if(e.reason == 'install' || e.reason == 'update')
+			CheckSitesPermission();
 	});
 });
+browser.runtime.onMessage.addListener(onMessage);
+browser.notifications.onClicked.addListener(onNotificationClicked);
+
+// Wakes the page when a preference changes, so a new ActivateMouseButton takes effect at once: a page woken by it reads the
+// new value as it starts (below), a page already running hears of it from Prefs.onChanged()
+browser.storage.onChanged.addListener(() => {});
 
 DOMReady.then(() => {
-	browser.runtime.onMessage.addListener(onMessage);
 	Prefs.onChanged(key => {
 		if(key == 'ActivateMouseButton')
 			UpdateContextMenuSetting();

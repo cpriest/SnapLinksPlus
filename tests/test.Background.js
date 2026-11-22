@@ -212,7 +212,7 @@ describe('OpenUrlsInTabs tab properties', () => {
 describe('message handling', () => {
 	const send = (msg) => run('onMessage')(msg, {}, () => {});
 
-	test('registers its message listener once Prefs are ready', () => {
+	test('registers its message listener', () => {
 		expect(browser.runtime.onMessage.addListener).toHaveBeenCalledWith(run('onMessage'));
 	});
 
@@ -254,8 +254,9 @@ describe('message handling', () => {
 		expect(writeText).toHaveBeenCalledWith('[A](http://a/)\n[http://b/](http://b/)');
 	});
 
-	test('RELOAD_EXTENSION detaches the listener and reloads the tab and extension', () => {
+	test('RELOAD_EXTENSION detaches the listener and reloads the tab and extension', async () => {
 		send({ Action: run('RELOAD_EXTENSION') });
+		await flush();
 
 		expect(browser.runtime.onMessage.removeListener).toHaveBeenCalledWith(run('onMessage'));
 		expect(strip.api.reload).toHaveBeenCalledTimes(1);
@@ -265,7 +266,8 @@ describe('message handling', () => {
 
 describe('failed tab opens (#578, #579)', () => {
 	const send    = (urls) => run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: urls }, {}, () => {});
-	const settled = () => run('openUrlsPromiseChain');
+	// Messages are queued once DOMReady resolves, so the chain is read after that
+	const settled = async () => { await run('DOMReady'); return run('openUrlsPromiseChain'); };
 	let errors;
 
 	/** Makes tabs.create() throw for the tabs that fail(props) picks, and create the rest */
@@ -386,6 +388,39 @@ describe('install and update handling', () => {
 		await install({ local: { LastInstalledVersion: '3.1.6', ScrollRate: 20, ActivateMouseButton: 1 } });
 
 		expect(browser.storage.sync.data).toMatchObject({ ScrollRate: 20, ActivateMouseButton: 1, StorageAPI: 'sync', LastInstalledVersion: '3.1.16' });
+	});
+
+	describe('access to all websites (Manifest V3: not granted on an update from a Manifest V2 version)', () => {
+		let allSites;
+
+		/** Fires onInstalled for the reason, with or without access to all websites */
+		const installed = async (reason, granted) => {
+			allSites = granted;
+			browser.permissions               = { contains: jest.fn(async () => allSites) };
+			browser.runtime.openOptionsPage = jest.fn(async () => {});
+			browser.runtime.onInstalled.addListener.mock.calls[0][0]({ reason });
+			await flush();
+		};
+
+		test.each(['install', 'update'])('on %s without it, the options page opens to ask for it', async (reason) => {
+			await installed(reason, false);
+
+			expect(browser.permissions.contains).toHaveBeenCalledWith({ origins: ['<all_urls>'] });
+			expect(browser.runtime.openOptionsPage).toHaveBeenCalledTimes(1);
+		});
+
+		test('with it, nothing opens', async () => {
+			await installed('update', true);
+
+			expect(browser.runtime.openOptionsPage).not.toHaveBeenCalled();
+		});
+
+		test('a browser update does not ask again, the user may have limited Snap Links to some sites', async () => {
+			await installed('browser_update', false);
+
+			expect(browser.permissions.contains).not.toHaveBeenCalled();
+			expect(browser.runtime.openOptionsPage).not.toHaveBeenCalled();
+		});
 	});
 
 	test('upgrading from 3.1.7 or later leaves sync storage alone', async () => {
@@ -513,6 +548,7 @@ describe('OpenUrlsInWindow (#182)', () => {
 
 			run('onMessage')({ Action: run('OPEN_URLS_IN_WINDOW'), tUrls: ['w1'] }, { tab: source }, () => {});
 			run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a1'] }, { tab: source }, () => {});
+			await run('DOMReady');
 			await run('openUrlsPromiseChain');
 
 			expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['a1']);
@@ -655,5 +691,115 @@ describe('BookmarkLinks (#216)', () => {
 		await flush();
 
 		expect(created.map(n => n.url)).toEqual([undefined, 'http://a/']);
+	});
+});
+
+/*
+ * Firefox runs background.js as an event page (Manifest V3): it unloads the page when idle and loads it again for the next
+ * event.  Loading the scripts again into a fresh context, with the same browser, is what that looks like to the code.
+ */
+describe('event page (Manifest V3)', () => {
+	const contextGlobals = { navigator: { clipboard: { writeText: jest.fn() } }, chrome: { runtime: { PlatformOs: { WIN: 'win' } } } };
+
+	/** Loads background.js again with the same browser, as a woken event page, and waits until it is ready */
+	const reload = async ({ storedPrefs = false, ...globals } = {}) => {
+		({ run } = loadScripts(Scripts, browser, { ...contextGlobals, ...globals }));
+		await run('DOMReady');
+		if(!storedPrefs)
+			setPrefs();
+	};
+
+	/** A storage.session stand-in that outlives the page loads of a test, as the real one does */
+	const makeSession = () => {
+		let data = {};
+		return {
+			data,
+			get: jest.fn(async (key) => (key in data ? { [key]: data[key] } : {})),
+			set: jest.fn(async (items) => { Object.assign(data, items); }),
+		};
+	};
+
+	test('adds its listeners while the script runs, before Prefs have loaded, so that their events wake the page', () => {
+		let storageListeners = jest.spyOn(browser.storage.onChanged, 'addListener');
+		for(let event of [browser.runtime.onMessage, browser.runtime.onInstalled, browser.notifications.onClicked])
+			event.addListener.mockClear();
+		browser.storage.local.get = jest.fn(() => new Promise(() => {}));	// Prefs never finish loading
+
+		({ run } = loadScripts(Scripts, browser, contextGlobals));
+
+		expect(browser.runtime.onMessage.addListener).toHaveBeenCalledWith(run('onMessage'));
+		expect(browser.runtime.onInstalled.addListener).toHaveBeenCalledTimes(1);
+		expect(browser.notifications.onClicked.addListener).toHaveBeenCalledWith(run('onNotificationClicked'));
+		expect(storageListeners).toHaveBeenCalledTimes(1);
+	});
+
+	test('a message that wakes the page is carried out once Prefs have loaded, with the stored Prefs', async () => {
+		let release, get = browser.storage.local.get;
+		browser.storage.local.get = jest.fn(key => new Promise(resolve => { release = () => resolve(get(key)); }));
+		Object.assign(browser.storage.sync.data, { OpenTabs: run('TABS_OPEN_END'), NewTabDelayMS: 0 });
+
+		({ run } = loadScripts(Scripts, browser, contextGlobals));
+		run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['u1', 'u2'] }, {}, () => {});
+		await flush();
+
+		expect(strip.api.create).not.toHaveBeenCalled();
+
+		release();
+		await run('DOMReady');
+		await run('openUrlsPromiseChain');
+
+		expect(strip.order()).toEqual(['#1', '#2', '#3', 'u1', 'u2']);	// TABS_OPEN_END, not the default TABS_OPEN_NATURAL
+	});
+
+	test('TABS_OPEN_NATURAL still continues after the tab it last opened when the page was unloaded in between', async () => {
+		browser.storage.session = makeSession();
+		await reload();
+
+		await run('OpenUrlsInTabs')(['u1', 'u2']);
+		await reload();
+		await run('OpenUrlsInTabs')(['u3']);
+
+		expect(strip.order()).toEqual(['#1', '#2', 'u1', 'u2', 'u3', '#3']);
+		expect(browser.storage.session.data).toEqual({ 'TabStack.2': [102, 101, 100] });
+	});
+
+	test('a notification clicked after the page was unloaded still opens its page', async () => {
+		browser.storage.local.data.LastInstalledVersion = '3.1.15';
+		await reload({ storedPrefs: true });
+		browser.runtime.onInstalled.addListener.mock.calls.at(-1)[0]({ reason: 'update' });
+		await flush();
+
+		let [[id]] = browser.notifications.create.mock.calls;
+		await reload();
+		browser.notifications.onClicked.addListener.mock.calls.at(-1)[0](id);
+
+		expect(strip.api.create).toHaveBeenCalledWith({ url: 'https://cpriest.github.io/SnapLinksPlus/#/Updated', active: true });
+	});
+
+	test('a click on a notification that is not ours does nothing', async () => {
+		run('onNotificationClicked')('another-notification');
+
+		expect(strip.api.create).not.toHaveBeenCalled();
+	});
+
+	test('while links are queued to open, an API call every KEEP_AWAKE_MS keeps the page loaded, and stops once they have', async () => {
+		let timers = [], cleared = [];
+		await reload({
+			setInterval:   (fn, ms) => timers.push({ fn, ms }),
+			clearInterval: (id) => cleared.push(id),
+		});
+		let getPlatformInfo = jest.spyOn(browser.runtime, 'getPlatformInfo');
+
+		run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a'] }, {}, () => {});
+		run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['b'] }, {}, () => {});
+		await run('DOMReady');
+
+		expect(timers.map(t => t.ms)).toEqual([run('KEEP_AWAKE_MS')]);	// One timer for the whole queue
+		timers[0].fn();
+		expect(getPlatformInfo).toHaveBeenCalledTimes(1);
+
+		await run('openUrlsPromiseChain');
+		expect(cleared).toEqual([1]);
+		expect(strip.order()).toEqual(['#1', '#2', 'a', 'b', '#3']);
 	});
 });

@@ -25,9 +25,10 @@
 		IMG.Info { cursor: help; margin-left: 5px; }
 		DIV > LABEL { display: inline-block; width: auto; }
 
-		/* Shown when bookmarking is the default action but the permission is missing, eg: the options page opened after a selection */
-		#BookmarkPermission { width: fit-content; margin: 4px 0px 10px; padding: 6px 10px; border: 1px solid #c9a227; border-radius: 4px; background: #fff3cd; color: #3d3000; font-weight: bold; }
-		#BookmarkPermission BUTTON { margin-left: 6px; font-weight: bold; }
+		/* Shown when bookmarking is the default action but the permission is missing, eg: the options page opened after a selection,
+		   and when Snap Links may not run on all websites */
+		#BookmarkPermission, #SitesPermission { width: fit-content; margin: 4px 0px 10px; padding: 6px 10px; border: 1px solid #c9a227; border-radius: 4px; background: #fff3cd; color: #3d3000; font-weight: bold; }
+		#BookmarkPermission BUTTON, #SitesPermission BUTTON { margin-left: 6px; font-weight: bold; }
 
 		/* Wraps onto as many lines as the width needs; a fixed height with column wrap overflowed sideways */
 		DIV.flex-list {
@@ -39,6 +40,11 @@
 	<title>SnapLinks Options</title>
 </head>
 <body>
+
+<p id="SitesPermission" hidden>
+	Snap Links is not allowed to run on all websites, so selecting does nothing on the others:
+	<button id="GrantSitesPermission" type="button">Allow on all websites</button>
+</p>
 
 <label>
 	<span>Select Elements when I hold down</span>

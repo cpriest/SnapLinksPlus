@@ -55,6 +55,7 @@ function createBackgroundTestHarness({
 				onInstalled:     { addListener: jest.fn() },
 				onMessage:       { addListener: listener => messageListeners.push(listener) },
 			},
+			notifications:   { onClicked: { addListener: jest.fn() } },
 		},
 		console: { warn: jest.fn(), error: jest.fn() },
 	});

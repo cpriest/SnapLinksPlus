@@ -71,7 +71,35 @@ class Options {
 				devModeElem.addEventListener('change', UpdateCheckboxState);
 				UpdateCheckboxState();
 			})
-			.then(() => this.SetupBookmarkPermission());
+			.then(() => this.SetupBookmarkPermission())
+			.then(() => this.SetupSitesPermission());
+	}
+
+	/**
+	 * Without access to all websites (see ALL_SITES_PERMISSION) an Allow button is shown, which asks for it.  The note follows
+	 * changes made elsewhere too, eg: in the Permissions tab next to this page in about:addons.
+	 */
+	SetupSitesPermission() {
+		let note   = $('#SitesPermission')[0],
+			button = $('#GrantSitesPermission')[0];
+
+		if(!note || !button || !browser.permissions)
+			return;
+
+		let update = async () => {
+			note.hidden = await browser.permissions.contains(ALL_SITES_PERMISSION);
+		};
+
+		button.addEventListener('click', () => {
+			// Called synchronously in the click handler, so the browser can still see the user's action
+			browser.permissions.request(ALL_SITES_PERMISSION)
+				.then(update)
+				.catch(error => console.error('Snap Links could not request access to websites: ', error));
+		});
+		browser.permissions.onAdded?.addListener(update);
+		browser.permissions.onRemoved?.addListener(update);
+
+		return update();
 	}
 
 	/**
