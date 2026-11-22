@@ -24,8 +24,8 @@ const LMB = 1,	// Left Mouse Button
 const OPEN_LINKS     = 1,	// Open links
 		COPY_LINKS     = 2,	// Copy links
 		OPEN_IN_WINDOW = 3,	// Open links as tabs of a new window
-		OPEN_IN_SEPARATE_WINDOWS = 4;	// Open each link in its own window
-		BOOKMARK_LINKS = 5;	// Bookmark links in a new folder
+		BOOKMARK_LINKS = 4;	// Bookmark links in a new folder
+		OPEN_IN_SEPARATE_WINDOWS = 5;	// Open each link in its own window
 
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest',
