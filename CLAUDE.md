@@ -1,8 +1,8 @@
 # CLAUDE.md
 
-Snap Links Plus: a WebExtension, Manifest V3 for Firefox (primary) and Manifest V2 for Chrome (secondary). The user drags a lasso with a mouse button (default RMB); links, checkboxes, radio buttons and clickable elements inside it are highlighted, then acted on (open in tabs, copy, toggle, click).
+Snap Links Plus: a Manifest V3 WebExtension (Firefox primary, Chrome secondary). The user drags a lasso with a mouse button (default RMB); links, checkboxes, radio buttons and clickable elements inside it are highlighted, then acted on (open in tabs, copy, toggle, click).
 
-**Status: maintenance mode.** Inherited project. Prefer small, surgical bug fixes over refactors or new features. Do not "modernize" (modules, bundlers, a Chrome MV3 service worker) unless asked.
+**Status: maintenance mode.** Inherited project. Prefer small, surgical bug fixes over refactors or new features. Do not "modernize" (modules, bundlers) unless asked.
 
 ## Commands
 
@@ -39,9 +39,9 @@ Version lives only in `package.json`. Chrome gets a derived 4-part `version`. Th
 
 `browser-polyfill` (Chrome) → `StoragePrefs` → `CSP` → `globals` → `[DevBuild]` → `Utility` → `SelectionRect` → `ElementIndexer` → `SvgOverlay` → `CategorizedCollection` → `ActionMgr` → `EventHandler`
 
-Background page: polyfill (Chrome) → `StoragePrefs` → `globals` → `[DevBuild]` → `background.js`. The background reuses `globals.js` for constants and `Prefs`.
+Background: `StoragePrefs` → `globals` → `[DevBuild]` → `background.js`. Firefox lists them in the manifest (an event page); Chrome's service worker `service-worker.js` loads the polyfill and then the same files with `importScripts()`, so keep both lists in step. The background reuses `globals.js` for constants and `Prefs`.
 
-In Firefox (MV3) the background is an **event page**: Firefox unloads it after 30 s idle (`extensions.background.idle.timeout`) and loads it again for the next event, which clears every variable. Add listeners at the top level of `background.js`, never in a promise callback (Firefox only keeps listeners added while the script first runs, and only those wake the page). The waking event arrives before `Prefs` load, so handlers wait for `DOMReady`. State that must outlive the page goes to storage (`TabStacks` uses `storage.session`). Any extension API call resets the idle timer; `QueueOpen` keeps the page awake while links are queued. Test with `extensions.background.idle.timeout` lowered, or `terminateBackground()` from the Browser Console.
+The background is a Firefox **event page** and a Chrome **service worker**: both browsers unload it after 30 s idle (Firefox: `extensions.background.idle.timeout`) and load it again for the next event, which clears every variable. Add listeners at the top level of `background.js`, never in a promise callback (Firefox only keeps listeners added while the script first runs, and only those wake the page). The waking event arrives before `Prefs` load, so handlers wait for `DOMReady`. State that must outlive the page goes to storage (`TabStacks` uses `storage.session`). Any extension API call resets the idle timer; `QueueOpen` keeps the page awake while links are queued. Test with `extensions.background.idle.timeout` lowered, or `terminateBackground()` from the Browser Console. Chrome's worker has no DOM: `globals.js` must not touch `document`/`window` at load (`docElem` is undefined there), and copying goes through an offscreen document (`WriteToClipboard()`, `src/lib/Offscreen.js`).
 
 ### Drag lifecycle (`src/content-scripts/EventHandler.js`)
 
