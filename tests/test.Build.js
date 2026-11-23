@@ -28,7 +28,8 @@ describe.each(Targets)('build/%s', (target) => {
 	const manifest = () => readManifest(target);
 
 	test('manifest.json is valid and carries the package version', () => {
-		expect(manifest().manifest_version).toBe(2);
+		// Firefox is on Manifest V3, Chrome stays on V2 until its background moves to a service worker (CONTEXT-GRAPH.md)
+		expect(manifest().manifest_version).toBe(target === 'ff' ? 3 : 2);
 		expect(target === 'ff' ? manifest().version : manifest().version_name).toBe(Package.version);
 	});
 
@@ -84,4 +85,59 @@ test('Firefox manifest declares the gecko id and data collection policy', () => 
 
 	expect(gecko.id).toBe('snaplinks@snaplinks.mozdev.org');
 	expect(gecko.data_collection_permissions).toEqual({ required: ['none'] });
+});
+
+describe('Firefox Manifest V3', () => {
+	const ff = () => readManifest('ff');
+
+	test('the background scripts run as an event page: no persistent flag, no service worker', () => {
+		let bg = ff().background;
+
+		expect(bg.scripts.length).toBeGreaterThan(0);
+		expect(bg).not.toHaveProperty('persistent');
+		expect(bg).not.toHaveProperty('service_worker');
+		expect(bg).not.toHaveProperty('page');
+	});
+
+	test('has no keys that Manifest V3 removed or reshaped', () => {
+		let m = ff();
+
+		for(let key of ['browser_action', 'page_action', 'applications'])
+			expect(m).not.toHaveProperty(key);
+		expect(m.options_ui).toEqual({ page: 'src/html/options.html' });	// chrome_style and browser_style are Manifest V2 only
+		if('content_security_policy' in m)
+			expect(typeof m.content_security_policy).toBe('object');
+		if('web_accessible_resources' in m)
+			expect(m.web_accessible_resources.every(war => typeof war === 'object')).toBe(true);
+	});
+
+	test('asks for the same API permissions as before, and for sites only through its content scripts', () => {
+		let m = ff();
+
+		expect(m.permissions).toEqual(['cookies', 'storage', 'notifications', 'clipboardWrite', 'browserSettings']);
+		expect(m.optional_permissions).toEqual(['bookmarks']);
+		expect(m).not.toHaveProperty('host_permissions');
+		expect(m).not.toHaveProperty('optional_host_permissions');
+		expect(m.content_scripts.map(cs => cs.matches)).toEqual([['<all_urls>']]);
+	});
+});
+
+test('the Chrome manifest stays on Manifest V2 with its Chrome-only options', () => {
+	let m = readManifest('chrome');
+
+	expect(m.manifest_version).toBe(2);
+	expect(m.options_ui).toEqual({ page: 'src/html/options.html', chrome_style: true });
+	expect(m.background).not.toHaveProperty('service_worker');
+});
+
+test.each(Targets)('build/%s scripts evaluate no strings as code (blocked by the Manifest V3 content security policy)', (target) => {
+	const scripts = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap(e =>
+		e.isDirectory() ? scripts(path.join(dir, e.name)) : e.name.endsWith('.js') ? [path.join(dir, e.name)] : []);
+
+	let offenders = scripts(path.join(Root, 'build', target, 'src'))
+		.filter(file => !file.endsWith('browser-polyfill.js'))
+		.filter(file => /\bnew Function\s*\(|\beval\s*\(/.test(fs.readFileSync(file, 'utf8')))
+		.map(file => path.relative(Root, file));
+
+	expect(offenders).toEqual([]);
 });

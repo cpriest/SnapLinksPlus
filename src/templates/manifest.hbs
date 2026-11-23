@@ -1,5 +1,10 @@
 {
+{{#Firefox}}	{{! The background scripts run as an event page: Firefox suspends it when idle, see CONTEXT-GRAPH.md }}
+	"manifest_version":			3,
+{{/Firefox}}
+{{#Chrome}}		{{! Chrome needs a service worker for Manifest V3, a separate migration, see CONTEXT-GRAPH.md }}
 	"manifest_version":			2,
+{{/Chrome}}
 	"name":						"{{package.FullName}}",
 {{#Firefox}}        {{! Needs 1.2.3-beta1 or 1.2.3 format }}
 	"version":                "{{package.version}}",
@@ -116,7 +121,12 @@
 		}
 	],
 	"options_ui":             {
+{{#Firefox}}
+		"page":			"src/html/options.html"
+{{/Firefox}}
+{{#Chrome}}
 		"page":			"src/html/options.html",
 		"chrome_style": true
+{{/Chrome}}
 	}
 }

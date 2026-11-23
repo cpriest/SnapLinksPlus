@@ -285,3 +285,49 @@ describe('bookmarks permission (#216)', () => {
 	});
 
 });
+
+describe('access to all websites (Manifest V3)', () => {
+	let allSites, onAdded;
+	const permissions = () => ({
+		contains: jest.fn(async (perm) => (perm.origins ? allSites : true)),
+		request:  jest.fn(async () => (allSites = true)),
+		onAdded:  { addListener: (fn) => { onAdded = fn; } },
+		onRemoved: { addListener: jest.fn() },
+	});
+	const settle = async () => { for(let i = 0; i < 5; i++) await Promise.resolve(); };
+
+	test('no note while Snap Links may run on all websites', async () => {
+		allSites = true;
+		await load({}, { permissions: permissions() });
+		await settle();
+
+		expect(browser.permissions.contains).toHaveBeenCalledWith({ origins: ['<all_urls>'] });
+		expect(el('SitesPermission').hidden).toBe(true);
+	});
+
+	test('without it, the Allow button asks for it and the note goes away once granted', async () => {
+		allSites = false;
+		await load({}, { permissions: permissions() });
+		await settle();
+
+		expect(el('SitesPermission').hidden).toBe(false);
+
+		el('GrantSitesPermission').click();
+		await settle();
+
+		expect(browser.permissions.request).toHaveBeenCalledWith({ origins: ['<all_urls>'] });
+		expect(el('SitesPermission').hidden).toBe(true);
+	});
+
+	test('the note follows a permission granted elsewhere (eg: about:addons)', async () => {
+		allSites = false;
+		await load({}, { permissions: permissions() });
+		await settle();
+
+		allSites = true;
+		onAdded({ origins: ['<all_urls>'] });
+		await settle();
+
+		expect(el('SitesPermission').hidden).toBe(true);
+	});
+});

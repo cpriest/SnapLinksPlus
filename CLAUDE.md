@@ -1,8 +1,8 @@
 # CLAUDE.md
 
-Snap Links Plus: a Manifest V2 WebExtension (Firefox primary, Chrome secondary). The user drags a lasso with a mouse button (default RMB); links, checkboxes, radio buttons and clickable elements inside it are highlighted, then acted on (open in tabs, copy, toggle, click).
+Snap Links Plus: a WebExtension, Manifest V3 for Firefox (primary) and Manifest V2 for Chrome (secondary). The user drags a lasso with a mouse button (default RMB); links, checkboxes, radio buttons and clickable elements inside it are highlighted, then acted on (open in tabs, copy, toggle, click).
 
-**Status: maintenance mode.** Inherited project. Prefer small, surgical bug fixes over refactors or new features. Do not "modernize" (MV3, modules, bundlers) unless asked.
+**Status: maintenance mode.** Inherited project. Prefer small, surgical bug fixes over refactors or new features. Do not "modernize" (modules, bundlers, a Chrome MV3 service worker) unless asked.
 
 ## Commands
 
@@ -41,6 +41,8 @@ Version lives only in `package.json`. Chrome gets a derived 4-part `version`. Th
 
 Background page: polyfill (Chrome) → `StoragePrefs` → `globals` → `[DevBuild]` → `background.js`. The background reuses `globals.js` for constants and `Prefs`.
 
+In Firefox (MV3) the background is an **event page**: Firefox unloads it after 30 s idle (`extensions.background.idle.timeout`) and loads it again for the next event, which clears every variable. Add listeners at the top level of `background.js`, never in a promise callback (Firefox only keeps listeners added while the script first runs, and only those wake the page). The waking event arrives before `Prefs` load, so handlers wait for `DOMReady`. State that must outlive the page goes to storage (`TabStacks` uses `storage.session`). Any extension API call resets the idle timer; `QueueOpen` keeps the page awake while links are queued. `run-ff` lowers `extensions.background.idle.timeout` to 5 s so unloads happen while testing; `terminateBackground()` in the Browser Console forces one. Each start re-applies the #400 context-menu setting, so `UpdateContextMenuSetting` writes it only when it differs.
+
 ### Drag lifecycle (`src/content-scripts/EventHandler.js`)
 
 1. `mousedown` (capture) matches `Prefs.ActivateModifiers` + `ActivateMouseButton` → `BeginDrag`. `FirstInit` lazily builds `ActionMgr`, `RectMapper` (`ElemDocRects`), `ElementIndexer`, `SvgOverlayMgr`, `SelectionRect`.
@@ -63,7 +65,7 @@ Background page: polyfill (Chrome) → `StoragePrefs` → `globals` → `[DevBui
 | `ActionMgr.js` | Acts on the greatest category. Links go to background via `runtime.sendMessage`. |
 | `SelectionRect.js` | `Rect`/`DocRect` geometry and the lasso DOM (`DIV.SnapLinksContainer`, counter label). |
 | `SvgOverlay.js` | SVG highlight layer; styles come from `Prefs.HighlightStyles_*`. |
-| `background.js` | Messages: `OpenUrlsInTabs` (serialized on a promise chain; `TABS_OPEN_*` placement), `CopyToClipboard`, `ReloadExtension` (dev), context-menu timing and drag-recovery state (#400), install/update notifications, storage migration at 3.1.7. |
+| `background.js` | Messages: `OpenUrlsInTabs` (serialized on a promise chain; `TABS_OPEN_*` placement), `CopyToClipboard`, `ReloadExtension` (dev), context-menu timing and drag-recovery state (#400), install/update notifications (fixed ids, clicks handled by a top-level listener), the all-sites permission check on install/update (MV3), storage migration at 3.1.7. |
 | `src/lib/Options.js`, `src/html/options.html` | Options page, driven by `DefaultPrefs` keys. |
 
 ### Preferences
@@ -96,6 +98,7 @@ Add a setting by putting a default in `DefaultPrefs` (`globals.js`), then a cont
 
 ## Gotchas
 
+- MV3 applies the extension's content security policy to content scripts too: no `eval`/`new Function` anywhere (`test.Build.js` checks the build). Firefox treats MV3 host access (the content scripts' `<all_urls>`) as revocable by the user (an MV2 → MV3 update keeps it, see `CONTEXT-GRAPH.md`): `ALL_SITES_PERMISSION`, the options page note and `CheckSitesPermission()` handle a withdrawn one.
 - Runs in **every frame** of every page; be wary of anything heavy at load, and of global name collisions with page scripts (content scripts share an isolated world, but the extension's own files share one scope).
 - Obscured-element detection samples only the rect midpoint; partly covered elements can be mis-classified (known idea in `DevNotes.md`).
 - Gulp 5 pitfalls (both bit 3.1.16): `gulp.src` needs `{ encoding: false }` or it corrupts PNGs, and a positive glob listed after a `!negation` gets base `.` (options.html landed in `src/src/html/`). Keep positive globs first. `test.Build.js` guards both.

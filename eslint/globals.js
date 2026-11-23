@@ -57,6 +57,7 @@ module.exports = {
 		'OPEN_IN_SEPARATE_WINDOWS': 'readonly',
 		'BOOKMARK_LINKS':          'readonly',
 		'BOOKMARKS_PERMISSION':    'readonly',
+		'ALL_SITES_PERMISSION':    'readonly',
 		'isChrome':                'readonly',
 		'isFirefox':               'readonly',
 		'DragRectChanged':         'readonly',

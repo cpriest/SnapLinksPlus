@@ -275,6 +275,8 @@ function createFrameMessageRouter() {
 				onMessage:       { addListener: listener => backgroundListeners.push(listener) },
 				onInstalled:     { addListener: jest.fn() },
 			},
+			notifications: { onClicked: { addListener: jest.fn() } },
+			storage:       { onChanged: { addListener: jest.fn() } },
 			tabs: {
 				sendMessage: jest.fn(async (tabId, message) => {
 					for(const frame of frames)

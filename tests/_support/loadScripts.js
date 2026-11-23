@@ -55,11 +55,13 @@ function makeBrowser({ local, sync } = {}) {
  * @param {string[]} files             Files relative to src/, in load order
  * @param {object}   [browser]         The browser mock to expose, defaults to an empty makeBrowser()
  * @param {object}   [globals]         Extra globals for the context (eg: navigator, chrome), or overrides such as location
+ * @param {object}   [contextOptions]  Options for vm.createContext(), eg: { codeGeneration: { strings: false } } makes eval() and
+ *                                     new Function() throw, as the Manifest V3 content security policy does
  *
  * @return {{ctx: object, run: function(string): *, browser: object}}
  *      run() evaluates an expression in the context, which is how top-level let/class bindings are reached.
  */
-function loadScripts(files, browser = makeBrowser(), globals = {}) {
+function loadScripts(files, browser = makeBrowser(), globals = {}, contextOptions = {}) {
 	let ctx = vm.createContext({
 		browser,
 		document: { documentElement: {}, readyState: 'complete', addEventListener() {} },
@@ -70,7 +72,7 @@ function loadScripts(files, browser = makeBrowser(), globals = {}) {
 		setInterval,
 		clearInterval,
 		...globals,
-	});
+	}, contextOptions);
 
 	// Created inside the context, globals.js adds methods to Function.prototype and console that must live in that realm
 	vm.runInContext('console = { log() {}, info() {}, warn() {}, error() {} };', ctx);
