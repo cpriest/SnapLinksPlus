@@ -16,8 +16,9 @@ let openUrlsPromiseChain = Promise.resolve();
 let queuedOpens = 0,
 	keepAwakeTimer;
 
-/** How often an API call keeps the event page loaded while links are still opening, see QueueOpen() */
-const KEEP_AWAKE_MS = 10000;
+/** How often an API call keeps the event page loaded while links are still opening, see QueueOpen().  Shorter than the
+ *  shortest idle timeout: 30 s by default, 5 s in the run-ff profile */
+const KEEP_AWAKE_MS = 2000;
 
 /**
  * For TABS_OPEN_NATURAL: the ids of the tabs each tab has opened, the latest first.  Kept in storage.session (cleared when the
