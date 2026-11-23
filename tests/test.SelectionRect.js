@@ -168,12 +168,8 @@ describe('DOM lifecycle', () => {
 
 describe('site CSS resets (#567)', () => {
 	test('a `background-color: inherit` reset does not paint the selection rect opaque', () => {
-		// notepad-plus-plus.org resets every element with `background-color: inherit`,
-		// so without an explicit transparent background the rect inherits the page
-		// background (#fefefe) and hides the website under the lasso.
-		// The site style goes in first: in a real browser the extension's class rules
-		// win on specificity; jsdom resolves ties by order, so the extension style
-		// (appended by the constructor below) must come after it for the same outcome.
+		// notepad-plus-plus.org resets every element to `background-color: inherit`, so the rect inherited the opaque page background.
+		// The site style goes first so that, in jsdom as in a browser, the extension's rules win.
 		let siteStyle = document.createElement('style');
 		siteStyle.textContent = 'html { background-color: #fefefe; } *, *::before, *::after { background-color: inherit; }';
 		document.head.appendChild(siteStyle);
@@ -183,5 +179,7 @@ describe('site CSS resets (#567)', () => {
 
 		expect(getComputedStyle(second.elRect).backgroundColor).toBe('rgba(0, 0, 0, 0)');
 		expect(getComputedStyle(second.elContainer).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+
+		siteStyle.remove();
 	});
 });
