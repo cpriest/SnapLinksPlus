@@ -20,7 +20,7 @@ git tag v3.1.17
 git push origin v3.1.17
 ```
 
-Then watch **Actions > Release**. To run a release again for an existing tag (eg: after fixing store credentials), use **Run workflow** and enter the tag.
+Then watch **Actions > Release**. To run a release again for an existing tag (eg: after fixing store credentials), use **Run workflow** and choose the tag (not a branch) under **Use workflow from**. The `release` environment only lets a run started from a `v*` tag read its secrets, so a run started from `master` stops at once.
 
 `gulp publish` (signing from your machine with `insecure/Firefox/api-key.json`) still works. Use one or the other for a version, not both: AMO refuses a version it already has.
 
@@ -31,21 +31,25 @@ Then watch **Actions > Release**. To run a release again for an existing tag (eg
 **Settings > Environments > New environment**, name it `release`.
 
 - **Deployment branches and tags**: choose *Selected branches and tags* and add the tag rule `v*`. Only workflows started by a tag can then read its secrets. A pull request's workflow cannot.
-- Optional: **Required reviewers** with yourself, if every store upload should wait for your click.
+- **Required reviewers**: add yourself, so every store job waits for your approval. A run uses the `release.yml` of the tagged commit, so its own checks (eg: that the tag is on `master`) only hold for a workflow file you have reviewed. The approval is what keeps the secrets from a tag pushed by anyone else.
+
+### 2. Protect the version tags
+
+**Settings > Rules > Rulesets > New tag ruleset**: target `v*` tags, add **Repository admin** to the bypass list, and turn on **Restrict creations**, **Restrict updates** and **Restrict deletions**. Only admins can then push, move or delete a version tag, which is what starts a release.
 
 Add the secrets below to this environment (**Environment secrets**), not to the repository. Add the variables as **Repository variables** (**Settings > Secrets and variables > Actions > Variables**).
 
-### 2. addons.mozilla.org (Firefox)
+### 3. addons.mozilla.org (Firefox)
 
 1. Sign in at <https://addons.mozilla.org/developers/addon/api/key/> with the account that owns Snap Links and generate credentials.
 2. Environment secrets:
    - `AMO_JWT_ISSUER`: the **JWT issuer** (looks like `user:12345:67`)
    - `AMO_JWT_SECRET`: the **JWT secret**
-3. Repository variable `AMO_PUBLISH` = `true`.
+3. Repository variable `PUBLISH_TO_AMO` = `true`.
 
 These are the same two values as `insecure/Firefox/api-key.json` (`jwt_issuer`, `jwt_secret`).
 
-### 3. Chrome Web Store (once the Chrome build is Manifest V3)
+### 4. Chrome Web Store (once the Chrome build is Manifest V3)
 
 The Chrome Web Store API cannot create an item; the listing must exist. If the old listing was removed, create the item and upload the first MV3 version by hand in the [Developer Dashboard](https://chrome.google.com/webstore/devconsole). The workflow publishes the versions after that.
 
@@ -56,11 +60,11 @@ The Chrome Web Store API cannot create an item; the listing must exist. If the o
 5. Repository variables:
    - `CWS_PUBLISHER_ID`: from the Developer Dashboard, **Account** section
    - `CWS_EXTENSION_ID`: the item's 32-letter id
-   - `CWS_PUBLISH` = `true`
+   - `PUBLISH_TO_CWS` = `true`
 
 A refresh token of an OAuth app whose consent screen is in *Testing* status expires after 7 days. Set the consent screen to **In production**, or create a new token before each release. An alternative without a long-lived token is a [service account](https://developer.chrome.com/docs/webstore/service-accounts), which the API's V2 supports.
 
-### 4. Microsoft Edge Add-ons (once the Chrome build is Manifest V3)
+### 5. Microsoft Edge Add-ons (once the Chrome build is Manifest V3)
 
 Like the Chrome Web Store, the API updates an existing product only: submit the first version in [Partner Center](https://partner.microsoft.com/dashboard/microsoftedge/overview).
 
@@ -70,7 +74,7 @@ Like the Chrome Web Store, the API updates an existing product only: submit the 
    - `EDGE_API_KEY`: a new **API key**. It expires after 72 days; make a new one before then.
 3. Repository variables:
    - `EDGE_PRODUCT_ID`: the product's id from its overview page (the GUID in the address bar; not the Store ID)
-   - `EDGE_PUBLISH` = `true`
+   - `PUBLISH_TO_EDGE` = `true`
 
 ## Trying it first
 
