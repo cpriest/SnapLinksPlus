@@ -88,6 +88,8 @@ const DefaultPrefs = {
 
 	DisableFontWeightFiltering: false,
 
+	SmartDuplicateDetection: false,	// Treat links that lead to the same page (eg: differ only by #fragment or utm_* parameters) as duplicates
+
 	SetOwnershipTabID_FF: false,	// Whether or not to set tab.openerTabId in Firefox on tab creation
 
 	NewTabDelayMS: 50,	// The delay in ms between new tabs being opened

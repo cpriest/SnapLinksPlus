@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Links to the same page (#583, SmartDuplicateDetection)</title>
+	<style>body { font: 16px sans-serif; margin: 20px; } li { margin: 8px 0; }</style>
+</head>
+<body>
+<p>Lasso all of the links. With "Treat links to the same page as duplicates" off: 8 links. With it on: 3 links (x, y, z).</p>
+<ul>
+	<li><a href="https://example.com/x?utm_source=feed">x?utm_source=feed</a></li>
+	<li><a href="https://example.com/x#comments">x#comments</a></li>
+	<li><a href="http://www.example.com/x/">http://www.example.com/x/</a></li>
+	<li><a href="https://example.com/x?fbclid=abc">x?fbclid=abc</a></li>
+	<li><a href="https://example.com/y">y</a></li>
+	<li><a href="https://example.com/z?b=2&amp;a=1">z?b=2&amp;a=1</a></li>
+	<li><a href="https://example.com/z?a=1&amp;b=2">z?a=1&amp;b=2</a></li>
+	<li><a href="https://example.com/z?a=1&amp;b=2#top">z?a=1&amp;b=2#top</a></li>
+</ul>
+</body>
+</html>

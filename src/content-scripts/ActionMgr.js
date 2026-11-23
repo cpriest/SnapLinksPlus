@@ -13,13 +13,6 @@ class ActionMgr {
 		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
 			return console.log('Skipped Copying Links: %o', links);
 
-		// The first element with each URL names it
-		let titles = new Map();
-		for(let elem of Elements) {
-			if(!titles.has(elem.href))
-				titles.set(elem.href, this.LinkTitle(elem));
-		}
-
 		browser.runtime.sendMessage({
 			Action:  COPY_TO_CLIPBOARD,
 			tUrls:   links,
@@ -190,14 +183,9 @@ class ActionMgr {
 
 		switch(SelectedElements.GreatestType) {
 			case CT_LINKS:
-				// Remove duplicates by HREF
-				let links = Array.from(
-					new Set(
-						SelectedElements
-							.Links
-							.map(elem => elem.href)
-					)
-				);
+				// Remove links to the same page
+				let links = UniqueLinks(SelectedElements.Links)
+					.map(elem => elem.href);
 
 				let reverse = Boolean(Prefs.ReverseLinkOrder);
 
