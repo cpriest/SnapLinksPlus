@@ -1,0 +1,294 @@
+name: Release
+
+# Publishes a version.  To release: set "version" in package.json, commit it to master, then
+# push a tag of the same version (git tag v3.1.17 && git push origin v3.1.17).  Setup, and what
+# each store needs, is in docs/Releasing.md.
+#
+#   build             checks the tag, lints, tests, builds and packages both builds
+#   github-release    a GitHub Release with both zips (always)
+#   amo               submits the Firefox build to addons.mozilla.org, listed channel
+#   chrome-web-store  uploads and publishes the Chrome build    } only once the Chrome build is
+#   edge-add-ons      uploads and publishes it to Edge Add-ons  } Manifest V3, see below
+#
+# A store job runs only when its repository variable is "true" (PUBLISH_TO_AMO, PUBLISH_TO_CWS,
+# PUBLISH_TO_EDGE), so a fork, or a store not set up yet, never fails the release.  Each store
+# job is independent: one store failing leaves the others and the GitHub Release alone, and
+# the job can be re-run on its own from the run's page.
+#
+# The Chrome Web Store and Edge Add-ons accept Manifest V3 packages only (Chrome removed V2 in
+# Chrome 139).  Their jobs check the built manifest and skip with a notice while it is V2.
+#
+# Store credentials are secrets of the "release" environment, which only v* tags may use
+# (Settings > Environments > release > Deployment branches and tags): a workflow on a branch,
+# eg: a pull request's, cannot read them.  The environment checks the ref the run started from,
+# so to run a release again by hand, choose the tag (not a branch) under "Use workflow from".
+
+on:
+  push:
+    tags: [ 'v*.*.*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One run per tag at a time; a second waits instead of racing the first to the stores.
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  RELEASE_TAG: ${{ github.ref_name }}
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      package-version:         ${{ steps.version_check.outputs.package_version }}
+      chrome-manifest-version: ${{ steps.chrome_manifest.outputs.manifest_version }}
+
+    steps:
+      - name: Check the run was started from a tag
+        run: |
+          if [ "$GITHUB_REF_TYPE" != "tag" ]; then
+            echo "::error::Started from the branch $RELEASE_TAG. Choose the tag to release under 'Use workflow from'."
+            exit 1
+          fi
+
+      # The whole history, so the tag can be checked to be on master
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      # No dependency cache: other workflows' runs write it, and this build is what the stores receive
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.x
+          package-manager-cache: false
+
+      # A tag that disagrees with package.json would publish a package under the wrong version
+      - name: Check the tag matches package.json and is on master
+        id: version_check
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          if [ "${RELEASE_TAG#v}" != "$PACKAGE_VERSION" ]; then
+            echo "::error::Tag $RELEASE_TAG does not match package.json version $PACKAGE_VERSION. Set the version, commit, then tag that commit."
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor HEAD "refs/remotes/origin/$DEFAULT_BRANCH"; then
+            echo "::error::$RELEASE_TAG is not on $DEFAULT_BRANCH. A release is made from a commit of $DEFAULT_BRANCH only."
+            exit 1
+          fi
+          echo "package_version=$PACKAGE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Install, lint, test and build
+        run: |
+          npm ci
+          npm run lint
+          npm test
+          npm run build
+          npx web-ext lint --source-dir build/ff
+
+      - name: Package both builds
+        run: npx gulp package
+
+      - name: Read the Chrome manifest version
+        id: chrome_manifest
+        run: echo "manifest_version=$(node -p "require('./build/chrome/manifest.json').manifest_version")" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-zips
+          path: artifacts/**/*.zip
+          if-no-files-found: error
+
+      # web-ext sign submits a source directory, not a zip
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: firefox-build
+          path: build/ff
+          if-no-files-found: error
+
+  github-release:
+    name: GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write     # creates the release and uploads its files
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-zips
+          path: release-zips
+
+      # Run again for a tag that has a release, it replaces that release's files
+      - name: Publish the GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mv release-zips/ff/*.zip     "release-zips/snaplinks-$RELEASE_TAG-firefox.zip"
+          mv release-zips/chrome/*.zip "release-zips/snaplinks-$RELEASE_TAG-chrome.zip"
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release-zips/*.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$RELEASE_TAG" release-zips/*.zip --repo "$GITHUB_REPOSITORY" --title "Snap Links $RELEASE_TAG" --generate-notes --verify-tag
+          fi
+
+  amo:
+    name: addons.mozilla.org
+    needs: build
+    if: vars.PUBLISH_TO_AMO == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ env.RELEASE_TAG }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.x
+          package-manager-cache: false
+
+      # For the package-lock's web-ext.  No install scripts: the secrets reach the signing step, which runs
+      # code from node_modules, so no dependency may run code of its own here.
+      - run: npm ci --ignore-scripts
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: firefox-build
+          path: firefox-build
+
+      # Listed: AMO reviews the version and then offers it to every user as an update.
+      # --approval-timeout 0 returns once AMO has accepted the upload, the review can take hours to days.
+      - name: Submit to addons.mozilla.org
+        env:
+          WEB_EXT_API_KEY:    ${{ secrets.AMO_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          npx web-ext sign --source-dir firefox-build --artifacts-dir web-ext-artifacts \
+            --channel listed --approval-timeout 0
+
+  chrome-web-store:
+    name: Chrome Web Store
+    needs: build
+    if: vars.PUBLISH_TO_CWS == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: release
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        if: needs.build.outputs.chrome-manifest-version == '3'
+        with:
+          name: release-zips
+          path: release-zips
+
+      # Chrome Web Store API V2: https://developer.chrome.com/docs/webstore/using-api
+      - name: Upload and publish to the Chrome Web Store
+        env:
+          CHROME_MANIFEST_VERSION: ${{ needs.build.outputs.chrome-manifest-version }}
+          CWS_CLIENT_ID:           ${{ secrets.CWS_CLIENT_ID }}
+          CWS_CLIENT_SECRET:       ${{ secrets.CWS_CLIENT_SECRET }}
+          CWS_REFRESH_TOKEN:       ${{ secrets.CWS_REFRESH_TOKEN }}
+          CWS_PUBLISHER_ID:        ${{ vars.CWS_PUBLISHER_ID }}
+          CWS_EXTENSION_ID:        ${{ vars.CWS_EXTENSION_ID }}
+        run: |
+          set -euo pipefail
+          if [ "$CHROME_MANIFEST_VERSION" != "3" ]; then
+            echo "::notice::The Chrome build is Manifest V$CHROME_MANIFEST_VERSION, which the Chrome Web Store no longer accepts. Skipped."
+            exit 0
+          fi
+          # jq -e fails the step when the response has no access_token, eg: an expired refresh token
+          CWS_ACCESS_TOKEN=$(curl -sSf https://oauth2.googleapis.com/token \
+            --data-urlencode "client_id=$CWS_CLIENT_ID" --data-urlencode "client_secret=$CWS_CLIENT_SECRET" \
+            --data-urlencode "refresh_token=$CWS_REFRESH_TOKEN" --data-urlencode "grant_type=refresh_token" | jq -er .access_token)
+          echo "::add-mask::$CWS_ACCESS_TOKEN"
+          CWS_ITEM_URL="https://chromewebstore.googleapis.com/v2/publishers/$CWS_PUBLISHER_ID/items/$CWS_EXTENSION_ID"
+
+          CWS_UPLOAD_RESPONSE=$(curl -sS -H "Authorization: Bearer $CWS_ACCESS_TOKEN" -X POST -T release-zips/chrome/*.zip \
+            "https://chromewebstore.googleapis.com/upload/v2/publishers/$CWS_PUBLISHER_ID/items/$CWS_EXTENSION_ID:upload")
+          echo "upload: $CWS_UPLOAD_RESPONSE"
+          CWS_UPLOAD_STATE=$(jq -r '.uploadState // empty' <<< "$CWS_UPLOAD_RESPONSE")
+          for _ in $(seq 1 30); do
+            [ "$CWS_UPLOAD_STATE" = "IN_PROGRESS" ] || break
+            sleep 10
+            CWS_UPLOAD_STATE=$(curl -sS -H "Authorization: Bearer $CWS_ACCESS_TOKEN" "$CWS_ITEM_URL:fetchStatus" | jq -r '.lastAsyncUploadState // empty')
+          done
+          if [ "$CWS_UPLOAD_STATE" != "SUCCEEDED" ]; then
+            echo "::error::The upload did not succeed (state: ${CWS_UPLOAD_STATE:-none})."
+            exit 1
+          fi
+
+          CWS_PUBLISH_RESPONSE=$(curl -sS -H "Authorization: Bearer $CWS_ACCESS_TOKEN" -X POST "$CWS_ITEM_URL:publish")
+          echo "publish: $CWS_PUBLISH_RESPONSE"
+          case "$(jq -r '.state // empty' <<< "$CWS_PUBLISH_RESPONSE")" in
+            PENDING_REVIEW|STAGED|PUBLISHED|PUBLISHED_TO_TESTERS) ;;
+            *) echo "::error::The Chrome Web Store did not accept the submission."; exit 1 ;;
+          esac
+
+  edge-add-ons:
+    name: Microsoft Edge Add-ons
+    needs: build
+    if: vars.PUBLISH_TO_EDGE == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: release
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        if: needs.build.outputs.chrome-manifest-version == '3'
+        with:
+          name: release-zips
+          path: release-zips
+
+      # Edge Add-ons Update REST API v1.1:
+      # https://learn.microsoft.com/microsoft-edge/extensions/update/api/using-addons-api
+      - name: Upload and publish to Microsoft Edge Add-ons
+        env:
+          CHROME_MANIFEST_VERSION: ${{ needs.build.outputs.chrome-manifest-version }}
+          EDGE_CLIENT_ID:          ${{ secrets.EDGE_CLIENT_ID }}
+          EDGE_API_KEY:            ${{ secrets.EDGE_API_KEY }}
+          EDGE_PRODUCT_ID:         ${{ vars.EDGE_PRODUCT_ID }}
+        run: |
+          set -euo pipefail
+          if [ "$CHROME_MANIFEST_VERSION" != "3" ]; then
+            echo "::notice::The Chrome build is Manifest V$CHROME_MANIFEST_VERSION, which Edge Add-ons no longer accepts. Skipped."
+            exit 0
+          fi
+          EDGE_SUBMISSIONS_URL="https://api.addons.microsoftedge.microsoft.com/v1/products/$EDGE_PRODUCT_ID/submissions"
+          EDGE_AUTH_HEADERS=(-H "Authorization: ApiKey $EDGE_API_KEY" -H "X-ClientID: $EDGE_CLIENT_ID")
+
+          # The operation id from the Location header of a 202 response (the docs show a bare id; a path is cut to its end)
+          operation_id_from_headers() { sed -n 's/^[Ll]ocation: *//p' | tr -d '\r' | sed 's|.*/||'; }
+
+          # Polls an operation until it succeeds, fails or times out
+          wait_for_operation() {
+            local OPERATION_URL=$1 OPERATION_RESPONSE
+            for _ in $(seq 1 30); do
+              OPERATION_RESPONSE=$(curl -sS "${EDGE_AUTH_HEADERS[@]}" "$OPERATION_URL")
+              case "$(jq -r '.status // empty' <<< "$OPERATION_RESPONSE")" in
+                Succeeded) return 0 ;;
+                Failed)    echo "::error::$OPERATION_RESPONSE"; return 1 ;;
+              esac
+              sleep 10
+            done
+            echo "::error::Timed out: $OPERATION_RESPONSE"
+            return 1
+          }
+
+          EDGE_UPLOAD_OPERATION_ID=$(curl -sSf -D - -o /dev/null "${EDGE_AUTH_HEADERS[@]}" -H "Content-Type: application/zip" -X POST \
+            -T release-zips/chrome/*.zip "$EDGE_SUBMISSIONS_URL/draft/package" | operation_id_from_headers)
+          wait_for_operation "$EDGE_SUBMISSIONS_URL/draft/package/operations/$EDGE_UPLOAD_OPERATION_ID"
+
+          EDGE_PUBLISH_OPERATION_ID=$(curl -sSf -D - -o /dev/null "${EDGE_AUTH_HEADERS[@]}" -X POST -d "{ \"notes\": \"Snap Links $RELEASE_TAG\" }" \
+            "$EDGE_SUBMISSIONS_URL" | operation_id_from_headers)
+          wait_for_operation "$EDGE_SUBMISSIONS_URL/operations/$EDGE_PUBLISH_OPERATION_ID"
