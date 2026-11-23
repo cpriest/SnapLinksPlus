@@ -13,6 +13,8 @@ module.exports = {
 		'ElementIndexer':          'readonly',
 		'GetDocumentDims':         'readonly',
 		'GetClientDims':           'readonly',
+		'SamePageKey':             'readonly',
+		'UniqueLinks':             'readonly',
 		'module':                  'readonly',
 		'pub':                     'readonly',
 		'RateReporter':            'readonly',
