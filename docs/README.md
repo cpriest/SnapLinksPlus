@@ -50,13 +50,15 @@
     <h2>Snap Links is a Browser Addon that lets you lasso links, checkboxes and other elements and do things with them.</h2>
 </header>
 
-* Open links in New Tabs
+* Open links in New Tabs, a New Window, or each in its own Window
+* Copy links to the clipboard, as URLs, titles, Markdown or HTML
+* Bookmark links in a new folder
 * Check/Uncheck checkboxes
 * Select radio items
+* Click buttons and other clickable elements
 
 Other actions in the not too distant future planned (from v3)
 
-* Bookmark All
 * Download All
 
 # Issues
@@ -103,9 +105,9 @@ The reasons behind this are simple, [electrolysis](https://wiki.mozilla.org/Elec
 Snap Links Plus is a Firefox addon that lets you draw a lasso around links, checkboxes and other on-screen elements. Links can be handled with the following actions:
 
 * Open in New Tabs (default)
-* Open in New Windows
+* Open as the Tabs of a New Window
+* Open each in its own Window
 * Copy to Clipboard
-
-(Additional actions such as bookmarking and downloading can be re-added to this list as they are implemented in upcoming v3 releases.)
+* Bookmark in a New Folder
 
 [Links](Links.md ':include')
