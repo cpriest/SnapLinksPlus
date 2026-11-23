@@ -48,6 +48,12 @@ describe('markup matches the code', () => {
 
 	beforeEach(() => load());
 
+	test('every id is used once: a second element with an id is never bound, its changes are not saved', () => {
+		let ids = Array.from(document.querySelectorAll('[id]'), el => el.id);
+
+		expect(ids.filter((id, i) => ids.indexOf(id) !== i)).toEqual([]);
+	});
+
 	test('every control id is a preference with a default', () => {
 		let defaults = Object.keys(run('DefaultPrefs'));
 
