@@ -1,10 +1,6 @@
 {
-{{#Firefox}}	{{! The background scripts run as an event page: Firefox suspends it when idle, see CONTEXT-GRAPH.md }}
+	{{! The background runs as an event page in Firefox and as a service worker in Chrome, both unloaded when idle, see CONTEXT-GRAPH.md }}
 	"manifest_version":			3,
-{{/Firefox}}
-{{#Chrome}}		{{! Chrome needs a service worker for Manifest V3, a separate migration, see CONTEXT-GRAPH.md }}
-	"manifest_version":			2,
-{{/Chrome}}
 	"name":						"{{package.FullName}}",
 {{#Firefox}}        {{! Needs 1.2.3-beta1 or 1.2.3 format }}
 	"version":                "{{package.version}}",
@@ -17,7 +13,9 @@
 	"description":            "{{package.description}}",
 	"homepage_url":           "{{package.homepage}}",
 
-	"minimum_chrome_version": "51",
+{{#Chrome}}		{{! 116: runtime.getContexts(), used with the offscreen document that copies }}
+	"minimum_chrome_version": "116",
+{{/Chrome}}
 
 {{#Firefox}}
 	"permissions":            [
@@ -33,7 +31,8 @@
 		"cookies",
 		"storage",
 		"notifications",
-		"clipboardWrite"
+		"clipboardWrite",
+		"offscreen"
 	],
 {{/Chrome}}
 
@@ -59,15 +58,11 @@
 {{/Firefox}}
 
 	"background":             {
-
 {{#Chrome}}
-{{!		"persistent": false, }}
+		"service_worker": "src/background-scripts/service-worker.js"
 {{/Chrome}}
-
+{{#Firefox}}
 		"scripts": [
-			{{#Chrome}}
-				"src/lib/browser-polyfill.js",
-			{{/Chrome}}
 			"src/StoragePrefs.js",
 			"src/globals.js",
 			{{#DevBuild}}
@@ -75,6 +70,7 @@
 			{{/DevBuild}}
 			"src/background-scripts/background.js"
 		]
+{{/Firefox}}
 	},
 	"commands":               {
 		{{#DevBuild}}
@@ -121,12 +117,6 @@
 		}
 	],
 	"options_ui":             {
-{{#Firefox}}
 		"page":			"src/html/options.html"
-{{/Firefox}}
-{{#Chrome}}
-		"page":			"src/html/options.html",
-		"chrome_style": true
-{{/Chrome}}
 	}
 }

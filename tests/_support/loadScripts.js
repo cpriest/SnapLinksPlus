@@ -42,6 +42,7 @@ function makeBrowser({ local, sync } = {}) {
 		storage: {
 			local:     makeStorageArea(local),
 			sync:      makeStorageArea(sync),
+			session:   makeStorageArea(),
 			onChanged: { addListener: (fn) => changeListeners.push(fn) },
 		},
 		// Like the real API, sendMessage returns a Promise; resolving undefined leaves Linux drag recovery (#580) off

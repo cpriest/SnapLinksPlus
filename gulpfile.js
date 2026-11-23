@@ -36,6 +36,13 @@ const FireFox = {
 	BuildData:     {
 		Firefox: true,
 	},
+	// Chrome's service worker and its offscreen clipboard: Firefox runs the background as an event page with a DOM
+	Exclude:       [
+		'src/background-scripts/service-worker.js',
+		'src/background-scripts/OffscreenClipboard.js',
+		'src/html/offscreen.html',
+		'src/lib/Offscreen.js',
+	],
 };
 
 /** This is passed to all handlebar builds */
@@ -107,11 +114,11 @@ async function buildTmp() {
 
 let webext = (cmd, data) => `npx web-ext ${cmd} -s ${data.BuildPath} -a ${data.ArtifactsPath} `;
 
-async function buildFor({ BuildPath, BuildData }) {
+async function buildFor({ BuildPath, BuildData, Exclude = [] }) {
 	fs.rmSync(BuildPath, { recursive: true, force: true });
 
 	await Promise.all([
-		finished(gulp.src('./build/tmp/**', { encoding: false })
+		finished(gulp.src(['./build/tmp/**', ...Exclude.map(file => `!./build/tmp/${file}`)], { encoding: false })
 			.pipe(gulp.dest(BuildPath))),
 		finished(
 			gulp.src('src/templates/manifest.hbs')
