@@ -23,14 +23,21 @@ const LMB = 1,	// Left Mouse Button
 //  Default Action
 const OPEN_LINKS     = 1,	// Open links
 		COPY_LINKS     = 2,	// Copy links
-		OPEN_IN_WINDOW = 3;	// Open links as tabs of a new window
+		OPEN_IN_WINDOW = 3,	// Open links as tabs of a new window
+		BOOKMARK_LINKS = 4,	// Bookmark links in a new folder
+		OPEN_IN_SEPARATE_WINDOWS = 5;	// Open each link in its own window
 
 // Actions
 const BACKGROUND_TEST   = 'BackgroundTest',
 		RELOAD_EXTENSION  = 'ReloadExtension',
 		OPEN_URLS_IN_TABS = 'OpenUrlsInTabs',
 		OPEN_URLS_IN_WINDOW = 'OpenUrlsInWindow',
-		COPY_TO_CLIPBOARD = 'CopyToClipboard';
+		COPY_TO_CLIPBOARD = 'CopyToClipboard',
+		BOOKMARK_LINKS_IN_FOLDER = 'BookmarkLinksInFolder',
+		OPEN_URLS_IN_SEPARATE_WINDOWS = 'OpenUrlsInSeparateWindows';
+
+// Bookmarking needs this optional permission, the options page asks for it when bookmarking is the default action
+const BOOKMARKS_PERMISSION = { permissions: ['bookmarks'] };
 
 const TABS_OPEN_END     = 'OpenTabsAtEnd',
 		TABS_OPEN_RIGHT   = 'OpenTabsToRight',
@@ -80,6 +87,8 @@ const DefaultPrefs = {
 	ShowUpdateNotification: true,		// Controls whether version update notifications are shown
 
 	DisableFontWeightFiltering: false,
+
+	SmartDuplicateDetection: false,	// Treat links that lead to the same page (eg: differ only by #fragment or utm_* parameters) as duplicates
 
 	SetOwnershipTabID_FF: false,	// Whether or not to set tab.openerTabId in Firefox on tab creation
 
