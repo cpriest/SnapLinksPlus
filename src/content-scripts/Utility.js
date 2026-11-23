@@ -1,7 +1,7 @@
 "use strict";
 
 
-/* exported CreateElement, dir, RateReporter, AddModsToEvent, GetClientDims */
+/* exported CreateElement, dir, RateReporter, AddModsToEvent, GetClientDims, SamePageKey, UniqueLinks */
 
 /**
  * Handy shortcut for creating an element or element tree
@@ -137,4 +137,70 @@ function GetDocumentDims() {
 		);
 
 	return [docWidth, docHeight];
+}
+
+/** Query parameters that only record where a click came from, a link that differs from another only by these leads to the same page */
+const TrackingParams = /^(utm_\w+|fbclid|gclid|gclsrc|dclid|msclkid|yclid|igshid|mc_cid|mc_eid|_hsenc|_hsmi|mkt_tok)$/i;
+
+/**
+ * Returns a key that is the same for links that lead to the same page, so they can be treated as duplicates.
+ *   Ignored:	http vs https, a leading www., a trailing slash, the order of query parameters, tracking parameters (utm_*, fbclid, ...)
+ *				and the #fragment, except #/ and #! fragments, which single page apps use as their own paths.
+ *
+ * @param {string} href    The URL of the link
+ *
+ * @returns {string}
+ */
+function SamePageKey(href) {
+	let url;
+
+	try {
+		url = new URL(href);
+	} catch(e) {
+		return href;
+	}
+
+	if(url.protocol != 'http:' && url.protocol != 'https:')
+		return href;
+
+	let params = [...url.searchParams]
+		.filter(([name]) => !TrackingParams.test(name))
+		.sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
+
+	return url.host.replace(/^www\./i, '') +
+		url.pathname.replace(/\/+$/, '') +
+		(params.length ? '?' + new URLSearchParams(params) : '') +
+		(/^#[!/]/.test(url.hash) ? url.hash : '');
+}
+
+/** @type {Map<string, string>}    Cache of SamePageKey() results by href, the link counter asks again on every mouse move */
+const SamePageKeys = new Map();
+
+/**
+ * Removes the links that lead to the same page as an earlier link, see SamePageKey(), when Prefs.SmartDuplicateDetection is on;
+ *	otherwise only links with exactly the same href are removed.
+ *
+ * @param {HTMLAnchorElement[]} Links    The links, in document order
+ *
+ * @returns {HTMLAnchorElement[]}    The first link to each page, in the same order
+ */
+function UniqueLinks(Links) {
+	let seen  = new Set(),
+		smart = Prefs.SmartDuplicateDetection;
+
+	return Links.filter((elem) => {
+		let key = elem.href;
+
+		if(smart) {
+			if(!SamePageKeys.has(key))
+				SamePageKeys.set(key, SamePageKey(key));
+			key = SamePageKeys.get(key);
+		}
+
+		if(seen.has(key))
+			return false;
+
+		seen.add(key);
+		return true;
+	});
 }

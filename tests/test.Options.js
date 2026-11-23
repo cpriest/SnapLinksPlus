@@ -48,6 +48,12 @@ describe('markup matches the code', () => {
 
 	beforeEach(() => load());
 
+	test('every id is used once: a second element with an id is never bound, its changes are not saved', () => {
+		let ids = Array.from(document.querySelectorAll('[id]'), el => el.id);
+
+		expect(ids.filter((id, i) => ids.indexOf(id) !== i)).toEqual([]);
+	});
+
 	test('every control id is a preference with a default', () => {
 		let defaults = Object.keys(run('DefaultPrefs'));
 
@@ -69,8 +75,8 @@ describe('markup matches the code', () => {
 		expect(values).toEqual([run('NONE'), run('CTRL'), run('ALT'), run('CTRL | ALT'), run('SHIFT'), run('CTRL | SHIFT'), run('ALT | SHIFT'), run('CTRL | ALT | SHIFT')].sort());
 	});
 
-	test('DefaultAction options are OPEN_LINKS, COPY_LINKS, OPEN_IN_WINDOW and BOOKMARK_LINKS', () => {
-		expect(Array.from(el('DefaultAction').options).map(o => Number(o.value)).sort()).toEqual([run('OPEN_LINKS'), run('COPY_LINKS'), run('OPEN_IN_WINDOW'), run('BOOKMARK_LINKS')].sort());
+	test('DefaultAction options are OPEN_LINKS, COPY_LINKS, OPEN_IN_WINDOW, BOOKMARK_LINKS and OPEN_IN_SEPARATE_WINDOWS', () => {
+		expect(Array.from(el('DefaultAction').options).map(o => Number(o.value)).sort()).toEqual([run('OPEN_LINKS'), run('COPY_LINKS'), run('OPEN_IN_WINDOW'), run('BOOKMARK_LINKS'), run('OPEN_IN_SEPARATE_WINDOWS')].sort());
 	});
 
 	test('OpenTabs options are the three TABS_OPEN_* constants', () => {

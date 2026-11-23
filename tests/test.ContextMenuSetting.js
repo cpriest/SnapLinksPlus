@@ -12,13 +12,20 @@ const LEFT_MOUSE_BUTTON = 1;
 const RIGHT_MOUSE_BUTTON = 2;
 const MIDDLE_MOUSE_BUTTON = 4;
 
+// browserSettings.contextMenuShowEvent values: Firefox's own on Linux, and the one Snap Links sets for right-button selection
+const RELEASED = { value: 'mousedown', levelOfControl: 'controllable_by_this_extension' };
+const OURS     = { value: 'mouseup', levelOfControl: 'controlled_by_this_extension' };
+
 function createBackgroundTestHarness({
 	firefox = true, preferences = {}, contextMenuShowEvent, os = 'linux',
 	preferencesReady = Promise.resolve(), storedPreferences, activeStorageArea = 'sync',
+	menuSetting = RELEASED,
 } = {}) {
+	// Keeps the value, so get() reports what the last set() or clear() left, as Firefox does
 	contextMenuShowEvent = contextMenuShowEvent || {
-		set:   jest.fn().mockResolvedValue(true),
-		clear: jest.fn().mockResolvedValue(true),
+		get:   jest.fn(async () => ({ ...menuSetting })),
+		set:   jest.fn(async ({ value }) => { menuSetting = { value, levelOfControl: 'controlled_by_this_extension' }; return true; }),
+		clear: jest.fn(async () => { menuSetting = RELEASED; return true; }),
 	};
 	let observer;
 	const storageListeners = [];
@@ -36,6 +43,7 @@ function createBackgroundTestHarness({
 		RELOAD_EXTENSION:  'ReloadExtension',
 		OPEN_URLS_IN_TABS: 'OpenUrlsInTabs',
 		OPEN_URLS_IN_WINDOW: 'OpenUrlsInWindow',
+		OPEN_URLS_IN_SEPARATE_WINDOWS: 'OpenUrlsInSeparateWindows',
 		COPY_TO_CLIPBOARD: 'CopyToClipboard',
 		BOOKMARK_LINKS_IN_FOLDER: 'BookmarkLinksInFolder',
 		Prefs:             {
@@ -109,6 +117,7 @@ test.each([
 ])('startup releases context menu control for %s-button selection', async (buttonName, activationMouseButton) => {
 	const harness = createBackgroundTestHarness({
 		preferences: { ActivateMouseButton: activationMouseButton },
+		menuSetting: OURS,
 	});
 
 	await harness.startBackground();
@@ -125,9 +134,10 @@ test('changing the activation button releases and reapplies context menu control
 	let finishClear;
 	let markClearStarted;
 	const clearStarted = new Promise(resolve => { markClearStarted = resolve; });
+	const clear = harness.contextMenuShowEvent.clear.getMockImplementation();
 	harness.contextMenuShowEvent.clear.mockImplementationOnce(() => {
 		markClearStarted();
-		return new Promise(resolve => { finishClear = resolve; });
+		return new Promise(resolve => { finishClear = resolve; }).then(clear);
 	});
 
 	harness.changePreference('ActivateMouseButton', LEFT_MOUSE_BUTTON);
@@ -139,6 +149,22 @@ test('changing the activation button releases and reapplies context menu control
 	await harness.waitForContextMenuUpdates();
 	expect(harness.contextMenuShowEvent.clear).toHaveBeenCalledTimes(1);
 	expect(harness.contextMenuShowEvent.set).toHaveBeenCalledTimes(2);
+});
+
+test.each([
+	['right-button selection, menus already open on release', RIGHT_MOUSE_BUTTON, OURS],
+	['left-button selection, setting not ours', LEFT_MOUSE_BUTTON, RELEASED],
+])('a restart of the event page writes no setting when it is already right: %s', async (_label, activationMouseButton, menuSetting) => {
+	const harness = createBackgroundTestHarness({
+		preferences: { ActivateMouseButton: activationMouseButton },
+		menuSetting,
+	});
+
+	await harness.startBackground();
+
+	expect(harness.contextMenuShowEvent.get).toHaveBeenCalled();
+	expect(harness.contextMenuShowEvent.set).not.toHaveBeenCalled();
+	expect(harness.contextMenuShowEvent.clear).not.toHaveBeenCalled();
 });
 
 test('Chrome does not access Firefox browser settings', async () => {
@@ -201,6 +227,7 @@ test('a rejected setting update is reported and later updates still work', async
 	const harness = createBackgroundTestHarness({
 		preferences:          { ActivateMouseButton: RIGHT_MOUSE_BUTTON },
 		contextMenuShowEvent: {
+			get:   jest.fn().mockResolvedValue({ value: 'mousedown', levelOfControl: 'controlled_by_this_extension' }),	// Left by an earlier start
 			set:   jest.fn().mockRejectedValue(new Error('Setting unavailable')),
 			clear: jest.fn().mockResolvedValue(true),
 		},
@@ -218,6 +245,7 @@ test('an unsuccessful setting update is reported', async () => {
 	const harness = createBackgroundTestHarness({
 		preferences:          { ActivateMouseButton: RIGHT_MOUSE_BUTTON },
 		contextMenuShowEvent: {
+			get:   jest.fn().mockResolvedValue({ value: 'mousedown', levelOfControl: 'controlled_by_other_extensions' }),
 			set:   jest.fn().mockResolvedValue(false),
 			clear: jest.fn().mockResolvedValue(true),
 		},
