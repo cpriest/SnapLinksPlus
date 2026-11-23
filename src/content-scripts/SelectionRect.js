@@ -151,9 +151,11 @@ class SelectionRect {
 					}
 					.SnapLinksContainer {
 						pointer-events: none; z-index: 999999;
-						position: absolute; top: 0px; left: 0px; margin: 0px; padding: 0px; height: 0px; width: 0px; }
-					.SnapLinksContainer > .SL_SelectionRect { 
-						outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1;	
+						position: absolute; top: 0px; left: 0px; margin: 0px; padding: 0px; height: 0px; width: 0px;
+						background-color: transparent; }
+					.SnapLinksContainer > .SL_SelectionRect {
+						outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1;
+						background-color: transparent;
 					}
 					.SL_SelectionRect > .SL_SelectionLabel { 
 						position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px;	
@@ -243,29 +245,15 @@ class SelectionRect {
 	}
 
 	/**
-	 * Sets the label for the rect to the count of the largest selected category,
-	 * e.g. "2 Links", "3 Checkboxes" or "1 Radio Buttons"
-	 * @param {CategorizedCollection|number} Elements    The selected elements, or a legacy link count
+	 * Sets the label for the rect to the number of elements the action will act upon, eg: "3 Links" or "2 Checkboxes"
+	 *
+	 * @param {CategorizedCollection} Elements    The selected elements, links are counted once per page (see UniqueLinks())
 	 *
 	 * @returns {SelectionRect}
 	 */
 	SetCounter(Elements) {
-		let count, type;
-
-		if(typeof Elements === 'number') {
-			[count, type] = [Elements, 'Links'];
-		} else {
-			/* Links are counted by distinct href, as before; the other categories by element count.
-			   The greatest category wins (Links first on a tie), matching what ActUpon will act on. */
-			let Counts = [
-				['Links', (new Set((Elements.Links || []).map((elem) => elem.href))).size],
-				['Clickable', (Elements.Clickable || []).length],
-				['Checkboxes', (Elements.Checkboxes || []).length],
-				['Radio Buttons', (Elements.RadioButtons || []).length],
-			];
-
-			[type, count] = Counts.reduce((greatest, current) => current[1] > greatest[1] ? current : greatest);
-		}
+		let type  = Elements.GreatestType || CT_LINKS,
+			count = type == CT_LINKS ? UniqueLinks(Elements.Links).length : Elements.Counts.get(type);
 
 		this.elRect.firstElementChild.innerHTML = `${count} ${type}`;
 

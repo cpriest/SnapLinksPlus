@@ -143,4 +143,11 @@ async function firefoxClient({ port }) {
 	}
 }
 
+/*
+ * Firefox caches each add-on's parsed manifest by id + version and keeps it when Firefox quits. Every run installs the same
+ * version, so a manifest change (eg: a new optional permission) would be ignored in favor of the cached copy until the add-on
+ * is reloaded. The profile is for development only, so drop the cache before each start.
+ */
+fs.rmSync(path.join(config.run.firefoxProfile, 'startupCache', 'webext.sc.lz4'), { force: true });
+
 await webExt.cmd.run({ sourceDir: config.sourceDir, ...config.run, startUrl: await httpStartUrls(config.run.startUrl), noInput: !process.stdin.isTTY }, { firefoxClient, shouldExitProgram: false });
