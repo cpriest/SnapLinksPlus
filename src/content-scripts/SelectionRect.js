@@ -190,7 +190,7 @@ class SelectionRect {
 		pub(ContainerElementCreated, this.elContainer);
 
 		sub(ElementsSelected, (Elements) => {
-			this.SetCounter(UniqueLinks(Elements.Links).length);
+			this.SetCounter(Elements);
 		});
 
 		sub(DragStarted, data => this.InsertElements());
@@ -245,13 +245,17 @@ class SelectionRect {
 	}
 
 	/**
-	 * Sets the label for the rect to {count} Links
-	 * @param {number} count    The count of the links to set the label to
+	 * Sets the label for the rect to the number of elements the action will act upon, eg: "3 Links" or "2 Checkboxes"
+	 *
+	 * @param {CategorizedCollection} Elements    The selected elements, links are counted once per page (see UniqueLinks())
 	 *
 	 * @returns {SelectionRect}
 	 */
-	SetCounter(count) {
-		this.elRect.firstElementChild.innerHTML = `${count} Links`;
+	SetCounter(Elements) {
+		let type  = Elements.GreatestType || CT_LINKS,
+			count = type == CT_LINKS ? UniqueLinks(Elements.Links).length : Elements.Counts.get(type);
+
+		this.elRect.firstElementChild.innerHTML = `${count} ${type}`;
 
 		return this.AlignCounter();
 	}

@@ -8,7 +8,7 @@
 const { loadScriptsInDom }                              = require('./_support/loadScripts');
 const { build, setDocumentSize, stubEmptyLayout, trackListeners } = require('./_support/dom');
 
-const Scripts = ['StoragePrefs.js', 'CSP.js', 'globals.js', 'content-scripts/Utility.js', 'content-scripts/SelectionRect.js'];
+const Scripts = ['StoragePrefs.js', 'CSP.js', 'globals.js', 'content-scripts/Utility.js', 'content-scripts/SelectionRect.js', 'content-scripts/CategorizedCollection.js'];
 
 let run, selection, published, cleanup;
 
@@ -21,7 +21,7 @@ beforeEach(async () => {
 	build('');
 	setDocumentSize(1000, 800);
 
-	({ run } = loadScriptsInDom(Scripts));
+	({ run } = loadScriptsInDom(Scripts, undefined, ['LastModifierKeys']));
 	await run('DOMReady');
 
 	published = [];
@@ -100,11 +100,29 @@ describe('link counter', () => {
 		let links = hrefs.map(href => ({ href }));
 		run('(c) => pub(ElementsSelected, c)')({ Links: links });
 	};
+	/** Selects a CategorizedCollection of the given markup, ALT held so font weight filtering (which needs layout) is skipped */
+	const selectMarkup = (html) => {
+		run('LastModifierKeys = ALT');
+		run('(c) => pub(ElementsSelected, c)')(new (run('CategorizedCollection'))(Object.values(build(html))));
+	};
 
 	test('counts distinct hrefs', () => {
 		select('http://a/', 'http://b/', 'http://a/');
 
 		expect(label().innerHTML).toBe('2 Links');
+	});
+
+	test.each([
+		['only checkboxes', '<input id="c1" type="checkbox"><input id="c2" type="checkbox"><input id="c3" type="checkbox">', '3 Checkboxes'],
+		['only radio buttons', '<input id="r1" type="radio"><input id="r2" type="radio">', '2 Radio Buttons'],
+		['more checkboxes than links', '<a id="a" href="/a"></a><input id="c1" type="checkbox"><input id="c2" type="checkbox">', '2 Checkboxes'],
+		['more links than checkboxes', '<a id="a" href="/a"></a><a id="b" href="/b"></a><input id="c1" type="checkbox">', '2 Links'],
+		['mostly buttons', '<button id="b1"></button><button id="b2"></button><input id="c1" type="checkbox">', '2 Clickable'],
+		['links to one page outnumbering checkboxes', '<a id="a" href="/a"></a><a id="b" href="/a"></a><a id="c" href="/a"></a><input id="c1" type="checkbox"><input id="c2" type="checkbox">', '1 Links'],
+	])('counts the greatest category, which the action acts upon (#416): %s', (_label, html, expected) => {
+		selectMarkup(html);
+
+		expect(label().innerHTML).toBe(expected);
 	});
 
 	test.each([
