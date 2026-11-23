@@ -8,7 +8,7 @@
 const { loadScriptsInDom }                              = require('./_support/loadScripts');
 const { build, setDocumentSize, stubEmptyLayout, trackListeners } = require('./_support/dom');
 
-const Scripts = ['StoragePrefs.js', 'CSP.js', 'globals.js', 'content-scripts/Utility.js', 'content-scripts/SelectionRect.js'];
+const Scripts = ['StoragePrefs.js', 'CSP.js', 'globals.js', 'content-scripts/Utility.js', 'content-scripts/SelectionRect.js', 'content-scripts/CategorizedCollection.js'];
 
 let run, selection, published, cleanup;
 
@@ -21,7 +21,7 @@ beforeEach(async () => {
 	build('');
 	setDocumentSize(1000, 800);
 
-	({ run } = loadScriptsInDom(Scripts));
+	({ run } = loadScriptsInDom(Scripts, undefined, ['LastModifierKeys']));
 	await run('DOMReady');
 
 	published = [];
@@ -100,11 +100,39 @@ describe('link counter', () => {
 		let links = hrefs.map(href => ({ href }));
 		run('(c) => pub(ElementsSelected, c)')({ Links: links });
 	};
+	/** Selects a CategorizedCollection of the given markup, ALT held so font weight filtering (which needs layout) is skipped */
+	const selectMarkup = (html) => {
+		run('LastModifierKeys = ALT');
+		run('(c) => pub(ElementsSelected, c)')(new (run('CategorizedCollection'))(Object.values(build(html))));
+	};
 
 	test('counts distinct hrefs', () => {
 		select('http://a/', 'http://b/', 'http://a/');
 
 		expect(label().innerHTML).toBe('2 Links');
+	});
+
+	test.each([
+		['only checkboxes', '<input id="c1" type="checkbox"><input id="c2" type="checkbox"><input id="c3" type="checkbox">', '3 Checkboxes'],
+		['only radio buttons', '<input id="r1" type="radio"><input id="r2" type="radio">', '2 Radio Buttons'],
+		['more checkboxes than links', '<a id="a" href="/a"></a><input id="c1" type="checkbox"><input id="c2" type="checkbox">', '2 Checkboxes'],
+		['more links than checkboxes', '<a id="a" href="/a"></a><a id="b" href="/b"></a><input id="c1" type="checkbox">', '2 Links'],
+		['mostly buttons', '<button id="b1"></button><button id="b2"></button><input id="c1" type="checkbox">', '2 Clickable'],
+		['links to one page outnumbering checkboxes', '<a id="a" href="/a"></a><a id="b" href="/a"></a><a id="c" href="/a"></a><input id="c1" type="checkbox"><input id="c2" type="checkbox">', '1 Links'],
+	])('counts the greatest category, which the action acts upon (#416): %s', (_label, html, expected) => {
+		selectMarkup(html);
+
+		expect(label().innerHTML).toBe(expected);
+	});
+
+	test.each([
+		[true, '1 Links'],
+		[false, '3 Links'],
+	])('with SmartDuplicateDetection %s, links to the same page count %s', (on, expected) => {
+		run('(on) => { Prefs = { ...Prefs, SelectionLabel_CursorMargin: 2, ShowNumberOfLinks: true, SmartDuplicateDetection: on }; }')(on);
+		select('https://a.test/x', 'https://a.test/x#top', 'http://www.a.test/x/?utm_source=feed');
+
+		expect(label().innerHTML).toBe(expected);
 	});
 
 	test('pins to the bottom right of the rect for a normal drag', () => {
@@ -153,5 +181,23 @@ describe('DOM lifecycle', () => {
 		expect(document.head.contains(selection.StyleNode)).toBe(false);
 		expect(selection.elContainer.style.display).toBe('none');
 		expect(selection.dims).toMatchObject({ width: 0, height: 0 });
+	});
+});
+
+describe('site CSS resets (#567)', () => {
+	test('a `background-color: inherit` reset does not paint the selection rect opaque', () => {
+		// notepad-plus-plus.org resets every element to `background-color: inherit`, so the rect inherited the opaque page background.
+		// The site style goes first so that, in jsdom as in a browser, the extension's rules win.
+		let siteStyle = document.createElement('style');
+		siteStyle.textContent = 'html { background-color: #fefefe; } *, *::before, *::after { background-color: inherit; }';
+		document.head.appendChild(siteStyle);
+
+		let second = new (run('SelectionRect'))();
+		second.SetOrigin(100, 200).SetBottomRight(300, 500);
+
+		expect(getComputedStyle(second.elRect).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+		expect(getComputedStyle(second.elContainer).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+
+		siteStyle.remove();
 	});
 });
