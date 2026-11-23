@@ -151,9 +151,11 @@ class SelectionRect {
 					}
 					.SnapLinksContainer {
 						pointer-events: none; z-index: 999999;
-						position: absolute; top: 0px; left: 0px; margin: 0px; padding: 0px; height: 0px; width: 0px; }
-					.SnapLinksContainer > .SL_SelectionRect { 
-						outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1;	
+						position: absolute; top: 0px; left: 0px; margin: 0px; padding: 0px; height: 0px; width: 0px;
+						background-color: transparent; }
+					.SnapLinksContainer > .SL_SelectionRect {
+						outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1;
+						background-color: transparent;
 					}
 					.SL_SelectionRect > .SL_SelectionLabel { 
 						position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px;	
@@ -188,7 +190,7 @@ class SelectionRect {
 		pub(ContainerElementCreated, this.elContainer);
 
 		sub(ElementsSelected, (Elements) => {
-			this.SetCounter((new Set(Elements.Links.map((elem) => elem.href))).size);
+			this.SetCounter(Elements);
 		});
 
 		sub(DragStarted, data => this.InsertElements());
@@ -243,13 +245,17 @@ class SelectionRect {
 	}
 
 	/**
-	 * Sets the label for the rect to {count} Links
-	 * @param {number} count    The count of the links to set the label to
+	 * Sets the label for the rect to the number of elements the action will act upon, eg: "3 Links" or "2 Checkboxes"
+	 *
+	 * @param {CategorizedCollection} Elements    The selected elements, links are counted once per page (see UniqueLinks())
 	 *
 	 * @returns {SelectionRect}
 	 */
-	SetCounter(count) {
-		this.elRect.firstElementChild.innerHTML = `${count} Links`;
+	SetCounter(Elements) {
+		let type  = Elements.GreatestType || CT_LINKS,
+			count = type == CT_LINKS ? UniqueLinks(Elements.Links).length : Elements.Counts.get(type);
+
+		this.elRect.firstElementChild.innerHTML = `${count} ${type}`;
 
 		return this.AlignCounter();
 	}

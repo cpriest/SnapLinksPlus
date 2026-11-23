@@ -10,3 +10,11 @@ updates:
       - dependency-type: "direct"
     labels:
       - "dependencies"
+
+  # The workflows pin each action to a release's commit; this proposes the newer ones
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"

@@ -90,6 +90,11 @@ If you have any questions or trouble getting things up and running, please feel 
 
   * Open a new Github pull request with the patch.
   * Ensure the PR description links to the [open issue][Issues-Open] and clearly describes the solution.
+  * Every pull request runs the CI checks (lint, unit tests on Linux and Windows, both builds, `web-ext lint`); the packaged builds are attached to the run.
+
+## Releasing
+
+Maintainers: see [Releasing](Releasing.md) for publishing a version to GitHub, addons.mozilla.org and the Chrome and Edge stores.
 
 
 

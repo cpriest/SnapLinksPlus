@@ -1,10 +1,10 @@
 'use strict';
 
-/* global test, expect, describe, beforeEach, jest, require */
+/* global test, expect, describe, beforeEach, jest, require, URL, URLSearchParams */
 
 const { loadScripts } = require('./_support/loadScripts');
 
-const Scripts = ['StoragePrefs.js', 'globals.js', 'content-scripts/CategorizedCollection.js', 'content-scripts/ActionMgr.js'];
+const Scripts = ['StoragePrefs.js', 'globals.js', 'content-scripts/Utility.js', 'content-scripts/CategorizedCollection.js', 'content-scripts/ActionMgr.js'];
 
 let browser, run, actions;
 
@@ -23,7 +23,7 @@ const collection = (GreatestType, props) => ({ GreatestType, ...props });
 const checkbox = (checked) => ({ checked, click: jest.fn() });
 
 beforeEach(async () => {
-	({ run, browser } = loadScripts(Scripts));
+	({ run, browser } = loadScripts(Scripts, undefined, { URL, URLSearchParams }));
 	await run('DOMReady');
 	actions = new (run('ActionMgr'))();
 	setPrefs();
@@ -58,10 +58,32 @@ describe('ActUpon links', () => {
 		expect(browser.runtime.sendMessage.mock.calls[0][0]).toMatchObject({ Action: run(expectedAction), tUrls: ['http://a/', 'http://b/', 'http://c/'] });
 	});
 
+	test.each([
+		[false, 'OPEN_URLS_IN_SEPARATE_WINDOWS'],
+		[true, 'COPY_TO_CLIPBOARD'],
+	])('default action open each link in its own window, ctrlKey=%s → %s', (ctrlKey, expectedAction) => {
+		setPrefs({ DefaultAction: run('OPEN_IN_SEPARATE_WINDOWS') });
+
+		actions.ActUpon(collection(run('CT_LINKS'), { Links: links(...urls) }), { ctrlKey });
+
+		expect(browser.runtime.sendMessage).toHaveBeenCalledTimes(1);
+		expect(browser.runtime.sendMessage.mock.calls[0][0]).toMatchObject({ Action: run(expectedAction), tUrls: ['http://a/', 'http://b/', 'http://c/'] });
+	});
+
 	test('removes duplicate hrefs, keeping first-seen order', () => {
 		actions.ActUpon(collection(run('CT_LINKS'), { Links: links(...urls) }), { ctrlKey: false });
 
 		expect(browser.runtime.sendMessage.mock.calls[0][0].tUrls).toEqual(['http://a/', 'http://b/', 'http://c/']);
+	});
+
+	test('with SmartDuplicateDetection, sends the first-seen href of each page', () => {
+		setPrefs({ SmartDuplicateDetection: true });
+
+		actions.ActUpon(collection(run('CT_LINKS'), {
+			Links: links('https://a.test/x?utm_source=feed', 'https://a.test/x#comments', 'https://a.test/y', 'http://www.a.test/x/'),
+		}), { ctrlKey: false });
+
+		expect(browser.runtime.sendMessage.mock.calls[0][0].tUrls).toEqual(['https://a.test/x?utm_source=feed', 'https://a.test/y']);
 	});
 
 	test('copying sends the text of the first link to each URL as its title', () => {

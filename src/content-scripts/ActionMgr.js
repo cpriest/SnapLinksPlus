@@ -13,13 +13,6 @@ class ActionMgr {
 		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
 			return console.log('Skipped Copying Links: %o', links);
 
-		// The first element with each URL names it
-		let titles = new Map();
-		for(let elem of Elements) {
-			if(!titles.has(elem.href))
-				titles.set(elem.href, this.LinkTitle(elem));
-		}
-
 		browser.runtime.sendMessage({
 			Action:  COPY_TO_CLIPBOARD,
 			tUrls:   links,
@@ -113,6 +106,21 @@ class ActionMgr {
 	}
 
 	/**
+	 * Opens the set of links, each in its own new window
+	 *
+	 * @param {string[]} links
+	 */
+	OpenUrlsInSeparateWindows(links) {
+		if(Prefs.DevMode && Prefs.Dev_Skip_AllActions)
+			return console.log('Skipped Opening Links in Separate Windows: %o', links);
+
+		browser.runtime.sendMessage({
+			Action: OPEN_URLS_IN_SEPARATE_WINDOWS,
+			tUrls:  links,
+		});
+	}
+
+	/**
 	 * Selects the first radio button per group
 	 *
 	 * @param {HTMLInputElement[]} RadioButtons
@@ -175,14 +183,9 @@ class ActionMgr {
 
 		switch(SelectedElements.GreatestType) {
 			case CT_LINKS:
-				// Remove duplicates by HREF
-				let links = Array.from(
-					new Set(
-						SelectedElements
-							.Links
-							.map(elem => elem.href)
-					)
-				);
+				// Remove links to the same page
+				let links = UniqueLinks(SelectedElements.Links)
+					.map(elem => elem.href);
 
 				let reverse = Boolean(Prefs.ReverseLinkOrder);
 
@@ -199,6 +202,8 @@ class ActionMgr {
 				    this.CopyToClipboard(links, SelectedElements.Links);
 				else if(!e.ctrlKey && Prefs.DefaultAction == OPEN_IN_WINDOW)
 					this.OpenUrlsInWindow(links);
+				else if(!e.ctrlKey && Prefs.DefaultAction == OPEN_IN_SEPARATE_WINDOWS)
+					this.OpenUrlsInSeparateWindows(links);
 				else if(!e.ctrlKey && Prefs.DefaultAction == BOOKMARK_LINKS)
 					this.BookmarkLinks(links, SelectedElements.Links);
 				else

@@ -77,6 +77,7 @@
 		<option value="1">Open Links</option>
 		<option value="2">Copy Links to clipboard</option>
 		<option value="3">Open Links in a New Window</option>
+		<option value="5">Open each Link in its own Window</option>
 		<option value="4">Bookmark Links in a new folder</option>
 	</select>
 	<span>press CTRL after selection to modify default action</span>
@@ -86,19 +87,6 @@
 	Snap Links needs your permission to create bookmarks before it can bookmark links:
 	<button id="GrantBookmarkPermission" type="button">Allow</button>
 </p>
-
-<label>
-	<span>Copy links as</span>
-	<select id="CopyFormat" title="How copied links are written to the clipboard. The title of a link is its text.">
-		<option value="Urls">URLs, one per line</option>
-		<option value="TitlesAndUrls">Titles and URLs, tab separated</option>
-		<option value="Titles">Titles only</option>
-		<option value="Markdown">Markdown: [Title](URL)</option>
-		<option value="Html">HTML: &lt;a href="URL"&gt;Title&lt;/a&gt;</option>
-		<option value="HtmlList">HTML list: &lt;ul&gt;&lt;li&gt;&lt;a href="URL"&gt;Title&lt;/a&gt;&lt;/li&gt;...&lt;/ul&gt;</option>
-		<option value="UrlsSpaceSeparated">URLs on one line, space separated</option>
-	</select>
-</label>
 
 <label>
 	<span>Copy links as</span>
@@ -145,8 +133,8 @@
 		<input id="SwitchFocusToNewTab" type="checkbox"> Switch focus to new tab or window
 	</label>
 
-	<label title="Show the number of selected unique links as a label while selecting.">
-		<input id="ShowNumberOfLinks" type="checkbox"> Show the number of selected links
+	<label title="Show the number of selected items as a label while selecting.">
+		<input id="ShowNumberOfLinks" type="checkbox"> Show the number of selected items
 	</label>
 
 	<label title="Show a notification when an update has occurred.">
@@ -170,6 +158,11 @@
 &bull;  Holding alt while selecting disables filtering as well.">
 		<input id="DisableFontWeightFiltering" type="checkbox"> Disable link filtering by font weight
 		<img class="Info" alt="Additional Info" src="../../res/Info16.png" title="Holding alt while selecting disables filtering as well."/>
+	</label>
+
+	<label title="Open or copy only one link per page, even when the links differ in http/https, www., a trailing slash, the #anchor or tracking parameters such as utm_source.
+&bull;  When off, only links with exactly the same address are treated as duplicates.">
+		<input id="SmartDuplicateDetection" type="checkbox"> Treat links to the same page as duplicates
 	</label>
 
 	<label browsers="FireFox" title="This sets the opening tab id on newly opened tabs to maintain parent/child relationships between tabs.">
