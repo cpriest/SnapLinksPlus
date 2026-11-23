@@ -190,7 +190,7 @@ class SelectionRect {
 		pub(ContainerElementCreated, this.elContainer);
 
 		sub(ElementsSelected, (Elements) => {
-			this.SetCounter((new Set(Elements.Links.map((elem) => elem.href))).size);
+			this.SetCounter(UniqueLinks(Elements.Links).length);
 		});
 
 		sub(DragStarted, data => this.InsertElements());
