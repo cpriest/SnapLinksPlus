@@ -69,6 +69,7 @@ const load = async (globals = {}, stores = undefined) => {
 		notifications: { create: jest.fn(async () => 'n'), onClicked: { addListener: jest.fn() } },
 		browserSettings: {
 			contextMenuShowEvent: {
+				get:   jest.fn(async () => ({ value: 'mousedown', levelOfControl: 'controllable_by_this_extension' })),
 				set:   jest.fn(async () => true),
 				clear: jest.fn(async () => true),
 			},
@@ -683,6 +684,7 @@ describe('OpenUrlsInSeparateWindows (#576)', () => {
 
 			run('onMessage')({ Action: run('OPEN_URLS_IN_SEPARATE_WINDOWS'), tUrls: ['w1'] }, { tab: source }, () => {});
 			run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a1'] }, { tab: source }, () => {});
+			await run('DOMReady');
 			await run('openUrlsPromiseChain');
 
 			expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['a1']);

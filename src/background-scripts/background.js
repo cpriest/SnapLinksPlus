@@ -89,12 +89,18 @@ function UpdateContextMenuSetting() {
 
 	let useMouseUp = Prefs.ActivateMouseButton == RMB;
 	contextMenuSettingsChain = contextMenuSettingsChain.then(async () => {
-		let setting = browser.browserSettings.contextMenuShowEvent;
+		let setting = browser.browserSettings.contextMenuShowEvent,
+			current = await setting.get({}),
+			ours    = current.levelOfControl == 'controlled_by_this_extension';
+
+		// Firefox saves each change to its settings file, and the event page runs this every time it starts: write only a change
 		if(useMouseUp) {
+			if(ours && current.value == 'mouseup')
+				return;
 			let changed = await setting.set({ value: 'mouseup' });
 			if(!changed)
 				console.warn('Snap Links could not change context menu timing. The setting may be locked or controlled by another extension.');
-		} else {
+		} else if(ours) {
 			await setting.clear({});
 		}
 	}).catch(error => {
