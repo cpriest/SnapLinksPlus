@@ -188,10 +188,7 @@ function QueueOpen(open) {
  * @return {Promise<void>}
  */
 async function OpenUrlsInTabs(urls) {
-	let activeTab = (await browser.tabs.query({
-		active:        true,
-		currentWindow: true,
-	}))[0];
+	let activeTab = await ActiveTab();
 
 	let tabsLeft   = urls.length,
 		tabsOpened = 0,
@@ -266,6 +263,50 @@ async function OpenUrlsInTabs(urls) {
 }
 
 /**
+ * Returns the active tab of the current window
+ *
+ * @return {Promise<Tab>}
+ */
+async function ActiveTab() {
+	return (await browser.tabs.query({
+		active:        true,
+		currentWindow: true,
+	}))[0];
+}
+
+/**
+ * Opens a new window with the url, in the container and private browsing mode of the tab the links came from
+ *
+ * @param {string} url
+ * @param {Tab}    sourceTab    The tab the links were selected in
+ * @return {Promise<Window|undefined>}    undefined when the url cannot be opened (eg: an illegal URL), the error is logged
+ */
+async function CreateWindow(url, sourceTab) {
+	let props = { url, incognito: Boolean(sourceTab.incognito) };
+
+	if(isFirefox)
+		props.cookieStoreId = sourceTab.cookieStoreId;
+
+	try {
+		return await browser.windows.create(props);
+	} catch(error) {
+		console.error(`Error while opening ${url} in a new window: `, error);
+	}
+}
+
+/**
+ * Brings the window the links came from back to the front, unless focus should move to the new tabs or windows
+ *
+ * @param {Tab} sourceTab    The tab the links were selected in, its window may have been closed meanwhile
+ * @return {Promise<void>}
+ */
+async function KeepSourceWindowInFront(sourceTab) {
+	if(!Prefs.SwitchFocusToNewTab)
+		await browser.windows.update(sourceTab.windowId, { focused: true })
+			.catch(error => console.error(`Error while focusing window ${sourceTab.windowId}: `, error));
+}
+
+/**
  * Opens the urls, in order, as the tabs of one new window, in the container and private browsing mode of the tab they came from
  *
  * @param {string[]} urls
@@ -280,34 +321,19 @@ async function OpenUrlsInWindow(urls, sourceTab) {
 	if(!browser.windows)
 		return OpenUrlsInTabs(urls);
 
-	sourceTab = sourceTab || (await browser.tabs.query({
-		active:        true,
-		currentWindow: true,
-	}))[0];
+	sourceTab = sourceTab || await ActiveTab();
 
-	let props = { incognito: Boolean(sourceTab.incognito) },
-		rest  = urls.slice(),
+	let rest = urls.slice(),
 		newWindow;
 
-	if(isFirefox)
-		props.cookieStoreId = sourceTab.cookieStoreId;
+	// The window opens with the first link that can be opened
+	while(!newWindow && rest.length)
+		newWindow = await CreateWindow(rest.shift(), sourceTab);
 
-	// The window opens with the first link that can be opened (eg: not an illegal URL)
-	while(!newWindow && rest.length) {
-		let url = rest.shift();
-		try {
-			newWindow = await browser.windows.create({ ...props, url });
-		} catch(error) {
-			console.error(`Error while opening ${url} in a new window: `, error);
-		}
-	}
 	if(!newWindow)
 		return;
 
-	// Keep the window the links came from in front, it may have been closed meanwhile
-	if(!Prefs.SwitchFocusToNewTab)
-		await browser.windows.update(sourceTab.windowId, { focused: true })
-			.catch(error => console.error(`Error while focusing window ${sourceTab.windowId}: `, error));
+	await KeepSourceWindowInFront(sourceTab);
 
 	for(let url of rest) {
 		await sleep(Prefs.NewTabDelayMS);
@@ -334,7 +360,7 @@ async function OpenUrlsInWindow(urls, sourceTab) {
 }
 
 /**
- * Opens each url in its own new window, in the container and private browsing mode of the tab they came from
+ * Opens each url in its own new window, in the container and private browsing mode of the tab they came from (#576)
  *
  * @param {string[]} urls
  * @param {Tab}      [sourceTab]    The tab the links were selected in, defaults to the active tab
@@ -348,34 +374,21 @@ async function OpenUrlsInSeparateWindows(urls, sourceTab) {
 	if(!browser.windows)
 		return OpenUrlsInTabs(urls);
 
-	sourceTab = sourceTab || (await browser.tabs.query({
-		active:        true,
-		currentWindow: true,
-	}))[0];
+	sourceTab = sourceTab || await ActiveTab();
 
-	let props = { incognito: Boolean(sourceTab.incognito) },
-		opened = false;
-
-	if(isFirefox)
-		props.cookieStoreId = sourceTab.cookieStoreId;
+	let opened = false;
 
 	for(let [index, url] of urls.entries()) {
 		if(index > 0)
 			await sleep(Prefs.NewTabDelayMS);
 
-		try {
-			await browser.windows.create({ ...props, url });
+		// A url that cannot be opened is skipped
+		if(await CreateWindow(url, sourceTab))
 			opened = true;
-		} catch(error) {
-			// Skip this URL and keep opening the rest
-			console.error(`Error while opening ${url} in a new window: `, error);
-		}
 	}
 
-	// Keep the window the links came from in front, it may have been closed meanwhile
-	if(opened && !Prefs.SwitchFocusToNewTab)
-		await browser.windows.update(sourceTab.windowId, { focused: true })
-			.catch(error => console.error(`Error while focusing window ${sourceTab.windowId}: `, error));
+	if(opened)
+		await KeepSourceWindowInFront(sourceTab);
 }
 
 /**
