@@ -359,7 +359,8 @@ class ElementIndexer {
 						if(left > 0 && left < clientWidth && top > 0 && top < clientHeight) {
 							let elPoint = document.elementFromPoint(left, top);
 
-							if(elPoint != elem && !elem.contains(elPoint) && elPoint.tagName !== 'LABEL') {
+							if(elPoint != elem && !elem.contains(elPoint) && elPoint.tagName !== 'LABEL' &&
+							!(elPoint.contains(elem) && getComputedStyle(elem).pointerEvents === 'none')) {
 								elemNotes.Obscured = true;
 								this.BoundaryIndex[j].delete(elem);
 
