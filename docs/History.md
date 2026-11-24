@@ -1,3 +1,7 @@
+v3.2.1 / 2026-11-24
+===================
+* Chrome and Edge: no longer ask for the cookies permission, which only Firefox uses (containers)
+
 v3.2.0 / 2026-11-24
 ===================
 * Manifest V3: Firefox runs the background as an event page, and Snap Links loads in Chrome and Edge again (#595, #597, @Nawid3333)

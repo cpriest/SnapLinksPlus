@@ -26,9 +26,8 @@
 		"browserSettings"
 	],
 {{/Firefox}}
-{{#Chrome}}
+{{#Chrome}}		{{! No cookies: only Firefox uses it (containers), and the Chrome Web Store rejects unused permissions }}
 	"permissions":            [
-		"cookies",
 		"storage",
 		"notifications",
 		"clipboardWrite",

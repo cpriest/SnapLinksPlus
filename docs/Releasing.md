@@ -51,22 +51,26 @@ These are the same two values as `insecure/Firefox/api-key.json` (`jwt_issuer`, 
 
 ### 4. Chrome Web Store
 
-The Chrome Web Store API cannot create an item; the listing must exist. If the old listing was removed, create the item and upload the first MV3 version by hand in the [Developer Dashboard](https://chrome.google.com/webstore/devconsole). The workflow publishes the versions after that.
+The item is `ikglmligndmabebhnicldebpekldnabm`, unpublished since Chrome removed Manifest V2. The Chrome Web Store API cannot create an item or fill in its listing, and it cannot publish an item whose listing or privacy practices are incomplete. So submit the first Manifest V3 version by hand in the [Developer Dashboard](https://chrome.google.com/webstore/devconsole): upload the Chrome zip from the GitHub Release on **Package**, then fill in **Store listing** and **Privacy** with the answers in [ChromeWebStore.md](ChromeWebStore.md), and **Submit for review**. The workflow publishes the versions after that.
 
-1. In the [Google Cloud Console](https://console.cloud.google.com/), create a project and enable the **Chrome Web Store API**.
-2. Configure the OAuth consent screen (type *External*, add your own address as a test user), then create an **OAuth client ID** of type *Desktop app*.
-3. Get a refresh token for the account that owns the item, with the scope `https://www.googleapis.com/auth/chromewebstore`. The steps are in [Use the Chrome Web Store API](https://developer.chrome.com/docs/webstore/using-api). The OAuth Playground with your own client ID is the quickest way.
-4. Environment secrets: `CWS_CLIENT_ID`, `CWS_CLIENT_SECRET`, `CWS_REFRESH_TOKEN`.
-5. Repository variables:
+1. In the [Google Cloud Console](https://console.cloud.google.com/), create a project and enable the **Chrome Web Store API** (**APIs & Services > Library**).
+2. **Google Auth Platform > Branding**: app name and your address. **Audience**: user type *External*, then **Publish app** so that the status is *In production*. Google shows an "unverified app" warning during step 4. Continue past it: the app is yours and only you sign in.
+3. **Google Auth Platform > Clients > Create client**, type *Web application*, with the authorized redirect URI `https://developers.google.com/oauthplayground`. Keep its client ID and secret.
+4. Get a refresh token in the [OAuth Playground](https://developers.google.com/oauthplayground):
+   1. The gear icon: check **Use your own OAuth credentials** and enter the client ID and secret.
+   2. **Step 1**: type the scope `https://www.googleapis.com/auth/chromewebstore`, **Authorize APIs**, and sign in with the account that owns the item.
+   3. **Step 2**: **Exchange authorization code for tokens**, and copy the **Refresh token**.
+5. Environment secrets, entered with `gh secret set <NAME> --env release` (it prompts for the value, so it stays out of the shell history): `CWS_CLIENT_ID`, `CWS_CLIENT_SECRET`, `CWS_REFRESH_TOKEN`.
+6. Repository variables:
    - `CWS_PUBLISHER_ID`: from the Developer Dashboard, **Account** section
-   - `CWS_EXTENSION_ID`: the item's 32-letter id
+   - `CWS_EXTENSION_ID`: `ikglmligndmabebhnicldebpekldnabm`
    - `PUBLISH_TO_CWS` = `true`
 
-A refresh token of an OAuth app whose consent screen is in *Testing* status expires after 7 days. Set the consent screen to **In production**, or create a new token before each release. An alternative without a long-lived token is a [service account](https://developer.chrome.com/docs/webstore/service-accounts), which the API's V2 supports.
+A refresh token of an OAuth app whose status is *Testing* expires after 7 days, so the app must be *In production* (step 2). The token also stops working if you revoke the app's access in your Google account. An alternative without a long-lived token is a [service account](https://developer.chrome.com/docs/webstore/service-accounts), which the API's V2 supports.
 
-### 5. Microsoft Edge Add-ons (once the Chrome build is Manifest V3)
+### 5. Microsoft Edge Add-ons
 
-Like the Chrome Web Store, the API updates an existing product only: submit the first version in [Partner Center](https://partner.microsoft.com/dashboard/microsoftedge/overview).
+Like the Chrome Web Store, the API updates an existing product only: submit the first version in [Partner Center](https://partner.microsoft.com/dashboard/microsoftedge/overview), with the answers in [ChromeWebStore.md](ChromeWebStore.md).
 
 1. In Partner Center, **Microsoft Edge > Publish API**, choose **Enable** (the v1.1 API, with API keys).
 2. Environment secrets:

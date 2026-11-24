@@ -160,10 +160,11 @@ describe('Chrome Manifest V3', () => {
 		expect(chromeOnly.filter(file => exists('build', 'ff', file))).toEqual([]);
 	});
 
-	test('asks for the same permissions as before, plus offscreen for copying', () => {
+	// No cookies: only Firefox uses it (containers, cookieStoreId), and the Chrome Web Store rejects unused permissions
+	test('asks for the permissions it uses, plus offscreen for copying', () => {
 		let m = chrome();
 
-		expect(m.permissions).toEqual(['cookies', 'storage', 'notifications', 'clipboardWrite', 'offscreen']);
+		expect(m.permissions).toEqual(['storage', 'notifications', 'clipboardWrite', 'offscreen']);
 		expect(m.optional_permissions).toEqual(['bookmarks']);
 		expect(m).not.toHaveProperty('host_permissions');
 		expect(m.content_scripts.map(cs => cs.matches)).toEqual([['<all_urls>']]);
