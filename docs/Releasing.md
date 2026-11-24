@@ -5,7 +5,7 @@
 1. **build**: checks that the tag matches `version` in `package.json` and is on `master`, then runs lint, the tests, both builds, `web-ext lint`, and packages both builds.
 2. **github-release**: a GitHub Release named after the tag, with `snaplinks-vX.Y.Z-firefox.zip` and `snaplinks-vX.Y.Z-chrome.zip` and notes generated from the merged pull requests.
 3. **amo**: submits the Firefox build to [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/snaplinksplus/) on the listed channel. AMO reviews it, then offers it to every user as an update.
-4. **chrome-web-store** and **edge-add-ons**: upload and submit the Chrome build. Both stores accept Manifest V3 packages only, so these jobs skip with a notice while the Chrome build is Manifest V2.
+4. **chrome-web-store** and **edge-add-ons**: upload and submit the Chrome build (Manifest V3, the only version both stores accept).
 
 The store jobs are independent: one store failing leaves the others and the GitHub Release alone. Re-run a failed job on its own from the run's page (**Re-run failed jobs**). Each runs only when its switch variable is `true`. So nothing is published to a store until you set it up, and forks never try.
 
@@ -49,7 +49,7 @@ Add the secrets below to this environment (**Environment secrets**), not to the 
 
 These are the same two values as `insecure/Firefox/api-key.json` (`jwt_issuer`, `jwt_secret`).
 
-### 4. Chrome Web Store (once the Chrome build is Manifest V3)
+### 4. Chrome Web Store
 
 The Chrome Web Store API cannot create an item; the listing must exist. If the old listing was removed, create the item and upload the first MV3 version by hand in the [Developer Dashboard](https://chrome.google.com/webstore/devconsole). The workflow publishes the versions after that.
 

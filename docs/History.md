@@ -1,3 +1,20 @@
+v3.2.0 / 2026-11-24
+===================
+* Manifest V3: Firefox runs the background as an event page, and Snap Links loads in Chrome and Edge again (#595, #597, @Nawid3333)
+* New actions: open the selected links in a new window, in one window each, or bookmark them in a new folder (#588, #576, #589, @Nawid3333)
+* Copy links with their titles, as Markdown or as HTML (#198, #273, #587, @Nawid3333)
+* A list of sites where Snap Links is disabled (#473, #584, @Nawid3333)
+* Open and copy links in reverse order, also by holding SHIFT on release (#586, @Nawid3333)
+* Autoscroll down on long pages and near the window edges (#566, #516, #585, @Nawid3333)
+* Open new tabs in the background unloaded, Firefox only (#427, #541, @DanKaplanSES)
+* Links to the same page (http/https, www., trailing slash, #anchor, tracking parameters) count as duplicates (#583, @Nawid3333)
+* The selection label counts checkboxes, radio buttons and clickable elements too (#416)
+* The options page follows the browser's light or dark theme and matches its look
+* Fixed: the context menu showed after a right-drag on Linux and macOS (#577, #400, @remi-garcia)
+* Fixed: one tab that failed to open stopped the rest from opening (#582, @hanming5)
+* Fixed: custom checkboxes inside nested labels were not detected (#540)
+* Fixed: some sites made the selection rectangle opaque (#567)
+
 v3.1.16 / 2025-12-27
 ====================
 * Fixes link opening behavior to open serially when from multiple actions (@DanKaplanSES)
