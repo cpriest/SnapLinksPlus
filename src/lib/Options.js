@@ -7,6 +7,11 @@
 
 'use strict';
 
+// Selects the styles that match the browser's own options page, before the page is drawn
+document.documentElement.classList.add(isChrome ? 'Chrome' : 'Firefox');
+if(navigator.userAgent.includes(' Edg/'))
+	document.documentElement.classList.add('Edge');
+
 class Options {
 	get isChrome() { return window.location.protocol === 'chrome-extension:'; }
 

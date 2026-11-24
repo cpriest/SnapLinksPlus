@@ -32,6 +32,8 @@
 		"lint-fix": "eslint --fix src/",
 		"test": "jest",
 		"build": "gulp",
-		"run-ff": "node scripts/run-ff.mjs"
+		"run-ff": "node scripts/run-browser.mjs firefox",
+		"run-chrome": "node scripts/run-browser.mjs chrome",
+		"run-edge": "node scripts/run-browser.mjs edge"
 	}
 }

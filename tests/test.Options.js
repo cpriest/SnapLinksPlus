@@ -43,6 +43,33 @@ afterEach(() => {
 	jest.useRealTimers();
 });
 
+describe('theme', () => {
+	const Style = OptionsHtml.match(/<style>([\s\S]*?)<\/style>/)[1];
+
+	test('follows the light or dark theme of the browser: the default colors of the page and its controls come from color-scheme', () => {
+		expect(Style).toMatch(/:root\s*\{[^}]*color-scheme:\s*light dark/);
+	});
+
+	test('the permission notes have dark theme colors, so they do not glare on a dark page', () => {
+		expect(Style).toMatch(/@media \(prefers-color-scheme: dark\)\s*\{[^@]*#SitesPermission/);
+	});
+
+	test('HTML and BODY are blocks: Chrome sizes its options dialog to the preferred width of the page, which a flex layout reports as its 400px minimum', () => {
+		expect(Style).not.toMatch(/(HTML|BODY)[^{]*\{[^}]*display:\s*flex/i);
+	});
+
+	test('Edge has no minimum width: its options dialog has a fixed width, so the lines wrap instead of scrolling sideways', () => {
+		expect(Style).toMatch(/HTML\.Edge BODY\s*\{[^}]*min-width:\s*0/);
+		expect(Style).toMatch(/TEXTAREA[^{]*\{[^}]*max-width:\s*100%/);
+	});
+
+	test('the page is marked with its browser, for the styles that match the options page around it', async () => {
+		await load();
+
+		expect(document.documentElement.classList.contains('Firefox')).toBe(true);
+	});
+});
+
 describe('markup matches the code', () => {
 	const controls = () => Array.from(document.querySelectorAll('input[id], select[id], textarea[id], details[id]'));
 

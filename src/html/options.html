@@ -7,13 +7,69 @@
 	<script src="../globals.js" type="application/javascript"></script>
 	<script src="../lib/Options.js" type="application/javascript"></script>
 	<style>
-		/* The layout and type browser_style gave the page in Manifest V2 (from Firefox's extension.css), which Manifest V3 dropped */
-		HTML, BODY { display: flex; flex-direction: column; box-sizing: border-box; font: caption; margin: 0; padding: 0; }
+		/*
+		 * Colors and controls like the options page around this one: Firefox's about:addons, or Chrome's options dialog.  Light or
+		 * dark like the browser theme.  Manifest V3 dropped browser_style, which gave Firefox its style.
+		 *
+		 * Firefox: the values of its design tokens (tokens-brand.css, tokens-shared.css) that about:addons uses.  about:addons draws
+		 * the options page on Canvas, darker than the card around it in the dark theme, so the page paints the card color.
+		 */
+		:root {
+			color-scheme:    light dark;
+			--text:          light-dark(#15141a, #fbfbfe);	/* --text-color */
+			--background:    light-dark(#ffffff, #23222b);	/* --card-background-color */
+			--control:       color-mix(in srgb, currentColor 7%, transparent);	/* --button-background-color */
+			--control-hover: color-mix(in srgb, currentColor 14%, transparent);
+			--control-line:  transparent;
+			--field:         transparent;
+			--field-line:    light-dark(#8f8f9d, #bfbfc9);	/* --border-color-interactive */
+			--accent:        light-dark(oklch(55% 0.24 260), oklch(76% 0.14 205));	/* --color-accent-primary */
+			--font-size:     15px;
+		}
+		HTML.Chrome {
+			--text:          #1f1f1f;
+			--background:    #ffffff;	/* The dialog's; a transparent page is drawn on the default canvas color, not the dialog */
+			--control:       #ffffff;
+			--control-hover: #f2f2f2;
+			--control-line:  #c7c7c7;
+			--field-line:    #c7c7c7;
+			--accent:        #0b57d0;
+			--font-size:     13px;
+		}
+		@media (prefers-color-scheme: dark) {
+			HTML.Chrome {
+				--text:          #e3e3e3;
+				--background:    #292a2d;
+				--control:       #292a2d;
+				--control-hover: #3c3d40;
+				--control-line:  #5f6368;
+				--field:         #292a2d;
+				--field-line:    #5f6368;
+				--accent:        #a8c7fa;
+			}
+			HTML.Edge {
+				--background:    #242424;
+				--control:       #242424;
+				--field:         #242424;
+			}
+		}
+
+		/* Blocks, not flex: Chrome sizes its options dialog to the preferred width of the page, and a flex HTML or BODY reports 400px */
+		HTML, BODY { margin: 0; padding: 0; background: var(--background); color: var(--text); }
+		BODY { font: var(--font-size) system-ui, sans-serif; padding: 2px 4px; }
+		HTML.Chrome BODY { min-width: 660px; padding: 0px 20px 16px; }	/* Wide enough for the first lines (Chrome's dialog is 400px unless the page needs more), lined up with its title */
+		HTML.Edge BODY { min-width: 0; }	/* Edge's dialog does not grow with the page, so the lines wrap */
 		BODY * { box-sizing: border-box; }
+		SELECT, INPUT[type=text], TEXTAREA { max-width: 100%; }
+		SELECT, BUTTON, INPUT[type=text], TEXTAREA { font: inherit; color: inherit; border-radius: 4px; }
+		SELECT, BUTTON { padding: 3px 6px; background-color: var(--control); border: 1px solid var(--control-line); }
+		SELECT:enabled:hover, BUTTON:enabled:hover { background-color: var(--control-hover); }
+		INPUT[type=text], TEXTAREA { padding: 3px 6px; background: var(--field); border: 1px solid var(--field-line); }
+		INPUT[type=checkbox] { accent-color: var(--accent); }
+		:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 		LABEL { display: block; margin: 6px 4px 8px 0px; }
-		INPUT[type=checkbox] { margin: 0px 2px; vertical-align: -2px; }
+		INPUT[type=checkbox] { margin: 0px 4px 0px 0px; vertical-align: -2px; }
 		INPUT[type=checkbox]:enabled { cursor: pointer; }
-		INPUT[type=text] { padding: 0px 2px; height: 20px; min-height: 0.5em;}
 		LABEL[title],
 		SELECT[title] { cursor: help;}
 		/*noinspection CssUnusedSymbol*/
@@ -31,6 +87,9 @@
 		   and when Snap Links may not run on all websites */
 		#BookmarkPermission, #SitesPermission { width: fit-content; margin: 4px 0px 10px; padding: 6px 10px; border: 1px solid #c9a227; border-radius: 4px; background: #fff3cd; color: #3d3000; font-weight: bold; }
 		#BookmarkPermission BUTTON, #SitesPermission BUTTON { margin-left: 6px; font-weight: bold; }
+		@media (prefers-color-scheme: dark) {
+			#BookmarkPermission, #SitesPermission { border-color: #8a6d0b; background: #3a2f05; color: #ffe08a; }
+		}
 
 		/* Wraps onto as many lines as the width needs; a fixed height with column wrap overflowed sideways */
 		DIV.flex-list {
