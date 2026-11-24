@@ -255,7 +255,7 @@ class SelectionRect {
 		let type  = Elements.GreatestType || CT_LINKS,
 			count = type == CT_LINKS ? UniqueLinks(Elements.Links).length : Elements.Counts.get(type);
 
-		this.elRect.firstElementChild.innerHTML = `${count} ${type}`;
+		this.elRect.firstElementChild.textContent = `${count} ${type}`;
 
 		return this.AlignCounter();
 	}
