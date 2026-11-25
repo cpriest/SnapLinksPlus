@@ -436,3 +436,42 @@ describe('GetClientDims (the viewport, not the page)', () => {
 		expect(dims()).toEqual([1024, 768]);
 	});
 });
+
+describe('after a selection', () => {
+	test('scrolling a scrollable part of the page (a sidebar, a chat list) neither searches again nor throws, now that the lasso is gone', () => {
+		drag([50, 50], [450, 200]);
+
+		let errors = [], selected = [];
+		let onError = (e) => errors.push(e.error);
+		window.addEventListener('error', onError);
+		run('(log) => sub(ElementsSelected, c => log.push(c))')(selected);
+
+		document.body.dispatchEvent(new Event('scroll'));
+		window.removeEventListener('error', onError);
+
+		expect(errors).toEqual([]);
+		expect(selected).toEqual([]);
+	});
+
+	test('scrolling a scrollable part of the page during a drag still searches again, as before', () => {
+		down(50, 50);
+		move(450, 200);
+
+		let selected = [];
+		run('(log) => sub(ElementsSelected, c => log.push(c))')(selected);
+		document.body.dispatchEvent(new Event('scroll'));
+		up(450, 200);
+
+		expect(selected.map(c => c.Links.map(a => a.id))).toEqual([['a', 'b']]);
+	});
+
+	test('each drag does not add another ElementsSelected listener', () => {
+		drag([50, 50], [450, 200]);
+		let afterOne = run('channels.elementsselected.length');
+
+		drag([50, 50], [450, 200]);
+		drag([50, 50], [450, 200]);
+
+		expect(run('channels.elementsselected.length')).toBe(afterOne);
+	});
+});

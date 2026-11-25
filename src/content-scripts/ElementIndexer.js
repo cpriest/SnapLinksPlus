@@ -182,8 +182,12 @@ class ElementIndexer {
 
 		sub(DragCompleted, (data) => {
 			delete this._Elements;
+			delete this.LastDragDims;
 		});
 		sub(ElementPositionsChanged, (data) => {
+			if(!this.LastDragDims)
+				return;
+
 			this.UpdateIndex();
 			pub(ElementsSelected, this.Search(this.LastDragDims));
 		});
