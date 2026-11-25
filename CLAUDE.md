@@ -102,6 +102,7 @@ Add a setting by putting a default in `DefaultPrefs` (`globals.js`), then a cont
 ## Gotchas
 
 - MV3 applies the extension's content security policy to content scripts too: no `eval`/`new Function` anywhere (`test.Build.js` checks the build). Firefox treats MV3 host access (the content scripts' `<all_urls>`) as revocable by the user (an MV2 → MV3 update keeps it, see `CONTEXT-GRAPH.md`): `ALL_SITES_PERMISSION`, the options page note and `CheckSitesPermission()` handle a withdrawn one.
+- A page's CSP (`style-src` without `'unsafe-inline'`) blocks a `<style>` element or `style` attribute a content script adds, in Firefox (#527). Style page elements through `element.style` only; the CSSOM is never subject to CSP (see `CONTEXT-GRAPH.md`).
 - Runs in **every frame** of every page; be wary of anything heavy at load, and of global name collisions with page scripts (content scripts share an isolated world, but the extension's own files share one scope).
 - Obscured-element detection samples only the rect midpoint; partly covered elements can be mis-classified (known idea in `DevNotes.md`).
 - Gulp 5 pitfalls (both bit 3.1.16): `gulp.src` needs `{ encoding: false }` or it corrupts PNGs, and a positive glob listed after a `!negation` gets base `.` (options.html landed in `src/src/html/`). Keep positive globs first. `test.Build.js` guards both.

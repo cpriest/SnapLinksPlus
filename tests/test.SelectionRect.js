@@ -33,10 +33,15 @@ beforeEach(async () => {
 afterEach(() => cleanup());
 
 describe('construction', () => {
-	test('adds a hidden, positioned container and a style node', () => {
+	test('adds a hidden container, positioned by its own inline style rather than a style node (#527)', () => {
 		expect(container().style.display).toBe('none');
 		expect(container().querySelector('.SL_SelectionRect > .SL_SelectionLabel')).not.toBeNull();
-		expect(document.head.querySelector('style')).toBe(selection.StyleNode);
+		expect(document.querySelector('style')).toBeNull();
+		let { position, top, left, zIndex, pointerEvents } = container().style;
+		expect({ position, top, left, zIndex, pointerEvents }).toEqual({ position: 'absolute', top: '0px', left: '0px', zIndex: '999999', pointerEvents: 'none' });
+		expect(selection.elRect.style.position).toBe('absolute');
+		expect(selection.elRect.style.outline).toMatch(/dashed/);
+		expect(label().style.position).toBe('absolute');
 	});
 
 	test('announces the container so the SVG overlay can attach to it', () => {
@@ -162,23 +167,21 @@ describe('link counter', () => {
 });
 
 describe('DOM lifecycle', () => {
-	test('DragStarted puts the container and style in the page', () => {
+	test('DragStarted puts the container in the page', () => {
 		selection.RemoveElements();
 		expect(container()).toBeNull();
 
 		run('pub(DragStarted, {})');
 
 		expect(container()).toBe(selection.elContainer);
-		expect(document.head.contains(selection.StyleNode)).toBe(true);
 	});
 
-	test('DragCompleted removes them, hides the container and resets the rect', () => {
+	test('DragCompleted removes it, hides the container and resets the rect', () => {
 		selection.SetOrigin(100, 200).SetBottomRight(300, 500);
 
 		run('pub(DragCompleted, {})');
 
 		expect(container()).toBeNull();
-		expect(document.head.contains(selection.StyleNode)).toBe(false);
 		expect(selection.elContainer.style.display).toBe('none');
 		expect(selection.dims).toMatchObject({ width: 0, height: 0 });
 	});
@@ -187,7 +190,7 @@ describe('DOM lifecycle', () => {
 describe('site CSS resets (#567)', () => {
 	test('a `background-color: inherit` reset does not paint the selection rect opaque', () => {
 		// notepad-plus-plus.org resets every element to `background-color: inherit`, so the rect inherited the opaque page background.
-		// The site style goes first so that, in jsdom as in a browser, the extension's rules win.
+		// The extension's inline styles win over the site's rule.
 		let siteStyle = document.createElement('style');
 		siteStyle.textContent = 'html { background-color: #fefefe; } *, *::before, *::after { background-color: inherit; }';
 		document.head.appendChild(siteStyle);

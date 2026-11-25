@@ -38,6 +38,7 @@ class SvgOverlayMgr {
 				<rect width="0" height="0"/> <!-- Used for easily cloning the properly namespaced rect -->
 			</svg>
 		`);
+		this.Overlay.style.cssText = 'all: initial; overflow: visible; position: absolute; top: 0px; left: 0px; width: 10px; height: 10px;';
 		Container.appendChild(this.Overlay);
 
 		sub(DocSizeChanged, (data) => {
@@ -75,8 +76,13 @@ class SvgOverlayMgr {
 			elem = this.AvailableRects.pop();
 		}
 
-		for(let name of Object.keys(attr))
-			elem.setAttribute(name, attr[name]);
+		/* The style goes through the CSSOM: a page's CSP can block style attributes, never element.style (#527) */
+		for(let name of Object.keys(attr)) {
+			if(name === 'style')
+				elem.style.cssText = attr.style;
+			else
+				elem.setAttribute(name, attr[name]);
+		}
 
 		return elem;
 	}

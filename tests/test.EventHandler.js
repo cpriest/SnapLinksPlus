@@ -168,6 +168,28 @@ describe('during the drag', () => {
 		expect(container().querySelector('.SL_SelectionLabel').innerHTML).toBe('1 Links');
 	});
 
+	test('the lasso and the highlights are styled through element.style, which a page CSP cannot block (#527)', () => {
+		// With a CSP such as `style-src 'self'`, Firefox drops a <style> element and style attributes that come from markup or
+		// setAttribute(): the lasso lost its outline and position and its counter ended up in the top-left corner.
+		let setAttribute = jest.spyOn(Element.prototype, 'setAttribute');
+
+		down(50, 50);
+		move(450, 200);
+
+		let rect = container().querySelector('.SL_SelectionRect');
+
+		expect(document.querySelector('style')).toBeNull();
+		expect(setAttribute.mock.calls.filter(([name]) => name.toLowerCase() === 'style')).toEqual([]);
+		expect([getComputedStyle(container()).position, getComputedStyle(container()).zIndex]).toEqual(['absolute', '999999']);
+		expect(getComputedStyle(rect).position).toBe('absolute');
+		expect(rect.style.outline).toMatch(/dashed/);
+		expect(getComputedStyle(rect.firstElementChild).position).toBe('absolute');
+		expect(getComputedStyle(container().querySelector('svg')).position).toBe('absolute');
+		expect(container().querySelector('rect.ActOn').style.cssText).toBe(run('Prefs.HighlightStyles_ActOnElements'));
+
+		setAttribute.mockRestore();
+	});
+
 	test('dragging past the bottom of the window autoscrolls', () => {
 		down(50, 50);
 		move(450, 900);

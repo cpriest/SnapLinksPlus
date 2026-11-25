@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="Content-Security-Policy" content="style-src 'self'">
+	<title>Page CSP blocks inline styles (#527)</title>
+</head>
+<body>
+<p>This page's CSP (<code>style-src 'self'</code>) blocks inline &lt;style&gt; elements and style attributes, like mangaupdates.com, FreshRSS
+	(#527) and arewewaylandyet.com (#466) do.</p>
+<p>Lasso the links: the green dashed lasso is drawn, the counter sits next to the cursor and the links are highlighted. Before the fix
+	Firefox drew no lasso and put the counter in the top-left corner of the page.</p>
+<ul>
+	<li><a href="https://example.com/1">Link 1</a></li>
+	<li><a href="https://example.com/2">Link 2</a></li>
+	<li><a href="https://example.com/3">Link 3</a></li>
+	<li><a href="https://example.com/4">Link 4</a></li>
+	<li><a href="https://example.com/5">Link 5</a></li>
+</ul>
+<p>
+	<label><input type="checkbox"> Checkbox 1</label>
+	<label><input type="checkbox"> Checkbox 2</label>
+	<label><input type="checkbox"> Checkbox 3</label>
+</p>
+</body>
+</html>

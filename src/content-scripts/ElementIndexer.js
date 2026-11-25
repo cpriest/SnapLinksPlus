@@ -330,6 +330,7 @@ class ElementIndexer {
 		let elContainer                 = document.querySelector('DIV.SnapLinksContainer');
 
 		// We move our container down the zIndex for document.elementFromPoint purposes, seems to have little impact on performance
+		let zIndex               = elContainer.style.zIndex;
 		elContainer.style.zIndex = '-999999';
 
 		for(let j = FirstBucket; j <= LastBucket; j++) {
@@ -385,7 +386,7 @@ class ElementIndexer {
 				NonMatches.add(elem);
 			}
 		}
-		elContainer.style.zIndex = '';
+		elContainer.style.zIndex = zIndex;
 
 		if(rr)
 			rr.report(Matches.size);
