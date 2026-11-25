@@ -76,8 +76,24 @@ class Options {
 				devModeElem.addEventListener('change', UpdateCheckboxState);
 				UpdateCheckboxState();
 			})
+			.then(() => this.SetupResetColors())
 			.then(() => this.SetupBookmarkPermission())
 			.then(() => this.SetupSitesPermission());
+	}
+
+	SetupResetColors() {
+		let button = $('#ResetColors')[0];
+
+		if(!button)
+			return;
+
+		button.addEventListener('click', () => {
+			for(let key of ['SelectionRectColor', 'HighlightColor']) {
+				let node   = document.getElementById(key);
+				node.value = this.prefs.Defaults[key];
+				node.dispatchEvent(new Event('input'));
+			}
+		});
 	}
 
 	/**
@@ -191,6 +207,7 @@ class Options {
 		switch(node.type) {
 			case 'text':
 			case 'password':
+			case 'color':
 				return this.UI_TYPE_TEXT_FIELD;
 			case 'checkbox':
 				return this.UI_TYPE_CHECKBOX;

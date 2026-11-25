@@ -191,6 +191,36 @@ describe('saving preferences', () => {
 	});
 });
 
+describe('colors', () => {
+	test('the color pickers show the default colors when nothing is stored', async () => {
+		await load();
+
+		expect(el('SelectionRectColor').value).toBe('#009900');
+		expect(el('HighlightColor').value).toBe('#ff0000');
+	});
+
+	test('a picked color is saved', async () => {
+		await load();
+
+		el('SelectionRectColor').value = '#ff8800';
+		change(el('SelectionRectColor'), 'input');
+		await flush();
+
+		expect(stored().SelectionRectColor).toBe('#ff8800');
+	});
+
+	test('Default colors puts both default colors back, and saves them', async () => {
+		await load({ SelectionRectColor: '#ff0000', HighlightColor: '#0000ff' });
+		expect(el('SelectionRectColor').value).toBe('#ff0000');
+
+		el('ResetColors').click();
+		await flush();
+
+		expect([el('SelectionRectColor').value, el('HighlightColor').value]).toEqual(['#009900', '#ff0000']);
+		expect(stored()).toMatchObject({ SelectionRectColor: '#009900', HighlightColor: '#ff0000' });
+	});
+});
+
 describe('developer options', () => {
 	test('are disabled until Dev Mode is on, and follow the checkbox', async () => {
 		await load();

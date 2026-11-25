@@ -78,10 +78,10 @@ describe('SetBottomRight', () => {
 		expect(published[0].dims).toMatchObject({ top: 100, left: 200, bottom: 300, right: 500 });
 	});
 
-	test('the selection is clipped to the document, less a 2px margin', () => {
+	test('the selection is clipped to the document, less the 3px outline', () => {
 		selection.SetOrigin(100, 200).SetBottomRight(5000, 5000);
 
-		expect(published[0].dims).toMatchObject({ bottom: 798, right: 998 });
+		expect(published[0].dims).toMatchObject({ bottom: 797, right: 997 });
 	});
 });
 
@@ -172,6 +172,15 @@ describe('DOM lifecycle', () => {
 		expect(document.head.contains(selection.StyleNode)).toBe(true);
 	});
 
+	test('DragStarted outlines the rect in SelectionRectColor, read at each drag so a color chosen in the options needs no reload', () => {
+		run('pub(DragStarted, {})');
+		expect(selection.elRect.style.outlineColor).toMatch(/^(#009900|rgb\(0, 153, 0\))$/);
+
+		run('Prefs = { ...DefaultPrefs, SelectionRectColor: "#ff8800" }');
+		run('pub(DragStarted, {})');
+		expect(selection.elRect.style.outlineColor).toMatch(/^(#ff8800|rgb\(255, 136, 0\))$/);
+	});
+
 	test('DragCompleted removes them, hides the container and resets the rect', () => {
 		selection.SetOrigin(100, 200).SetBottomRight(300, 500);
 
@@ -199,5 +208,13 @@ describe('site CSS resets (#567)', () => {
 		expect(getComputedStyle(second.elContainer).backgroundColor).toBe('rgba(0, 0, 0, 0)');
 
 		siteStyle.remove();
+	});
+});
+
+describe('selection rect outline', () => {
+	test('is a 3px dashed line', () => {
+		let rule = Array.from(selection.StyleNode.sheet.cssRules).find(r => r.selectorText === '.SnapLinksContainer > .SL_SelectionRect');
+
+		expect(rule.style.outline.split(' ')).toEqual(expect.arrayContaining(['3px', 'dashed']));
 	});
 });

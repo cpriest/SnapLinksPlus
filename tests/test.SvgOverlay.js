@@ -70,11 +70,19 @@ describe('initialization', () => {
 describe('Highlight', () => {
 	beforeEach(init);
 
-	test('draws one rect per client rect of each element, using the highlight style', () => {
+	test('draws one rect per client rect of each element, using the highlight color and style', () => {
 		select('a', 'b');
 
 		expect(rects()).toEqual([[10, 10, 100, 20], [10, 50, 50, 20], [10, 80, 50, 20]]);
-		expect(container.querySelector('rect.ActOn').getAttribute('style')).toBe(run('Prefs.HighlightStyles_ActOnElements'));
+		expect(container.querySelector('rect.ActOn').getAttribute('style')).toBe('fill: #ff0000; stroke: #ff0000; fill-opacity: .10; stroke-width: 1px;');
+	});
+
+	test('a HighlightColor chosen in the options applies to the next highlight, without reloading the page', () => {
+		run('Prefs = { ...DefaultPrefs, HighlightColor: "#ff8800" }');
+
+		select('a');
+
+		expect(container.querySelector('rect.ActOn').getAttribute('style')).toBe('fill: #ff8800; stroke: #ff8800; fill-opacity: .10; stroke-width: 1px;');
 	});
 
 	test('removes the highlight of elements that are no longer selected, and keeps the others', () => {
