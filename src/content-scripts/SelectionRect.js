@@ -151,7 +151,7 @@ class SelectionRect {
 		this.elRect = this.elContainer.firstElementChild;
 
 		/* Styled through element.style, not a <style> element or style attributes: a page's CSP (style-src without
-		 'unsafe-inline') blocks those in Firefox, but never the CSSOM (#527).  Inline styles also win over the page's rules. */
+		 'unsafe-inline') blocks those in Firefox, but never the CSSOM (#527).  Inline styles also win over the page's rules, except !important ones. */
 		this.elContainer.style.cssText =
 			'pointer-events: none; z-index: 999999; position: absolute; top: 0px; left: 0px; margin: 0px; padding: 0px; height: 0px; width: 0px; ' +
 			'background-color: transparent;';
