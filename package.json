@@ -27,6 +27,11 @@
 		"web-ext": "^10.8.0",
 		"webextension-polyfill": "^0.12.0"
 	},
+	"overrides": {
+		"node-notifier": {
+			"uuid": "^11.1.1"
+		}
+	},
 	"scripts": {
 		"lint": "eslint src/",
 		"lint-fix": "eslint --fix src/",
