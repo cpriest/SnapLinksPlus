@@ -77,6 +77,24 @@ describe('Highlight', () => {
 		expect(container.querySelector('rect.ActOn').getAttribute('style')).toBe(run('Prefs.HighlightStyles_ActOnElements'));
 	});
 
+	test('highlights only what the action acts upon: the links, not the buttons beside them (#282)', () => {
+		let more = document.body.appendChild(Object.assign(document.createElement('button'), { textContent: 'Save' }));
+		place(more, [300, 0, 320, 40]);
+
+		run('(c) => pub(ElementsSelected, c)')(new (run('CategorizedCollection'))([els.a, more]));
+
+		expect(rects()).toEqual([[10, 10, 100, 20]]);
+	});
+
+	test('highlights one link to each page', () => {
+		let again = document.body.appendChild(Object.assign(document.createElement('a'), { href: '/a' }));
+		place(again, [300, 0, 320, 40]);
+
+		run('(c) => pub(ElementsSelected, c)')(new (run('CategorizedCollection'))([els.a, again, els.c]));
+
+		expect(rects()).toEqual([[10, 10, 100, 20], [0, 200, 50, 20]]);
+	});
+
 	test('removes the highlight of elements that are no longer selected, and keeps the others', () => {
 		select('a', 'b');
 		select('b');
