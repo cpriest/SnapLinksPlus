@@ -232,6 +232,24 @@ describe('ElementIndexer', () => {
 			expect(ids(search(400, 0, 500, 200))).toEqual([]);
 		});
 
+		test('a pointer-events: none element hit-tested through to an ancestor is not considered covered', () => {
+			// elementFromPoint skips pointer-events: none elements and returns the ancestor behind them (#552)
+			setup('<div id="page"><input id="bare" type="checkbox" style="pointer-events: none">' +
+					'<div id="wrap"><input id="cb" type="checkbox" style="pointer-events: none"></div></div>',
+				{ wrap: [405, 5, 445, 50], page: [200, 0, 460, 60], bare: [210, 10, 240, 40], cb: [410, 10, 440, 40] });
+			indexer.UpdateIndex();
+
+			expect(ids(search(200, 0, 460, 60))).toEqual(['bare', 'cb']);
+		});
+
+		test('a pointer-events: none element covered by an unrelated element is still excluded', () => {
+			setup('<input id="cb" type="checkbox" style="pointer-events: none"><div id="cover"></div>',
+				{ cover: [405, 5, 445, 50], cb: [410, 10, 440, 40] });
+			indexer.UpdateIndex();
+
+			expect(ids(search(400, 0, 460, 60))).toEqual([]);
+		});
+
 		test('an element whose center is a descendant of itself, or a label, is not considered covered', () => {
 			let els = setup('<a id="a" href="/1"><span id="inner"></span></a><input id="cb" type="checkbox"><label id="lbl" for="cb"></label>',
 				{ a: [10, 10, 40, 110], cb: [210, 10, 240, 40], lbl: [210, 10, 240, 40] },
