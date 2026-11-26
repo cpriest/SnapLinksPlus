@@ -12,6 +12,7 @@
  *  - State that must outlive the page goes to storage (see TabStacks).
  */
 
+/** Settles once every open request so far has finished, see QueueOpen() */
 let openUrlsPromiseChain = Promise.resolve();
 
 /** The number of open requests queued or running, see QueueOpen() */
@@ -245,7 +246,8 @@ function FormatLinks(urls, titles, format, eol) {
 }
 
 /**
- * Runs open() after the earlier open requests, so selections open in the order they were made.
+ * Runs open() at once, so a slow selection does not hold up the next one (#599).  With Prefs.SingleOpenQueue, it runs
+ * after the earlier open requests instead, so selections open in the order they were made (#534).
  * Errors are caught so that a failed request doesn't leave the chain rejected, which would skip every later request (#578, #579).
  *
  * Firefox and Chrome reset the background's idle timer on every extension API call, which opening a tab is, but a
@@ -258,13 +260,15 @@ function QueueOpen(open) {
 	if(queuedOpens++ === 0)
 		keepAwakeTimer = setInterval(() => browser.runtime.getPlatformInfo(), KEEP_AWAKE_MS);
 
-	openUrlsPromiseChain = openUrlsPromiseChain
+	let request = (Prefs.SingleOpenQueue ? openUrlsPromiseChain : Promise.resolve())
 		.then(open)
 		.catch(error => console.error('Error while opening URLs: ', error))
 		.finally(() => {
 			if(--queuedOpens === 0)
 				clearInterval(keepAwakeTimer);
 		});
+
+	openUrlsPromiseChain = Promise.all([openUrlsPromiseChain, request]);
 }
 
 /**

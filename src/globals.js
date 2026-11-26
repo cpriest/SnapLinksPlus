@@ -98,8 +98,9 @@ const DefaultPrefs = {
 
 	SetOwnershipTabID_FF: false,	// Whether or not to set tab.openerTabId in Firefox on tab creation
 
-	NewTabDelayMS: 50,	// The delay in ms between new tabs being opened
-	ClickDelayMS:  50,   // The delay in ms between clicks on elements
+	NewTabDelayMS:   50,	// The delay in ms between new tabs being opened
+	SingleOpenQueue: false,	// Open each selection after the ones before it (#534), instead of all at once (#599)
+	ClickDelayMS:    50,   // The delay in ms between clicks on elements
 
 	StorageAPI: 'sync',
 
