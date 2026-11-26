@@ -256,10 +256,6 @@ class EventHandler {
 
 		pub(DragStarted, {});
 
-		sub(ElementsSelected, (Elements) => {
-			this.SelectedElements = Elements;
-		});
-
 		this.mmTimer = setInterval(this.onMouseMoveInterval.bind(this), 30);
 	}
 
@@ -383,6 +379,10 @@ class EventHandler {
 		SvgOverlay         = new SvgOverlayMgr();
 
 		this.CurrentSelection = new SelectionRect();
+
+		sub(ElementsSelected, (Elements) => {
+			this.SelectedElements = Elements;
+		});
 	}
 }
 
