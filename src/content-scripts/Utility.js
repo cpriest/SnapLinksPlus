@@ -11,15 +11,10 @@
  * @returns {HTMLElement}
  */
 function CreateElement(html) {
-	let DocFrag = document.createDocumentFragment();
-	let result;
+	let doc = new DOMParser().parseFromString(html, 'text/html');
 
-	DocFrag.appendChild(document.createElement('div'));
-	DocFrag.firstChild.innerHTML = html;
-	result                       = DocFrag.firstElementChild.firstElementChild;
-	result.remove();
-
-	return result;
+	// A <style> lands in the parsed document's head, everything else in its body
+	return document.adoptNode(doc.body.firstElementChild || doc.head.firstElementChild);
 }
 
 /**
