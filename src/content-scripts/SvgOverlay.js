@@ -32,7 +32,6 @@ class SvgOverlayMgr {
 	 * @param {HTMLElement} Container    The SnapLinks Container Element
 	 */
 	Init(Container) {
-		this.style   = Prefs.HighlightStyles_ActOnElements;
 		this.Overlay = CreateElement(`
 			<svg class="SnapLinksHighlighter" xmlns="http://www.w3.org/2000/svg">
 				<rect width="0" height="0"/> <!-- Used for easily cloning the properly namespaced rect -->
@@ -55,6 +54,11 @@ class SvgOverlayMgr {
 		sub(ElementPositionsChanged, (data) => {
 			this.Reposition();
 		});
+	}
+
+	/** @returns {string} */
+	get style() {
+		return `fill: ${Prefs.HighlightColor}; stroke: ${Prefs.HighlightColor}; ${Prefs.HighlightStyles_ActOnElements}`;
 	}
 
 	/**
@@ -111,7 +115,8 @@ class SvgOverlayMgr {
 			tHighlight   = tElems.filter(
 				(elem) => { return !tPrevElems.includes(elem); },
 			),
-			offset       = { x: window.scrollX, y: window.scrollY };
+			offset       = { x: window.scrollX, y: window.scrollY },
+			style        = this.style;
 
 		/* Remove highlighting of elements no longer in tElems */
 		for(let elem of tUnhighlight)
@@ -129,7 +134,7 @@ class SvgOverlayMgr {
 						y:      r.top,
 						width:  r.width,
 						height: r.height,
-						style:  this.style,
+						style:  style,
 						class:  'ActOn',
 					}),
 				);

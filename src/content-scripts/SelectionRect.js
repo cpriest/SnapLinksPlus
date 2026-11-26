@@ -154,12 +154,13 @@ class SelectionRect {
 						position: absolute; top: 0px; left: 0px; margin: 0px; padding: 0px; height: 0px; width: 0px;
 						background-color: transparent; }
 					.SnapLinksContainer > .SL_SelectionRect {
-						outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1;
+						outline: 3px dashed #009900; position: absolute; overflow: visible; z-index: 1;
 						background-color: transparent;
 					}
-					.SL_SelectionRect > .SL_SelectionLabel { 
-						position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px;	
-						font: normal 12px Verdana; white-space: nowrap; color: #000000;	
+					.SL_SelectionRect > .SL_SelectionLabel {
+						position: absolute; background: rgba(32,33,36,.92); border: 1px solid rgba(255,255,255,.18); border-radius: 999px; padding: 2px 9px;
+						font: 600 12px/16px system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: .2px; white-space: nowrap; color: #ffffff;
+						box-shadow: 0 2px 8px rgba(0,0,0,.3);
 					}
 				</style>
 			`)
@@ -219,7 +220,7 @@ class SelectionRect {
 	 */
 	SetBottomRight(bottom, right) {
 		let dr = (new DocRect(document))
-			.Expand(-2, -2);
+			.Expand(-3, -3);
 
 		let { width, height } = this.dims;
 
@@ -307,6 +308,8 @@ class SelectionRect {
 	 * @returns {this}
 	 */
 	InsertElements() {
+		this.elRect.style.outlineColor = Prefs.SelectionRectColor;
+
 		document.head.appendChild(this.StyleNode);
 		document.body.appendChild(this.elContainer);
 

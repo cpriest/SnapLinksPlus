@@ -72,7 +72,10 @@ const DefaultPrefs = {
 
 	SelectionLabel_CursorMargin: 2,
 
-	HighlightStyles_ActOnElements:       'fill: rgba(0,255,0,.10); stroke: rgba(0,255,0,1); stroke-width: 1px;',
+	SelectionRectColor: '#009900',
+	HighlightColor:     '#ff0000',
+
+	HighlightStyles_ActOnElements:       'fill-opacity: .10; stroke-width: 1px;',
 	HighlightStyles_IndexBoundaryMarker: 'fill: rgba(128,128,128,.5);',
 
 	HighlightStyles_ObscuredPoint: 'fill: rgba(255,0,0,.80);',

@@ -66,6 +66,10 @@
 		SELECT:enabled:hover, BUTTON:enabled:hover { background-color: var(--control-hover); }
 		INPUT[type=text], TEXTAREA { padding: 3px 6px; background: var(--field); border: 1px solid var(--field-line); }
 		INPUT[type=checkbox] { accent-color: var(--accent); }
+		INPUT[type=color] { width: 36px; height: 22px; margin: 0px 4px 0px 0px; padding: 1px 2px; vertical-align: middle; cursor: pointer;
+			background-color: var(--control); border: 1px solid var(--control-line); border-radius: 4px; }
+		DIV.colors { align-items: center; }
+		DIV.colors BUTTON { margin: 6px 0px 8px; }
 		:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 		LABEL { display: block; margin: 6px 4px 8px 0px; }
 		INPUT[type=checkbox] { margin: 0px 4px 0px 0px; vertical-align: -2px; }
@@ -199,6 +203,18 @@
 	<label title="Show a notification when an update has occurred.">
 		<input id="ShowUpdateNotification" type="checkbox"> Notify me when updates happen
 	</label>
+</div>
+
+<div class="flex-list colors">
+	<label title="The color of the dashed rectangle drawn while selecting.">
+		<input id="SelectionRectColor" type="color"> Selection rectangle color
+	</label>
+
+	<label title="The color of the outline drawn around each selected item.">
+		<input id="HighlightColor" type="color"> Selected items color
+	</label>
+
+	<button id="ResetColors" type="button" title="Put the default colors back.">Default colors</button>
 </div>
 
 <label title="Snap Links does nothing on pages that match one of these lines:
