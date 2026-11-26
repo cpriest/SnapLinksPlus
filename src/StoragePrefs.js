@@ -186,17 +186,30 @@ class StoragePrefs {
 	}
 
 	/**
-	 * Initializes this.storage based on the Options value, resolves auto if necessary
+	 * Initializes this.storage based on the Options value, resolves auto if necessary.
+	 * If storage.sync fails (Firefox with webextensions.storage.sync.enabled=false, #422), uses storage.local and records that
+	 * choice, so the settings still load and save.
 	 */
 	async SetupStorageAPI(StorageAPI) {
 		if(StorageAPI == 'auto')
 			StorageAPI = await this.GetValidStorageApiFromLocal();
 
-		this.storage = StorageAPI == 'local'
-						? browser.storage.local
-						: browser.storage.sync;
+		if(StorageAPI != 'local') {
+			try {
+				this.storage = browser.storage.sync;
+				this.Values  = await this.storage.get();
+			} catch(e) {
+				console.warn(`StoragePrefs: storage.sync.get() failed, using storage.local for the settings instead: ${e}`);
+				StorageAPI = 'local';
+				await browser.storage.local.set({ [StorageAPI_Key]: StorageAPI });
+			}
+		}
 
-		this.Values            = await this.storage.get();
+		if(StorageAPI == 'local') {
+			this.storage = browser.storage.local;
+			this.Values  = await this.storage.get();
+		}
+
 		this.Values.StorageAPI = StorageAPI;
 
 //		console.log(`${this.id}: storage.${StorageAPI}.get(), Values = `, this.Values);

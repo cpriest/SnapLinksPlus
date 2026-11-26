@@ -209,11 +209,31 @@ class Options {
 		}, 250);
 	}
 
+	/**
+	 * Binds a checkbox to a pref.  Most checkbox prefs are booleans: the box shows the pref and saves true or false.
+	 *
+	 * A pref with two string values can use a checkbox too, when the markup names the two values in data-* attributes
+	 * (standard HTML custom attributes, read here through node.dataset; the names are this page's own convention):
+	 *
+	 *		<input id="StorageAPI" type="checkbox" data-checked="local" data-unchecked="sync">
+	 *
+	 * The box is checked when the pref equals data-checked, and saves data-checked or data-unchecked when changed.  So
+	 * StorageAPI keeps its stored 'local' / 'sync' values, which StoragePrefs reads.
+	 */
 	bindToCheckbox(aKey) {
-		let node     = document.getElementById(aKey);
-		node.checked = this.prefs[aKey];
+		let node                 = document.getElementById(aKey),
+			{ checked, unchecked } = node.dataset,
+			isBoolean            = checked === undefined;
+
+		node.checked = isBoolean
+			? this.prefs[aKey]
+			: this.prefs[aKey] === checked;
+
 		node.addEventListener('change', () => {
-			this.throttledUpdate(aKey, node.checked);
+			if(isBoolean)
+				this.throttledUpdate(aKey, node.checked);
+			else
+				this.throttledUpdate(aKey, node.checked ? checked : unchecked);
 		});
 	}
 

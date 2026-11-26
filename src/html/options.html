@@ -243,10 +243,10 @@
 		Delay between clicks on elements: <input type="text" size="2" id="ClickDelayMS"> ms
 	</label>
 
-	<select id="StorageAPI" title="Syncronize your settings across all Firefox browsers or use Local Storage?">
-		<option value="sync">Sync storage</option>
-		<option value="local">Local storage</option>
-	</select>
+	<label title="Keep the settings on this computer only.
+&bull;  When off, the browser syncs them to your other computers that use the same account.">
+		<input id="StorageAPI" type="checkbox" data-checked="local" data-unchecked="sync"> Use local storage for preferences
+	</label>
 
 	<details id="UI_DevOptions_Section">
 		<summary>Developer Options</summary>

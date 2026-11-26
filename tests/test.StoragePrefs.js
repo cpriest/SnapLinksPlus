@@ -73,6 +73,54 @@ describe('choosing the storage area', () => {
 	});
 });
 
+describe('storage.sync unavailable (#422: webextensions.storage.sync.enabled=false in Firefox)', () => {
+	/** As setup(), but every storage.sync call rejects as Firefox's does with sync disabled */
+	async function setupWithoutSync(local = {}, options = { StorageAPI: 'auto' }) {
+		let browser = makeBrowser({ local, sync: { Alpha: 'from-sync' } });
+		let error   = new Error('Please set webextensions.storage.sync.enabled to true in about:config');
+		for(let method of ['get', 'set', 'remove'])
+			browser.storage.sync[method].mockRejectedValue(error);
+
+		let { run } = loadScripts(['StoragePrefs.js', 'globals.js'], browser);
+		let warnings = [];
+		run('(log) => { console.warn = (...a) => log.push(a); }')(warnings);
+		let prefs = run('(Defaults, options) => new StoragePrefs(Defaults, options)')(Defaults, options);
+
+		await prefs.Ready;
+
+		return { prefs, browser, warnings };
+	}
+
+	test('falls back to local storage, so the stored settings are read', async () => {
+		let { prefs, warnings } = await setupWithoutSync({ Alpha: 'from-local' });
+
+		expect(prefs.Alpha).toBe('from-local');
+		expect(prefs.Values.StorageAPI).toBe('local');
+		expect(warnings[0][0]).toContain('storage.sync');
+	});
+
+	test('records StorageAPI=local, so later loads go straight to local storage', async () => {
+		let { browser } = await setupWithoutSync();
+
+		expect(browser.storage.local.data.StorageAPI).toBe('local');
+	});
+
+	test('settings are saved to local storage', async () => {
+		let { prefs, browser } = await setupWithoutSync();
+
+		prefs.Alpha = 7;
+		await flush();
+
+		expect(browser.storage.local.data.Alpha).toBe(7);
+	});
+
+	test('an explicit StorageAPI=sync falls back too', async () => {
+		let { prefs } = await setupWithoutSync({ Alpha: 'from-local' }, { StorageAPI: 'sync' });
+
+		expect(prefs.Alpha).toBe('from-local');
+	});
+});
+
 describe('writing values', () => {
 	test('set persists to the active storage area only', async () => {
 		let { prefs, browser } = await setup();

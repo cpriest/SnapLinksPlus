@@ -24,9 +24,9 @@ const flush   = async () => { jest.advanceTimersByTime(250); await jest.runAllTi
 const stored  = () => browser.storage.sync.data;
 const change  = (node, type = 'change') => node.dispatchEvent(new Event(type, { bubbles: true }));
 
-async function load(sync = {}, extraApis = {}) {
+async function load(sync = {}, extraApis = {}, local = {}) {
 	document.body.innerHTML = BodyHtml;
-	browser                 = Object.assign(makeBrowser({ sync }), extraApis);
+	browser                 = Object.assign(makeBrowser({ sync, local }), extraApis);
 	({ run } = loadScriptsInDom(['StoragePrefs.js', 'globals.js', 'lib/Options.js'], browser));
 	await run('DOMReady');
 	await Promise.resolve();
@@ -115,8 +115,10 @@ describe('markup matches the code', () => {
 			.toEqual(['COPY_URLS', 'COPY_TITLES_URLS', 'COPY_TITLES', 'COPY_MARKDOWN', 'COPY_HTML', 'COPY_HTML_LIST', 'COPY_URLS_SPACED'].map(c => run(c)).sort());
 	});
 
-	test('StorageAPI options are the valid storage areas', () => {
-		expect(Array.from(el('StorageAPI').options).map(o => o.value).sort()).toEqual(['local', 'sync']);
+	test('StorageAPI is a checkbox for the local storage area, unchecked for sync', () => {
+		expect(el('StorageAPI').type).toBe('checkbox');
+		expect([el('StorageAPI').dataset.checked, el('StorageAPI').dataset.unchecked]).toEqual(['local', 'sync']);
+		expect(el('StorageAPI').closest('label').textContent).toContain('Use local storage for preferences');
 	});
 });
 
@@ -129,6 +131,12 @@ describe('showing preferences', () => {
 		expect(el('OpenTabs').value).toBe(run('TABS_OPEN_NATURAL'));
 		expect(el('Activation_Min').value).toBe('5');
 		expect(el('DevMode').checked).toBe(false);
+	});
+
+	test('"Use local storage for preferences" is checked when the settings are in local storage', async () => {
+		await load({}, {}, { StorageAPI: 'local' });
+
+		expect(el('StorageAPI').checked).toBe(true);
 	});
 
 	test('stored values override the defaults, for every control type', async () => {
@@ -160,6 +168,17 @@ describe('saving preferences', () => {
 		await flush();
 
 		expect(stored().OpenTabs).toBe(run('TABS_OPEN_END'));
+	});
+
+	test('a checkbox with data-checked/data-unchecked saves those values: checking "Use local storage" moves the settings to local', async () => {
+		expect(el('StorageAPI').checked).toBe(false);
+
+		el('StorageAPI').checked = true;
+		change(el('StorageAPI'));
+		await flush();
+		await Promise.resolve();
+
+		expect(browser.storage.local.data.StorageAPI).toBe('local');
 	});
 
 	test('typing in a text field saves the final value only', async () => {
