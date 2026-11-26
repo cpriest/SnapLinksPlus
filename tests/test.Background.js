@@ -54,7 +54,7 @@ let platformOs;
 /** Replaces the storage-backed Prefs so each test controls exactly what background.js sees */
 const setPrefs = (overrides = {}) => run('(p) => { Prefs = p; }')({
 	OpenTabs: run('TABS_OPEN_NATURAL'), SwitchFocusToNewTab: true, NewTabDelayMS: 0, SetOwnershipTabID_FF: false, NewTabsOpenUnloaded: false,
-	...overrides,
+	SingleOpenQueue: false, ...overrides,
 });
 
 /**
@@ -223,7 +223,23 @@ describe('message handling', () => {
 		expect(strip.api.create).not.toHaveBeenCalled();
 	});
 
-	test('OPEN_URLS_IN_TABS batches are processed one after another, in the order received', async () => {
+	test('each OPEN_URLS_IN_TABS batch opens at once, so a stalled batch does not hold up the next (#599)', async () => {
+		let release;
+		strip.api.create.mockImplementationOnce((props) => new Promise(resolve => release = () => resolve({ ...props, id: 99 })));	// a1 stalls
+
+		send({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a1', 'a2'] });
+		send({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['b1'] });
+		await flush();
+
+		expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['a1', 'b1']);
+
+		release();
+		await run('openUrlsPromiseChain');
+		expect(strip.api.create.mock.calls.map(([p]) => p.url)).toEqual(['a1', 'b1', 'a2']);
+	});
+
+	test('with SingleOpenQueue, OPEN_URLS_IN_TABS batches are processed one after another, in the order received (#534)', async () => {
+		setPrefs({ SingleOpenQueue: true });
 		send({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a1', 'a2'] });
 		send({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['b1'] });
 		await flush();
@@ -594,6 +610,7 @@ describe('OpenUrlsInWindow (#182)', () => {
 	});
 
 	test('OPEN_URLS_IN_WINDOW messages use the sending tab and share the queue with OPEN_URLS_IN_TABS', async () => {
+		setPrefs({ SingleOpenQueue: true });
 		run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a1'] }, { tab: source }, () => {});
 		run('onMessage')({ Action: run('OPEN_URLS_IN_WINDOW'), tUrls: ['w1', 'w2'] }, { tab: { ...source, cookieStoreId: 'c9' } }, () => {});
 		await flush();
@@ -919,6 +936,7 @@ describe('event page (Manifest V3)', () => {
 			setInterval:   (fn, ms) => timers.push({ fn, ms }),
 			clearInterval: (id) => cleared.push(id),
 		});
+		setPrefs({ SingleOpenQueue: true });
 		let getPlatformInfo = jest.spyOn(browser.runtime, 'getPlatformInfo');
 
 		run('onMessage')({ Action: run('OPEN_URLS_IN_TABS'), tUrls: ['a'] }, {}, () => {});
