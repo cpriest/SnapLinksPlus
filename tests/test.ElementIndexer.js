@@ -248,17 +248,18 @@ describe('ElementIndexer', () => {
 			expect(indexer.Search(undefined).All).toEqual([]);
 		});
 
-		test('the container is sent behind the page while searching and restored after', () => {
+		test('the container is sent behind the page while searching and gets its own z-index back after (#527)', () => {
 			let els = setup(html, rects);
 			indexer.UpdateIndex();
 			let container = document.querySelector('DIV.SnapLinksContainer');
+			container.style.zIndex = '999999';
 			let seen;
 			document.elementFromPoint.mockImplementation(() => { seen = container.style.zIndex; return els.mid; });
 
 			search(400, 0, 500, 200);
 
 			expect(seen).toBe('-999999');
-			expect(container.style.zIndex).toBe('');
+			expect(container.style.zIndex).toBe('999999');
 		});
 	});
 

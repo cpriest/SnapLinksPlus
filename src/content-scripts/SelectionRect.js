@@ -140,31 +140,6 @@ class SelectionRect {
 	constructor() {
 		this.dims = new Rect();
 
-		//noinspection CssUnusedSymbol
-		document.head.appendChild(
-			this.StyleNode = CreateElement(`
-				<style>
-					.SnapLinksContainer :not([xyz]) {  }
-					.SnapLinksContainer .SnapLinksHighlighter {
-						all: initial; overflow: visible;
-						position: absolute; top: 0px; left: 0px; width: 10px; height: 10px;
-					}
-					.SnapLinksContainer {
-						pointer-events: none; z-index: 999999;
-						position: absolute; top: 0px; left: 0px; margin: 0px; padding: 0px; height: 0px; width: 0px;
-						background-color: transparent; }
-					.SnapLinksContainer > .SL_SelectionRect {
-						outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1;
-						background-color: transparent;
-					}
-					.SL_SelectionRect > .SL_SelectionLabel { 
-						position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px;	
-						font: normal 12px Verdana; white-space: nowrap; color: #000000;	
-					}
-				</style>
-			`)
-		);
-
 		this.elContainer = CreateElement(
 			'<div class="SnapLinksContainer">' +
 			'	<div class="SL_SelectionRect">' +
@@ -174,6 +149,17 @@ class SelectionRect {
 		);
 
 		this.elRect = this.elContainer.firstElementChild;
+
+		/* Styled through element.style, not a <style> element or style attributes: a page's CSP (style-src without
+		 'unsafe-inline') blocks those in Firefox, but never the CSSOM (#527).  Inline styles also win over the page's rules, except !important ones. */
+		this.elContainer.style.cssText =
+			'pointer-events: none; z-index: 999999; position: absolute; top: 0px; left: 0px; margin: 0px; padding: 0px; height: 0px; width: 0px; ' +
+			'background-color: transparent;';
+		this.elRect.style.cssText =
+			'outline: 2px dashed rgba(0,200,0,1); position: absolute; overflow: visible; z-index: 1; background-color: transparent;';
+		this.elRect.firstElementChild.style.cssText =
+			'position: absolute; background: #FFFFD9; border: 1px solid black; border-radius: 2px; padding: 2px; ' +
+			'font: normal 12px Verdana; white-space: nowrap; color: #000000;';
 
 		document.body.appendChild(this.elContainer);
 
@@ -307,7 +293,6 @@ class SelectionRect {
 	 * @returns {this}
 	 */
 	InsertElements() {
-		document.head.appendChild(this.StyleNode);
 		document.body.appendChild(this.elContainer);
 
 		return this;
@@ -324,7 +309,6 @@ class SelectionRect {
 		this.elContainer.style.display = 'none';
 
 		this.elContainer.remove();
-		this.StyleNode.remove();
 
 		return this;
 	}
