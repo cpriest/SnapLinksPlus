@@ -3,6 +3,7 @@ Unreleased
 * Settings load and save when Firefox sync storage is turned off (webextensions.storage.sync.enabled=false): Snap Links uses local storage instead (#422)
 * Options: the storage drop-down is now a checkbox, "Use local storage for preferences" (Advanced)
 * 3.2.0 Behavior of using a single queue (#599, #534) now gated behind "Use a single queue for opening links" (Advanced) option, defaults to 3.1.15 behavior.
+* Fixed: when Shift+left click activates Snap Links, a Shift+click extends the text selection again (#361)
 
 v3.2.1 / 2026-11-24
 ===================

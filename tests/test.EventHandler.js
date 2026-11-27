@@ -282,6 +282,112 @@ describe('finishing the drag', () => {
 	});
 });
 
+describe('Shift+click when Shift+left button activates (#361)', () => {
+	const shift = { buttons: LMB, button: 0, shiftKey: true };
+	/** [anchorOffset, focusOffset, selected text] */
+	const sel   = () => [getSelection().anchorOffset, getSelection().focusOffset, getSelection().toString()];
+
+	let text;
+
+	/** @param {object} sync    Activation prefs */
+	async function reload(sync) {
+		cleanup();
+		cleanup = trackListeners();
+		await load({ sync });
+	}
+
+	beforeEach(async () => {
+		await reload({ ActivateMouseButton: LMB, ActivateModifiers: 4 });
+
+		let p = document.createElement('p');
+		p.textContent = 'Alpha bravo charlie';
+		document.body.appendChild(p);
+		text = p.firstChild;
+
+		getSelection().collapse(text, 2);
+		document.caretPositionFromPoint = jest.fn(() => ({ offsetNode: text, offset: 11 }));
+	});
+
+	afterEach(() => {
+		delete document.caretPositionFromPoint;
+		delete document.caretRangeFromPoint;
+		getSelection().removeAllRanges();
+	});
+
+	test('a Shift+click extends the text selection to the clicked point, as the browser would', () => {
+		let e = down(50, 50, shift);
+		up(50, 50, shift);
+
+		expect(e.defaultPrevented).toBe(true);
+		expect(document.caretPositionFromPoint).toHaveBeenCalledWith(50, 50);
+		expect(sel()).toEqual([2, 11, 'pha bravo']);
+	});
+
+	test('with no selection yet, a Shift+click places the caret at the clicked point', () => {
+		getSelection().removeAllRanges();
+
+		down(50, 50, shift);
+		up(50, 50, shift);
+
+		expect(getSelection().isCollapsed).toBe(true);
+		expect(sel()).toEqual([11, 11, '']);
+	});
+
+	test('Chrome before 128 has no caretPositionFromPoint: caretRangeFromPoint is used', () => {
+		delete document.caretPositionFromPoint;
+		document.caretRangeFromPoint = jest.fn(() => {
+			let range = document.createRange();
+			range.setStart(text, 6);
+			return range;
+		});
+
+		down(50, 50, shift);
+		up(50, 50, shift);
+
+		expect(sel()).toEqual([2, 6, 'pha ']);
+	});
+
+	test('a Shift+drag still selects links and leaves the text selection alone (#302)', () => {
+		down(50, 50, shift);
+		move(450, 200, shift);
+		up(450, 200, shift);
+
+		expect(sent()).toHaveLength(1);
+		expect(sel()).toEqual([2, 2, '']);
+	});
+
+	test('a press released further away than Activation_Min is not a click, even before the lasso shows', () => {
+		down(50, 50, shift);
+		up(60, 50, shift);
+
+		expect(sel()).toEqual([2, 2, '']);
+	});
+
+	test('a Shift+click in a text field is left to the field', () => {
+		let input = document.createElement('input');
+		document.body.appendChild(input);
+
+		mouse('mousedown', { ...shift, clientX: 50, clientY: 50 }, input);
+		mouse('mouseup', { shiftKey: true, clientX: 50, clientY: 50 }, input);
+
+		expect(document.caretPositionFromPoint).not.toHaveBeenCalled();
+		expect(sel()).toEqual([2, 2, '']);
+	});
+
+	test('other activations leave the text selection alone: Ctrl+left click, Shift+right click', async () => {
+		await reload({ ActivateMouseButton: LMB, ActivateModifiers: 1 });
+		down(50, 50, { buttons: LMB, button: 0, ctrlKey: true });
+		up(50, 50, { ctrlKey: true });
+
+		await reload({ ActivateMouseButton: RMB, ActivateModifiers: 4 });
+		down(50, 50, { shiftKey: true });
+		up(50, 50, { shiftKey: true });
+
+		expect(document.caretPositionFromPoint).not.toHaveBeenCalled();
+		expect(sel()).toEqual([2, 2, '']);
+	});
+});
+
 describe('actions by greatest element type', () => {
 	test('lassoing checkboxes toggles them (all unchecked → all checked)', () => {
 		drag([80, 280], [240, 340]);
