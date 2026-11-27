@@ -348,7 +348,10 @@ class EventHandler {
 					 **/
 					if(this.SelectedElements)
 						this.ActionHandler.ActUpon(this.SelectedElements, e);
-				} else {pub(DragCompleted, { SelectedElements: [], e: e });}
+				} else {
+					this.ExtendSelectionOnShiftClick(e);	// Before DragCompleted, which clears the lasso's origin
+					pub(DragCompleted, { SelectedElements: [], e: e });
+				}
 				break;
 			case 'keydown':
 				if(!(e.mods & SHIFT && e.key == 'Escape'))
@@ -364,6 +367,51 @@ class EventHandler {
 
 //		if(document.releaseCapture)
 //			document.releaseCapture();
+	}
+
+	/**
+	 * With the left button activating, our preventDefault() on mousedown also stops the browser from extending the text
+	 * selection on a Shift+click (#361).  When the press ends where it started, extend the selection to that point
+	 * as the browser would have.  A drag still selects no text (#302).
+	 *
+	 * @param {MouseEvent} e    The mouseup that ended a press too small to activate
+	 */
+	ExtendSelectionOnShiftClick(e) {
+		if(!e.shiftKey || Prefs.ActivateMouseButton != LMB || e.target.closest?.('INPUT, TEXTAREA'))
+			return;
+
+		let origin = this.CurrentSelection.dims;
+		if(Math.max(Math.abs(window.scrollX + e.clientX - origin.originLeft), Math.abs(window.scrollY + e.clientY - origin.originTop)) > Prefs.Activation_Min)
+			return;
+
+		let node, offset;
+
+		if(document.caretPositionFromPoint) {
+			let pos = document.caretPositionFromPoint(e.clientX, e.clientY);
+
+			if(pos)
+				[node, offset] = [pos.offsetNode, pos.offset];
+		} else if(document.caretRangeFromPoint) {	// Chrome before 128
+			let range = document.caretRangeFromPoint(e.clientX, e.clientY);
+
+			if(range)
+				[node, offset] = [range.startContainer, range.startOffset];
+		}
+
+		// A text field has its own selection, which the page's selection can't extend into
+		let elem = node && (node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement);
+		if(!elem || elem.closest('INPUT, TEXTAREA') || getComputedStyle(elem).userSelect === 'none')
+			return;
+
+		let selection = window.getSelection();
+		try {
+			if(selection.rangeCount)
+				selection.extend(node, offset);
+			else
+				selection.collapse(node, offset);
+		} catch(err) {
+			// The point is somewhere the selection can't reach, such as inside a shadow root
+		}
 	}
 
 	/**
