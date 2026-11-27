@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Snap Links: hidden-input checkboxes (Shopee Seller Center / EDS style)</title>
+<style>
+	body { font: 14px/1.5 sans-serif; margin: 2em; }
+	h2 { margin-top: 2em; font-size: 16px; }
+	.row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #eee; }
+
+	/* Same structure and CSS approach as Shopee Seller Center's EDS checkbox:
+	   the real <input> is display:none, a <span> inside the <label> draws the box. */
+	.eds-checkbox { display: inline-flex; cursor: pointer; }
+	.eds-checkbox__input { display: none; }
+	.eds-checkbox__indicator {
+		width: 16px; height: 16px; box-sizing: border-box;
+		border: 1px solid #b7b7b7; border-radius: 2px; background: #fff;
+		display: inline-flex; align-items: center; justify-content: center;
+	}
+	.eds-checkbox__indicator svg { width: 12px; height: 12px; fill: #fff; visibility: hidden; }
+	.eds-checkbox__input:checked + .eds-checkbox__indicator { background: #ee4d2d; border-color: #ee4d2d; }
+	.eds-checkbox__input:checked + .eds-checkbox__indicator svg { visibility: visible; }
+</style>
+</head>
+<body>
+
+<h1>Hidden-input checkboxes</h1>
+<p>Right-drag over the checkbox column of each section.
+	Expected: both sections select checkboxes.
+	Actual (3.2.1): section A works, section B is not picked up.</p>
+
+<h2>A. Native checkboxes (works)</h2>
+<div class="row"><input type="checkbox"> <a href="#a1">Product A1</a></div>
+<div class="row"><input type="checkbox"> <a href="#a2">Product A2</a></div>
+<div class="row"><input type="checkbox"> <a href="#a3">Product A3</a></div>
+
+<h2>B. &lt;label&gt;&lt;input style="display:none"&gt;&lt;span&gt;&lt;/span&gt;&lt;/label&gt; (not picked up)</h2>
+<div class="row">
+	<label class="eds-checkbox"><input type="checkbox" class="eds-checkbox__input" name="b1"><span class="eds-checkbox__indicator"><svg viewBox="0 0 16 16"><path d="M6 11.4 2.6 8 1.5 9.1 6 13.6l8.5-8.5-1.1-1.1z"/></svg></span></label>
+	<a href="#b1">Product B1</a>
+</div>
+<div class="row">
+	<label class="eds-checkbox"><input type="checkbox" class="eds-checkbox__input" name="b2"><span class="eds-checkbox__indicator"><svg viewBox="0 0 16 16"><path d="M6 11.4 2.6 8 1.5 9.1 6 13.6l8.5-8.5-1.1-1.1z"/></svg></span></label>
+	<a href="#b2">Product B2</a>
+</div>
+<div class="row">
+	<label class="eds-checkbox"><input type="checkbox" class="eds-checkbox__input" name="b3"><span class="eds-checkbox__indicator"><svg viewBox="0 0 16 16"><path d="M6 11.4 2.6 8 1.5 9.1 6 13.6l8.5-8.5-1.1-1.1z"/></svg></span></label>
+	<a href="#b3">Product B3</a>
+</div>
+
+</body>
+</html>

@@ -242,6 +242,34 @@ describe('ElementIndexer', () => {
 			expect(els.inner).toBeDefined();
 		});
 
+		test('a checkbox whose center hits something inside its own label is not considered covered (#602)', () => {
+			// Shopee's EDS checkbox: the input is display: none, and a span inside the label draws the box
+			setup('<label id="lbl"><input id="cb" type="checkbox" style="display: none"><span id="box"></span></label>',
+				{ cb: [410, 10, 440, 40], lbl: [410, 10, 440, 40], box: [410, 10, 440, 40] },
+				{ obscuredBy: { cb: 'box' } });
+			indexer.UpdateIndex();
+
+			expect(ids(search(400, 0, 460, 60))).toEqual(['cb']);
+		});
+
+		test('the same through a <label for>: a hit on something inside it is not considered covered', () => {
+			setup('<input id="cb" type="checkbox"><label id="lbl" for="cb"><span id="box"></span></label>',
+				{ cb: [410, 10, 440, 40], lbl: [405, 5, 445, 50], box: [405, 5, 445, 50] },
+				{ obscuredBy: { cb: 'box' } });
+			indexer.UpdateIndex();
+
+			expect(ids(search(400, 0, 460, 60))).toEqual(['cb']);
+		});
+
+		test('a checkbox whose center hits something inside another element\'s label is still considered covered', () => {
+			setup('<input id="cb" type="checkbox"><label id="other"><span id="box"></span></label>',
+				{ cb: [410, 10, 440, 40], other: [405, 5, 445, 50], box: [405, 5, 445, 50] },
+				{ obscuredBy: { cb: 'box' } });
+			indexer.UpdateIndex();
+
+			expect(ids(search(400, 0, 460, 60))).toEqual([]);
+		});
+
 		test('a non-Rect argument yields an empty collection', () => {
 			setup(html, rects);
 
