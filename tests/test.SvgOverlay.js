@@ -81,7 +81,7 @@ describe('Highlight', () => {
 		let more = document.body.appendChild(Object.assign(document.createElement('button'), { textContent: 'Save' }));
 		place(more, [300, 0, 320, 40]);
 
-		run('(c) => pub(ElementsSelected, c)')(new (run('CategorizedCollection'))([els.a, more]));
+		run('(c) => pub(ElementsSelected, c)')(new(run('CategorizedCollection'))([els.a, more]));
 
 		expect(rects()).toEqual([[10, 10, 100, 20]]);
 	});
@@ -90,7 +90,7 @@ describe('Highlight', () => {
 		let again = document.body.appendChild(Object.assign(document.createElement('a'), { href: '/a' }));
 		place(again, [300, 0, 320, 40]);
 
-		run('(c) => pub(ElementsSelected, c)')(new (run('CategorizedCollection'))([els.a, again, els.c]));
+		run('(c) => pub(ElementsSelected, c)')(new(run('CategorizedCollection'))([els.a, again, els.c]));
 
 		expect(rects()).toEqual([[10, 10, 100, 20], [0, 200, 50, 20]]);
 	});
