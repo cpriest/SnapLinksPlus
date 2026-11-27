@@ -85,7 +85,9 @@ jobs:
           node-version: 22.x
           cache: npm
 
+      # bash stops at the first failing command; the default pwsh would report only the last one's exit code
       - name: npm install, lint and test
+        shell: bash
         run: |
           npm ci
           npm run lint
