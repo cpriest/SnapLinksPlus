@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Links next to page controls: menus, toggles, icon buttons (#282)</title>
+	<style>
+		body { font: 14px sans-serif; margin: 20px 20px 80px; background: #fafafa; }
+		h2 { font-size: 18px; margin: 28px 0 6px; }
+		p.how { margin: 0 0 10px; color: #444; }
+		button { font: 500 14px sans-serif; }
+		.icon { width: 32px; height: 32px; padding: 4px; border: 0; border-radius: 50%; background: #e4e4e4; }
+		.icon svg { width: 20px; height: 20px; }
+
+		.cards { display: flex; flex-wrap: wrap; gap: 16px; }
+		.card { width: 200px; }
+		.thumb { display: block; position: relative; font-size: 10px; }
+		.thumb img { display: block; width: 200px; height: 112px; border-radius: 8px; }
+		.thumb span { position: absolute; right: 6px; bottom: 6px; padding: 1px 4px; background: #000c; color: #fff; }
+		.meta { display: flex; align-items: flex-start; gap: 4px; margin-top: 6px; }
+		.meta > div { flex: 1; }
+		.title { font: 500 16px sans-serif; color: #111; text-decoration: none; }
+		.channel { font-size: 12px; color: #666; }
+
+		.story { display: flex; gap: 10px; margin: 8px 0; }
+		.story img { width: 70px; height: 50px; }
+		.story .title { font-size: 16px; }
+		.domain, .tagline, .actions a { font-size: 11px; color: #777; }
+		.actions a { margin-right: 6px; font-weight: bold; }
+
+		.ranked { font: 13px Verdana, sans-serif; }
+		.ranked td { padding: 2px 4px; vertical-align: top; }
+		.arrow { display: block; width: 0; height: 0; margin-top: 3px; border: 5px solid transparent; border-bottom: 8px solid #999; }
+		.ranked .sub, .ranked .sub a { font-size: 9px; color: #828282; }
+
+		.rows label { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+
+		#log { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 20px; background: #222; color: #fff; font: 14px monospace; }
+	</style>
+</head>
+<body>
+<p>Lasso across each section. The bar at the bottom lists every button or script link that gets clicked; with this fix it stays empty
+	unless you lasso the buttons-only row. The boxes drawn during the lasso should match the counter.</p>
+
+<h2>1. Video cards</h2>
+<p class="how">Expected: 6 Links (the titles). Never the &#8942; menu buttons, the Like toggles or the thumbnails' duplicates.</p>
+<div class="cards" id="cards"></div>
+
+<h2>2. Story list with script links (#282)</h2>
+<p class="how">Expected: the story links. Never share / save / hide / report (javascript: and href="#" links).</p>
+<div id="stories"></div>
+
+<h2>3. Ranked list with vote arrows</h2>
+<p class="how">Expected: the 5 titles. Never the vote arrows (links that show no text).</p>
+<table class="ranked" id="ranked"></table>
+
+<h2>4. Checkboxes with row buttons</h2>
+<p class="how">Expected: 4 Checkboxes. The Edit buttons and &#8942; menus are not clicked.</p>
+<div class="rows" id="rows"></div>
+
+<h2>5. Buttons only</h2>
+<p class="how">Expected: 3 Clickable. A lasso that holds only buttons with text still clicks them.</p>
+<div id="only"><button>Load part 1</button> <button>Load part 2</button> <button>Load part 3</button>
+	<button class="icon" aria-label="Close"><svg viewBox="0 0 20 20"><path d="M4 4l12 12M16 4L4 16" stroke="#333" stroke-width="2"/></svg></button></div>
+
+<div id="log">Clicked: (nothing yet)</div>
+
+<script>
+	const dots = '<svg viewBox="0 0 20 20"><circle cx="10" cy="4" r="2"/><circle cx="10" cy="10" r="2"/><circle cx="10" cy="16" r="2"/></svg>',
+		  thumb = hue => 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="200" height="112"><rect width="200" height="112" fill="hsl(${hue},45%,60%)"/></svg>`);
+
+	for(let i = 1; i <= 6; i++) {
+		document.getElementById('cards').insertAdjacentHTML('beforeend', `
+			<div class="card">
+				<a class="thumb" href="https://example.com/watch?v=${i}" aria-hidden="true" tabindex="-1"><img src="${thumb(i * 50)}" alt=""><span>1${i}:0${i}</span></a>
+				<div class="meta">
+					<div>
+						<a class="title" href="https://example.com/watch?v=${i}">Video number ${i}</a><br>
+						<a class="channel" href="https://example.com/@channel">Some channel</a>
+					</div>
+					<button class="icon" aria-label="More actions">${dots}</button>
+				</div>
+				<button aria-pressed="false" aria-label="Like this video">&#128077; 1.${i}K</button>
+				<button aria-haspopup="dialog">Save</button>
+			</div>`);
+	}
+
+	for(let i = 1; i <= 5; i++) {
+		document.getElementById('stories').insertAdjacentHTML('beforeend', `
+			<div class="story">
+				<a href="https://example.org/deal/${i}"><img src="${thumb(i * 70)}" alt=""></a>
+				<div>
+					<a class="title" href="https://example.org/deal/${i}">Deal number ${i}: a monitor for less</a> <span class="domain">(example.org)</span><br>
+					<span class="tagline">submitted 3 hours ago by someone</span><br>
+					<span class="actions"><a href="https://example.com/r/deals/comments/${i}">12 comments</a><a href="javascript:void(0)">share</a><a href="#">save</a><a href="javascript:void(0)">hide</a><a href="javascript:void(0)">report</a></span>
+				</div>
+			</div>`);
+	}
+
+	for(let i = 1; i <= 5; i++) {
+		document.getElementById('ranked').insertAdjacentHTML('beforeend', `
+			<tr><td>${i}.</td><td><a href="https://example.com/vote?id=${i}&amp;how=up"><div class="arrow" title="upvote"></div></a></td>
+				<td><a href="https://example.net/article/${i}">Article number ${i} about something</a>
+					<div class="sub">120 points | <a href="https://example.com/hide?id=${i}">hide</a> | <a href="https://example.com/item?id=${i}">40 comments</a></div></td></tr>`);
+	}
+
+	for(let i = 1; i <= 4; i++) {
+		document.getElementById('rows').insertAdjacentHTML('beforeend', `
+			<label><input type="checkbox"> File number ${i} <button>Edit</button> <button class="icon" aria-label="Options" aria-haspopup="menu">${dots}</button></label>`);
+	}
+
+	let clicked = [];
+	document.addEventListener('click', e => {
+		let el = e.target.closest('button, a');
+		if(!el || (el.tagName == 'A' && !/^(javascript:|#)/.test(el.getAttribute('href'))))
+			return;
+		if(el.getAttribute('href') == '#')
+			e.preventDefault();
+		clicked.push((el.getAttribute('aria-label') || el.textContent).trim());
+		document.getElementById('log').textContent = 'Clicked: ' + clicked.join(', ');
+	}, true);
+</script>
+</body>
+</html>

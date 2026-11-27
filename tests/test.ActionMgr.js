@@ -86,7 +86,7 @@ describe('ActUpon links', () => {
 		expect(browser.runtime.sendMessage.mock.calls[0][0].tUrls).toEqual(['https://a.test/x?utm_source=feed', 'https://a.test/y']);
 	});
 
-	test('copying sends the text of the first link to each URL as its title', () => {
+	test('copying sends the title of the link to each URL that shows the most text', () => {
 		let selected = [
 			{ href: 'http://a/', innerText: '  Article\n  title ' },
 			{ href: 'http://b/', innerText: '', getAttribute: (name) => name === 'title' ? 'Tooltip' : null },
@@ -102,6 +102,22 @@ describe('ActUpon links', () => {
 			tUrls:   ['http://a/', 'http://b/', 'http://c/', 'http://d/'],
 			tTitles: ['Article title', 'Tooltip', 'Logo', ''],
 		});
+	});
+
+	test('the title of a video is its title link, not the duration shown on its thumbnail link', () => {
+		let selected = [{ href: 'http://v/1', innerText: '12:34' }, { href: 'http://v/1', innerText: 'Video one' }];
+
+		actions.ActUpon(collection(run('CT_LINKS'), { Links: selected }), { ctrlKey: true });
+
+		expect(browser.runtime.sendMessage.mock.calls[0][0].tTitles).toEqual(['Video one']);
+	});
+
+	test('a link that shows text wins over a longer tooltip of a link that shows none', () => {
+		let thumb = { href: 'http://v/1', innerText: '', getAttribute: (name) => name === 'title' ? 'A much longer tooltip' : null };
+
+		actions.ActUpon(collection(run('CT_LINKS'), { Links: [thumb, { href: 'http://v/1', innerText: 'Hi' }] }), { ctrlKey: true });
+
+		expect(browser.runtime.sendMessage.mock.calls[0][0].tTitles).toEqual(['Hi']);
 	});
 
 	test.each([

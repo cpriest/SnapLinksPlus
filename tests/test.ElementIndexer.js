@@ -233,7 +233,7 @@ describe('ElementIndexer', () => {
 		});
 
 		test('an element whose center is a descendant of itself, or a label, is not considered covered', () => {
-			let els = setup('<a id="a" href="/1"><span id="inner"></span></a><input id="cb" type="checkbox"><label id="lbl" for="cb"></label>',
+			let els = setup('<a id="a" href="/1"><span id="inner">1</span></a><input id="cb" type="checkbox"><label id="lbl" for="cb"></label>',
 				{ a: [10, 10, 40, 110], cb: [210, 10, 240, 40], lbl: [210, 10, 240, 40] },
 				{ obscuredBy: { a: 'inner', cb: 'lbl' } });
 			indexer.UpdateIndex();

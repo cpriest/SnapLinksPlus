@@ -117,7 +117,9 @@ describe('link counter', () => {
 		['only radio buttons', '<input id="r1" type="radio"><input id="r2" type="radio">', '2 Radio Buttons'],
 		['more checkboxes than links', '<a id="a" href="/a"></a><input id="c1" type="checkbox"><input id="c2" type="checkbox">', '2 Checkboxes'],
 		['more links than checkboxes', '<a id="a" href="/a"></a><a id="b" href="/b"></a><input id="c1" type="checkbox">', '2 Links'],
-		['mostly buttons', '<button id="b1"></button><button id="b2"></button><input id="c1" type="checkbox">', '2 Clickable'],
+		['only buttons', '<button id="b1">Save</button><button id="b2">Share</button>', '2 Clickable'],
+		['more buttons than checkboxes (#282)', '<button id="b1">Save</button><button id="b2">Share</button><input id="c1" type="checkbox">', '1 Checkboxes'],
+		['more buttons than links (#282)', '<button id="b1">Save</button><button id="b2">Share</button><a id="a" href="/a"></a>', '1 Links'],
 		['links to one page outnumbering checkboxes', '<a id="a" href="/a"></a><a id="b" href="/a"></a><a id="c" href="/a"></a><input id="c1" type="checkbox"><input id="c2" type="checkbox">', '1 Links'],
 	])('counts the greatest category, which the action acts upon (#416): %s', (_label, html, expected) => {
 		selectMarkup(html);
