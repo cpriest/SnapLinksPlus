@@ -28,8 +28,8 @@
 		"webextension-polyfill": "^0.12.0"
 	},
 	"scripts": {
-		"lint": "eslint src/",
-		"lint-fix": "eslint --fix src/",
+		"lint": "eslint .",
+		"lint-fix": "eslint --fix .",
 		"test": "jest",
 		"build": "gulp",
 		"run-ff": "node scripts/run-browser.mjs firefox",

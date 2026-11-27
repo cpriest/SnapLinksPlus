@@ -103,7 +103,8 @@ describe('markup matches the code', () => {
 	});
 
 	test('DefaultAction options are OPEN_LINKS, COPY_LINKS, OPEN_IN_WINDOW, BOOKMARK_LINKS and OPEN_IN_SEPARATE_WINDOWS', () => {
-		expect(Array.from(el('DefaultAction').options).map(o => Number(o.value)).sort()).toEqual([run('OPEN_LINKS'), run('COPY_LINKS'), run('OPEN_IN_WINDOW'), run('BOOKMARK_LINKS'), run('OPEN_IN_SEPARATE_WINDOWS')].sort());
+		let expected = [run('OPEN_LINKS'), run('COPY_LINKS'), run('OPEN_IN_WINDOW'), run('BOOKMARK_LINKS'), run('OPEN_IN_SEPARATE_WINDOWS')];
+		expect(Array.from(el('DefaultAction').options).map(o => Number(o.value)).sort()).toEqual(expected.sort());
 	});
 
 	test('OpenTabs options are the three TABS_OPEN_* constants', () => {
@@ -335,9 +336,9 @@ describe('bookmarks permission (#216)', () => {
 describe('access to all websites (Manifest V3)', () => {
 	let allSites, onAdded;
 	const permissions = () => ({
-		contains: jest.fn(async (perm) => (perm.origins ? allSites : true)),
-		request:  jest.fn(async () => (allSites = true)),
-		onAdded:  { addListener: (fn) => { onAdded = fn; } },
+		contains:  jest.fn(async (perm) => (perm.origins ? allSites : true)),
+		request:   jest.fn(async () => (allSites = true)),
+		onAdded:   { addListener: (fn) => { onAdded = fn; } },
 		onRemoved: { addListener: jest.fn() },
 	});
 	const settle = async () => { for(let i = 0; i < 5; i++) await Promise.resolve(); };

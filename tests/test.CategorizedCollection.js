@@ -25,7 +25,7 @@ beforeEach(() => {
 	run('Prefs = { DevMode: false, DisableFontWeightFiltering: true }');
 	run('LastModifierKeys = 0');
 
-	make       = (elems) => new (run('CategorizedCollection'))(elems);
+	make       = (elems) => new(run('CategorizedCollection'))(elems);
 	ElementsOf = (list) => list.map(el => el.id);
 });
 

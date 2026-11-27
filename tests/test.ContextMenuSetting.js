@@ -36,17 +36,17 @@ function createBackgroundTestHarness({
 		onChanged: { addListener: listener => storageListeners.push(listener) },
 	};
 	const context = vm.createContext({
-		isFirefox:         firefox,
-		RMB:               RIGHT_MOUSE_BUTTON,
-		_:                 undefined,
-		BACKGROUND_TEST:   'BackgroundTest',
-		RELOAD_EXTENSION:  'ReloadExtension',
-		OPEN_URLS_IN_TABS: 'OpenUrlsInTabs',
-		OPEN_URLS_IN_WINDOW: 'OpenUrlsInWindow',
+		isFirefox:                     firefox,
+		RMB:                           RIGHT_MOUSE_BUTTON,
+		_:                             undefined,
+		BACKGROUND_TEST:               'BackgroundTest',
+		RELOAD_EXTENSION:              'ReloadExtension',
+		OPEN_URLS_IN_TABS:             'OpenUrlsInTabs',
+		OPEN_URLS_IN_WINDOW:           'OpenUrlsInWindow',
 		OPEN_URLS_IN_SEPARATE_WINDOWS: 'OpenUrlsInSeparateWindows',
-		COPY_TO_CLIPBOARD: 'CopyToClipboard',
-		BOOKMARK_LINKS_IN_FOLDER: 'BookmarkLinksInFolder',
-		Prefs:             {
+		COPY_TO_CLIPBOARD:             'CopyToClipboard',
+		BOOKMARK_LINKS_IN_FOLDER:      'BookmarkLinksInFolder',
+		Prefs:                         {
 			...preferences,
 			Ready:     preferencesReady,
 			onChanged: callback => { observer = callback; },

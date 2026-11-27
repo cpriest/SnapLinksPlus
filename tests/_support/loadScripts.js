@@ -27,7 +27,7 @@ function makeStorageArea(initial = {}) {
 				return { ...data };
 			return key in data ? { [key]: data[key] } : {};
 		}),
-		set: jest.fn(async (items) => { Object.assign(data, items); }),
+		set:    jest.fn(async (items) => { Object.assign(data, items); }),
 		remove: jest.fn(async (key) => { delete data[key]; }),
 	};
 }
@@ -46,7 +46,7 @@ function makeBrowser({ local, sync } = {}) {
 			onChanged: { addListener: (fn) => changeListeners.push(fn) },
 		},
 		// Like the real API, sendMessage returns a Promise; resolving undefined leaves Linux drag recovery (#580) off
-		runtime: { sendMessage: jest.fn(async () => undefined), onMessage: { addListener: jest.fn() } },
+		runtime:            { sendMessage: jest.fn(async () => undefined), onMessage: { addListener: jest.fn() } },
 		/** Simulates the browser notifying every storage.onChanged listener */
 		fireStorageChanged: (changes, area) => changeListeners.forEach(fn => fn(changes, area)),
 	};
@@ -98,7 +98,7 @@ function installSelectorShim() {
 			if(proto[name].shimmed)
 				continue;
 			let original = proto[name];
-			proto[name]  = Object.assign(function(selector, ...rest) { return original.call(this, fix(selector), ...rest); }, { shimmed: true });
+			proto[name]  = Object.assign(function (selector, ...rest) { return original.call(this, fix(selector), ...rest); }, { shimmed: true });
 		}
 	}
 }

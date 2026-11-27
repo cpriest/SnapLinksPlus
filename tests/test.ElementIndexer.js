@@ -29,7 +29,7 @@ describe('RectMapper', () => {
 	let mapper;
 
 	beforeEach(() => {
-		mapper = new (run('RectMapper'))();
+		mapper = new(run('RectMapper'))();
 	});
 
 	describe('GetElementRects', () => {
@@ -166,7 +166,7 @@ describe('ElementIndexer', () => {
 
 		run('ElemDocRects = new RectMapper()');
 		run('SvgOverlay = { AddRect() {}, AddPoint() {}, AddIndexBoundaryMark() {}, Release() {} }');
-		indexer = new (run('ElementIndexer'))();
+		indexer = new(run('ElementIndexer'))();
 
 		return els;
 	};

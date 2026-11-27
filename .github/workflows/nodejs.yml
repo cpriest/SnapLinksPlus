@@ -68,8 +68,8 @@ jobs:
           retention-days: 30
 
   # The unit tests on Windows, where most users are: path handling in the tests and the gulp
-  # build differ there (test.Build.js runs gulp through node for that reason). No lint: the
-  # Windows checkout has CRLF line endings, which the linebreak-style rule rejects.
+  # build differ there (test.Build.js runs gulp through node for that reason). The lint runs here
+  # too: .gitattributes gives the Windows checkout the same LF line endings as Linux.
   test-windows:
     name: Unit tests on Windows
     runs-on: windows-latest
@@ -85,9 +85,10 @@ jobs:
           node-version: 22.x
           cache: npm
 
-      - name: npm install and test
+      - name: npm install, lint and test
         run: |
           npm ci
+          npm run lint
           npm test
         env:
           CI: true

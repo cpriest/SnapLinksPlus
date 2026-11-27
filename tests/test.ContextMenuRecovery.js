@@ -277,7 +277,7 @@ function createFrameMessageRouter() {
 			},
 			notifications: { onClicked: { addListener: jest.fn() } },
 			storage:       { onChanged: { addListener: jest.fn() } },
-			tabs: {
+			tabs:          {
 				sendMessage: jest.fn(async (tabId, message) => {
 					for(const frame of frames)
 						if(frame.tabId == tabId)
