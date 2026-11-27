@@ -27,7 +27,7 @@ beforeEach(async () => {
 	published = [];
 	run('(log) => { sub(DragRectChanged, d => log.push({ ...d, dims: { ...d.dims } })); }')(published);
 
-	selection = new (run('SelectionRect'))();
+	selection = new(run('SelectionRect'))();
 });
 
 afterEach(() => cleanup());
@@ -43,7 +43,7 @@ describe('construction', () => {
 		let announced = [];
 		run('(log) => { sub(ContainerElementCreated, c => log.push(c)); }')(announced);
 
-		let second = new (run('SelectionRect'))();
+		let second = new(run('SelectionRect'))();
 
 		expect(announced).toEqual([second.elContainer]);
 	});
@@ -103,7 +103,7 @@ describe('link counter', () => {
 	/** Selects a CategorizedCollection of the given markup, ALT held so font weight filtering (which needs layout) is skipped */
 	const selectMarkup = (html) => {
 		run('LastModifierKeys = ALT');
-		run('(c) => pub(ElementsSelected, c)')(new (run('CategorizedCollection'))(Object.values(build(html))));
+		run('(c) => pub(ElementsSelected, c)')(new(run('CategorizedCollection'))(Object.values(build(html))));
 	};
 
 	test('counts distinct hrefs', () => {
@@ -112,6 +112,7 @@ describe('link counter', () => {
 		expect(label().textContent).toBe('2 Links');
 	});
 
+	/* eslint-disable max-len -- one line of markup per case */
 	test.each([
 		['only checkboxes', '<input id="c1" type="checkbox"><input id="c2" type="checkbox"><input id="c3" type="checkbox">', '3 Checkboxes'],
 		['only radio buttons', '<input id="r1" type="radio"><input id="r2" type="radio">', '2 Radio Buttons'],
@@ -124,6 +125,7 @@ describe('link counter', () => {
 
 		expect(label().textContent).toBe(expected);
 	});
+	/* eslint-enable max-len */
 
 	test.each([
 		[true, '1 Links'],
@@ -192,7 +194,7 @@ describe('site CSS resets (#567)', () => {
 		siteStyle.textContent = 'html { background-color: #fefefe; } *, *::before, *::after { background-color: inherit; }';
 		document.head.appendChild(siteStyle);
 
-		let second = new (run('SelectionRect'))();
+		let second = new(run('SelectionRect'))();
 		second.SetOrigin(100, 200).SetBottomRight(300, 500);
 
 		expect(getComputedStyle(second.elRect).backgroundColor).toBe('rgba(0, 0, 0, 0)');

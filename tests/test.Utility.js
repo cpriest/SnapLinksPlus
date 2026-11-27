@@ -10,7 +10,7 @@ test('RateReporter fills in its ${...} placeholders without evaluating code (blo
 	let logged = [];
 	run('(log) => { console.log = (...args) => log.push(args); }')(logged);
 
-	new (run('RateReporter'))('Found ${Count} Elements in ${Elapsed} (${PerSecond}), ${Other} stays').report(5);
+	new(run('RateReporter'))('Found ${Count} Elements in ${Elapsed} (${PerSecond}), ${Other} stays').report(5);
 
 	expect(logged).toHaveLength(1);
 	expect(logged[0][0]).toMatch(/^Found 5 Elements in \d+(ms|(\.\d+)?s) \((\d+(\.\d+)?|Infinity)\/s\), \$\{Other\} stays$/);

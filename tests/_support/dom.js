@@ -59,7 +59,7 @@ function trackListeners() {
 		restores = [EventTarget.prototype, window].map(owner => {
 			let original = owner.addEventListener;
 
-			owner.addEventListener = function(type, fn, options) {
+			owner.addEventListener = function (type, fn, options) {
 				added.push([this, type, fn, options]);
 				return original.call(this, type, fn, options);
 			};

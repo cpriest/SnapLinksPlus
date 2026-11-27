@@ -1,0 +1,9 @@
+# Text files are checked out with LF on every platform, as .editorconfig and ESLint's linebreak-style expect.
+* text=auto eol=lf
+
+*.png binary
+*.gif binary
+*.jpg binary
+*.ico binary
+*.xpi binary
+*.zip binary

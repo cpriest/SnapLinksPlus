@@ -25,9 +25,9 @@ function makeTabStrip() {
 	return {
 		tabs,
 		/** URLs in strip order, tabs that were pre-existing show as their id */
-		order:  () => tabs.map(t => t.url || `#${t.id}`),
+		order:    () => tabs.map(t => t.url || `#${t.id}`),
 		closeUrl: (url) => { tabs.splice(tabs.findIndex(t => t.url === url), 1); renumber(); },
-		api:    {
+		api:      {
 			query:  jest.fn(async (q) => q.active ? tabs.filter(t => t.active) : tabs.slice()),
 			get:    jest.fn(async (id) => {
 				let tab = tabs.find(t => t.id === id);
@@ -53,8 +53,13 @@ let platformOs;
 
 /** Replaces the storage-backed Prefs so each test controls exactly what background.js sees */
 const setPrefs = (overrides = {}) => run('(p) => { Prefs = p; }')({
-	OpenTabs: run('TABS_OPEN_NATURAL'), SwitchFocusToNewTab: true, NewTabDelayMS: 0, SetOwnershipTabID_FF: false, NewTabsOpenUnloaded: false,
-	SingleOpenQueue: false, ...overrides,
+	OpenTabs:             run('TABS_OPEN_NATURAL'),
+	SwitchFocusToNewTab:  true,
+	NewTabDelayMS:        0,
+	SetOwnershipTabID_FF: false,
+	NewTabsOpenUnloaded:  false,
+	SingleOpenQueue:      false,
+	...overrides,
 });
 
 /**
@@ -65,8 +70,8 @@ const load = async (globals = {}, stores = undefined) => {
 	strip   = makeTabStrip();
 	browser = {
 		...makeBrowser(stores),
-		tabs:          strip.api,
-		notifications: { create: jest.fn(async () => 'n'), onClicked: { addListener: jest.fn() } },
+		tabs:            strip.api,
+		notifications:   { create: jest.fn(async () => 'n'), onClicked: { addListener: jest.fn() } },
 		browserSettings: {
 			contextMenuShowEvent: {
 				get:   jest.fn(async () => ({ value: 'mousedown', levelOfControl: 'controllable_by_this_extension' })),

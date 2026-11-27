@@ -8,7 +8,10 @@
 const { loadScriptsInDom }                  = require('./_support/loadScripts');
 const { place, build, stubEmptyLayout, trackListeners } = require('./_support/dom');
 
-const Scripts = ['StoragePrefs.js', 'CSP.js', 'globals.js', 'content-scripts/Utility.js', 'content-scripts/SelectionRect.js', 'content-scripts/ElementIndexer.js', 'content-scripts/SvgOverlay.js', 'content-scripts/CategorizedCollection.js'];
+const Scripts = [
+	'StoragePrefs.js', 'CSP.js', 'globals.js', 'content-scripts/Utility.js', 'content-scripts/SelectionRect.js',
+	'content-scripts/ElementIndexer.js', 'content-scripts/SvgOverlay.js', 'content-scripts/CategorizedCollection.js',
+];
 
 let run, overlay, container, els, cleanup;
 
@@ -31,7 +34,7 @@ beforeEach(async () => {
 	place(els.c, [200, 0, 220, 50]);
 
 	run('ElemDocRects = new RectMapper()');
-	overlay   = new (run('SvgOverlayMgr'))();
+	overlay   = new(run('SvgOverlayMgr'))();
 	container = document.createElement('div');
 });
 
@@ -42,7 +45,7 @@ const init = () => {
 	run('(c) => pub(ContainerElementCreated, c)')(container);
 };
 
-const select = (...ids) => run('(c) => pub(ElementsSelected, c)')(new (run('CategorizedCollection'))(ids.map(id => els[id])));
+const select = (...ids) => run('(c) => pub(ElementsSelected, c)')(new(run('CategorizedCollection'))(ids.map(id => els[id])));
 
 describe('initialization', () => {
 	test('creates its SVG layer inside the container once the container is announced', () => {
@@ -63,7 +66,7 @@ describe('initialization', () => {
 	});
 
 	test('highlighting before the container exists is harmless', () => {
-		expect(() => overlay.Highlight(new (run('CategorizedCollection'))([els.a]))).not.toThrow();
+		expect(() => overlay.Highlight(new(run('CategorizedCollection'))([els.a]))).not.toThrow();
 	});
 });
 

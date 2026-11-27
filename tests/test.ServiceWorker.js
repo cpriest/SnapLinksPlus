@@ -42,8 +42,8 @@ function startWorker({ manifest = { commands: {} }, stores } = {}) {
 
 	ctx = vm.createContext({
 		browser, chrome,
-		location:  { protocol: 'chrome-extension:' },
-		navigator: {},			// A worker's navigator has no clipboard
+		location:      { protocol: 'chrome-extension:' },
+		navigator:     {},			// A worker's navigator has no clipboard
 		setTimeout, clearTimeout, setInterval, clearInterval,
 		importScripts: (...files) => {
 			for(let file of files) {

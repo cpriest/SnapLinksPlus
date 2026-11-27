@@ -25,7 +25,7 @@ const checkbox = (checked) => ({ checked, click: jest.fn() });
 beforeEach(async () => {
 	({ run, browser } = loadScripts(Scripts, undefined, { URL, URLSearchParams }));
 	await run('DOMReady');
-	actions = new (run('ActionMgr'))();
+	actions = new(run('ActionMgr'))();
 	setPrefs();
 });
 

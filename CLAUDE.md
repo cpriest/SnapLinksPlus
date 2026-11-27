@@ -8,7 +8,7 @@ Snap Links Plus: a Manifest V3 WebExtension (Firefox primary, Chrome secondary).
 
 ```bash
 npm test            # jest, ~1s, tests/ only
-npm run lint        # eslint src/ (currently clean; keep it that way)
+npm run lint        # eslint . (the whole repository, build output ignored; currently clean, keep it that way)
 npm run lint-fix
 npm run build       # gulp: build/ff/ and build/chrome/
 npx gulp watch      # DevBuild: includes Dev* files, rebuilds on change

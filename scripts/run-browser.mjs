@@ -45,7 +45,12 @@ if(Args.includes('--windows') && process.platform == 'linux') {
 	let windowsPath = file => execFileSync('wslpath', ['-w', file], { encoding: 'utf8' }).trim(),
 		child       = spawn(nodeExe, [windowsPath(fileURLToPath(import.meta.url)), ...Args.filter(arg => arg != '--windows')], {
 			cwd:      ProjectDir,
-			env:      { ...process.env, WATCHPACK_POLLING: '500', RUN_BROWSER_STDIN_STOPS: '1', WSLENV: [process.env.WSLENV, 'WATCHPACK_POLLING', 'RUN_BROWSER_STDIN_STOPS'].filter(Boolean).join(':') },
+			env:      {
+				...process.env,
+				WATCHPACK_POLLING:       '500',
+				RUN_BROWSER_STDIN_STOPS: '1',
+				WSLENV:                  [process.env.WSLENV, 'WATCHPACK_POLLING', 'RUN_BROWSER_STDIN_STOPS'].filter(Boolean).join(':'),
+			},
 			stdio:    ['pipe', 'inherit', 'inherit'],
 			detached: true,
 		});
@@ -165,8 +170,8 @@ const MaxRetries    = 250,	// ~30s, matching web-ext's own limit
  * @param {string} profile    The profile directory
  */
 function closeProfileProcesses(profile) {
-	let command = `Get-CimInstance Win32_Process | Where-Object { $_.ProcessId -ne $PID -and $_.CommandLine -and $_.CommandLine.Contains('${profile.replaceAll("'", "''")}') }`
-		+ ' | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }';
+	let command = `Get-CimInstance Win32_Process | Where-Object { $_.ProcessId -ne $PID -and $_.CommandLine -and $_.CommandLine.Contains('${profile.replaceAll("'", "''")}') }` +
+		' | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }';
 
 	try {
 		execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', command], { stdio: 'ignore' });
@@ -185,8 +190,9 @@ async function firefoxClient({ port }) {
 			return await connect(port);
 		} catch(error) {
 			if(!['ECONNREFUSED', 'ECONNRESET'].includes(error.code) || attempt >= MaxRetries)
-				throw new Error(`Could not connect to the Firefox debugger on 127.0.0.1:${port} after ${attempt + 1} attempts: ${error.message}. `
-					+ `Run 'npm run run-ff -- --verbose' to see Firefox's own output. If Firefox never opened a window, check that it can reach a display (DISPLAY=${process.env.DISPLAY || '<unset>'}, WAYLAND_DISPLAY=${process.env.WAYLAND_DISPLAY || '<unset>'}).`, { cause: error });
+				throw new Error(`Could not connect to the Firefox debugger on 127.0.0.1:${port} after ${attempt + 1} attempts: ${error.message}. ` +
+					`Run 'npm run run-ff -- --verbose' to see Firefox's own output. If Firefox never opened a window, check that it can reach a display ` +
+					`(DISPLAY=${process.env.DISPLAY || '<unset>'}, WAYLAND_DISPLAY=${process.env.WAYLAND_DISPLAY || '<unset>'}).`, { cause: error });
 			await new Promise(resolve => setTimeout(resolve, RetryInterval));
 		}
 	}
